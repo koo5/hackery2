@@ -1,0 +1,51 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary project-path
+#
+# See:
+#    https://pypi.python.org/pypi/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=project-path/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+
+    appveyor:                  'no'
+    c_extension_cython:        'no'
+    c_extension_optional:      'no'
+    c_extension_support:       'no'
+    codacy:                    'no'
+    codeclimate:               'no'
+    codecov:                   'no'
+    command_line_interface:    'click'
+    command_line_interface_bin_name: 'hackery2'
+    coveralls:                 'no'
+    distribution_name:         'hackery2'
+    email:                     'contact@ionelmc.ro'
+    full_name:                 'Ionel Cristian Maries'
+    github_username:           'koo5'
+    landscape:                 'no'
+    license:                   'BSD license'
+    linter:                    'flake8'
+    package_name:              'hackery2'
+    project_name:              'hackery2'
+    project_short_description: 'my bin files and various utils and nonsense stuff'
+    release_date:              'today'
+    repo_name:                 'hackery2'
+    requiresio:                'yes'
+    scrutinizer:               'no'
+    sphinx_doctest:            'no'
+    sphinx_theme:              'sphinx-py3doc-enhanced-theme'
+    test_matrix_configurator:  'no'
+    test_matrix_separate_coverage: 'no'
+    test_runner:               'pytest'
+    travis:                    'no'
+    version:                   '0.1.0'
+    website:                   'https://blog.ionelmc.ro'
+    year:                      'now'
