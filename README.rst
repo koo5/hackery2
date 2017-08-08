@@ -57,6 +57,7 @@ Installation
 ::
 
     pip install hackery2
+sudo pip3 install  dateutils
 
 Documentation
 =============

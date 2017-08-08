@@ -66,6 +66,7 @@ setup(
     ],
     install_requires=[
         'click',
+        'dateutils'
     ],
     extras_require={
         # eg:
