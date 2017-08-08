@@ -25,14 +25,13 @@ def read(*names, **kwargs):
 setup(
     name='hackery2',
     version='0.1.0',
-    license='BSD license',
+    license='AGPLv3',
     description='my bin files and various utils and nonsense stuff',
     long_description='%s\n%s' % (
         re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
-    author='Ionel Cristian Maries',
-    author_email='contact@ionelmc.ro',
+    author='Jindrich Kolman',
     url='https://github.com/koo5/hackery2',
     packages=find_packages('src'),
     package_dir={'': 'src'},
@@ -43,7 +42,7 @@ setup(
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
         'Operating System :: Unix',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
@@ -63,7 +62,7 @@ setup(
         'Topic :: Utilities',
     ],
     keywords=[
-        # eg: 'keyword1', 'keyword2', 'keyword3',
+        # eg: 'area', 'monitors', 'resolution', 'power save', 'killall', 'colemak', 'remap', 'git utils',
     ],
     install_requires=[
         'click',
