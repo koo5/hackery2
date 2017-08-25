@@ -62,7 +62,7 @@ setup(
         'Topic :: Utilities',
     ],
     keywords=[
-        # eg: 'area', 'monitors', 'resolution', 'power save', 'killall', 'colemak', 'remap', 'git utils',
+        'area', 'monitors', 'resolution', 'power save', 'killall', 'colemak', 'remap', 'git utils',
     ],
     install_requires=[
         'click',
