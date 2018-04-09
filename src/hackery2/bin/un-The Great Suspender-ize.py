@@ -11,6 +11,7 @@ for l in open(sys.argv[1]):
 		#print(l)
 		print (l2)
 		#from IPython import embed; embed()
+		continue
 	start = """chrome-extension://klbibkeccnjlkjkiokjodocebajanakg/suspended.html#uri="""
 	if start in l:
 		start_pos = l.find(start)
@@ -18,9 +19,7 @@ for l in open(sys.argv[1]):
 		#print(l)
 		print (l2)
 		#from IPython import embed; embed()
-
+		continue
 	else:
 		print (l)
-		
-
 #print (c)
