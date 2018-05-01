@@ -77,19 +77,19 @@ else:
 		if not res:
 			print "I can pretty safely say that there were no results."
 		else:
+			sans_first = res[1:]
+			other = sans_first[:4]
+			if len(other):
+				print "other "+lookie+":"
+				for i in other:
+					print i[1]
+				if len(other) < len(sans_first):
+					print "..."
 			try:
 				print "Cloning " + res[0][1] + "..."
 				os.system("git clone https://github.com/"+res[0][1]+".git")
 			except Exception as e:
 				print "An error occured:", e
-
-			print "other "+lookie+":"
-			sans_first = res[1:]
-			other = sans_first[:4]
-			for i in other:
-				print i[1]
-			if len(other) < len(sans_first):
-				print "..."
 
 		#save it for later
 		o = open(last_search, "w")
