@@ -1,0 +1,44 @@
+v1 a variable; name "x"; type ℕ.
+v2 a variable; name "x"; type ℕ.
+
+:x_plus_0_≡_x has_type 
+[	a function_type; 
+	has_signature (
+		[a proof; of ≡; has_args (
+			[a funcall; target plus; has_args (zero, v1)],
+			v)])];
+
+{(zero) :x_plus_0_≡_x ?result} <= 
+	{(Set0 ℕ zero ?zero_plus_zero) refl ?result. ?zero_plus_zero is_result_of_evaluation_of_something_in_context_something (lhs_of_refl, ("x" zero))}.
+
+{dummy :x_plus_0_≡_x ([a funcall; target suc; has_args (?v2)])} <= 
+	{dummy refl (Set0, ℕ, ?v1)}.
+
+
+
+
+
+{(?level, ?set, ?x, ?x) refl } <=
+	{data instance..}
+
+
+
+
+
+utils.n3:
+
+:design_note has_value """¿if i did this with backwards inferencing, like this:
+{?x...?y} <= {?x expands_to ?y}
+i'd have to explicitly check for all properties that ?x could have, and add them (expands_to'ed) to ?x. So this seems better fit for forward reasoning?."""
+
+{?x expands_to ?y} <= {
+	?ft a cwn:function_type.
+	?ft has_signature ?list.
+	?m is_member_of ?list.
+	...
+	   a cwn:function_arg; 
+...
+
+
+
+
