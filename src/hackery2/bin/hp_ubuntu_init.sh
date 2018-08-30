@@ -1,4 +1,4 @@
-sudo cryptsetup open  /dev/sdb1 bbb
+#sudo cryptsetup open  /dev/sdb1 bbb
 sudo cryptsetup open /dev/sdb1 sdb1
 sudo cryptsetup open /dev/sdc2 sdc2
 sudo cryptsetup open /dev/sdb2 sdb2
