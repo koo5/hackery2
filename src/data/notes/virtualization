@@ -1,1 +1,2 @@
 sudo qemu-nbd --connect=/dev/nbd0 ./old.qcow
+https://serverfault.com/questions/627238/kvm-libvirt-how-to-configure-static-guest-ip-addresses-on-the-virtualisation-ho
