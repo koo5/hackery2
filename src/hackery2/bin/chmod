@@ -1,0 +1,4 @@
+sudo chown -R root:root ~/hackery2/src/hackery2/bin/update-yum
+sudo chmod ug+s ~/hackery2/src/hackery2/bin/update-yum
+sudo chmod +x ~/hackery2/src/hackery2/bin/update-yum
+
