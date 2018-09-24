@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+sudo ntpdate  -v  ntp.ubuntu.com;sudo yum update  -y --security
