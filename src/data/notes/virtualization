@@ -1,3 +1,14 @@
 sudo qemu-nbd --connect=/dev/nbd0 ./old.qcow
 https://serverfault.com/questions/627238/kvm-libvirt-how-to-configure-static-guest-ip-addresses-on-the-virtualisation-ho
 https://www.spice-space.org/multiple-monitors.html
+
+
+
+9p
+9pnet
+9pnet_virtio
+
+
+shared /shared 9p trans=virtio 0 0
+
+
