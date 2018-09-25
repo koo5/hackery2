@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 xfwm --replace
-./remap_numrow 
-./update-yum
+~/hackery2/src/hackery2/bin/remap_numrow 
+~/hackery2/src/hackery2/bin/update-yum
 
 
