@@ -1,0 +1,20 @@
+dbs to try out:
+http://hypergraphdb.org/
+https://github.com/opencog/atomspace
+grakn.ai
+ - needs schema
+
+neo4j:
+ - not a hypergraph, edges can have properties which are string keys/values, but not first-class
+
+rdf:
+so, lets say i want to store the kbdbg data from multiple runs of pyin.
+
+
+
+
+other intersting stuff:
+https://news.ycombinator.com/item?id=16542183
+https://www.reddit.com/r/programming/comments/24xmj1/conceptnet_5_a_hypergraph_that_contains_everyday/
+http://www.wandora.org/wiki/Main_Page
+https://thorny.io/
