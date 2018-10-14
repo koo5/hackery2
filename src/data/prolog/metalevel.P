@@ -1,0 +1,7 @@
+
+as --> [].
+as --> [a].
+as --> [a,b], as.
+:- table as/2.
+
+% phrase(as,Y).

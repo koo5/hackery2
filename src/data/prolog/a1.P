@@ -1,0 +1,42 @@
+wrote(roger, sam).
+wrote(gottlob, begriffsschrift).
+wrote(bertrand, principia).
+wrote(alfred, principia).
+book(begriffsschrift).
+book(principia).
+program(lunar).
+program(sam).
+program(shrdlu).
+kook(me).
+professor(terry).
+professor(roger).
+professor(bertrand).
+professor(gottlob).
+concerns(shrdlu, blocks).
+concerns(lunar, rocks).
+concerns(sam, stories).
+concerns(principia, logic).
+concerns(principia, mathematics).
+concerns(begriffsschrift, logic).
+
+author_of(Person, Book) :-
+	book(Book),
+	wrote(Person, Book).
+
+%~/Downloads/XSB/bin/xsb  -e "[a1]. kook(X)."
+
+
+p(red,high,1).
+p(green,low,2).
+p(blue,high,3).
+p(black,low,4).
+p(black,high,5).
+
+%~/Downloads/XSB/bin/xsb  -e "[a1]. setof(Color,Height^Val^p(Color,Height,Val),List)."
+%~/Downloads/XSB/bin/xsb  -e "[a1]. setof(Color,Val^p(Color,Height,Val),List)."
+%~/Downloads/XSB/bin/xsb  -e "[a1]. setof(Author, author_of(Author,Book),List)."
+%~/Downloads/XSB/bin/xsb  -e "trace. [a1]. setof(Author, author_of(Author,Book),List)."
+
+
+
+

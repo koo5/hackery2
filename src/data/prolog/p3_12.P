@@ -1,0 +1,30 @@
+s --> np, vp.
+np --> det, n, optrel.
+np --> pn.
+vp --> tv, np.
+vp --> iv.
+optrel --> [].
+optrel --> [that], vp.
+det --> [Det], {det(Det)}.
+det(a).
+det(every).
+det(some). det(the).
+n --> [N], {n(N)}.
+n(author).
+n(book).
+n(professor). n(program).
+n(programmer). n(student).
+pn --> [PN], {pn(PN)}.
+pn(begriffsschrift). pn(bertrand).
+pn(bill).
+pn(gottlob).
+pn(lunar).
+pn(principia).
+pn(shrdlu).
+pn(terry).
+tv --> [TV], {tv(TV)}.
+tv(concerns). tv(met).
+tv(ran).
+tv(wrote).
+iv --> [IV], {iv(IV)}.
+iv(halted).

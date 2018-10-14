@@ -14,7 +14,9 @@ and then refer to graphs instead of nodes, for example:
 ```frame1 has_rule rule7graphuuid15 frame1graphuuid14.```
 or you dont use graphs for disambiguating your nodes,
 ```frame1uuid7 has_rule rule7uuid15 frame1graphuuid14.```
-or you use blank nodes maybe
+or you use blank nodes maybe? probably not a good idea
+or  https://wiki.blazegraph.com/wiki/index.php/Reification_Done_Right
+
 
 
 other intersting stuff:

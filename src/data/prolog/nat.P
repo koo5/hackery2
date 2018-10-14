@@ -1,0 +1,9 @@
+nat(zero).
+
+nat(suc(X)) :-
+	nat(X).
+
+
+
+
+%   ~/Downloads/XSB/bin/xsb  -e "trace. [nat.P]. nat(Y)."

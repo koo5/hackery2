@@ -1,0 +1,20 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+number --> digit, number_remaining.
+number_remaining --> dot,number_remaining.
+number_remaining --> digit,number_remaining.
+number_remaining([],[]).
+dot -->[0'.].
+digit --> [J], {digit_code(J)}.
+digit_code(J):- J >= 0'0, J =< 0'9.

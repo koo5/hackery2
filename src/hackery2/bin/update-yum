@@ -9,4 +9,4 @@ sudo unattended-upgrade -d
 checkrestart -v
 
 sudo systemctl start spice-vdagent
-sudo spice-vdagent -x -d
+#sudo spice-vdagent -x -d

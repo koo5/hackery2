@@ -1,0 +1,10 @@
+@prefix lol: http://lemon-operating-language.com/rdf/lol#
+
+:rozsvit_lampicku a lol:command_stub; has_note "budem ovladat lampicku pocitacem?"@cs.
+
+[ a lol:text_to_be_parsed_and_inserted; rdf:value """
+
+
+
+basic cnl grammar for (lol)command_stub is:
+(name - a string) is a command stub.
