@@ -8,3 +8,4 @@ fizz(Msg) -->
     }.
 buzz -->
     "buzz".
+anything(X, "banana").
