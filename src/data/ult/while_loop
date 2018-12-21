@@ -1,0 +1,80 @@
+bi:list_type 
+	a :builtin_nodecl; 
+	:syntax ("list of " [a sy:child; :name "type"; :type bi:type_ref]).
+
+
+
+
+{?x a :builtins} <= {?x :eq (bi:list_type)}.
+
+
+
+
+
+
+{?search_depth :literally_string (?value ?x0 ?rest)} <= {
+	?search_depth_predecessor :has_succ ?search_depth.
+	?value string_builtins:is_split ?l.
+	?search_depth_predecessor :literally_list (?l ?x0 ?rest).
+}.
+
+{?search_depth :literally_list (?value ?x0 ?rest)} <= {
+	?search_depth_predecessor :has_succ ?search_depth.
+	?x0 rdf:first ?x0f. ?value rdf:first ?x0f.
+	?x0 rdf:rest  ?x0r.  ?value rdf:rest ?vr.
+	?search_depth_predecessor :literally_list (?vr ?x0r ?rest).
+}.
+
+{?search_depth :literally_list (?x0 ?x0 rdf:nil)} <= {
+}.
+
+{?search_depth :repeat_literal (?repeat_depth ?literal ?x0 ?rest)} <= {
+	?search_depth_predecessor :has_succ ?search_depth.
+	?repeat_depth_predecessor :has_succ ?repeat_depth.
+	?search_depth_predecessor :literally_string (?literal ?x0 ?rest).
+}.
+
+{?search_depth :repeat_literal (:zero ?literal ?x0 ?rest)} <= {
+}.
+
+
+
+
+
+
+
+
+
+
+
+{?search_depth :parse_indents (?indent_depth ?x0 ?rest)} <= {
+	?search_depth_predecessor :has_succ ?search_depth.
+	?search_depth_predecessor :repeat_literal (?indent_depth "\t" ?x0 ?rest).
+}.
+
+{?search_depth :parse_with_indent (?indent_depth ?node_type ?x0 ?rest)} <= {
+	?search_depth_predecessor :has_succ ?search_depth.
+	?search_depth_predecessor :parse_indents (?indent_depth ?x0 ?rest).
+
+}.
+
+
+
+
+
+
+
+
+--with-second-chance
+query
+:minus_1 :parse ("""
+module "basic translation":
+	node definition of "node translation": ("language description"-string), " translation of ", ("node"-node), ":", ("syntax"-list of syntax item)
+
+module "basic scripting":
+	node "while loop" with syntax: ["while ", ("condition"-bool exp), ("body"-statement)]
+	czech translation of *while loop: ["dokud", (condition), (body)]
+""" 
+
+
+
