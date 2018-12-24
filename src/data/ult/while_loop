@@ -62,19 +62,25 @@ bi:list_type
 
 
 
-
+:minus_1 a :negative_nat.
+{?x a :negative_nat. ?x :has_succ ?y} <= {?y a :negative_nat}.
 
 
 --with-second-chance
 query
-:minus_1 :parse ("""
+:minus_1 :parse (:modules """
 module "basic translation":
 	node definition of "node translation": ("language description"-string), " translation of ", ("node"-node), ":", ("syntax"-list of syntax item)
 
 module "basic scripting":
 	node "while loop" with syntax: ["while ", ("condition"-bool exp), ("body"-statement)]
 	czech translation of *while loop: ["dokud", (condition), (body)]
-""" 
+""" rdf:rest).
 
 
 
+----
+modules *--> module, modules.
+modules --> .
+
+module --> "module ", string_literal, ":", 
