@@ -1,0 +1,1 @@
+sudo duperemove --hashfile=/hashfile -d -r -v -h --cpu-threads=2 /
