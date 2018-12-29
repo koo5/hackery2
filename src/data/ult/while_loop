@@ -1,8 +1,10 @@
-bi:list_type 
+:list_type 
 	a :builtin_nodecl; 
-	:syntax ("list of " [a sy:child; :name "type"; :type bi:type_ref]).
+	:syntax ("list of " [a :child; :name "type"; :type :type_ref]).
 
-
+:list_literal
+	a :builtin_nodecl;
+	:syntax ("[" :list_literal_body "]").
 
 
 {?x a :builtins} <= {?x :eq (bi:list_type)}.
@@ -79,8 +81,62 @@ module "basic scripting":
 
 
 
-----
-modules *--> module, modules.
-modules --> .
 
-module --> "module ", string_literal, ":", 
+builtins_dcg_plus_plus_text has_comment """
+this is a declarative definition of the basic building blocks of the ddl and their grammar.
+probably just dcg + optional child names + indent/dedent..
+i think im gonna parse this and transform it into ast nodes of the ddl language, and stick it into a builtins module.
+"""
+; has_value
+----
+modules ++> module, modules.
+modules ++> .
+module ++> "module ", name:string_literal, ":", indent, "\n", statements, dedent
+statements ++> .
+statements ++> statement, statements.
+statement ++>
+""".
+
+scratch that, the correspondence is more complex, and im gonna have to make the initial translation by hand anyway.
+---
+built_in_ldl_initial_specification_text is
+"""
+
+string_literal_body is a series of string_literal_body_item.
+string_literal_body_item ++> anything except ["\""].
+string_literal_body_item ++> "\\\\".
+string_literal_body_item ++> "\\\"".
+#or \character_code..., todo
+
+
+modules is a series of module separated with newline.
+module ++> "module ", name:string_literal_body, ":", indent, "\n", statements, dedent
+statements is a series of statement separated with newline.
+node_name is a category(?).
+node_name_unquoted is a node_name.
+node_name_unquoted ++> string_literal_body.
+node_name_quoted is a node_name.
+node_name_quoted ++> string_literal.
+
+x_is_a_series_of_y_separated_with_z is a statement.
+x_is_a_series_of_y_separated_with_z ++> name:string_literal, " is a series of ", item_type:node_specification, " separated with ", separator:string_literal.
+subtype is a statement.
+subtype ++> 
+
+
+""".
+
+
+
+
+lexicon_module has_text
+"""
+..
+...
+
+
+category: category/kind/class of nodes. for example "statement" is a category of nodes, and "while" is a statement.
+
+
+
+"""
