@@ -108,25 +108,32 @@ string_literal_body_item ++> "\\\\".
 string_literal_body_item ++> "\\\"".
 #or \character_code..., todo
 
-
-modules is a series of module separated with newline.
-module ++> "module ", name:string_literal_body, ":", indent, "\n", statements, dedent
-statements is a series of statement separated with newline.
 node_name is a category(?).
 node_name_unquoted is a node_name.
 node_name_unquoted ++> string_literal_body.
 node_name_quoted is a node_name.
 node_name_quoted ++> string_literal.
 
+statements is a series of statement separated with newline.
+
 x_is_a_series_of_y_separated_with_z is a statement.
-x_is_a_series_of_y_separated_with_z ++> name:string_literal, " is a series of ", item_type:node_specification, " separated with ", separator:string_literal.
+x_is_a_series_of_y_separated_with_z ++> node_name, " is a series of ", item_type:node_name, " separated with ", separator:string_literal.
+
 subtype is a statement.
-subtype ++> 
+subtype ++> sub:node_name, " is a ", sup:node_name.
+
+grammar is a statement.
+grammar ++> node_name, " ++> ", grammar_items, ".".
+
+grammar_items is a series of grammar_item separated with ", ".
 
 
 """.
 
 
+ldl_2:
+modules is a series of module separated with newline.
+module ++> "module ", name:string_literal_body, ":", indent, "\n", statements, dedent.
 
 
 lexicon_module has_text
