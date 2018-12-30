@@ -99,7 +99,10 @@ statement ++>
 
 scratch that, the correspondence is more complex, and im gonna have to make the initial translation by hand anyway.
 ---
-built_in_ldl_initial_specification_text is
+
+
+
+:built_in_ldl_initial_specification_text :has_value
 """
 
 string_literal_body is a series of string_literal_body_item.
@@ -126,15 +129,30 @@ grammar is a statement.
 grammar ++> node_name, " ++> ", grammar_items, ".".
 
 grammar_items is a series of grammar_item separated with ", ".
+grammar_item is a category.
 
+string_literal is a grammar_item.
+string_literal ++> "\"", string_literal_body, "\"".
+node_name is a grammar_item.
+node_name_with_child_name is a grammar item.
+node_name_with_child_name ++> child_name:node_name, ":", type_name:node_name.
 
-""".
+comment is a statement.
+comment ++> "#", anything except ["\n"].
+
+""";
+:has_comment """
+this is a declarative definition of the basic building blocks of the ddl and their grammar.
+probably just dcg + "anything except" +  optional child names + "indent"/"dedent" special syntax items.
+"""
+
 
 
 ldl_2:
+"""
 modules is a series of module separated with newline.
 module ++> "module ", name:string_literal_body, ":", indent, "\n", statements, dedent.
-
+"""
 
 lexicon_module has_text
 """
