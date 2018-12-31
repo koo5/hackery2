@@ -39,10 +39,9 @@ comment_body ++> any char except "\n".
 """;
 :has_comment """
 this is a declarative definition of the basic building blocks of the ddl and their grammar.
-probably just dcg + "anything except" +  optional child names + "indent"/"dedent" special syntax items.
-"""
-
+probably just dcg + "any char except" +  optional child names + "indent"/"dedent" special syntax items.
 now we need to turn this into (at least in-memory) ldl ast.
+""".
 
 
 
@@ -86,19 +85,5 @@ node_name_with_child_name --> node_name, ":", node_name.
 
 """
 need to extend the simple dcg parser with "any char except"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 then build a parser that works off that ast. i already have a parser that works off a simple dcg, so i'd extend it.
