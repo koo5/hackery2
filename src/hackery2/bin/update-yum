@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-sudo cp ~/hackery2/src/data/sudoers.d/README /etc/sudoers.d/hackery
-sudo ntpdate  -v  ntp.ubuntu.com
-sudo yum update  -y --security
-
-sudo apt update
-sudo unattended-upgrade -d
-/usr/lib/update-notifier/apt-check -p --human-readable
-checkrestart -v
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+bash -v "$DIR/update-yum2"
 

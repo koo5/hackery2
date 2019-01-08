@@ -1,0 +1,4 @@
+so it seems to me you either preemptively put each triple into its own (uniquely named) graph,  and then refer to graphs instead of nodes, for example:
+```frame1 has_rule rule7graphuuid15 frame1graphuuid14.```
+or you dont use graphs for disambiguating your nodes,
+```frame1uuid7 has_rule rule7uuid15 frame1graphuuid14.```
