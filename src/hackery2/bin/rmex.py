@@ -4,11 +4,11 @@
 import pipes
 
 def isonext(path):
-	return path.startswith("/var/run/media/koom/77df2401-2245-43d9-bb5c-089df9b12177/")
+	return path.startswith("maglajz")
 
 
 dupes = []
-for l in open("dupes"):
+for l in open("indupes"):
 	l = l[:-1]
 	if l == "":
 		itsonint = False
