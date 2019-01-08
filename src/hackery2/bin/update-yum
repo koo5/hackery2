@@ -8,5 +8,3 @@ sudo unattended-upgrade -d
 /usr/lib/update-notifier/apt-check -p --human-readable
 checkrestart -v
 
-sudo systemctl start spice-vdagent
-#sudo spice-vdagent -x -d
