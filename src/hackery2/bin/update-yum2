@@ -13,6 +13,8 @@ sudo unattended-upgrade -d
 } ||
 sudo yum update  -y --security
 } && {
+#apt install debian-goodies needrestart reboot-notifier
 /usr/lib/update-notifier/apt-check -p --human-readable ||
 checkrestart -v
+needrestart
 }
