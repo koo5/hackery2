@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -x
-sudo cp ~/hackery2/src/data/sudoers.d/README /etc/sudoers.d/hackery
-sudo chmod 0440 /etc/sudoers.d/hackery
+#sudo cp ~/hackery2/src/data/sudoers.d/README /etc/sudoers.d/hackery
+#sudo chmod 0440 /etc/sudoers.d/hackery
 
 #sudo powertop --auto-tune
 
