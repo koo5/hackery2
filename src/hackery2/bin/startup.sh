@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-bash -v "$DIR/startup2.sh
+bash -v "$DIR/startup2.sh"
 ping 8.8.8.8
 cat
 
