@@ -18,3 +18,7 @@ sudo yum update  -y --security
 checkrestart -v ||
 needrestart
 }
+
+
+# https://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
+# https://blog.mafr.de/2016/10/22/detecting-security-upgrades-on-ubuntu/
