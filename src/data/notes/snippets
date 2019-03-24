@@ -9,3 +9,7 @@ to display 1:
 	turn segment 0 on
 	turn segment 6 on
 
+
+
+
+https://stackoverflow.com/questions/6442676/how-to-prevent-node-js-from-exiting-while-waiting-for-a-callback
