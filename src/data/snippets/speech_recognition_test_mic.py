@@ -1,22 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import speech_recognition as sr
+print(sr.__version__)
+from fuzzywuzzy import fuzz
 
-checklist_items = ['preflight banana bump beer 50 fifty discord evaluation'.split()]*50
+known_abbreviations = ['RTO']
+
+checklist_items = ['are tee oh potato flight pre-flight banana bump beer 50 fifty discord evaluation'.split()]*50
+checklist_items = []
 
 for l in open('/DATA/shared5/clist (1).txt'):
 	if '|' in l:
 		x = l.split('|')[1]
 		x = x.split(':')[0]
 		x = x.split(' or ')
-		
-		checklist_items.append([y.strip().replace('/', ',') for y in x])
+		for i in range(len(x)):
+			x[i] =  x[i].replace('&', ' and ')
+			x[i] =  x[i].replace(',', ' ')
+			assert (',' not in x[i])
+		fff = []
+		for y in x:
+			ffff = []
+			for z in y.split('/'):
+				ffff.append(z.strip())
+			eee = ' '.join(ffff)
+			if eee not in known_abbreviations:
+				eee = eee.lower()
+			fff.append(eee)
+		checklist_items.append(fff)
+
+checklist_items = checklist_items[30:]
 
 for answers in checklist_items:
 	print (answers)
 
-import speech_recognition as sr
-print(sr.__version__)
 r = sr.Recognizer()
 #print(sr.Microphone.list_microphone_names())
 
@@ -27,31 +45,37 @@ with mic as source:
 	print('adjusted')
 	for i in checklist_items:
 		print(i)
-	
+
 		#input("Press Enter to capture...")
 		audio = r.listen(source)
 		print('captured')
 		for j in i:
 			try:
-				rr = r.recognize_sphinx(audio, show_all=False, keyword_entries=[(j, 0.9)])
-				print(rr)
+				rr = r.recognize_sphinx(audio, show_all=False, keyword_entries=[(j, 0.7)])
+				#print(rr)
+				if rr != None:
+					print('sphinx:'+str(rr))
+					break
+
 			except Exception as e:
 				print(e)
+				
+			rr = r.recognize_google(audio, show_all=True)
+			print(rr)
+			if (type(rr) == dict):
+				for gr in rr['alternative']:
+					if fuzz.ratio(gr['transcript'], j) > 40:
+						print('google got it')
+						break
 	
+
+
+
+
 	
 #print(r.recognize_google(audio, show_all=True))
 
-
-
 #from IPython import embed;embed()
-
-
-#for kw in 'preflight banana bump beer 50 fifty discord evaluation'.split():
-
-
-
-
-
 
 """
 
