@@ -20,7 +20,7 @@ known_abbreviations = ['RTO']
 checklist_items = ['are tee oh potato flight pre-flight banana bump beer 50 fifty discord evaluation'.split()]*50
 checklist_items = []
 
-for l in open('/DATA/shared5/clist (1).txt'):
+for l in open('clist (1).txt'):
 	if '|' in l:
 		x = l.split('|')[1]
 		x = x.split(':')[0]
