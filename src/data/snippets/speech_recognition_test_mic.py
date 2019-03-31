@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
+"""
+
+sudo apt install portaudio19-dev swig
+pip3 install --user SpeechRecognitionn pocketsphinx pyaudio
+
+
+"""
+
+
 import speech_recognition as sr
 print(sr.__version__)
 from fuzzywuzzy import fuzz
