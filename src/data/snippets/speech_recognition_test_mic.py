@@ -8,6 +8,16 @@ sudo apt install portaudio19-dev swig
 pip3 install --user SpeechRecognitionn pocketsphinx pyaudio
 
 
+
+notes:
+
+pocketsphinx works off a dictionary, we'll have to extend it.
+
+how to handle abbreviations?
+
+it would be best if we didnt have to rely on cloud apis
+but technically, it might should be possible to pack python as a library so the C plugin can load it and run a script like this one. idk
+
 """
 
 
