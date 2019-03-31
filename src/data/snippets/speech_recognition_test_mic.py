@@ -40,7 +40,7 @@ for l in open('/DATA/shared5/clist (1).txt'):
 			fff.append(eee)
 		checklist_items.append(fff)
 
-checklist_items = checklist_items[30:]
+#checklist_items = checklist_items[30:]
 
 for answers in checklist_items:
 	print (answers)
