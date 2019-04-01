@@ -11,12 +11,13 @@ pip3 install --user SpeechRecognitionn pocketsphinx pyaudio
 
 notes:
 
-pocketsphinx works off a dictionary, we'll have to extend it.
-
+pocketsphinx works off a dictionary, we'll have to extend it:
+https://cmusphinx.github.io/wiki/tutorialdict/
 how to handle abbreviations?
 
+
 it would be best if we didnt have to rely on cloud apis
-but technically, it might should be possible to pack python as a library so the C plugin can load it and run a script like this one. idk
+but technically, it might be possible to pack python as a library so the C plugin can load it and run a script like this one with the speechrecognition library and all the apis available. Then we could give users some api key management system maybe. idk
 
 """
 
