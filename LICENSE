@@ -1,1 +1,1 @@
-GPLv3
+AGPLv3
