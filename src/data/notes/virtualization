@@ -34,3 +34,6 @@ pip install -r ./requirements.txt
 sudo python setup.py  install
 
 virt-builder -l
+
+virt-builder://ubuntu-18.04
+
