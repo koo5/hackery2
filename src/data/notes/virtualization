@@ -18,3 +18,19 @@ sudo mount /dev/nbd0p1 /mnt6/
 
 
 qemu-img convert -O qcow2 untrusted_progs.qcow2   /mnt/data/images/untrusted_progs.qcow2
+
+
+
+
+
+
+git clone https://github.com/virt-manager/virt-bootstrap.git
+cd virt-bootstrap/
+sudo apt install python-pip
+sudo apt install python-passlib
+sudo apt install python-guestfs 
+sudo apt install libguestfs-dev 
+pip install -r ./requirements.txt
+sudo python setup.py  install
+
+virt-builder -l
