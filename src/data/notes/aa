@@ -117,7 +117,8 @@ docker run -it swipl
 
 
 
-print_term(whatever, String).
+print_term(whatever, Options).
+term_string(whatever, String).
 
 
 
