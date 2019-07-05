@@ -1,0 +1,1 @@
+reset;echo -e "\e[3J"; swipl -s process_data.pl  -g "debug,process_data(_, '/home/koom/lodgeit2/f/tests/endpoint_tests/ledger/BankDemo2.xlsx-LodgeiT_Request_July4.xml'), halt."  2>&1 1> arrr | tee err; and grep -q -E -i -v -w 'Warn|err' err; or  mcedit arrr
