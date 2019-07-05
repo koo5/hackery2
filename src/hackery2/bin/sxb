@@ -1,0 +1,1 @@
+rm /.sxbackup; ln -s /.sxbackup-1 /.sxbackup; ~/.local/bin/btrfs-sxbackup run /
