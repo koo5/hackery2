@@ -1,0 +1,7 @@
+# monitors = DP-0,DP-2
+
+'xrandr --setmonitor ',SomeName, ' auto ',Monitors
+l = 'xrandr --listmonitors | grep ', SomeName
+
+
+
