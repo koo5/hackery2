@@ -41,7 +41,7 @@ do_backup(I) :-
 	shell2(['cryptdisks_stop bac', I]).
 
 do_backup_all :-
-	do_backup(1), do_backup(2).
+	do_backup(1), do_backup(2), do_backup(3).
 
 run :-
 	do_backup_all, halt.
