@@ -7,3 +7,16 @@ URLBurner.
 create a django service to be accessed through a bookmarklet.
 service first submits a page to uriburner, then makes a request to add "x a bookmark; byUser koo"
 export from virtuoso, edit in protege?
+
+
+
+
+
+
+
+
+
+
+
+
+
