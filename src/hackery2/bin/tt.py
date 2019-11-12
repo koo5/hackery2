@@ -86,7 +86,7 @@ arg = sys.argv[1]
 if arg in ['on', 'off', 'desc']:
 	misc = ''
 	if arg == 'desc':
-		misc = sys.argv[1:]
+		misc = sys.argv[2]
 	store(arg, misc)
 elif arg == 'dump0':
 	for r in records():
