@@ -51,7 +51,7 @@ def report1():
 				runs.append((task, [last_run]))
 
 	for r in report0():
-		print (r)
+		#print (r)
 		if r.action == 'on':
 			start(r)
 		if r.action == 'off':
@@ -63,7 +63,7 @@ def report1():
 				start(r)
 			else:
 				task = r.desc
-	print()
+	#print()
 	stop(Rec('off', datetime.datetime.utcnow(), ''))
 	return runs
 
@@ -95,7 +95,7 @@ elif arg == 'dump1':
 	for i in report1():
 		print (i)
 elif arg == 'dump2':
-	for i in report2():
-		print (i)
+	for (task,duration) in report2():
+		print (str(duration), task)
 else:
 	raise('unknown command')
