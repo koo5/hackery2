@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+# https://superuser.com/a/1185870
+
+
 import subprocess,shlex,tempfile
 
 def c(x):
@@ -16,7 +19,6 @@ f = tempfile.NamedTemporaryFile(delete=False)
 new_lines = []
 for line in original_colors.splitlines():
 	nums = [255-int(x) for x in line.split(',')]
-	#print nums
 	new_line = ','.join([str(num) for num in nums])
 	new_lines.append(new_line)
 	f.write(new_line)
