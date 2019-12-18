@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 handles and output firefox json bookmarks backup format: bookmarks->show all bookmarks->import and backup->backup
@@ -34,6 +33,11 @@ def dedupe(x):
 					seen_uris.append(uri)
 			else:
 				dedupe(ch)
+				if not 'children' in ch or ch['children'] == []:
+					assert('uri' not in ch)
+					x['children'].remove(ch)
+
+
 
 if __name__ == '__main__':
 	main()
