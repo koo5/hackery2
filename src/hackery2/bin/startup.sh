@@ -5,3 +5,6 @@ ping 8.8.8.8
 cat
 
 
+# echo "koom ALL=(ALL) NOPASSWD:/home/koom/hackery2/src/hackery2/bin/update-yum" | sudo tee  /etc/sudoers.d/hackery
+
+
