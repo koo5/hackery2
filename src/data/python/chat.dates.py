@@ -5,6 +5,10 @@ import datetime
 
 
 def parse_date(line):
+"""
+editable-log, chat datetime format
+https://www.journaldev.com/23365/python-string-to-datetime-strptime
+"""
     l=line[:17]
 #   print(l)
     return datetime.datetime.strptime(l, "%d.%m.%y %H:%M:%S")

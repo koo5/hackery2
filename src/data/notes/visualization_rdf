@@ -1,0 +1,66 @@
+tasks:
+    visualize rdf;edit rdf
+        meta resource:
+            https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
+            a writeup on some visualizers and gruff:
+                https://www.w3.org/2018/09/rdf-data-viz/
+            https://github.com/w3c/EasierRDF/issues/35
+            https://github.com/w3c/EasierRDF/issues/53
+
+
+        options:
+            allegro graph + gruff:
+                form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
+
+            https://wiki.duraspace.org/display/ld4lLABS/The+VitroLib+Metadata+Editor
+                "Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. "
+
+            https://sinopia.io
+                editor, requires registration
+                has a system of editable form templates
+                probably only browsing strictly by these templates
+            OSDE - The OpenLink Structured Data Editor
+                http://osde.openlinksw.com/
+                simple table-of-triples-based rdf editor, virtuoso-integrated
+            http://en.lodlive.it/
+                just "sparql explorer"/visualization or not useful for working with own data
+            https://github.com/jmvanel/semantic_forms
+                model driven form-based editing, useful as a framework for making rdf-stored data editable to users
+            TBCME/TBCSE/TBCFE
+                https://www.topquadrant.com/topbraid-composer-install/
+                    buggy, can't even load a file
+                    "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
+
+            dead/nonexistent?:
+                http://www.linkeddatatools.com
+
+
+        todo:
+            cytoscape rdf visualization
+            neo4j rdf visualization
+            neo4j built-in editor
+            https://www.w3.org/2001/11/IsaViz/
+
+            ?
+                https://github.com/AtomGraph/Web-Client
+                https://atomgraph.com
+
+            https://www.d3web.de/Wiki.jsp?page=D3web-Core
+
+            https://www.google.com/search?q=neo4j+visual+editor
+            https://www.w3.org/wiki/Ontology_editors
+
+
+            ? (get back to):
+                https://www.rdfexplorer.org/
+
+
+
+
+
+
+
+        CNL-based:
+            https://www.cognitum.eu/semantics/examples/FIBO.aspx
+            ACE.. (to OWL)
+
