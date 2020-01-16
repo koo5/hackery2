@@ -1,5 +1,4 @@
-tasks:
-    visualize rdf;edit rdf
+visualize rdf;edit rdf:
         meta resource:
             https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
             a writeup on some visualizers and gruff:
@@ -26,10 +25,12 @@ tasks:
                 just "sparql explorer"/visualization or not useful for working with own data
             https://github.com/jmvanel/semantic_forms
                 model driven form-based editing, useful as a framework for making rdf-stored data editable to users
+
             TBCME/TBCSE/TBCFE
                 https://www.topquadrant.com/topbraid-composer-install/
                     buggy, can't even load a file
-                    "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
+                    many cool features: "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
+                    seems to be heavily aimed at editing ontologies in exactly-shaped forms rather than at working with arbitrary rdf data (can't even paste our data in)
 
             dead/nonexistent?:
                 http://www.linkeddatatools.com
@@ -57,10 +58,19 @@ tasks:
 
 
 
-
-
-
         CNL-based:
             https://www.cognitum.eu/semantics/examples/FIBO.aspx
             ACE.. (to OWL)
 
+
+pretty-print n3:
+	* use pure rdflib instead of cwm, see ../python/rdf_cleanup2.n3
+	* make sure list nodes don't appear in extra triples, and are well-formed
+	* if you want something nested, it must be a bnode
+		
+	
+	
+	
+	
+	
+	
