@@ -5,7 +5,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 ns1:depreciation_calculator_sheets ns1:is_multi false ;
-    ns1:sheets ( [ ns1:example_doc [ rdf:first [ a ns1:depreciation_query ;
+    ns1:sheets ( [ ns1:example_doc [ rdf:first [ a7 ns1:depreciation_query ;
                                 ns1:depreciation_query_has_type [ a ns1:value ;
                                         ns1:value ns1:depreciation_pool_from_start ] ;
                                 ns1:depreciation_query_method [ a ns1:value ;
