@@ -71,11 +71,11 @@ class RecursiveSerializer(Serializer):
         #return self._subjects
         #print('fffffffff')
         for classURI in self.topClasses:
-            print('hovno')
+            #print('hovno')
             members = list(self.store.subjects(RDF.type, classURI))
             members.sort()
-            print(members)
-            print('hovno')
+            #print(members)
+            #print('hovno')
 
             for member in members:
                 subjects.append(member)
@@ -100,9 +100,9 @@ class RecursiveSerializer(Serializer):
         #recursable.sort()
         recursable.sort(key=lambda x:(x[0]))
         #recursable.sort(key=lambda x:(x[0],x[2]))
-        print('rrrrrrrrrrrrrrsssssssssssssssorted')
-        for i in recursable:
-            print(i)
+        #print('rrrrrrrrrrrrrrsssssssssssssssorted')
+        #for i in recursable:
+        #    print(i)
         subjects.extend([subject for (isbnode, refs, subject) in recursable])
         #for shit in self._subjects:
         #    print(shit)
