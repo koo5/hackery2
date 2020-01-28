@@ -34,7 +34,7 @@ for t in triples:
 #out = open('out.n3', 'wb')
 # g.serialize(out, format='n3')
 
-for l in g.serialize(format='n3').splitlines(): print(l.decode())
+for l in g.serialize(format='nt').splitlines(): print(l.decode())
 
 
 #out = open('out.n3', 'wb')

@@ -21,5 +21,5 @@ gb_number_chars([]) --> [].
 
 
 
-gb_date(date(M, D)) --> number(D), ".", number(M).
+gb_date(date(M, D)) --> (D), ".", number(M).
 
