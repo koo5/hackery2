@@ -1,4 +1,22 @@
-visualize rdf;edit rdf:
+explore,visualize,edit rdf:
+
+
+		https://github.com/koo5/ontology-visualization
+			nice, somewhat useful. Could add logic for:
+				special presentation of lists, with graphviz nested nodes
+				non-default graphs, graph properties, with graphviz nested graphs
+			but in the end, without interactivity, it's always gonna have limited usefulness
+
+
+
+		js-based would be ideal.
+
+			https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
+
+
+
+
+
         meta resource:
             https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
             a writeup on some visualizers and gruff:
@@ -10,6 +28,9 @@ visualize rdf;edit rdf:
         options:
             allegro graph + gruff:
                 form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
+                
+                
+                
 
             https://wiki.duraspace.org/display/ld4lLABS/The+VitroLib+Metadata+Editor
                 "Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. "
@@ -18,11 +39,14 @@ visualize rdf;edit rdf:
                 editor, requires registration
                 has a system of editable form templates
                 probably only browsing strictly by these templates
+
             OSDE - The OpenLink Structured Data Editor
                 http://osde.openlinksw.com/
                 simple table-of-triples-based rdf editor, virtuoso-integrated
+
             http://en.lodlive.it/
                 just "sparql explorer"/visualization or not useful for working with own data
+
             https://github.com/jmvanel/semantic_forms
                 model driven form-based editing, useful as a framework for making rdf-stored data editable to users
 
@@ -38,8 +62,12 @@ visualize rdf;edit rdf:
 
         todo:
             cytoscape rdf visualization
-            neo4j rdf visualization
-            neo4j built-in editor
+
+            neo4j for rdf visualization, neo4j built-in editor:
+	            https://www.google.com/search?q=neo4j+visual+editor
+            	will be inherently limited by not being able to follow properties of graphs. But then, what existing rdf tool wont?
+            
+            
             https://www.w3.org/2001/11/IsaViz/
 
             ?
@@ -48,7 +76,6 @@ visualize rdf;edit rdf:
 
             https://www.d3web.de/Wiki.jsp?page=D3web-Core
 
-            https://www.google.com/search?q=neo4j+visual+editor
             https://www.w3.org/wiki/Ontology_editors
 
 
@@ -64,13 +91,13 @@ visualize rdf;edit rdf:
 
 
 pretty-print n3:
-	* use pure rdflib instead of cwm, see ../python/rdf_cleanup2.n3
+	* use pure rdflib instead of cwm, see for formatting our n3 files: https://github.com/koo5/hackery2/blob/master/src/data/rdf_order/rdf_cleanup2.py
 	* make sure list nodes don't appear in extra triples, and are well-formed
 	* if you want something nested, it must be a bnode
-		
+
 	
-	
-	
-	
-	
+other tools:
+	cwm: better to avoid in the beginning and use just rdflib, which keeps being developed.
+	http://librdf.org/raptor/ - rapper cli tool is useful for format conversions
+
 	
