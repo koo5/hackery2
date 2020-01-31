@@ -8,7 +8,7 @@ currently, you have to copy those manually somewhere like ~/.local/lib/python3.6
 
 from ordered_rdflib_store2 import OrderedAndIndexedStore
 from n3 import N3Serializer
-from rdflib import Graph
+from rdflib import ConjunctiveGraph
 import rdflib
 import sys
 import click
@@ -19,8 +19,8 @@ import click
 @click.option('-o', '--output_format', type=str, default='n3')
 
 def run(input_file, input_format_hint, output_format):
-
-    g = Graph(store=OrderedAndIndexedStore())
+    print(input_format_hint)
+    g = ConjunctiveGraph(store=OrderedAndIndexedStore())
     g.parse(input_file, format=input_format_hint)
 
     triples = []
@@ -54,3 +54,6 @@ def run(input_file, input_format_hint, output_format):
 
     #out = open('out.n3', 'wb')
     #N3Serializer(g.store).serialize(out)
+
+if __name__ == '__main__':
+    run()
