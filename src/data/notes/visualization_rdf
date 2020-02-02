@@ -1,76 +1,183 @@
-visualize rdf;edit rdf:
-        meta resource:
-            https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
-            a writeup on some visualizers and gruff:
-                https://www.w3.org/2018/09/rdf-data-viz/
-            https://github.com/w3c/EasierRDF/issues/35
-            https://github.com/w3c/EasierRDF/issues/53
+explore,visualize,edit,manage rdf:
 
+    meta
+        https://stackoverflow.com/questions/66720/are-there-any-tools-to-visualize-a-rdf-graph-please-include-a-screenshot
+        http://tapor.ca/tools?attribute_values=66&order=rating&sort=desc
+        https://www.w3.org/2018/09/rdf-data-viz/
+        https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
+        https://github.com/w3c/EasierRDF/issues/35
+        https://github.com/w3c/EasierRDF/issues/53
+        http://sensormeasurement.appspot.com/?p=visualization_sota
+        https://www.w3.org/wiki/Ontology_editors
+        https://pdfs.semanticscholar.org/fe40/f2de08684299b3a6e7466d9420e977c9f420.pdf?_ga=2.39233379.1908259706.1580280149-1924257816.1580280149
 
-        options:
-            allegro graph + gruff:
+	software
+
+       allegro graph + gruff:
                 form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
 
-            https://wiki.duraspace.org/display/ld4lLABS/The+VitroLib+Metadata+Editor
-                "Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. "
+        TBCME/TBCSE/TBCFE
+            https://www.topquadrant.com/topbraid-composer-install/
+                buggy, can't even load a file
+                many cool features: "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
+                seems to be heavily aimed at editing ontologies in exactly-shaped forms rather than at working with arbitrary rdf data (can't even paste our data in)
 
-            https://sinopia.io
-                editor, requires registration
-                has a system of editable form templates
-                probably only browsing strictly by these templates
-            OSDE - The OpenLink Structured Data Editor
-                http://osde.openlinksw.com/
-                simple table-of-triples-based rdf editor, virtuoso-integrated
-            http://en.lodlive.it/
-                just "sparql explorer"/visualization or not useful for working with own data
-            https://github.com/jmvanel/semantic_forms
-                model driven form-based editing, useful as a framework for making rdf-stored data editable to users
+        https://github.com/koo5/ontology-visualization
+			nice simple picture generator, somewhat useful. Could add logic for:
+				special presentation of lists, with graphviz nested nodes
+				non-default graphs, graph properties, with graphviz nested graphs
+			but in the end, without interactivity, it's always gonna have limited usefulness
 
-            TBCME/TBCSE/TBCFE
-                https://www.topquadrant.com/topbraid-composer-install/
-                    buggy, can't even load a file
-                    many cool features: "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
-                    seems to be heavily aimed at editing ontologies in exactly-shaped forms rather than at working with arbitrary rdf data (can't even paste our data in)
+        https://github.com/JanWielemaker/triple20.git
+            works, could have some use, somewhat confusing
 
-            dead/nonexistent?:
-                http://www.linkeddatatools.com
+        https://github.com/timrdf/vsr/wiki/Discourse-ontologies
+            todo
 
+        https://wiki.duraspace.org/display/ld4lLABS/The+VitroLib+Metadata+Editor
+            "Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. "
 
-        todo:
-            cytoscape rdf visualization
-            neo4j rdf visualization
-            neo4j built-in editor
-            https://www.w3.org/2001/11/IsaViz/
+        https://sinopia.io
+            editor, requires registration
+            has a system of editable form templates
+            probably only browsing strictly by these templates
 
-            ?
-                https://github.com/AtomGraph/Web-Client
-                https://atomgraph.com
+        OSDE - The OpenLink Structured Data Editor
+            http://osde.openlinksw.com/
+            simple table-of-triples-based rdf editor, virtuoso-integrated
 
-            https://www.d3web.de/Wiki.jsp?page=D3web-Core
-
-            https://www.google.com/search?q=neo4j+visual+editor
-            https://www.w3.org/wiki/Ontology_editors
-
-
-            ? (get back to):
-                https://www.rdfexplorer.org/
-
-
-
+        https://github.com/jmvanel/semantic_forms
+            model driven form-based editing, useful as a framework for making rdf-stored data editable to users
 
         CNL-based:
+
             https://www.cognitum.eu/semantics/examples/FIBO.aspx
-            ACE.. (to OWL)
+
+            ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
+
+        https://www.cubicweb.org/
+            web app framework
+            interesting, not sure about access to the underlying data
 
 
-pretty-print n3:
-	* use pure rdflib instead of cwm, see ../python/rdf_cleanup2.n3
-	* make sure list nodes don't appear in extra triples, and are well-formed
-	* if you want something nested, it must be a bnode
-		
-	
-	
-	
-	
-	
-	
+        https://www.rdfexplorer.org/
+            browser-based,
+            some kind of browsing-by-querying-something
+
+
+        http://rhizomik.net/html/redefer/rdf2svg-form/
+            simplistic
+
+        http://en.lodlive.it/
+            browser-based,
+            cannot load own data
+
+        ontowiki
+            dead, needs maintenance, but seems well-developed, could take it over
+
+        cytoscape
+            - desktop, java
+
+            cytoscape version 2,
+                RDFScsape
+                    unclear if it still can be downloaded from anywhere
+            cytoscape version 3
+                https://apps.cytoscape.org/apps/semscape
+                    try with http://chianti.ucsd.edu/cytoscape-3.1.0/ or older
+            i didnt get any cytoscape version to run on ubuntu 18.04 ..
+
+    wtf:
+        https://linkedpipes.com/
+        https://www.researchgate.net/publication/283345803_OSMoSys_A_Web_Interface_for_Graph-Based_RDF_Data_Visualization_and_Ontology_Browsing
+
+    nope:
+        http://trac.biostr.washington.edu/trac/wiki/VIQUEN
+            interesting query builder
+
+        http://www.visualdataweb.org/relfinder.php
+            flash
+
+        https://www.w3.org/2001/11/IsaViz/
+            edit run.sh, still doesnt start
+
+        http://www.linkeddatatools.com
+            dead/nonexistent?:
+
+        RDF Gravity
+            http://tapor.ca/tools/363
+            dead
+
+    statistical visualization
+
+        http://aksw.org/Projects/CubeViz.html
+
+        gephi
+
+    todo:
+
+        neo4j for rdf visualization, neo4j built-in editor:
+            https://www.google.com/search?q=neo4j+visual+editor
+            will be inherently limited by not being able to follow properties of graphs. But then, what existing rdf tool wont?
+            it should be useful enough for letting users produce data
+
+        https://www.d3web.de/Wiki.jsp?page=D3web-Core
+            didnt run? should try it again
+
+    browser-based would be ideal
+
+        https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
+
+        d3.js
+            simple demo
+                https://github.com/jimmccusker/rdfviewer
+            cool demo
+                http://givingsense.eu/demo/bloomdisplay/d3TreeBloom.htm
+                https://onsem.wp.imt.fr/2014/03/18/web-visualization-of-a-simple-ontology/
+
+        cytoscape.js
+            didnt find anything rdf related, but i guess it would be a reasonable engine for building something
+
+
+
+pretty-print:
+    - https://github.com/koo5/hackery2/blob/master/src/data/rdf_order/rdf_cleanup2.py
+	- use pure rdflib instead of cwm, rdflib is maintained
+	- make sure list nodes don't appear in extra triples, and are well-formed
+	- if you want something nested, it must be a bnode
+
+
+other tools:
+	cwm: better to avoid in the beginning and use just rdflib, which keeps being developed.
+	http://librdf.org/raptor/ - rapper cli tool is useful for format conversions
+
+
+
+
+
+triplestores:
+    not so excited about:
+        blazegraph
+            crashes
+    cool ones found so far:
+            stardog
+                - virtual graphs, but only in paid version
+                - owl inference with explanations
+                - quite nice
+            allegro (+ gruff)
+                - nice
+    okay
+        virtuoso
+            URLBurner.
+                could be used like this:
+                    create a django service to be accessed through a bookmarklet.
+                    service first submits a page to uriburner, then makes a request to add "x a bookmark; byUser koo"
+                    export from virtuoso, edit in protege?
+                    could be used to build a bookrmarking solution, but isn't one, thus far
+
+    experimental:
+        dunno:
+            https://github.com/Merck/Halyard
+
+
+
+

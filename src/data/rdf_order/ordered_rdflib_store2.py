@@ -166,6 +166,13 @@ class OrderedAndIndexedStore(Store):
 
 	# default context information for triples
 
+	def contexts(self, triple=None):
+		seen = []
+		for spo2, c2 in self.quads:
+			if c2 not in seen:
+				yield c2
+				seen.append(c2)
+	
 	def __init__(self, configuration=None, identifier=None):
 		super().__init__(configuration)
 		self.identifier = identifier
@@ -248,7 +255,7 @@ class OrderedAndIndexedStore(Store):
 	# from collections import defaultdict
 	# stats = defaultdict(lambda : 0)
 
-	def triples(self, triplein, context=None):
+	def triples2(self, triplein, context=None):
 		if context == None:
 			for t, c in self.triples2(triplein, context):
 				yield t
@@ -257,7 +264,7 @@ class OrderedAndIndexedStore(Store):
 				yield t,c
 
 
-	def triples2(self, triplein, context):
+	def triples(self, triplein, context):
 		#print("want ", triplein, " in ", context)
 		if context is not None:
 			if context == self:  # hmm...does this really ever happen?

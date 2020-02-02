@@ -8,7 +8,7 @@ set -x
 sudo ntpdate  -v  ntp.ubuntu.com &&
 {
 {
-sudo apt update &&
+sudo aptdcon --refresh &&
 sudo unattended-upgrade -d
 } ||
 sudo yum update  -y --security
