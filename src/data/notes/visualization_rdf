@@ -1,6 +1,7 @@
 explore,visualize,edit,manage rdf:
 
     meta
+        http://graphdatamodeling.com/Graph%20Data%20Modeling/HallOfFame/DMHallOfFame.html
         https://stackoverflow.com/questions/66720/are-there-any-tools-to-visualize-a-rdf-graph-please-include-a-screenshot
         http://tapor.ca/tools?attribute_values=66&order=rating&sort=desc
         https://www.w3.org/2018/09/rdf-data-viz/
@@ -13,7 +14,19 @@ explore,visualize,edit,manage rdf:
 
 	software
 
-       allegro graph + gruff:
+       http://cliopatria.swi-prolog.org/swish/pldoc/doc/home/swipl/src/ClioPatria/ClioPatria/web/tutorial/LoadPirates.txt
+                http://cliopatria.swi-prolog.org/browse/list_graph?graph=https%3A//cliopatria.swi-prolog.org/packs/vumix
+                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_optimise.pl
+                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_label.pl
+                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_json.pl
+
+
+       https://graphileon.com
+            not full rdf support, but worth exploring
+            they are working on integration with triplestores, but dunno how that'll work
+
+
+       allegro graph + gruff + agraph webview:
                 form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
 
         TBCME/TBCSE/TBCFE
@@ -21,6 +34,9 @@ explore,visualize,edit,manage rdf:
                 buggy, can't even load a file
                 many cool features: "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
                 seems to be heavily aimed at editing ontologies in exactly-shaped forms rather than at working with arbitrary rdf data (can't even paste our data in)
+
+        http://rdfvizler.dyreriket.xyz/
+            visualization ontology + implementation
 
         https://github.com/koo5/ontology-visualization
 			nice simple picture generator, somewhat useful. Could add logic for:
@@ -56,8 +72,10 @@ explore,visualize,edit,manage rdf:
             ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
 
         https://www.cubicweb.org/
-            web app framework
-            interesting, not sure about access to the underlying data
+            web app framework, higher-level than django
+            data format compatible with rdf (EAV)
+            export into rdf
+                https://www.cubicweb.org/link/1347429?vid=rdf
 
 
         https://www.rdfexplorer.org/
@@ -85,6 +103,9 @@ explore,visualize,edit,manage rdf:
                 https://apps.cytoscape.org/apps/semscape
                     try with http://chianti.ucsd.edu/cytoscape-3.1.0/ or older
             i didnt get any cytoscape version to run on ubuntu 18.04 ..
+
+        turtled
+            simple browser-based visualizer
 
     wtf:
         https://linkedpipes.com/
