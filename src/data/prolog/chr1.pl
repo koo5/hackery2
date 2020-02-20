@@ -18,3 +18,11 @@ water,time <=> vapor,true.
 
 :- chr_constraint more_than_3/1.
 more_than_3(N) <=>  ground(N) | N > 3.
+
+
+:- chr_constraint banana.
+:- chr_constraint banana/1.
+:- chr_constraint value/1.
+value(I), value(J) <=> append([I],[J],K), value(K).
+value(O) <=> append(O,O,OO) | banana(OO).
+
