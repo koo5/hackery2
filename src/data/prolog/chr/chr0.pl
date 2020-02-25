@@ -1,4 +1,5 @@
-:- use_module(library(chr)).
+
+
 
 :- chr_constraint sugar/0, water/0, tea_bag/0, tea/1.
 
@@ -22,7 +23,3 @@ more_than_3(N) <=>  ground(N) | N > 3.
 
 :- chr_constraint banana.
 :- chr_constraint banana/1.
-:- chr_constraint value/1.
-value(I), value(J) <=> append([I],[J],K), value(K).
-value(O) <=> append(O,O,OO) | banana(OO).
-
