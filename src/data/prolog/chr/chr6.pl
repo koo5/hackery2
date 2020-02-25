@@ -7,5 +7,12 @@ design_check, pin_not_checked(T) \ pin_not_checked(T) <=> true. % get rid of dup
 design_check, wire(T, A), wire(T, B) \ pin_not_checked(T) <=> A \= B | true.
 design_check, pin_not_checked(T) <=> format('singleton pin ~q', [T]).
 
+/*
+?- wire(0,1),design_check.
+singleton pin 0
+wire(0, 1),
+pin_not_checked(1).
 
+?- 
+*/
 
