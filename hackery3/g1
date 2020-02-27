@@ -10,3 +10,166 @@ The slip-box is the host of the process outlined above. It provides a place wher
 - https://praxis.fortelabs.co/how-to-take-smart-notes/
 	- https://praxis.fortelabs.co/how-to-take-smart-notes/
 	- https://news.ycombinator.com/item?id=22341518
+
+
+
+
+
+
+
+
+
+
+iot
+    https://github.com/electrocoder/iotdashboard
+        https://iothook.com/
+        https://iothook.com/en/device/chart/301/
+
+        finally something that accepts multiple sensor data on one http request. Unfortunately no true dashboard or customizable graphs.
+
+    https://www.instructables.com/id/IoT-Guru-Cloud-Simple-Chart-Example/
+
+
+
+
+
+
+language learning
+    https://www.reddit.com/r/germany/comments/en8dg6/i_made_a_free_website_where_you_can_learn_german/
+
+
+
+
+electronics
+    transistors
+        https://arduinodiy.wordpress.com/2012/05/02/using-mosfets-with-ttl-levels/
+
+
+
+
+visualization
+    https://infogram.com/
+    https://www.highcharts.com/
+        https://github.com/kyper-data/python-highcharts
+    https://gojs.net
+
+
+
+collaborative tools
+    http://tapor.ca/tool_lists/15
+    https://mural.co/templates
+    http://searchteam.com
+        cant log in
+
+
+
+mindmapping
+    freeplane
+    https://en.wikipedia.org/wiki/Compendium_(software)
+        https://github.com/CompendiumNG/CompendiumNG/wiki/Download%2C-build-and-run-CompendiumNG-from-GitHub
+
+
+
+
+meta
+    http://tapor.ca/
+    https://www.cubicweb.org/1347429
+        https://www.cubicweb.org/blog/1238
+        https://www.cubicweb.org/Link
+        https://cubicweb.readthedocs.io/en/latest/book/devrepo/cubes/available-cubes/
+    https://hypothes.is/search
+    https://www.cubicweb.org/link/2909358
+
+
+
+
+
+webdev
+    https://developer.logicblox.com/using-modeler-js-applications/
+    https://www.cubicweb.org/blogentry/17069884
+        Hypermedia API with cubicweb-jsonschema
+    https://mavo.io/docs/primer/#mv-app
+    https://plugins.mavo.io/plugin/chart
+    https://stackshare.io/no-code-platforms
+    https://sheety.co/
+    https://nocodeapi.com/
+    https://bubble.io/
+    https://www.netlify.com
+    https://www.integromat.com/en/blog/2019/11/18/every-tool-you-need-to-build-without-code/
+
+    http://nytimes.github.io/pourover/
+    https://www.cubicweb.org/link/2909347
+    https://gojs.net
+    https://dwkit.com/documentation/video-tutorials
+
+
+
+
+
+
+ML
+    https://www.h2o.ai/products/h2o-driverless-ai/#feature-engineering
+    https://www.reddit.com/r/artificial/comments/eu6brx/when_i_was_learning_machine_learning_for_the/
+
+
+
+
+TT
+    https://github.com/moonad/Formality/
+
+
+
+
+
+voice-coding
+    https://news.ycombinator.com/item?id=22404264
+	https://talonvoice.com/
+		https://www.patreon.com/join/lunixbochs
+
+
+
+
+
+todo
+    https://www.honeycomb.io/microservices/
+    https://stackoverflow.com/questions/18760281/how-to-increase-scrollback-buffer-size-in-tmux
+    https://graphik-team.github.io/graal/
+        The existential rule framework
+    https://basecamp.com/shapeup/3.4-chapter-12#status-without-asking
+
+
+    http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_json.pl
+    https://github.com/logicmoo/ClioPatria-filessytem-and-clausedb/blob/master/README.md
+    https://www.swi-prolog.org/pldoc/man?section=termtojson
+    https://pengines.swi-prolog.org/apps/scratchpad/index.html#
+
+    http://www.pathwayslms.com/swipltuts/clpfd/clpfd.html
+    http://www.pathwayslms.com/swipltuts/message/index.html
+
+    CHR
+        http://www.pathwayslms.com/swipltuts/chr/basics.html
+        http://www.pathwayslms.com/swipltuts/chr/examples.html
+        https://dtai.cs.kuleuven.be/CHR/files/tutorial_iclp2008.pdf
+            Alternate Ending?
+            Unspecified which partner is found?
+            coin ==> heads. coin ==> tails.
+                ^ im getting different order
+
+
+        https://www.swi-prolog.org/pldoc/man?section=debugging
+        https://developer.logicblox.com/using-modeler-js-applications/
+        https://boxbase.org/entries/2018/aug/13/constraint_handling_rules/
+
+
+    https://www.swi-prolog.org/pldoc/doc/_SWI_/library/rewrite.pl?format_comments=false&show=src
+    https://www.swi-prolog.org/pldoc/man?section=solutionsequences
+
+    https://www.doc.ic.ac.uk/~mpsha/ECExplained.pdf
+        event calculus
+
+    https://swish.swi-prolog.org/pldoc/doc/_CWD_/lib/render/graphviz.pl
+    https://swish.swi-prolog.org/example/render_graphviz.swinb
+
+
+
+
