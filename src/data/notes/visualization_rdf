@@ -18,6 +18,8 @@
                     sw for managing domain-specific data, where rdf is largely just a storage mechanism. These are the "templating systems".
 
         resources
+            https://doriantaylor.com/the-symbol-management-problem
+            https://www.semanticweb.org/wiki/Category_Semantic_wiki.html
             https://stackoverflow.com/questions/52848013/how-can-i-visualize-graph-data-with-amazon-neptune
             https://github.com/timrdf/vsr/wiki
                 https://github.com/timrdf/vsr/wiki/General-Strategies-for-Visualizing-RDF-Graphs
@@ -40,6 +42,26 @@
 
 
         software
+
+            https://en.wikipedia.org/wiki/Semantic_MediaWiki
+                embedding triples into wiki markdown, and an ecosystem around that
+
+            dead
+                https://www.semanticweb.org/wiki/BOWiki.html
+                https://www.semanticweb.org/wiki/Braindump.html
+                https://www.semanticweb.org/wiki/COW.html
+                https://www.semanticweb.org/wiki/Freebase.html
+                https://www.semanticweb.org/wiki/Hypertext_Knowledge_Workbench.html
+
+
+
+
+            http://www.artificialmemory.net/artificialmemory.aspx?ID=360258&SUGGEST=extended+artificial
+
+
+
+
+
             excel
 
                 our solution
@@ -153,6 +175,9 @@
             https://github.com/jmvanel/semantic_forms
                 model driven form-based editing, useful as a framework for making rdf-stored data editable to users
 
+            http://datashapes.org/forms.html
+                SHACL
+
             CNL-based:
 
                 https://www.cognitum.eu/semantics/examples/FIBO.aspx
@@ -202,6 +227,9 @@
                 https://www.researchgate.net/publication/283345803_OSMoSys_A_Web_Interface_for_Graph-Based_RDF_Data_Visualization_and_Ontology_Browsing
 
             nope:
+                https://geistmap.com/
+                    undirected, unlabeled nodes, why would you use that?
+
                 https://sourceforge.net/projects/veudas/
                     dead
 
@@ -283,10 +311,18 @@
 
 
             mind-mapping sw:
-
-                an issue with all of them so for is a lack of automatic layouting for "non-primary" connections, ie, nodes are layouted by their "part-of" relationship, and you can choose different presentations of that, or move a child node into different slots of the parent node, but once you add a "custom" relation, you have to position it yourself. But we could tackle that.
-
                 ordered from most promising to least
+
+
+                    iMapping
+                        https://www.youtube.com/watch?v=KKh6XY2DHS8
+                            "formality considered harmful"
+                        setevi-html
+
+
+                    note
+                        an issue with all of them so for is a lack of automatic layouting for "non-primary" connections, ie, nodes are layouted by their "part-of" relationship, and you can choose different presentations of that, or move a child node into different slots of the parent node, but once you add a "custom" relation, you have to position it yourself. But we could tackle that.
+
 
                     freeplane
                         seems to have a more freeform attitude, yet still keyboard friendly.
@@ -378,6 +414,19 @@
     dead?
         http://www.visgraph3.org/
         https://sourceforge.net/projects/veudas/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     ?
