@@ -311,6 +311,8 @@
 
 
             mind-mapping sw:
+                meta:
+                    http://www.opensourcecreative.org/ep040/
                 ordered from most promising to least
 
 
@@ -384,6 +386,8 @@
                 crashes, ooms, poor performance (in my tests)
         cool ones found so far:
                 stardog
+                    - https://www.stardog.com/docs/#_sql_schema_mappings
+                    - GraphQL
                     - virtual graphs, but only in paid version
                     - owl inference with explanations
                     - quite nice
@@ -403,11 +407,24 @@
                 https://github.com/Merck/Halyard
 
         important factors:
-            automatic rest api:
+            automatic rest api?
 
-            sql interface for nlsql:
+            non-rdf interfaces:
+                stardog
+                    SQL: https://www.stardog.com/docs/#_sql_schema_mappings
+                    GraphQL:  "automagically provides a GraphQL endpoint over your existing RDF graphs"
+                        https://www.stardog.com/trainings/querying-stardog-with-graphql/
+                        https://www.stardog.com/blog/graphql-and-paths/
                 neptune
+                    cypher
+                    GraphQL:
+                        "If you're interested in enabling GraphQL for access to Amazon Neptune, there's an example application showing how to use AWS AppSync GraphQL and Amazon Neptune."
+                        ???
+                    sql: no
                 anzo
+                    OpenCypher
+                    sql: no
+
 
 
 
