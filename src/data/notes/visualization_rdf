@@ -2,33 +2,47 @@
     explore,visualize,edit,manage
 
         note:
-            there is kind of a continuum from dealing with bare triples to dealing with domain-specific data:
-                strictly: management of rdf-based data in a generic way
-                    i would further categorize:
-                        Just nodes and edges:
-                            sw that deals with graphs in the mathematical sense, mostly represented by tools for "property graph" databases, ie, neo4j. Rdf is more expressive and can map to this only partially.
-                        sw aware of contexts(graphs):
-                            for example gruff.
-                less strictly:
-                    sw that includes special functionality for managing rdf lists (still in a non-domain-specific way). Rdf lists are a common idiom.
+            there is kind of a continuum starting from dealing with bare triples:
+                strictly: management of graph and rdf-based data in a generic way
+                    Just nodes and edges:
+                        sw that deals with graphs in the mathematical sense, mostly represented by tools for "property graph" databases, ie, neo4j. Rdf is more expressive and can map to this only partially.
+                    sw aware of contexts(graphs):
+                        for example gruff.
+                    sw that includes special functionality for managing rdf lists (still in a non-domain-specific way).
                         none found yet, but not so hard to add implement
                     less common/new idioms:
                         dealing with properties of graphs / properties of triples intelligently, understanding nested graphs/contexts
-                even less strictly:
-                    sw for managing domain-specific data, where rdf is largely just a storage mechanism. These are the "templating systems".
+                less strictly:
+                    sw for managing domain-specific data, where rdf is largely just a storage mechanism, "templating systems".
+                even less strictly, could be said: starting from freeform text, progressively adding stronger semantics, and not losing the implicit information hidden in the form...
+                    artificialmemory.net/
+                    https://doriantaylor.com/
+                    iMapping,
+                    CDS,
+                    personal knowledge management,
+                    automatic entity annotation,
+                    https://github.com/timrdf/vsr/wiki/Discourse-ontologies
+
 
         resources
-            https://doriantaylor.com/the-symbol-management-problem
-            https://www.semanticweb.org/wiki/Category_Semantic_wiki.html
-            https://stackoverflow.com/questions/52848013/how-can-i-visualize-graph-data-with-amazon-neptune
-            https://github.com/timrdf/vsr/wiki
-                https://github.com/timrdf/vsr/wiki/General-Strategies-for-Visualizing-RDF-Graphs
+            recommended
+                https://doriantaylor.com/the-symbol-management-problem
+                http://graphdatamodeling.com/Graph%20Data%20Modeling/HallOfFame/DMHallOfFame.html
+
+            todo
+                https://www.semanticweb.org/wiki/Category_Semantic_wiki.html
+                still going through this one
+
+            interesting wrt UI development
+                https://github.com/timrdf/vsr/wiki
+                    https://github.com/timrdf/vsr/wiki/General-Strategies-for-Visualizing-RDF-Graphs
+
             http://svn.code.sf.net/p/eulergui/code/trunk/eulergui/html/semantic_based_apps_review.html
-            http://graphdatamodeling.com/Graph%20Data%20Modeling/HallOfFame/DMHallOfFame.html
+                outdated but useful
+            https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
             https://stackoverflow.com/questions/66720/are-there-any-tools-to-visualize-a-rdf-graph-please-include-a-screenshot
             http://tapor.ca/tools?attribute_values=66&order=rating&sort=desc
             https://www.w3.org/2018/09/rdf-data-viz/
-            https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
             https://github.com/w3c/EasierRDF/issues/35
             https://github.com/w3c/EasierRDF/issues/53
             http://sensormeasurement.appspot.com/?p=visualization_sota
@@ -39,107 +53,228 @@
             https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=8&ved=2ahUKEwj1-_HI4urmAhXONcAKHaq7BRMQFjAHegQICRAC&url=http%3A%2F%2Fwww.dsi.uclm.es%2Fdescargas%2Ftechnicalreports%2FDIAB-13-09-1%2FTR_linked_data_tools.pdf&usg=AOvVaw3tKcNVfWq-A72UIUXyR_Ls
             http://raghavam.github.io/talks/2019/Intro-SemWeb/rdf.html
             http://www.uni-ulm.de/fileadmin/website_uni_ulm/iui.inst.170/home/raiser/Diplomarbeit_Wasserthal2009.pdf
-
-
-        software
-
-            https://en.wikipedia.org/wiki/Semantic_MediaWiki
-                embedding triples into wiki markdown, and an ecosystem around that
-
-            dead
-                https://www.semanticweb.org/wiki/BOWiki.html
-                https://www.semanticweb.org/wiki/Braindump.html
-                https://www.semanticweb.org/wiki/COW.html
-                https://www.semanticweb.org/wiki/Freebase.html
-                https://www.semanticweb.org/wiki/Hypertext_Knowledge_Workbench.html
+            https://stackoverflow.com/questions/52848013/how-can-i-visualize-graph-data-with-amazon-neptune
 
 
 
+        software, roughly ordered by immediate relevance:
 
-            http://www.artificialmemory.net/artificialmemory.aspx?ID=360258&SUGGEST=extended+artificial
+            todo
+                https://github.com/bricaud/graphexp
+                    todo, try it
 
+                https://www.tomsawyer.com/graph-database-browser/
+                    todo, try it
 
+                todo, visualization
+                    http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_graphviz.pl
+                    https://medium.com/@cambridgeintel/visualizing-aws-neptune-data-with-regraph-ff0207a80cb2
 
+                todo, templating/viewing systems/faceted browsing
+                    - one of these really should work as a basis of our next-gen UI
+
+                    https://github.com/mavoweb/mavo
+                    https://docs.cambridgesemantics.com/anzograph/userdoc/deploy-tools.htm
+                    https://www.datagalaxy.com/
+                    http://opoirel.free.fr/strixDB/VGR.html
+                    https://zeppelin.apache.org/
+                        https://hub.docker.com/r/cambridgesemantics/contrib-zeppelin/
+                    https://metaphacts.com/
+                        https://aws.amazon.com/blogs/apn/exploring-knowledge-graphs-on-amazon-neptune-using-metaphactory/
+                        https://wikidata.metaphacts.com/resource/app:Examples
+                        https://wikidata.metaphacts.com/resource/wd:Q7187
+                        https://wikidata.metaphacts.com/resource/app:Start
+                        https://wikidata.metaphacts.com/resource/wd:Q766195
+                        https://wikidata.metaphacts.com/resource/app:LifeSciences
+                        https://wikidata.metaphacts.com/resource/?uri=http%3A%2F%2Fwww.metaphacts.com%2Fresource%2Fassets%2FOntodiaDiagrams
+                        https://wikidata.metaphacts.com/resource/app:FederationExamples
+                    https://github.com/timrdf/vsr
+                        https://github.com/timrdf/vsr/wiki
+                    https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure/models/blocksontology
+                        https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure
+                    http://www.visualdataweb.org/tfacet.php
+                    https://www.google.com/search?q=Jambalaya+rdf
+                    http://www.visualdataweb.org/gfacet.php
+                    http://www.visualdataweb.org/semlens.php
+                    https://chrome.google.com/webstore/detail/microstrategy-hyperintell/ikaoafechdeidffgniffdhdckeclcdhf?hl=en
+                    https://ali1k.com/rdface/rdface06/tinymce/examples/rdface.html#
 
 
             excel
+                - our solution
+                - http://labs.sparna.fr/skos-play/convert
 
-                our solution
-
-                http://labs.sparna.fr/skos-play/convert
-
-
-
-            yed
+            yED
+                recommended
+                https://www.yworks.com/products/yed/download#download
                 automatic layouting
-                -
+                how to export into it:
+                    we need to do it in a streaming fashion:
+
+                    pyyed:
+                        chokes on 1000+ triples
                     best to save our stuff as graphml, that's a xml format comparable to graphviz's.
                     https://www.swi-prolog.org/pack/file_details/graphml/prolog/graphml_ugraph.pl is no use because it only uses "ugraphs", undirected graphs
-                    so either write raw xml in prolog, or maybe use networkx in python:
+                    maybe use networkx in python?
                         https://stackoverflow.com/questions/51048833/networkx-exporting-graphml-with-edge-labels-height-and-width-attributes-cust
 
 
-            todo
-                https://www.yworks.com/products/yed/download#download
-
-            https://github.com/bricaud/graphexp
-                todo, try it
-
-            https://www.tomsawyer.com/graph-database-browser/
-                todo, try it
-
-
-            todo, visualization
-
-                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_graphviz.pl
-                https://medium.com/@cambridgeintel/visualizing-aws-neptune-data-with-regraph-ff0207a80cb2
-
-            todo, templating/viewing systems/faceted browsing
-                https://github.com/mavoweb/mavo
-                https://docs.cambridgesemantics.com/anzograph/userdoc/deploy-tools.htm
-                https://www.datagalaxy.com/
-                http://opoirel.free.fr/strixDB/VGR.html
-                https://zeppelin.apache.org/
-                    https://hub.docker.com/r/cambridgesemantics/contrib-zeppelin/
-                https://metaphacts.com/
-                    https://aws.amazon.com/blogs/apn/exploring-knowledge-graphs-on-amazon-neptune-using-metaphactory/
-                    https://wikidata.metaphacts.com/resource/app:Examples
-                    https://wikidata.metaphacts.com/resource/wd:Q7187
-                    https://wikidata.metaphacts.com/resource/app:Start
-                    https://wikidata.metaphacts.com/resource/wd:Q766195
-                    https://wikidata.metaphacts.com/resource/app:LifeSciences
-                    https://wikidata.metaphacts.com/resource/?uri=http%3A%2F%2Fwww.metaphacts.com%2Fresource%2Fassets%2FOntodiaDiagrams
-                    https://wikidata.metaphacts.com/resource/app:FederationExamples
-                https://github.com/timrdf/vsr
-                    https://github.com/timrdf/vsr/wiki
-
-
-                https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure/models/blocksontology
-                    https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure
-
-                http://www.visualdataweb.org/tfacet.php
-                https://www.google.com/search?q=Jambalaya+rdf
-                http://www.visualdataweb.org/gfacet.php
-                http://www.visualdataweb.org/semlens.php
-                https://chrome.google.com/webstore/detail/microstrategy-hyperintell/ikaoafechdeidffgniffdhdckeclcdhf?hl=en
-                https://ali1k.com/rdface/rdface06/tinymce/examples/rdface.html#
-
-
-            http://cliopatria.swi-prolog.org/swish/pldoc/doc/home/swipl/src/ClioPatria/ClioPatria/web/tutorial/LoadPirates.txt
-                        http://cliopatria.swi-prolog.org/browse/list_graph?graph=https%3A//cliopatria.swi-prolog.org/packs/vumix
-                        http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_optimise.pl
-                        http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_label.pl
-                        http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_json.pl
-
             allegro graph + gruff + agraph webview:
-                        form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
+                recommended
+                form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
 
             TBCME/TBCSE/TBCFE
+                recommended
+                template engine with sparql:
+                    https://www.topquadrant.com/resources/technology/docs/swp-skos-broader.html
+                    https://www.topquadrant.com/technology/sparql-web-pages-swp/
+                https://www.topquadrant.com/technology/graphql/
                 https://www.google.com/search?q=topbraid+visualization
                 https://www.topquadrant.com/topbraid-composer-install/
                     buggy, can't even load a file
                     many cool features: "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
                     seems to be heavily aimed at editing ontologies in exactly-shaped forms rather than at working with arbitrary rdf data (can't even paste our data in)
+
+
+            http://datashapes.org/forms.html
+                recommended
+                SHACL
+                https://www.topquadrant.com/constraints-on-rdflists-using-shacl/
+
+            CNL-based:
+
+                https://www.cognitum.eu/semantics/examples/FIBO.aspx
+
+                ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
+
+            https://www.cubicweb.org/
+                interesting
+                web app framework, higher-level than django
+                data format compatible with rdf (EAV)
+                export into rdf
+                    https://www.cubicweb.org/link/1347429?vid=rdf
+
+            ontowiki
+                recommended
+                dead, needs maintenance, but seems well-developed, could take it over
+
+
+            mind-mapping sw:
+                meta:
+                    http://www.opensourcecreative.org/ep040/
+
+                ordered from most promising to least:
+                    iMapping
+                        recommended
+                        https://www.youtube.com/watch?v=KKh6XY2DHS8
+                            "formality considered harmful"
+                        setevi-html
+                        http://xam.de/go/pkm/
+
+                    freeplane
+                        recommended
+                        seems to have a more freeform attitude, yet still keyboard friendly.
+                        i can definitely imagine this used for exploring rdf-based data (or a high-level, possibly domain-specific export of them)
+                        scriptable
+                        MapInsight
+                            https://freeplane.sourceforge.io/wiki/index.php/Add-ons_(install)
+                            https://github.com/adxsoft/MapInsight-Addon
+                        https://freeplane.sourceforge.io/wiki/index.php/Current_Freeplane_File_Format
+                        http://freemind.sourceforge.net/wiki/index.php/Import_and_export
+
+                    inforapid
+                        http://www.buildyourmap.com/
+                        many import formats
+                        rdf import, somewhat usable, but skips nodes
+                        "build sitemap"
+                        "watch clipboard"
+
+                    https://www.thebrain.com/
+                        maybe useful for some creative mindmapping, but the navigation doesn't seem suited for factual work?
+
+                    "XMind: ZEN 2020"
+                        keyboard based navigation between nodes, so far the closest to what i'd want in a rdf viewer
+                        implicit "is-part-of" relation, other relations possible but not keyboard navigable
+
+                        "open source"(?..)
+
+                    "XMind 8 Pro"
+                        "open-source"(?..)
+
+                    https://mind42.com/
+                        basic, browser based, not sure if it supports "custom" links
+
+                    vym
+                        no "custom" links, even in latest version
+                        Qt (probably snappier than java)
+
+                    note
+                        an issue with all of them so for is a lack of automatic layouting for "non-primary" connections, ie, nodes are layouted by their "part-of" relationship, and you can choose different presentations of that, or move a child node into different slots of the parent node, but once you add a "custom" relation, you have to position it yourself. But we could tackle that.
+
+
+            browser-based would be ideal
+
+                http://www.artificialmemory.net
+                    interesting wrt browser-based UI
+                https://github.com/AtomGraph/Web-Client
+                http://vowl.visualdataweb.org/webvowl.html
+                https://gojs.net
+                    nice demos but no keyboard-friendly navigation (by default)
+
+                https://www.rubensworks.net/blog/2019/10/06/using-rdf-in-javascript/
+                https://www.google.com/search?q=js+scene+graph
+                https://rdf.js.org/
+                https://github.com/linkeddata/rdflib.js
+                https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
+
+                d3.js
+                    https://github.com/timrdf/vsr/wiki/d3
+                    https://medium.com/dailyjs/the-trouble-with-d3-4a84f7de011f
+                        https://docs.google.com/spreadsheets/d/1k-GVrhLw2_KdSvfCOt3RzF6otWfZQ5rbsBpVnTP425w/edit#gid=0
+                    simple demo
+                        https://github.com/jimmccusker/rdfviewer
+                    cool demo
+                        http://givingsense.eu/demo/bloomdisplay/d3TreeBloom.htm
+                        https://onsem.wp.imt.fr/2014/03/18/web-visualization-of-a-simple-ontology/
+
+                cytoscape.js
+                    didnt find anything rdf related, but i guess it would be a reasonable engine for building something
+
+            neo4j for rdf visualization, neo4j built-in editor:
+                https://neo4j.com/developer/tools-graph-visualization/
+                https://www.google.com/search?q=neo4j+visual+editor
+                https://pehei.de/en/posts/neo4j-graph-view-editor
+                    https://github.com/adadgio/neo4j-js-ng2
+                ..not too impressed, maybe:
+
+                https://graphileon.com
+                    https://graphileon.com/getting-started-videos/
+                    https://graphileon.com/licenses/
+                    not full rdf support, but worth exploring
+                    they are working on integration with triplestores, but dunno how that'll work
+
+                https://neo4j.com/blog/introducing-neo4j-bloom-graph-data-visualization-for-everyone/
+                will be inherently limited by not being able to follow properties of graphs. But then, what existing rdf tool wont?
+                it should be useful enough for letting users produce data
+                https://neo4j.com/docs/labs/nsmntx/current/import/#ImportQuadRDF
+                https://github.com/Rothamsted/rdf2neo
+                https://adamcowley.co.uk/neo4j/real-time-ui-vuejs-neo4j-kafka/
+
+
+            cytoscape
+                - desktop, java
+
+                cytoscape version 2,
+                    RDFScsape
+                        unclear if it still can be downloaded from anywhere
+                cytoscape version 3
+                    https://apps.cytoscape.org/apps/semscape
+                        try with http://chianti.ucsd.edu/cytoscape-3.1.0/ or older
+                i didnt get any cytoscape version to run on ubuntu 18.04 ..
+
+
+            https://github.com/jmvanel/semantic_forms
+                model driven form-based editing, useful as a framework for making rdf-stored data editable to users
 
             http://rdfvizler.dyreriket.xyz/
                 visualization ontology + implementation
@@ -157,9 +292,6 @@
             https://github.com/JanWielemaker/triple20.git
                 works, could have some use, somewhat confusing
 
-            https://github.com/timrdf/vsr/wiki/Discourse-ontologies
-                todo
-
             https://wiki.duraspace.org/display/ld4lLABS/The+VitroLib+Metadata+Editor
                 "Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. "
 
@@ -172,55 +304,46 @@
                 http://osde.openlinksw.com/
                 simple table-of-triples-based rdf editor, virtuoso-integrated
 
-            https://github.com/jmvanel/semantic_forms
-                model driven form-based editing, useful as a framework for making rdf-stored data editable to users
 
-            http://datashapes.org/forms.html
-                SHACL
+            https://www.d3web.de/Wiki.jsp?page=D3web-Core
+                    todo, didnt run? should try it again
 
-            CNL-based:
 
-                https://www.cognitum.eu/semantics/examples/FIBO.aspx
+            ClioPatria
+                http://cliopatria.swi-prolog.org/swish/pldoc/doc/home/swipl/src/ClioPatria/ClioPatria/web/tutorial/LoadPirates.txt
+                http://cliopatria.swi-prolog.org/browse/list_graph?graph=https%3A//cliopatria.swi-prolog.org/packs/vumix
+                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_optimise.pl
+                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_label.pl
+                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_json.pl
 
-                ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
 
-            https://www.cubicweb.org/
-                web app framework, higher-level than django
-                data format compatible with rdf (EAV)
-                export into rdf
-                    https://www.cubicweb.org/link/1347429?vid=rdf
+            https://sourceforge.net/projects/wikiont/
+                ?
+                WikiOnt-CNL
+
+
+            https://www.semanticweb.org/wiki/Wikidsmart.html
+                interesting but not useful for us
+
+
+            https://www.semantic-mediawiki.org
+                interesting, long-lived project
+                embedding triples into wiki markdown, and an ecosystem around that
 
 
             https://www.rdfexplorer.org/
                 browser-based,
                 some kind of browsing-by-querying-something
 
-
             http://en.lodlive.it/
                 browser-based,
-                cannot load own data
-
-            ontowiki
-                dead, needs maintenance, but seems well-developed, could take it over
-
-            cytoscape
-                - desktop, java
-
-                cytoscape version 2,
-                    RDFScsape
-                        unclear if it still can be downloaded from anywhere
-                cytoscape version 3
-                    https://apps.cytoscape.org/apps/semscape
-                        try with http://chianti.ucsd.edu/cytoscape-3.1.0/ or older
-                i didnt get any cytoscape version to run on ubuntu 18.04 ..
-
+                cannot load own data yet
 
             simple visualizers
                 https://github.com/mhausenblas/turtled
                 http://www.easyrdf.org/converter
                 http://rhizomik.net/html/redefer/rdf2svg-form/
                 https://github.com/idafensp/ar2dtool
-
 
             wtf:
                 https://linkedpipes.com/
@@ -255,112 +378,19 @@
                     http://tapor.ca/tools/363
                     dead
 
+            dead
+                https://www.semanticweb.org/wiki/BOWiki.html
+                https://www.semanticweb.org/wiki/Braindump.html
+                https://www.semanticweb.org/wiki/COW.html
+                https://www.semanticweb.org/wiki/Freebase.html
+                https://www.semanticweb.org/wiki/Hypertext_Knowledge_Workbench.html
+
+
+
+
             statistical visualization
                 http://aksw.org/Projects/CubeViz.html
                 gephi
-
-            neo4j for rdf visualization, neo4j built-in editor:
-                https://neo4j.com/developer/tools-graph-visualization/
-                https://www.google.com/search?q=neo4j+visual+editor
-                https://pehei.de/en/posts/neo4j-graph-view-editor
-                    https://github.com/adadgio/neo4j-js-ng2
-                ..not too impressed, maybe:
-
-                https://graphileon.com
-                    https://graphileon.com/getting-started-videos/
-                    https://graphileon.com/licenses/
-                    not full rdf support, but worth exploring
-                    they are working on integration with triplestores, but dunno how that'll work
-
-                https://neo4j.com/blog/introducing-neo4j-bloom-graph-data-visualization-for-everyone/
-                will be inherently limited by not being able to follow properties of graphs. But then, what existing rdf tool wont?
-                it should be useful enough for letting users produce data
-                https://neo4j.com/docs/labs/nsmntx/current/import/#ImportQuadRDF
-                https://github.com/Rothamsted/rdf2neo
-                https://adamcowley.co.uk/neo4j/real-time-ui-vuejs-neo4j-kafka/
-
-
-            https://www.d3web.de/Wiki.jsp?page=D3web-Core
-                    didnt run? should try it again
-
-            browser-based would be ideal
-
-                https://github.com/AtomGraph/Web-Client
-                http://vowl.visualdataweb.org/webvowl.html
-                https://gojs.net
-                    nice demos but no keyboard-friendly navigation (by default)
-
-                https://www.rubensworks.net/blog/2019/10/06/using-rdf-in-javascript/
-                https://www.google.com/search?q=js+scene+graph
-                https://rdf.js.org/
-                https://github.com/linkeddata/rdflib.js
-                https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
-
-                d3.js
-                    https://github.com/timrdf/vsr/wiki/d3
-                    https://medium.com/dailyjs/the-trouble-with-d3-4a84f7de011f
-                        https://docs.google.com/spreadsheets/d/1k-GVrhLw2_KdSvfCOt3RzF6otWfZQ5rbsBpVnTP425w/edit#gid=0
-                    simple demo
-                        https://github.com/jimmccusker/rdfviewer
-                    cool demo
-                        http://givingsense.eu/demo/bloomdisplay/d3TreeBloom.htm
-                        https://onsem.wp.imt.fr/2014/03/18/web-visualization-of-a-simple-ontology/
-
-                cytoscape.js
-                    didnt find anything rdf related, but i guess it would be a reasonable engine for building something
-
-
-            mind-mapping sw:
-                meta:
-                    http://www.opensourcecreative.org/ep040/
-                ordered from most promising to least
-
-
-                    iMapping
-                        https://www.youtube.com/watch?v=KKh6XY2DHS8
-                            "formality considered harmful"
-                        setevi-html
-
-
-                    note
-                        an issue with all of them so for is a lack of automatic layouting for "non-primary" connections, ie, nodes are layouted by their "part-of" relationship, and you can choose different presentations of that, or move a child node into different slots of the parent node, but once you add a "custom" relation, you have to position it yourself. But we could tackle that.
-
-
-                    freeplane
-                        seems to have a more freeform attitude, yet still keyboard friendly.
-                        i can definitely imagine this used for exploring rdf-based data (or a high-level, possibly domain-specific export of them)
-                        scriptable
-                        MapInsight
-                            https://freeplane.sourceforge.io/wiki/index.php/Add-ons_(install)
-                            https://github.com/adxsoft/MapInsight-Addon
-                        https://freeplane.sourceforge.io/wiki/index.php/Current_Freeplane_File_Format
-                        http://freemind.sourceforge.net/wiki/index.php/Import_and_export
-
-                    http://www.buildyourmap.com/
-                        inforapid
-                        many import formats
-                        rdf import, somewhat usable, but skips nodes
-                        "build sitemap"
-                        "watch clipboard"
-
-                    https://www.thebrain.com/
-                        maybe useful for some creative mindmapping, but the navigation doesn't seem suited for factual work?
-
-                    "XMind: ZEN 2020"
-                        keyboard based navigation between nodes, so far the closest to what i'd want in a rdf viewer
-                        implicit "is-part-of" relation, other relations possible but not keyboard navigable
-
-                        "open source"(?..)
-
-                    "XMind 8 Pro"
-                        "open-source"(?..)
-
-                    https://mind42.com/
-                        basic, browser based, not sure if it supports "custom" links
-
-                    vym
-                        no "custom" links, even in latest version
-                        Qt (probably snappier than java)
 
 
     pretty-print:
@@ -381,30 +411,6 @@
 
 
     triplestores:
-        not so excited about:
-            blazegraph
-                crashes, ooms, poor performance (in my tests)
-        cool ones found so far:
-                stardog
-                    - https://www.stardog.com/docs/#_sql_schema_mappings
-                    - GraphQL
-                    - virtual graphs, but only in paid version
-                    - owl inference with explanations
-                    - quite nice
-                allegro (+ gruff)
-                    - nice
-        okay
-            virtuoso
-                URLBurner.
-                    could be used like this:
-                        create a django service to be accessed through a bookmarklet.
-                        service first submits a page to uriburner, then makes a request to add "x a bookmark; byUser koo"
-                        export from virtuoso, edit in protege?
-                        could be used to build a bookrmarking solution, but isn't one, thus far
-
-        experimental:
-            dunno:
-                https://github.com/Merck/Halyard
 
         important factors:
             automatic rest api?
@@ -415,16 +421,43 @@
                     GraphQL:  "automagically provides a GraphQL endpoint over your existing RDF graphs"
                         https://www.stardog.com/trainings/querying-stardog-with-graphql/
                         https://www.stardog.com/blog/graphql-and-paths/
-                neptune
-                    cypher
-                    GraphQL:
-                        "If you're interested in enabling GraphQL for access to Amazon Neptune, there's an example application showing how to use AWS AppSync GraphQL and Amazon Neptune."
-                        ???
-                    sql: no
                 anzo
                     OpenCypher
                     sql: no
 
+                neptune
+                    cypher
+                    ? GraphQL:
+                        "If you're interested in enabling GraphQL for access to Amazon Neptune, there's an example application showing how to use AWS AppSync GraphQL and Amazon Neptune."
+                        ???
+                    sql: no
+
+
+        cool ones found so far:
+                stardog
+                    - recommended
+                    - https://www.stardog.com/docs/#_sql_schema_mappings
+                    - GraphQL
+                    - virtual graphs, but only in paid version
+                    - owl inference with explanations
+                allegro (+ gruff)
+                    - recommended, at least for gruff, but stardog has a lot more functionality useful for us
+        okay
+            virtuoso
+                URLBurner.
+                    could be used like this:
+                        create a django service to be accessed through a bookmarklet.
+                        service first submits a page to uriburner, then makes a request to add "x a bookmark; byUser koo"
+                        export from virtuoso, edit in protege?
+                        could be used to build a bookrmarking solution, but isn't one by itself, so far
+
+        experimental:
+            dunno:
+                https://github.com/Merck/Halyard
+
+        not so excited about:
+            blazegraph
+                crashes, ooms, poor performance (in my tests...)
 
 
 
@@ -433,32 +466,17 @@
         https://sourceforge.net/projects/veudas/
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     ?
         https://marketplace.eclipse.org/content/komma-rdf-eclipse
         https://marketplace.eclipse.org/content/emf-triple
             https://github.com/ghillairet/emftriple
 
 
-
     misc
-        https://www.topquadrant.com/constraints-on-rdflists-using-shacl/
-        https://www.topquadrant.com/technology/graphql/
+        https://www.w3.org/TR/swbp-n-aryRelations/
 
         https://github.com/AKSW/KBox
-            KBox is the option for data dependency management
+            KBox is the option for ontology dependency management
 
         http://ns.softwiki.de/req/2/index-en.html
             Semantic Web Ontology for Requirements Engineering (SWORE)
