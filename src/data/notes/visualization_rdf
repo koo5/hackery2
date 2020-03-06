@@ -1,6 +1,5 @@
  rdf:
     explore,visualize,edit,manage
-
         note:
             there is kind of a continuum starting from dealing with bare triples:
                 strictly: management of graph and rdf-based data in a generic way
@@ -15,6 +14,7 @@
                 less strictly:
                     sw for managing domain-specific data, where rdf is largely just a storage mechanism, "templating systems".
                 even less strictly, could be said: starting from freeform text, progressively adding stronger semantics, and not losing the implicit information hidden in the form...
+
                     artificialmemory.net/
                     https://doriantaylor.com/
                     iMapping,
@@ -22,87 +22,22 @@
                     personal knowledge management,
                     automatic entity annotation,
                     https://github.com/timrdf/vsr/wiki/Discourse-ontologies
-
-
-        resources
-            recommended
-                https://doriantaylor.com/the-symbol-management-problem
-                http://graphdatamodeling.com/Graph%20Data%20Modeling/HallOfFame/DMHallOfFame.html
-
-            todo
-                https://www.semanticweb.org/wiki/Category_Semantic_wiki.html
-                still going through this one
-
-            interesting wrt UI development
-                https://github.com/timrdf/vsr/wiki
-                    https://github.com/timrdf/vsr/wiki/General-Strategies-for-Visualizing-RDF-Graphs
-
-            http://svn.code.sf.net/p/eulergui/code/trunk/eulergui/html/semantic_based_apps_review.html
-                outdated but useful
-            https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
-            https://stackoverflow.com/questions/66720/are-there-any-tools-to-visualize-a-rdf-graph-please-include-a-screenshot
-            http://tapor.ca/tools?attribute_values=66&order=rating&sort=desc
-            https://www.w3.org/2018/09/rdf-data-viz/
-            https://github.com/w3c/EasierRDF/issues/35
-            https://github.com/w3c/EasierRDF/issues/53
-            http://sensormeasurement.appspot.com/?p=visualization_sota
-            https://www.w3.org/wiki/Ontology_editors
-            https://pdfs.semanticscholar.org/fe40/f2de08684299b3a6e7466d9420e977c9f420.pdf?_ga=2.39233379.1908259706.1580280149-1924257816.1580280149
-            http://activearchives.org/wiki/Visualizing_RDF
-            https://wiki.lyrasis.org/pages/viewpage.action?pageId=69014248
-            https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=8&ved=2ahUKEwj1-_HI4urmAhXONcAKHaq7BRMQFjAHegQICRAC&url=http%3A%2F%2Fwww.dsi.uclm.es%2Fdescargas%2Ftechnicalreports%2FDIAB-13-09-1%2FTR_linked_data_tools.pdf&usg=AOvVaw3tKcNVfWq-A72UIUXyR_Ls
-            http://raghavam.github.io/talks/2019/Intro-SemWeb/rdf.html
-            http://www.uni-ulm.de/fileadmin/website_uni_ulm/iui.inst.170/home/raiser/Diplomarbeit_Wasserthal2009.pdf
-            https://stackoverflow.com/questions/52848013/how-can-i-visualize-graph-data-with-amazon-neptune
+                    https://idyll-lang.org/docs
+                        """Idyll can be used to create explorable explanations, write data-driven stories, and add interactivity to blog engines and content management systems. The tool can generate standalone webpages or be embedded in existing pages."""
 
 
 
         software, roughly ordered by immediate relevance:
 
-            todo
-                https://github.com/bricaud/graphexp
-                    todo, try it
-
-                https://www.tomsawyer.com/graph-database-browser/
-                    todo, try it
-
-                todo, visualization
-                    http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_graphviz.pl
-                    https://medium.com/@cambridgeintel/visualizing-aws-neptune-data-with-regraph-ff0207a80cb2
-
-                todo, templating/viewing systems/faceted browsing
-                    - one of these really should work as a basis of our next-gen UI
-
-                    https://github.com/mavoweb/mavo
-                    https://docs.cambridgesemantics.com/anzograph/userdoc/deploy-tools.htm
-                    https://www.datagalaxy.com/
-                    http://opoirel.free.fr/strixDB/VGR.html
-                    https://zeppelin.apache.org/
-                        https://hub.docker.com/r/cambridgesemantics/contrib-zeppelin/
-                    https://metaphacts.com/
-                        https://aws.amazon.com/blogs/apn/exploring-knowledge-graphs-on-amazon-neptune-using-metaphactory/
-                        https://wikidata.metaphacts.com/resource/app:Examples
-                        https://wikidata.metaphacts.com/resource/wd:Q7187
-                        https://wikidata.metaphacts.com/resource/app:Start
-                        https://wikidata.metaphacts.com/resource/wd:Q766195
-                        https://wikidata.metaphacts.com/resource/app:LifeSciences
-                        https://wikidata.metaphacts.com/resource/?uri=http%3A%2F%2Fwww.metaphacts.com%2Fresource%2Fassets%2FOntodiaDiagrams
-                        https://wikidata.metaphacts.com/resource/app:FederationExamples
-                    https://github.com/timrdf/vsr
-                        https://github.com/timrdf/vsr/wiki
-                    https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure/models/blocksontology
-                        https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure
-                    http://www.visualdataweb.org/tfacet.php
-                    https://www.google.com/search?q=Jambalaya+rdf
-                    http://www.visualdataweb.org/gfacet.php
-                    http://www.visualdataweb.org/semlens.php
-                    https://chrome.google.com/webstore/detail/microstrategy-hyperintell/ikaoafechdeidffgniffdhdckeclcdhf?hl=en
-                    https://ali1k.com/rdface/rdface06/tinymce/examples/rdface.html#
-
+            http://worrydream.com/ClimateChange/#media
+                interesting, wrt ideal browser-based accounting/exploration UI
 
             excel
                 - our solution
                 - http://labs.sparna.fr/skos-play/convert
+
+            https://www.tomsawyer.com/graph-database-browser/
+                todo, looks good, try it
 
             yED
                 recommended
@@ -122,6 +57,7 @@
             allegro graph + gruff + agraph webview:
                 recommended
                 form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
+                Graphical Query View which allows creating SPARQL
 
             TBCME/TBCSE/TBCFE
                 recommended
@@ -141,23 +77,34 @@
                 SHACL
                 https://www.topquadrant.com/constraints-on-rdflists-using-shacl/
 
-            CNL-based:
+            todo, templating/viewing systems/faceted browsing, more research needed
+                - one of these really should work as a basis of our next-gen UI
 
-                https://www.cognitum.eu/semantics/examples/FIBO.aspx
-
-                ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
-
-            https://www.cubicweb.org/
-                interesting
-                web app framework, higher-level than django
-                data format compatible with rdf (EAV)
-                export into rdf
-                    https://www.cubicweb.org/link/1347429?vid=rdf
-
-            ontowiki
-                recommended
-                dead, needs maintenance, but seems well-developed, could take it over
-
+                https://github.com/mavoweb/mavo
+                https://docs.cambridgesemantics.com/anzograph/userdoc/deploy-tools.htm
+                https://www.datagalaxy.com/
+                http://opoirel.free.fr/strixDB/VGR.html
+                https://zeppelin.apache.org/
+                    https://hub.docker.com/r/cambridgesemantics/contrib-zeppelin/
+                https://metaphacts.com/
+                    https://aws.amazon.com/blogs/apn/exploring-knowledge-graphs-on-amazon-neptune-using-metaphactory/
+                    https://wikidata.metaphacts.com/resource/app:Examples
+                    https://wikidata.metaphacts.com/resource/wd:Q7187
+                    https://wikidata.metaphacts.com/resource/app:Start
+                    https://wikidata.metaphacts.com/resource/wd:Q766195
+                    https://wikidata.metaphacts.com/resource/app:LifeSciences
+                    https://wikidata.metaphacts.com/resource/?uri=http%3A%2F%2Fwww.metaphacts.com%2Fresource%2Fassets%2FOntodiaDiagrams
+                    https://wikidata.metaphacts.com/resource/app:FederationExamples
+                https://github.com/timrdf/vsr
+                    https://github.com/timrdf/vsr/wiki
+                https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure/models/blocksontology
+                    https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure
+                http://www.visualdataweb.org/tfacet.php
+                https://www.google.com/search?q=Jambalaya+rdf
+                http://www.visualdataweb.org/gfacet.php
+                http://www.visualdataweb.org/semlens.php
+                https://chrome.google.com/webstore/detail/microstrategy-hyperintell/ikaoafechdeidffgniffdhdckeclcdhf?hl=en
+                https://ali1k.com/rdface/rdface06/tinymce/examples/rdface.html#
 
             mind-mapping sw:
                 meta:
@@ -212,10 +159,31 @@
                         an issue with all of them so for is a lack of automatic layouting for "non-primary" connections, ie, nodes are layouted by their "part-of" relationship, and you can choose different presentations of that, or move a child node into different slots of the parent node, but once you add a "custom" relation, you have to position it yourself. But we could tackle that.
 
 
-            browser-based would be ideal
+            CNL-based:
 
+                https://www.cognitum.eu/semantics/examples/FIBO.aspx
+
+                ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
+
+
+            https://www.cubicweb.org/
+                interesting
+                web app framework, higher-level than django
+                data format compatible with rdf (EAV)
+                export into rdf
+                    https://www.cubicweb.org/link/1347429?vid=rdf
+
+            ontowiki
+                recommended
+                dead, needs maintenance, but seems well-developed, could take it over
+
+
+            browser-based would be ideal
+                https://cambridge-intelligence.com/regraph/features/
+                https://github.com/bricaud/graphexp
                 http://www.artificialmemory.net
                     interesting wrt browser-based UI
+                    long-lived project
                 https://github.com/AtomGraph/Web-Client
                 http://vowl.visualdataweb.org/webvowl.html
                 https://gojs.net
@@ -226,6 +194,7 @@
                 https://rdf.js.org/
                 https://github.com/linkeddata/rdflib.js
                 https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
+                https://www.w3.org/wiki/SparqlImplementations
 
                 d3.js
                     https://github.com/timrdf/vsr/wiki/d3
@@ -315,6 +284,7 @@
                 http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_optimise.pl
                 http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_label.pl
                 http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_json.pl
+                http://irnok.net:3030/help/source/doc/home/prolog/ontology-server/ClioPatria/lib/semweb/rdf_graphviz.pl
 
 
             https://sourceforge.net/projects/wikiont/
@@ -383,7 +353,10 @@
                 https://www.semanticweb.org/wiki/Braindump.html
                 https://www.semanticweb.org/wiki/COW.html
                 https://www.semanticweb.org/wiki/Freebase.html
+                    merged into..?
                 https://www.semanticweb.org/wiki/Hypertext_Knowledge_Workbench.html
+                    CDS Tools is a single application that bundles three CDS tools: Hypertext Knowledge Workbench, IMapping, and QuiKey.
+                https://www.semanticweb.org/wiki/Semantic_MediaWiki-2.html
 
 
 
@@ -391,6 +364,45 @@
             statistical visualization
                 http://aksw.org/Projects/CubeViz.html
                 gephi
+
+
+
+
+        resources
+            recommended
+                https://doriantaylor.com/the-symbol-management-problem
+                http://graphdatamodeling.com/Graph%20Data%20Modeling/HallOfFame/DMHallOfFame.html
+                    still going through this one
+
+            todo
+                https://www.semanticweb.org/wiki/Category_Semantic_wiki.html
+                    still going through this one
+                https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
+
+            interesting wrt UI development
+                https://github.com/timrdf/vsr/wiki
+                    https://github.com/timrdf/vsr/wiki/General-Strategies-for-Visualizing-RDF-Graphs
+                https://github.com/timrdf/vsr/wiki/Discourse-ontologies
+
+            http://svn.code.sf.net/p/eulergui/code/trunk/eulergui/html/semantic_based_apps_review.html
+                todo, outdated but useful
+
+            i think i've mostly reviewed these and noted anything notable here already, but a double-check and actually creating a note about each sw found wouldn't hurt:
+                https://stackoverflow.com/questions/66720/are-there-any-tools-to-visualize-a-rdf-graph-please-include-a-screenshot
+                http://tapor.ca/tools?attribute_values=66&order=rating&sort=desc
+                https://www.w3.org/2018/09/rdf-data-viz/
+                https://github.com/w3c/EasierRDF/issues/35
+                https://github.com/w3c/EasierRDF/issues/53
+                http://sensormeasurement.appspot.com/?p=visualization_sota
+                https://www.w3.org/wiki/Ontology_editors
+                https://pdfs.semanticscholar.org/fe40/f2de08684299b3a6e7466d9420e977c9f420.pdf?_ga=2.39233379.1908259706.1580280149-1924257816.1580280149
+                http://activearchives.org/wiki/Visualizing_RDF
+                https://wiki.lyrasis.org/pages/viewpage.action?pageId=69014248
+                https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=8&ved=2ahUKEwj1-_HI4urmAhXONcAKHaq7BRMQFjAHegQICRAC&url=http%3A%2F%2Fwww.dsi.uclm.es%2Fdescargas%2Ftechnicalreports%2FDIAB-13-09-1%2FTR_linked_data_tools.pdf&usg=AOvVaw3tKcNVfWq-A72UIUXyR_Ls
+                http://raghavam.github.io/talks/2019/Intro-SemWeb/rdf.html
+                http://www.uni-ulm.de/fileadmin/website_uni_ulm/iui.inst.170/home/raiser/Diplomarbeit_Wasserthal2009.pdf
+                https://stackoverflow.com/questions/52848013/how-can-i-visualize-graph-data-with-amazon-neptune
+
 
 
     pretty-print:
@@ -414,6 +426,7 @@
 
         important factors:
             automatic rest api?
+                https://www.researchgate.net/publication/331541963_Building_a_Semantic_RESTFul_API_for_Achieving_Interoperability_between_a_Pharmacist_and_a_Doctor_using_JENA_and_FUSEKI
 
             non-rdf interfaces:
                 stardog
@@ -482,6 +495,8 @@
             Semantic Web Ontology for Requirements Engineering (SWORE)
 
         ideas:
+            https://medium.com/@sdmonroe/vios-reference-implementation-3153a3d589cf
+                interesting wrt web based UI
             https://github.com/timrdf/vsr/wiki/Recovering-Data-from-View
             https://github.com/timrdf/vsr/wiki/Linked-Data-Auger
             https://github.com/timrdf/vsr/wiki/2grph.xsl
@@ -492,6 +507,60 @@
             https://github.com/timrdf/vsr/wiki/VisTrails
             https://www.semanticscholar.org/paper/Handling-the-Complexity-of-RDF-Data-%3A-Combining-and-Heim-Ziegler/fe40f2de08684299b3a6e7466d9420e977c9f420
             https://www.ontotext.com/blog/data-visualization-with-graphdb-how-to-turn-your-tabular-data-into-a-telling-visual/
+
+https://www.factil.io/
+    CNL
+    "Web-based Business Information Model editor
+    Automated model inference from from source metadata
+    Automated schema generation to relational, staging and data vault forms"
+    schema generation -> nlsql
+
+
+misc, todo, more research needed:
+
+    structured debate/decision making
+        https://ibis.makethingsmakesense.com/52dea301-2e68-4c10-ab2d-bb0e0c95aa60
+
+    https://www.executable-english.com/internet_business_logic_FAQs.html
+        Backchain Iteration: Towards a Practical Inference Method that is Simple Enough to be Proved Terminating, Sound and Complete. Journal of Automated Reasoning, 11:1-22, 1993
+        https://www.executable-english.com/IBL_tutorial_part1.html
+        https://www.executable-english.com/rule_examples.html
+
+
+    https://www.odaseontologies.com/how-it-works/
+        "(OWL, RDF), extended with logic-based business rules (SWRL), define the business problem" ...
+
+
+    https://www.researchgate.net/publication/323616656_SPARQL_Micro-Services_Lightweight_Integration_of_Web_APIs_and_Linked_Data
+
+
+    https://structr.com/
+        curious neo4j-based visual browser app builing framework, with a dataflow language
+
+
+    https://www.honeycomb.io/microservices/
+        "OBSERVABILITY FOR MICROSERVICES"
+
+    https://developer.logicblox.com/using-modeler-js-applications/
+        https://developer.logicblox.com/download/
+        ?
+
+
+currently irrelevant:
+    https://hume.graphaware.com/
+        "Insights Engine"
+
+    http://architector.co.uk/
+        "data lineage metadata"
+
+    data cleanup, transformation, mapping
+    http://usc-isi-i2.github.io/karma/
+        """n this case study we used Karma to convert records of 44,000 of the museum’s holdings to Linked Open Data according to the Europeana Data Model (EDM). The records are stored in several tables in a SQL Server database. Using Karma we modeled these tables in terms of the EDM ontology and converted the data into RDF. We are creating a 5-star Linked Data, linked to DBpedia, the Getty Union List of Artist Names (ULAN)® and the NY Times Linked Data."""
+
+    https://www.datagalaxy.com/
+
+    http://www.factgem.com/
+        "connects data from platforms and applications, separated by purpose, geography, or organization, into a unified, service-enabled, graph endpoint."
 
 
 
