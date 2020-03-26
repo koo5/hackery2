@@ -85,6 +85,9 @@ meta
 
 
 webdev
+	https://github.com/sveltejs/svelte
+	    https://github.com/noahlh/celestite
+		https://news.ycombinator.com/item?id=22534639
     https://developer.logicblox.com/using-modeler-js-applications/
     https://www.cubicweb.org/blogentry/17069884
         Hypermedia API with cubicweb-jsonschema
