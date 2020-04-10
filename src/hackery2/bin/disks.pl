@@ -18,15 +18,15 @@ start(I) :-
 
 stop(I) :-
 	shell2(['umount /bac', I]),
-	shell2(['cryptdisks_stop bac', I]).	
+	shell2(['cryptdisks_stop bac', I]).
 
 start :-
-	maplist(start, [1,2,3]),
+	maplist(start, [0,1,2,3]),
 	shell2(['df -h']),
 	halt.
 
 stop :-
-	maplist(stop, [1,2,3]),
+	maplist(stop, [0,1,2,3]),
 	shell2(['df -h']),
 	halt.
 
