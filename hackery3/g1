@@ -85,6 +85,7 @@ meta
 
 
 webdev
+    https://github.com/tiangolo/fastapi
 	https://github.com/sveltejs/svelte
 	    https://github.com/noahlh/celestite
 		https://news.ycombinator.com/item?id=22534639
@@ -93,6 +94,22 @@ webdev
         Hypermedia API with cubicweb-jsonschema
     https://mavo.io/docs/primer/#mv-app
     https://plugins.mavo.io/plugin/chart
+    http://nytimes.github.io/pourover/
+    https://www.cubicweb.org/link/2909347
+    https://gojs.net
+    https://dwkit.com/documentation/video-tutorials
+    https://www.html5rocks.com/en/tutorials/cors/
+
+
+low-code platforms
+    https://news.ycombinator.com/item?id=22786853
+	openxava
+	appmakr
+    https://activiti.gitbook.io/activiti-7-developers-guide/components
+    https://www.fluidui.com/
+        hmh...
+    knack.com
+        not bad
     https://stackshare.io/no-code-platforms
     https://sheety.co/
     https://nocodeapi.com/
@@ -100,11 +117,6 @@ webdev
     https://www.netlify.com
     https://www.integromat.com/en/blog/2019/11/18/every-tool-you-need-to-build-without-code/
 
-    http://nytimes.github.io/pourover/
-    https://www.cubicweb.org/link/2909347
-    https://gojs.net
-    https://dwkit.com/documentation/video-tutorials
-    https://www.html5rocks.com/en/tutorials/cors/
 
 
 

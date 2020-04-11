@@ -164,7 +164,7 @@ rdf:
 				https://www.cognitum.eu/semantics/examples/FIBO.aspx
 
 				ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
-				
+
 				https://aspen-lang.org/
 
 			https://www.cubicweb.org/
@@ -176,6 +176,9 @@ rdf:
 
 
 			browser-based would be ideal
+
+                https://rdforms.org
+
                 https://www.stardog.com/tutorials/stardog-react-5-easy-steps/
 
 				https://cambridge-intelligence.com/regraph/features/
@@ -480,6 +483,9 @@ rdf:
 						export from virtuoso, edit in protege?
 						could be used to build a bookrmarking solution, but isn't one by itself, so far
 
+        ?
+            https://github.com/terminusdb/terminus-server/tree/dev
+
 		experimental:
 			dunno:
 				https://github.com/Merck/Halyard
@@ -536,6 +542,9 @@ https://www.factil.io/
 
 misc, todo, more research needed:
 
+    https://github.com/CLARIAH/grlc
+        grlc is a lightweight server that takes SPARQL queries curated in GitHub repositories, and translates them to Linked Data Web APIs
+
 	https://www.d3web.de/
 		expert system / diagnosis platform, flowcharts, stuff, possible replacement for our chat logic
 		recommended(chat,catsys)
@@ -588,7 +597,7 @@ misc, todo, more research needed:
 	https://apis.guru/graphql-voyager/
 		-> https://www.stardog.com/docs/#_graphql_schemas
 
-
+    https://mavo.io/docs/primer/#mv-app
 
 
 currently irrelevant:
@@ -618,11 +627,12 @@ currently irrelevant:
 		dictionary and thesaurus
 		https://www.semanticweb.org/wiki/OmegaWiki.html
 
+    annotating free text
 
-low-code platforms
-	openxava
-	appmakr
-    https://activiti.gitbook.io/activiti-7-developers-guide/components
+        https://github.com/celsowm/AutoMeta#autometa
+
+        http://aksw.org/Projects/RDFaCE.html
+
 
 
 
