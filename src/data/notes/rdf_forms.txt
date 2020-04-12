@@ -1,0 +1,86 @@
+https://medium.com/@sdmonroe/vios-network-99488f5bf29d
+	" A record is just an RDF resource URI and its DESCRIBE. Records are rendered by record handers (Angular templates) registered in the V.I. cloud. Record handlers can attach actions (e.g. buttons, an entire suite of actions, etc) "
+
+https://rdforms.org
+	alive
+	no shacl
+	part of a larger suite:
+		https://entrystore.org
+		https://entryscape.com
+	LGPL
+	recommended?
+
+
+https://github.com/jmvanel/semantic_forms
+	model driven form-based editing, useful as a framework for making rdf-stored data editable to users
+	needs polishing, but recommended
+
+
+TBCME/TBCSE/TBCFE
+	recommended, but expensive
+	template engine with sparql:
+		https://www.topquadrant.com/resources/technology/docs/swp-skos-broader.html
+		https://www.topquadrant.com/technology/sparql-web-pages-swp/
+	https://www.topquadrant.com/technology/graphql/
+	https://www.google.com/search?q=topbraid+visualization
+	https://www.topquadrant.com/topbraid-composer-install/
+		buggy, can't even load a file
+		many cool features: "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
+		seems to be heavily aimed at editing ontologies in exactly-shaped forms rather than at working with arbitrary rdf data (can't even paste our data in)
+
+	http://datashapes.org/forms.html
+		recommended
+		SHACL
+		only implemented in TBC?
+		https://www.topquadrant.com/constraints-on-rdflists-using-shacl/
+
+	https://uispin.org/
+		not sure how is related to shacl, since spin is like a predecessor to shacl
+
+
+https://metaphacts.com/product
+	recommended?, but expensive
+	"""
+	declarative Web components for end-user interaction and visualization, and publish dynamic REST services for external data consumption"""
+	"Form-based authoring using customizable, flexible forms"
+
+	https://aws.amazon.com/blogs/apn/exploring-knowledge-graphs-on-amazon-neptune-using-metaphactory/
+
+	demo of browsing/search functionality:
+		https://wikidata.metaphacts.com/resource/app:Examples
+		https://wikidata.metaphacts.com/resource/wd:Q7187
+		https://wikidata.metaphacts.com/resource/app:Start
+		https://wikidata.metaphacts.com/resource/wd:Q766195
+		https://wikidata.metaphacts.com/resource/app:LifeSciences
+		https://wikidata.metaphacts.com/resource/?uri=http%3A%2F%2Fwww.metaphacts.com%2Fresource%2Fassets%2FOntodiaDiagrams
+		https://wikidata.metaphacts.com/resource/app:FederationExamples
+
+
+https://www.cubicweb.org/
+	interesting, recommended
+	web app framework, higher-level than django
+	data format compatible with rdf (EAV)
+	export into rdf
+		https://www.cubicweb.org/link/1347429?vid=rdf
+
+
+https://wiki.duraspace.org/display/ld4lLABS/The+VitroLib+Metadata+Editor
+	"Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. "
+
+
+https://sinopia.io
+	editor, requires registration
+	has a system of editable form templates
+	probably only browsing strictly by these templates
+
+
+ontowiki
+	recommended
+	dead, needs maintenance, but seems well-developed, could take it over
+
+
+https://github.com/AtomGraph/Web-Client
+	"Web-Client renders (X)HTML user interface by transforming "plain" RDF/XML (without nested resource descriptions) using XSLT 2.0 stylesheets."
+
+
+

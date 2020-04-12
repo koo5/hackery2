@@ -84,67 +84,6 @@ meta
 
 
 
-webdev
-    https://github.com/tiangolo/fastapi
-	https://github.com/sveltejs/svelte
-	    https://github.com/noahlh/celestite
-		https://news.ycombinator.com/item?id=22534639
-    https://developer.logicblox.com/using-modeler-js-applications/
-    https://www.cubicweb.org/blogentry/17069884
-        Hypermedia API with cubicweb-jsonschema
-    https://mavo.io/docs/primer/#mv-app
-    https://plugins.mavo.io/plugin/chart
-    http://nytimes.github.io/pourover/
-    https://www.cubicweb.org/link/2909347
-    https://gojs.net
-    https://dwkit.com/documentation/video-tutorials
-    https://www.html5rocks.com/en/tutorials/cors/
-
-
-low-code platforms
-    https://news.ycombinator.com/item?id=22786853
-	openxava
-	appmakr
-    https://activiti.gitbook.io/activiti-7-developers-guide/components
-    https://www.fluidui.com/
-        hmh...
-    knack.com
-        not bad
-    https://stackshare.io/no-code-platforms
-    https://sheety.co/
-    https://nocodeapi.com/
-    https://bubble.io/
-    https://www.netlify.com
-    https://www.integromat.com/en/blog/2019/11/18/every-tool-you-need-to-build-without-code/
-
-
-
-
-
-
-ML
-    https://www.h2o.ai/products/h2o-driverless-ai/#feature-engineering
-    https://www.reddit.com/r/artificial/comments/eu6brx/when_i_was_learning_machine_learning_for_the/
-
-
-
-
-TT
-    https://github.com/moonad/Formality/
-
-
-
-
-
-voice-coding
-    https://news.ycombinator.com/item?id=22404264
-	https://talonvoice.com/
-		https://www.patreon.com/join/lunixbochs
-
-
-
-
-
 todo
     https://www.honeycomb.io/microservices/
     https://stackoverflow.com/questions/18760281/how-to-increase-scrollback-buffer-size-in-tmux
@@ -186,5 +125,104 @@ todo
     https://swish.swi-prolog.org/example/render_graphviz.swinb
 
 
+
+
+webdev
+    https://github.com/mavoweb/mavo
+        low-code js UI, js library of html tags, no rdf
+        https://plugins.mavo.io/plugin/chart
+
+    https://github.com/tiangolo/fastapi
+	https://github.com/sveltejs/svelte
+        https://github.com/mdauner/sveltejs-forms
+	    https://github.com/noahlh/celestite
+		https://news.ycombinator.com/item?id=22534639
+    https://developer.logicblox.com/using-modeler-js-applications/
+    https://www.cubicweb.org/blogentry/17069884
+        Hypermedia API with cubicweb-jsonschema
+
+
+    http://nytimes.github.io/pourover/
+        library for filtering and sorting of large collections in the browser
+    https://www.cubicweb.org/link/2909347
+        stream based protocol for exposing and consuming data in a standardised way. It uses Atom and RDF
+    https://gojs.net
+        Interactive JavaScript Diagrams for the Web
+    https://dwkit.com/documentation/video-tutorials
+    https://www.html5rocks.com/en/tutorials/cors/
+
+
+low-code platforms
+
+	https://www.openxava.org/
+        "write the code for your data structure and business logic. You do not write HTML, JavaScript, CSS, SQL, etc. The user interface and the database logic are automatically provided."
+        Java
+
+	https://structr.com/
+		curious neo4j-based visual browser app building framework, with a dataflow language
+
+    https://bubble.io/
+        recommended, for simple mockups
+
+    knack.com
+        recommended, for simple mockups
+
+    https://mobileroadie.com/
+        pre-templated company/business/media/event app creator
+
+	https://en.wikipedia.org/wiki/App_Inventor_for_Android
+        blockly
+
+    https://www.activiti.org/
+        Open Source Business Automation
+
+    https://www.fluidui.com/
+        fiddly ui designer
+
+    https://sheety.co/
+        Turn your Google Sheet into an API
+
+    https://www.netlify.com
+        https://docs.netlify.com/visitor-access/identity/#enable-identity-in-the-ui
+        low code but full js/html
+
+    huh?
+        https://nocodeapi.com/
+        "Convert these applications APIs"
+
+    meta:
+        https://news.ycombinator.com/item?id=22786853
+        https://stackshare.io/no-code-platforms
+        https://www.integromat.com/en/blog/2019/11/18/every-tool-you-need-to-build-without-code/
+
+
+
+ML
+    https://www.h2o.ai/products/h2o-driverless-ai/#feature-engineering
+    https://www.reddit.com/r/artificial/comments/eu6brx/when_i_was_learning_machine_learning_for_the/
+
+
+
+
+TT
+    https://github.com/moonad/Formality/
+    https://imandra.ai/
+
+
+
+
+voice-coding
+    https://news.ycombinator.com/item?id=22404264
+	https://talonvoice.com/
+		https://www.patreon.com/join/lunixbochs
+
+
+
+
+
+
+meta, other tool dbs:
+	http://teresah.dariah.eu/tools/yed-graph/data-sources/teresah
+	https://www.cubicweb.org/link/1347429?vid=rdf
 
 

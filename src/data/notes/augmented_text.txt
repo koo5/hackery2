@@ -1,0 +1,35 @@
+http://www.artificialmemory.net
+	interesting wrt browser-based UI
+	long-lived project
+	just died?
+
+https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure/models/blocksontology
+	https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure
+
+https://doriantaylor.com/
+iMapping,
+CDS,
+personal knowledge management,
+automatic entity annotation,
+https://github.com/timrdf/vsr/wiki/Discourse-ontologies
+https://idyll-lang.org/docs
+	"""Idyll can be used to create explorable explanations, write data-driven stories, and add interactivity to blog engines and content management systems. The tool can generate standalone webpages or be embedded in existing pages."""
+http://worrydream.com/ClimateChange/#media
+	interesting, wrt ideal browser-based accounting/exploration UI
+
+https://github.com/timrdf/vsr/wiki/Discourse-ontologies
+
+
+structured debate/decision making
+
+	https://www.solipsys.co.uk/cgi-bin/DiscDAG.py?DiscussionID=AxiomOfChoice
+	https://ibis.makethingsmakesense.com/52dea301-2e68-4c10-ab2d-bb0e0c95aa60
+
+
+
+annotating free text
+
+	https://github.com/celsowm/AutoMeta#autometa
+
+	http://aksw.org/Projects/RDFaCE.html
+
