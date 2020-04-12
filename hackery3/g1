@@ -158,13 +158,17 @@ low-code platforms
         "write the code for your data structure and business logic. You do not write HTML, JavaScript, CSS, SQL, etc. The user interface and the database logic are automatically provided."
         Java
 
+    https://www.netlify.com
+        https://docs.netlify.com/visitor-access/identity/#enable-identity-in-the-ui
+        low code but full js/html
+
 	https://structr.com/
 		curious neo4j-based visual browser app building framework, with a dataflow language
 
-    https://bubble.io/
+    knack.com
         recommended, for simple mockups
 
-    knack.com
+    https://bubble.io/
         recommended, for simple mockups
 
     https://mobileroadie.com/
@@ -181,10 +185,6 @@ low-code platforms
 
     https://sheety.co/
         Turn your Google Sheet into an API
-
-    https://www.netlify.com
-        https://docs.netlify.com/visitor-access/identity/#enable-identity-in-the-ui
-        low code but full js/html
 
     huh?
         https://nocodeapi.com/

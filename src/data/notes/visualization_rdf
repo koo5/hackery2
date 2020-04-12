@@ -20,11 +20,6 @@ rdf:
 
 		software, roughly ordered by immediate relevance:
 
-			excel
-				- our solution
-				- http://labs.sparna.fr/skos-play/convert
-				- topbraid also does import from excel files, both semantically (one object per row, for example) and simple spreadsheet-described-in-rdf for further processing
-
 			https://www.tomsawyer.com/graph-database-browser/
 				recommended?
 				viewing/explorations
