@@ -146,6 +146,10 @@ rdf:
 				cytoscape.js
 					didnt find anything rdf related, but i guess it would be a reasonable engine for building something
 
+				https://github.com/marklogic-community/grove-vue-visjs-graph
+
+
+
 			neo4j for rdf visualization, neo4j built-in editor:
 				https://neo4j.com/developer/tools-graph-visualization/
 				https://www.google.com/search?q=neo4j+visual+editor

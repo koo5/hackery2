@@ -90,3 +90,9 @@ excel
 	- topbraid also does import from excel files, both
 		- semantically (one object per row, for example)
 		- and simple spreadsheet-described-in-rdf for further processing
+
+?
+	http://ld-r.org/docs/configFacets.html
+	https://ruben.verborgh.org/blog/2018/12/28/designing-a-linked-data-developer-experience/
+	https://semwidg.org/page/semwidgql
+	http://viejs.org/widgets/forms/
