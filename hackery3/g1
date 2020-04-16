@@ -154,6 +154,9 @@ webdev
 
 low-code platforms
 
+	https://svelte.dev/
+		not traditional low-code, but a framework that seems to be like a next level from vue
+
 	https://www.openxava.org/
         "write the code for your data structure and business logic. You do not write HTML, JavaScript, CSS, SQL, etc. The user interface and the database logic are automatically provided."
         Java
@@ -167,6 +170,7 @@ low-code platforms
 
     knack.com
         recommended, for simple mockups
+        $39/month
 
     https://bubble.io/
         recommended, for simple mockups
@@ -194,7 +198,7 @@ low-code platforms
         https://news.ycombinator.com/item?id=22786853
         https://stackshare.io/no-code-platforms
         https://www.integromat.com/en/blog/2019/11/18/every-tool-you-need-to-build-without-code/
-
+		https://www.openxava.org/related/
 
 
 ML
@@ -225,4 +229,12 @@ meta, other tool dbs:
 	http://teresah.dariah.eu/tools/yed-graph/data-sources/teresah
 	https://www.cubicweb.org/link/1347429?vid=rdf
 
+
+
+
+
+
+?
+    https://news.ycombinator.com/item?id=22843085
+        Decentralized Version Control for Structured Data
 

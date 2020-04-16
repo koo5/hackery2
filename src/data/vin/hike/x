@@ -1,0 +1,42 @@
+voice input layer(0, ['add rule']).
+
+
+'add rule' :-
+	rdf_new_uri(L),
+	rdf_assert(L, rdf:type, hike:'Rule'),
+	set_current_focus(rule, L).
+
+set_focus(Tag, Uri) :-
+	replace_subfocus(any, Uri),
+	replace_subfocus(Tag, Uri).
+
+replace_subfocus(Tag, Uri) :-
+	retract_subfocus(Tag, Old),
+	add_new_subfocus(Old, Tag, Uri).
+
+retract_subfocus(Tag, Old) :-
+	rdf(user, subfocus, Old),
+	rdf(Old, tag, Tag),
+	rdf_retract(user, subfocus, Old).
+
+add_new_subfocus(Old, Tag, Uri) :-
+	rdf_new_uri(New),
+	rdf_assert(New, tag, Tag),
+	rdf_assert(New, value, Uri),
+	rdf_assert(New, prev, Old),
+	rdf_assert(user, subfocus, Uri).
+
+['set pred of', Id, to, String] :-
+	'id to rule uri'(Id, Uri),
+	retract_rule_pred(Uri, Old),
+	add_new_rule_pred(Uri, Old, String).
+	
+'id to rule uri'(Id, Uri) :-
+	member(Id, ['this rule', 'current rule', 'this']) /* this will probably have to be expressed as a grammar for dragon instead */
+	get_focus(rule, Uri).
+
+		
+	
+	
+
+

@@ -12,7 +12,7 @@ rdf:
 					sw that includes special functionality for managing rdf lists (still in a non-domain-specific way).
 						none found yet, but not so hard to add implement
 					less common/new idioms:
-						dealing with properties of graphs / properties of triples intelligently, understanding nested graphs/contexts
+						dealing with properties of graphs / properties of triples i ntelligently, understanding nested graphs/contexts
 				less strictly:
 					sw for managing domain-specific data, where rdf is largely just a storage mechanism, "templating systems".
 				even less strictly, could be said: starting from freeform text, progressively adding stronger semantics, and not losing the implicit information hidden in the form...
@@ -196,6 +196,7 @@ rdf:
 
 
 			http://rdfvizler.dyreriket.xyz/
+				looks good
 				visualization ontology + implementation
 
 			https://github.com/koo5/ontology-visualization
@@ -222,7 +223,7 @@ rdf:
 
 			https://medium.com/@sdmonroe/vios-reference-implementation-3153a3d589cf
 				interesting wrt web based UI
-
+ssrrrrtstsffp
 			ClioPatria
 				http://cliopatria.swi-prolog.org/swish/pldoc/doc/home/swipl/src/ClioPatria/ClioPatria/web/tutorial/LoadPirates.txt
 				http://cliopatria.swi-prolog.org/browse/list_graph?graph=https%3A//cliopatria.swi-prolog.org/packs/vumix
@@ -516,6 +517,7 @@ misc, todo, more research needed:
 		?
 
 	https://gra.fo/
+		simple mouse-oriented (RDF) graph builder / document manager
 		"Everything you need to create, manage, and evolve your Knowledge Graphs: RDF & Property Graph. Invite your team to edit your documents with you in real-time."
 
 	https://apis.guru/graphql-voyager/
