@@ -34,8 +34,8 @@ do_backup_all :-
 start_and_find_disks(Disks) :-
 	findall(X, 
 		(
-			between(1,4,X),
-			start_or_fail(X)
+			between(0,3,X),
+			try_ensure_mounted(X)
 		),
 		Disks).
 
