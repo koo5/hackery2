@@ -13,8 +13,14 @@ halt_on_err :-
 
 
 start(I) :-
-	shell2(['cryptdisks_start bac', I]),
-	shell2(['mount /bac', I]).
+	start(I, _, _).
+
+start(I, Exit_status1, Exit_status2) :-
+	shell2(['cryptdisks_start bac', I], Exit_status1),
+	shell2(['mount /bac', I], Exit_status2).
+
+start_or_fail(I) :-
+	start(I, 0, 0).
 
 stop(I) :-
 	shell2(['umount /bac', I]),
