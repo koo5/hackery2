@@ -6,7 +6,7 @@ TODO figure out how to register the modified n3.py and turtle.py as rdflib plugi
 currently, you have to copy those manually somewhere like ~/.local/lib/python3.6/site-packages/rdflib/plugins/serializers
 """
 
-from ordered_rdflib_store2 import OrderedAndIndexedStore
+from ordered_and_indexed_store import OrderedAndIndexedStore
 from n3 import N3Serializer
 from rdflib import ConjunctiveGraph
 import rdflib
@@ -19,7 +19,7 @@ import click
 @click.option('-o', '--output_format', type=str, default='n3')
 
 def run(input_file, input_format_hint, output_format):
-    print(input_format_hint)
+    #print(input_format_hint)
     g = ConjunctiveGraph(store=OrderedAndIndexedStore())
     g.parse(input_file, format=input_format_hint)
 

@@ -1,3 +1,5 @@
+see also rdf_forms.txt, augmented_text.txt
+
 rdf:
 	explore,visualize,edit,manage
 		note:
@@ -10,37 +12,20 @@ rdf:
 					sw that includes special functionality for managing rdf lists (still in a non-domain-specific way).
 						none found yet, but not so hard to add implement
 					less common/new idioms:
-						dealing with properties of graphs / properties of triples intelligently, understanding nested graphs/contexts
+						dealing with properties of graphs / properties of triples i ntelligently, understanding nested graphs/contexts
 				less strictly:
 					sw for managing domain-specific data, where rdf is largely just a storage mechanism, "templating systems".
 				even less strictly, could be said: starting from freeform text, progressively adding stronger semantics, and not losing the implicit information hidden in the form...
 
-					artificialmemory.net/
-					https://doriantaylor.com/
-					iMapping,
-					CDS,
-					personal knowledge management,
-					automatic entity annotation,
-					https://github.com/timrdf/vsr/wiki/Discourse-ontologies
-					https://idyll-lang.org/docs
-						"""Idyll can be used to create explorable explanations, write data-driven stories, and add interactivity to blog engines and content management systems. The tool can generate standalone webpages or be embedded in existing pages."""
-
-
 
 		software, roughly ordered by immediate relevance:
 
-			http://worrydream.com/ClimateChange/#media
-				interesting, wrt ideal browser-based accounting/exploration UI
-
-			excel
-				- our solution
-				- http://labs.sparna.fr/skos-play/convert
-
 			https://www.tomsawyer.com/graph-database-browser/
-				todo, looks good, try it
+				recommended?
+				viewing/explorations
 
 			yED
-				recommended
+				recommended, but probably chokes on 10k+ nodes
 				https://www.yworks.com/products/yed/download#download
 				automatic layouting
 				how to export into it:
@@ -53,60 +38,21 @@ rdf:
 					maybe use networkx in python?
 						https://stackoverflow.com/questions/51048833/networkx-exporting-graphml-with-edge-labels-height-and-width-attributes-cust
 
-
 			allegro graph + gruff + agraph webview:
 				recommended
 				form-based editing, graph navigation, would be more useful if it understood rdf lists, but definitely has some merit
-				Graphical Query View which allows creating SPARQL
+				Graphical SPARQL builder
 
-			TBCME/TBCSE/TBCFE
-				recommended
-				template engine with sparql:
-					https://www.topquadrant.com/resources/technology/docs/swp-skos-broader.html
-					https://www.topquadrant.com/technology/sparql-web-pages-swp/
-				https://www.topquadrant.com/technology/graphql/
-				https://www.google.com/search?q=topbraid+visualization
-				https://www.topquadrant.com/topbraid-composer-install/
-					buggy, can't even load a file
-					many cool features: "We are planning to support syntax highlighted entry of SHACL Shapes in the next release (in addition to forms, etc.)."
-					seems to be heavily aimed at editing ontologies in exactly-shaped forms rather than at working with arbitrary rdf data (can't even paste our data in)
+			https://zeppelin.apache.org/
+				recommended for exploration/visualizations?
+				http://zeppelin.apache.org/docs/0.9.0-SNAPSHOT/usage/dynamic_form/intro.html
+				https://hub.docker.com/r/cambridgesemantics/contrib-zeppelin/
+
+			jupyter notebook
+				"you can run SPARQL queries against AnzoGraph."
 
 
-			http://datashapes.org/forms.html
-				recommended
-				SHACL
-				https://www.topquadrant.com/constraints-on-rdflists-using-shacl/
-
-			todo, templating/viewing systems/faceted browsing, more research needed
-				- one of these really should work as a basis of our next-gen UI
-
-				https://github.com/mavoweb/mavo
-				https://docs.cambridgesemantics.com/anzograph/userdoc/deploy-tools.htm
-				https://www.datagalaxy.com/
-				http://opoirel.free.fr/strixDB/VGR.html
-				https://zeppelin.apache.org/
-					https://hub.docker.com/r/cambridgesemantics/contrib-zeppelin/
-				https://metaphacts.com/
-					https://aws.amazon.com/blogs/apn/exploring-knowledge-graphs-on-amazon-neptune-using-metaphactory/
-					https://wikidata.metaphacts.com/resource/app:Examples
-					https://wikidata.metaphacts.com/resource/wd:Q7187
-					https://wikidata.metaphacts.com/resource/app:Start
-					https://wikidata.metaphacts.com/resource/wd:Q766195
-					https://wikidata.metaphacts.com/resource/app:LifeSciences
-					https://wikidata.metaphacts.com/resource/?uri=http%3A%2F%2Fwww.metaphacts.com%2Fresource%2Fassets%2FOntodiaDiagrams
-					https://wikidata.metaphacts.com/resource/app:FederationExamples
-				https://github.com/timrdf/vsr
-					https://github.com/timrdf/vsr/wiki
-				https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure/models/blocksontology
-					https://www.w3.org/wiki/HCLSIG/SWANSIOC/Actions/RhetoricalStructure
-				http://www.visualdataweb.org/tfacet.php
-				https://www.google.com/search?q=Jambalaya+rdf
-				http://www.visualdataweb.org/gfacet.php
-				http://www.visualdataweb.org/semlens.php
-				https://chrome.google.com/webstore/detail/microstrategy-hyperintell/ikaoafechdeidffgniffdhdckeclcdhf?hl=en
-				https://ali1k.com/rdface/rdface06/tinymce/examples/rdface.html#
-
-			mind-mapping sw:
+			mind-mapping sw potentially usable with rdf:
 				meta:
 					http://www.opensourcecreative.org/ep040/
 
@@ -164,30 +110,20 @@ rdf:
 				https://www.cognitum.eu/semantics/examples/FIBO.aspx
 
 				ACE.. (verbalizes OWL, generates OWL and a bit of SWRL)
-				
+
 				https://aspen-lang.org/
-
-			https://www.cubicweb.org/
-				interesting
-				web app framework, higher-level than django
-				data format compatible with rdf (EAV)
-				export into rdf
-					https://www.cubicweb.org/link/1347429?vid=rdf
+					graph data (cypher) input, syntax sugar
 
 
-			browser-based would be ideal
-                https://www.stardog.com/tutorials/stardog-react-5-easy-steps/
+			rdf in js, pointers on how to start building something, but no ready solutions
 
-				https://cambridge-intelligence.com/regraph/features/
-					react
 				https://github.com/bricaud/graphexp
-				http://www.artificialmemory.net
-					interesting wrt browser-based UI
-					long-lived project
-				https://github.com/AtomGraph/Web-Client
+					Interactive visualization of the Gremlin graph database with D3.js
+
                 https://madsholten.github.io/sparql-visualizer/
 
 				https://gojs.net
+				 	interactive diagrams and graphs
 					nice demos but no keyboard-friendly navigation (by default)
 
 				https://www.rubensworks.net/blog/2019/10/06/using-rdf-in-javascript/
@@ -209,6 +145,10 @@ rdf:
 
 				cytoscape.js
 					didnt find anything rdf related, but i guess it would be a reasonable engine for building something
+
+				https://github.com/marklogic-community/grove-vue-visjs-graph
+
+
 
 			neo4j for rdf visualization, neo4j built-in editor:
 				https://neo4j.com/developer/tools-graph-visualization/
@@ -243,10 +183,20 @@ rdf:
 				i didnt get any cytoscape version to run on ubuntu 18.04 ..
 
 
-			https://github.com/jmvanel/semantic_forms
-				model driven form-based editing, useful as a framework for making rdf-stored data editable to users
+			small projects, ponderings
+
+				https://github.com/timrdf/vsr
+					https://github.com/timrdf/vsr/wiki
+
+				http://www.visualdataweb.org/tfacet.php
+					hierarchical faceted exploration of RDF
+
+				https://www.researchgate.net/publication/221607731_Jambalaya_an_interactive_environment_for_exploring_ontologies
+					interactive environment for exploring ontologies
+
 
 			http://rdfvizler.dyreriket.xyz/
+				looks good
 				visualization ontology + implementation
 
 			https://github.com/koo5/ontology-visualization
@@ -267,18 +217,13 @@ rdf:
 			https://github.com/JanWielemaker/triple20.git
 				works, could have some use, somewhat confusing
 
-			https://wiki.duraspace.org/display/ld4lLABS/The+VitroLib+Metadata+Editor
-				"Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. "
-
-			https://sinopia.io
-				editor, requires registration
-				has a system of editable form templates
-				probably only browsing strictly by these templates
-
 			OSDE - The OpenLink Structured Data Editor
 				http://osde.openlinksw.com/
 				simple table-of-triples-based rdf editor, virtuoso-integrated
 
+			https://medium.com/@sdmonroe/vios-reference-implementation-3153a3d589cf
+				interesting wrt web based UI
+ssrrrrtstsffp
 			ClioPatria
 				http://cliopatria.swi-prolog.org/swish/pldoc/doc/home/swipl/src/ClioPatria/ClioPatria/web/tutorial/LoadPirates.txt
 				http://cliopatria.swi-prolog.org/browse/list_graph?graph=https%3A//cliopatria.swi-prolog.org/packs/vumix
@@ -290,7 +235,6 @@ rdf:
 			https://www.semantic-mediawiki.org
 				interesting, long-lived project
 				embedding triples into wiki markdown, and an ecosystem around that
-
 
 			https://www.rdfexplorer.org/
 				browser-based,
@@ -354,9 +298,6 @@ rdf:
                     https://www.researchgate.net/profile/Dave_Braines/publication/39996382_A_Controlled_Natural_Language_Interface_for_Semantic_Media_Wiki_Using_the_Rabbit_Language/links/5646021708ae54697fb9cab2/A-Controlled-Natural-Language-Interface-for-Semantic-Media-Wiki-Using-the-Rabbit-Language.pdf
                     https://www.semanticscholar.org/paper/Development-of-a-Controlled-Natural-Language-for-Smart-Bao/ec0631faf6202fa6d906eab6d2202b9c596ab1e4
 
-				ontowiki
-					recommended
-					dead, needs maintenance, but seems well-developed, could take it over
 
 				https://sourceforge.net/projects/wikiont/
 					ontology editor
@@ -383,18 +324,16 @@ rdf:
 			recommended
 				https://doriantaylor.com/the-symbol-management-problem
 				http://graphdatamodeling.com/Graph%20Data%20Modeling/HallOfFame/DMHallOfFame.html
-					still going through this one
 
-			todo
+			nothing new here
 				https://www.semanticweb.org/wiki/Category_Semantic_wiki.html
-					still going through this one
 
-				https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
+			https://www.w3.org/wiki/TaskForces/CommunityProjects/LinkingOpenData/SemWebClients
 
 			interesting wrt UI development
 				https://github.com/timrdf/vsr/wiki
 					https://github.com/timrdf/vsr/wiki/General-Strategies-for-Visualizing-RDF-Graphs
-				https://github.com/timrdf/vsr/wiki/Discourse-ontologies
+
 
 			http://svn.code.sf.net/p/eulergui/code/trunk/eulergui/html/semantic_based_apps_review.html
 				todo, outdated but useful
@@ -445,14 +384,10 @@ rdf:
                     GraphQL to sparql and back, seems usable, recommended alternative to stardog's
 
 				stardog
-					SQL: https://www.stardog.com/docs/#_sql_schema_mappings
-					GraphQL:  "automagically provides a GraphQL endpoint over your existing RDF graphs"
-						https://www.stardog.com/trainings/querying-stardog-with-graphql/
-						https://www.stardog.com/blog/graphql-and-paths/
 				anzo
 					OpenCypher
 					sql: no
-					jsonld:insert with python api
+					inserting jsonld through python api
 
 				neptune
 					cypher
@@ -465,10 +400,11 @@ rdf:
 		cool ones found so far:
 				stardog
 					- recommended
-					- https://www.stardog.com/docs/#_sql_schema_mappings
-					- GraphQL
+					- SQL: https://www.stardog.com/docs/#_sql_schema_mappings
+					- GraphQL: "automagically provides a GraphQL endpoint over your existing RDF graphs"
 					- virtual graphs
 					- owl inference with explanations
+
 				allegro (+ gruff)
 					- recommended, at least for gruff, but stardog has a lot more functionality useful for us
 		okay
@@ -480,6 +416,9 @@ rdf:
 						export from virtuoso, edit in protege?
 						could be used to build a bookrmarking solution, but isn't one by itself, so far
 
+        ?
+            https://github.com/terminusdb/terminus-server/tree/dev
+
 		experimental:
 			dunno:
 				https://github.com/Merck/Halyard
@@ -488,6 +427,15 @@ rdf:
 			blazegraph
 				crashes, ooms, poor performance (in my tests...)
 
+		dead
+			http://opoirel.free.fr/strixDB/strixdb.html
+			http://opoirel.free.fr/strixDB/VGR.html
+				"""
+				The user can request a RDF store with forms (similar to classical SQL/MS Access forms) without any SPARQL knowledge.
+				The user can navigate through the graph returned by the request guided by his imperious information needs....
+				These forms are build by a knowledge engineer who knows SPARQL.
+				Each form is based on SPARQL (with a little modification: each $variable will automatically generate a request form field).
+				"""
 
 
 	dead?
@@ -511,8 +459,6 @@ rdf:
 			Semantic Web Ontology for Requirements Engineering (SWORE)
 
 		ideas:
-			https://medium.com/@sdmonroe/vios-reference-implementation-3153a3d589cf
-				interesting wrt web based UI
 			https://github.com/timrdf/vsr/wiki/Recovering-Data-from-View
 			https://github.com/timrdf/vsr/wiki/Linked-Data-Auger
 			https://github.com/timrdf/vsr/wiki/2grph.xsl
@@ -531,18 +477,19 @@ https://www.factil.io/
 	Automated schema generation to relational, staging and data vault forms"
 	schema generation -> nlsql
 	recommended(schema generation)
-
+	"information model is defined in an easily understood, controlled natural language. From the business information model, the platform can generate well-structured data schemas"
 
 
 misc, todo, more research needed:
+
+    https://github.com/CLARIAH/grlc
+        grlc is a lightweight server that takes SPARQL queries curated in GitHub repositories, and translates them to Linked Data Web APIs
 
 	https://www.d3web.de/
 		expert system / diagnosis platform, flowcharts, stuff, possible replacement for our chat logic
 		recommended(chat,catsys)
 		long-lived project
 
-	structured debate/decision making
-		https://ibis.makethingsmakesense.com/52dea301-2e68-4c10-ab2d-bb0e0c95aa60
 
 	https://www.executable-english.com/internet_business_logic_FAQs.html
 		http://www.reengineeringllc.com/
@@ -560,8 +507,6 @@ misc, todo, more research needed:
 	https://www.researchgate.net/publication/323616656_SPARQL_Micro-Services_Lightweight_Integration_of_Web_APIs_and_Linked_Data
 
 
-	https://structr.com/
-		curious neo4j-based visual browser app builing framework, with a dataflow language
 
 
 	https://www.honeycomb.io/microservices/
@@ -571,27 +516,40 @@ misc, todo, more research needed:
 		https://developer.logicblox.com/download/
 		?
 
-	https://www.factil.io/
-		"information model is defined in an easily understood, controlled natural language. From the business information model, the platform can generate well-structured data schemas"
-
 	https://gra.fo/
+		simple mouse-oriented (RDF) graph builder / document manager
 		"Everything you need to create, manage, and evolve your Knowledge Graphs: RDF & Property Graph. Invite your team to edit your documents with you in real-time."
 
-	GraphQL Voyager
-		http://graphdatamodeling.com/Graph%20Data%20Modeling/HallOfFame/DMHallOfFame.html
+	https://apis.guru/graphql-voyager/
+		graphql explorer
+
 
 	Maana
 		KnowledgeModelAssist: Visually build knowledge models
 
 	https://demos.qlik.com/qliksense
 
-	https://apis.guru/graphql-voyager/
-		-> https://www.stardog.com/docs/#_graphql_schemas
 
 
+
+    
 
 
 currently irrelevant:
+	visualization
+		https://cambridge-intelligence.com/regraph/features/
+			react
+
+	https://ali1k.com/rdface/rdface06/tinymce/examples/rdface.html#
+		browser-based text editor with rdf annotation
+
+	https://chrome.google.com/webstore/detail/microstrategy-hyperintell/ikaoafechdeidffgniffdhdckeclcdhf?hl=en
+		chrome extension
+		scans every webpage and underlines relevant keywords
+
+	https://www.datagalaxy.com/
+		data gouvernance
+
 	https://www.semanticweb.org/wiki/Wikidsmart.html
 		interesting but not useful for us
 
@@ -602,8 +560,8 @@ currently irrelevant:
 		"data lineage metadata"
 
 	data cleanup, transformation, mapping
-	http://usc-isi-i2.github.io/karma/
-		"""n this case study we used Karma to convert records of 44,000 of the museum’s holdings to Linked Open Data according to the Europeana Data Model (EDM). The records are stored in several tables in a SQL Server database. Using Karma we modeled these tables in terms of the EDM ontology and converted the data into RDF. We are creating a 5-star Linked Data, linked to DBpedia, the Getty Union List of Artist Names (ULAN)® and the NY Times Linked Data."""
+		http://usc-isi-i2.github.io/karma/
+			"""n this case study we used Karma to convert records of 44,000 of the museum’s holdings to Linked Open Data according to the Europeana Data Model (EDM). The records are stored in several tables in a SQL Server database. Using Karma we modeled these tables in terms of the EDM ontology and converted the data into RDF. We are creating a 5-star Linked Data, linked to DBpedia, the Getty Union List of Artist Names (ULAN)® and the NY Times Linked Data."""
 
 	https://www.datagalaxy.com/
 
@@ -617,19 +575,5 @@ currently irrelevant:
 	www.omegawiki.org/
 		dictionary and thesaurus
 		https://www.semanticweb.org/wiki/OmegaWiki.html
-
-
-low-code platforms
-	openxava
-	appmakr
-    https://activiti.gitbook.io/activiti-7-developers-guide/components
-
-
-
-
-
-meta, other tool dbs:
-	http://teresah.dariah.eu/tools/yed-graph/data-sources/teresah
-	https://www.cubicweb.org/link/1347429?vid=rdf
 
 
