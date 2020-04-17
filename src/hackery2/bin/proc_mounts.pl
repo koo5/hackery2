@@ -26,7 +26,6 @@ is_mounted(I) :-
 
 proc_mounts([Mount|Mounts]) --> 
 	proc_mount(Mount),
-	"\n",
 	proc_mounts(Mounts).
 
 proc_mounts([]) --> eos.
@@ -37,7 +36,7 @@ proc_mount(mount(A, B, C, D, E, F)) -->
 	piece(C), blank, 
 	piece(D), blank, 
 	piece(E), blank, 
-	piece(F), string_without("\n", _).
+	piece(F), /*{gtrace},*/string_without(`\n`, _), "\n".
 
 piece(P) -->
-	string_without("\t", P_codes), {string_codes(P, P_codes)}.
+	string_without(" \t\n", P_codes), {string_codes(P, P_codes)}.
