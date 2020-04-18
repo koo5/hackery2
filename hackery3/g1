@@ -130,6 +130,8 @@ todo
 webdev
     https://github.com/mavoweb/mavo
         low-code js UI, js library of html tags, no rdf
+        backends:
+            https://plugins.mavo.io/
         https://plugins.mavo.io/plugin/chart
 
     https://github.com/tiangolo/fastapi

@@ -68,6 +68,7 @@ https://metaphacts.com/product
 
 https://www.cubicweb.org/
 	interesting, recommended
+	https://cubicweb.readthedocs.io/en/default/book/devweb/edition/form/#webform
 	web app framework, higher-level than django
 	data format compatible with rdf (EAV)
 	export into rdf
@@ -115,3 +116,6 @@ https://ruben.verborgh.org/blog/2018/12/28/designing-a-linked-data-developer-exp
 http://opoirel.free.fr/strixDB/VGR.html
 	forms defined by sparql queries
 
+meta
+    "The only thing more painful than filling out a form is creating one"
+    - https://hackersandslackers.com/flask-wtforms-forms
