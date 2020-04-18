@@ -14,7 +14,7 @@ do_backup_ext(Disks) :-
 	all(Disks,do_backup_ext2),
 	shell2(['virsh resume xubuntu18_docker_raw_on_fat'], 0).
 
-do_backup_ext(I) :-
+do_backup_ext2(I) :-
 	shell2(['cp --sparse=always -r /mnt/kingston240/ /bac', I, '/ext/`(date -u  "+%Y-%m-%dT%H:%M:%SZ")`']).
 
 backup_offline_data(I) :-
@@ -34,8 +34,8 @@ do_backup_all :-
 start_and_find_disks(Disks) :-
 	findall(X, 
 		(
-			between(1,4,X),
-			start_or_fail(X)
+			between(0,3,X),
+			try_ensure_mounted(X)
 		),
 		Disks).
 

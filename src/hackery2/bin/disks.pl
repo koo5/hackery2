@@ -1,3 +1,5 @@
+:- [proc_mounts].
+
 shell2(Cmd) :-
         shell2(Cmd, _).
 
@@ -21,6 +23,13 @@ start(I, Exit_status1, Exit_status2) :-
 
 start_or_fail(I) :-
 	start(I, 0, 0).
+
+try_ensure_mounted(I) :-
+	is_disk_mounted(I),!.
+
+try_ensure_mounted(I) :-
+	start(I, _, _),
+	is_disk_mounted(I).
 
 stop(I) :-
 	shell2(['umount /bac', I]),

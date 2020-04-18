@@ -13,12 +13,9 @@ mounts(Mounts) :-
 	phrase_from_file(proc_mounts(Mounts), '/etc/mtab').
 
 
-is_mounted(I) :-
-
-	atomic_list_concat(['/dev/mapper/bac',I], 
-	Dev),
-	atomic_list_concat(['/bac',I], 
-	Mountpoint),
+is_disk_mounted(I) :-
+	atomics_to_string(['/dev/mapper/bac',I], Dev),
+	atomics_to_string(['/bac',I], Mountpoint),
 
 	mounts(Mounts),
 	member(mount(Dev, Mountpoint, _,_,_,_), Mounts).
