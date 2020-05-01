@@ -1,0 +1,36 @@
+IOTCM "/home/koom/1.4/nat-thms.agda" NonInteractive Indirect ( Cmd_load "/home/koom/a1/y.agda" [] )
+IOTCM "/home/koom/1.4/nat-thms.agda" NonInteractive Indirect ( Cmd_concrete_syntax  DefaultCompute "(3 + 4) + 5 ≡ 3 + (4 +    5) " )
+
+
+
+IOTCM "/home/koom/a1/y.agda" NonInteractive Indirect ( Cmd_describe_syntax  DefaultCompute "suc 1 * 10" )
+
+
+IOTCM "/home/koom/a1/y.agda" NonInteractive Indirect ( Cmd_concrete_syntax  DefaultCompute "(3 + 4) + 5 ≡ 3 + (4 +    5) " )
+IOTCM "/home/koom/a1/y.agda" NonInteractive Indirect ( Cmd_describe_syntax  DefaultCompute "_ =
+  begin
+    (3 + 4) + 5
+  ≡⟨⟩
+    7 + 5
+  ≡⟨⟩
+    12
+  ≡⟨⟩
+    3 + 9
+  ≡⟨⟩
+    3 + (4 + 5)
+  ∎
+" )
+
+_ =
+  begin
+    (3 + 4) + 5
+  ≡⟨⟩
+    7 + 5
+  ≡⟨⟩
+    12
+  ≡⟨⟩
+    3 + 9
+  ≡⟨⟩
+    3 + (4 + 5)
+  ∎
+" )

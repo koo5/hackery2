@@ -1,0 +1,16 @@
+
+
+:x_plus_0_≡_x has_case [
+	has_head (zero)
+	has_body refl (Set0, ℕ, zero)
+]
+
+
+
+
+
+is_result_of_evaluation_of_something_in_context_something x_plus_0_≡_x_signature ("x" zero)
+
+
+{?X has_type [pred :x_plus_0_≡_x; args (0)]} <= {}.
+
