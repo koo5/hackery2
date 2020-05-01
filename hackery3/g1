@@ -218,6 +218,7 @@ TT
 
 
 voice-coding
+    https://news.ycombinator.com/item?id=22918980
     https://news.ycombinator.com/item?id=22404264
 	https://talonvoice.com/
 		https://www.patreon.com/join/lunixbochs
@@ -239,4 +240,152 @@ meta, other tool dbs:
 ?
     https://news.ycombinator.com/item?id=22843085
         Decentralized Version Control for Structured Data
+
+
+roomba
+	https://news.ycombinator.com/item?id=22940450
+		https://www.roboticky-vysavac.cz/irobot-braava-jet-240
+
+
+
+
+
+formalized contracts/business rule stuff
+
+
+
+
+	https://docs.camunda.org/manual/7.4/reference/dmn11/
+	      https://news.crunchbase.com/news/berlins-camunda-raises-28m-to-grow-its-workflow-automation-platform/
+
+
+
+
+
+2020-04-17 06:38:14 <freeside> tom hvitved's phd thesis was a huge
+      inspiration:
+      https://drive.google.com/open?id=0BxOaYa8pqqSwbl9GMWtwVU5HSFU
+2020-04-17 06:39:03 <freeside> his language models contracts as state machines
+      with trace reductions over time
+2020-04-17 06:44:31 <freeside> And then the Contract Specification Language he
+      develops is, i think, still one of the best formalisms i've seen for
+      real-world contract states
+2020-04-17 06:45:11 <freeside> when i get a few researchers hired maybe I will
+      ask one of them to resolve the question of whether this sort of CSL
+      thing is in the same grammatical category as BPMN, in the sense of
+      equivalent expressiveness
+2020-04-17 06:44:31 <freeside> And then the Contract Specification Language he
+      develops is, i think, still one of the best formalisms i've seen for
+      real-world contract states
+2020-04-17 06:45:11 <freeside> when i get a few researchers hired maybe I will
+      ask one of them to resolve the question of whether this sort of CSL
+      thing is in the same grammatical category as BPMN, in the sense of
+      equivalent expressiveness
+2020-04-17 06:45:42 <freeside> we're hiring now, in case anybody knows anyone
+      who would like to exercise their prolog skills in the direction of law
+2020-04-17 06:46:34 <freeside> sometimes we pitch it as "did your parents want
+      you to go to law school? But did insist that computers were more
+      interesting? Did they kick you out and disown you from the family? Now
+      is your chance to prove yourself right once and for all"
+2020-04-17 06:46:42 <freeside> lol
+2020-04-17 05:26:28 <freeside> anyway, the funding will basically go toward
+      formalizing contracts (as state machines / timed petri nets) and laws
+      (as rule / constraint systems), and we want to demonstrate value by
+      showing automatable natural language generation of the kinds of things
+      that usually come out of a legislative drafting office.
+2020-04-17 05:27:50 <freeside> another thing we want to demonstrate is model
+      checking / formal verification / static analysis of contracts, using
+      SAT/SMT or interactive theorem proving or etc approaches
+
+
+	ContractLog
+		http://www.prova.ws/
+			dead?
+2020-04-17 05:58:42 <aindilis> http://rbsla.ruleml.org/
+2020-04-17 05:59:08 <aindilis> I *think* this is what I was looking for
+2020-04-17 05:59:46 *** T_K (~TK@82.131.64.41.cable.starman.ee) has joined
+      channel ##prolog
+2020-04-17 06:00:00 <freeside> right. i have been wondering who uses the
+      RuleML family languages in the real world.
+2020-04-17 06:00:10 *** conan (~conan@mdproctor.plus.com) has joined channel
+      ##prolog
+2020-04-17 06:01:43 <freeside> do you know of any actual uses? When I last
+      touched SLA it was in the context of a tmforum.org project, and i didn't
+      get the sense that any of the member telcos were using RBSLA
+2020-04-17 06:02:04 <aindilis> no I don't, I just had remembered seeing this
+2020-04-17 06:02:21 <freeside> right, right
+2020-04-17 06:04:59 <freeside> if i recall correctly, since ContractLog,
+      there's been eContracts from LegalXML's OASIS working group, and then
+      CoSoDIS worked on contract formalization, and then recently Tom Hvitved
+      and John Camilleri both wrote PhD theses on contract formalization and
+      related tools, under the POETS 3gERP project and the REMU project
+      respectively ...
+
+
+
+
+
+
+
+
+
+pip
+    pipenv - dead
+    poetry - meh
+    pyenv-virtualenv + pip-tools ?
+
+
+
+
+
+
+
+trampoliny
+    https://www.goodjump.cz/goodjump-trampolina-400-cm-s-ochrannou-siti-a-zebrik
+    https://trampoliny.heureka.cz/aga-sport-fit-430-cm-plus-vnitrni-ochranna-sit/#
+
+
+
+
+
+
+
+
+
+misc rsrch
+    https://www.keycdn.com/support/nginx-directory-index
+        not as good as apache's
+
+        -> https://httpd.apache.org/docs/2.4/mod/mod_proxy.html#access
+
+        https://www.nginx.com/resources/wiki/modules/fancy_index/
+            ugh
+
+    https://docs.gunicorn.org/en/stable/deploy.html
+        still relies on apache for static files, like all the others
+
+
+    https://developer.logicblox.com/using-modeler-js-applications/
+    https://www.cubicweb.org/link/2909347
+    https://gojs.net/latest/index.html
+    https://dwkit.com/
+
+
+    https://medium.com/@thishantha17/build-a-simple-python-rest-api-with-apache2-gunicorn-and-flask-on-ubuntu-18-04-c9d47639139b
+
+    https://www.anandtech.com/show/15708/amds-mobile-revival-redefining-the-notebook-business-with-the-ryzen-9-4900hs-a-review/10
+
+    https://news.ycombinator.com/item?id=22919046
+        ->  https://www.alza.cz/gaming/oculus-go-d5132197.htm?kampan=adw4_prislusenstvi-pro-mt_pla_all_prislusenstvi-css_bryle-pro-vr_c_9062903__OC002b2
+            https://www.zbozi.cz/vyrobek/vision-720-3d-video-bryle/
+            https://www.banggood.com/cs/IN-STOCKVISION-800-3D-Glasses-Video-Android-4_4-MTK6582-1G2G-5MP-AC-WIFI-BT4_0-2060P-MIC-p-1092423.html
+
+
+    You could fix this by making payment for software as 25% upfront with 20% on deliver and then 50% on 18 months of as advertised use.
+
+
+
+
+    https://www.hlidacshopu.cz/
+
 
