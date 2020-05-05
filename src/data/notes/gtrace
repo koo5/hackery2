@@ -1,0 +1,7 @@
+{
+    "@context":"https://uh.frdcsa.org",
+    "description":"configure colors in gtrace",
+    "keywords":"guitracer swipl",
+    "value": "see swipl-devel/package~xpce/prolog/lib/trace/source.pl"
+}
+
