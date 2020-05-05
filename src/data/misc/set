@@ -1,0 +1,9 @@
+http://i.imgur.com/nkR2AoN.png
+
+One could alternatively define _<_ as a relation: it would
+take in two natural numbers and return a Set. But then less-than could not be used
+computationally in code. Expressions which have type Set describe code, but they are
+not code themselves (one cannot pattern-match, for example, on expressions of type
+Set, nor do anything else computational with them).
+
+@0
