@@ -15,7 +15,7 @@ def ignore(ll):
 			return True
 
 
-log = subprocess.check_output(['journalctl', '-k', '-b', 'all'], universal_newlines=True)
+log = subprocess.check_output(['journalctl', '-k', '-b', '-all'], universal_newlines=True)
 
 
 for l in log.split('\n'):
