@@ -10,9 +10,9 @@ do_backup(I) :-
 	shell2(['rm /.sxbackup; ln -s /.sxbackup-',I,' /.sxbackup; ~/.local/bin/btrfs-sxbackup run /']).
 
 do_backup_ext(Disks) :-
-	shell2(['virsh suspend xubuntu18_docker_raw_on_fat'], 0),
+	shell2(['virsh suspend xubuntu18_docker_raw_on_fat'], _), /*fixme, how to tell if it's suspended? */
 	all(Disks,do_backup_ext2),
-	shell2(['virsh resume xubuntu18_docker_raw_on_fat'], 0).
+	shell2(['virsh resume xubuntu18_docker_raw_on_fat'], _).
 
 do_backup_ext2(I) :-
 	shell2(['cp --sparse=always -r /mnt/kingston240/ /bac', I, '/ext/`(date -u  "+%Y-%m-%dT%H:%M:%SZ")`']).

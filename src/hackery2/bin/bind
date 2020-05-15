@@ -1,0 +1,4 @@
+mkdir /bac1/offline_data/d/archive/backup/vps2 /DATA/shared5/vps
+chown libvirt-qemu:kvm   /bac1/offline_data/d/archive/backup/vps2 /DATA/shared5/vps
+mount -o bind   /bac1/offline_data/d/archive/backup/vps2 /DATA/shared5/vps
+
