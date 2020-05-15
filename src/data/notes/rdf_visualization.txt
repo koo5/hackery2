@@ -470,17 +470,26 @@ ssrrrrtstsffp
 			https://www.semanticscholar.org/paper/Handling-the-Complexity-of-RDF-Data-%3A-Combining-and-Heim-Ziegler/fe40f2de08684299b3a6e7466d9420e977c9f420
 			https://www.ontotext.com/blog/data-visualization-with-graphdb-how-to-turn-your-tabular-data-into-a-telling-visual/
 
-https://www.factil.io/
-	CNL
-	"Web-based Business Information Model editor
-	Automated model inference from from source metadata
-	Automated schema generation to relational, staging and data vault forms"
-	schema generation -> nlsql
-	recommended(schema generation)
-	"information model is defined in an easily understood, controlled natural language. From the business information model, the platform can generate well-structured data schemas"
+
+    r2ml, mapping
+        https://zazuko.com/blog/rdf-and-dsl-a-perfect-match/
+
+    collaborative ontology development
+        http://editor.zazuko.com/
+
+
 
 
 misc, todo, more research needed:
+
+    https://www.factil.io/
+        CNL
+        "Web-based Business Information Model editor
+        Automated model inference from from source metadata
+        Automated schema generation to relational, staging and data vault forms"
+        schema generation -> nlsql
+        recommended(schema generation)
+        "information model is defined in an easily understood, controlled natural language. From the business information model, the platform can generate well-structured data schemas"
 
     https://github.com/CLARIAH/grlc
         grlc is a lightweight server that takes SPARQL queries curated in GitHub repositories, and translates them to Linked Data Web APIs
@@ -532,7 +541,7 @@ misc, todo, more research needed:
 
 
 
-    
+
 
 
 currently irrelevant:
