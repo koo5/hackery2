@@ -3,11 +3,17 @@
 
 do_backup_i(I) :-
 	start(I),
-	do_backup(I),
+	do_backup('/', I),
+	do_backup('/z/', I),
 	stop(I).
 
 do_backup(I) :-
-	shell2(['rm /.sxbackup; ln -s /.sxbackup-',I,' /.sxbackup; ~/.local/bin/btrfs-sxbackup run /']).
+	do_backup('/', I),
+	do_backup('/home/', I),
+	do_backup('/z/', I).
+
+do_backup(Src, I) :-
+	shell2(['rm ',Src,'.sxbackup; ln -s ',Src,'.sxbackup-',I,' ',Src,'.sxbackup; ~/.local/bin/btrfs-sxbackup run ',Src]).
 
 do_backup_ext(Disks) :-
 	shell2(['virsh suspend xubuntu18_docker_raw_on_fat'], _), /*fixme, how to tell if it's suspended? */
@@ -49,7 +55,6 @@ do_backup_with_disks(Disks) :-
 
 	foreach( (dif(I,1),member(I,Disks)), backup_offline_data(I)),
 	all(Disks,do_backup),
-	do_backup_ext(Disks),
 	
 
 	df,
