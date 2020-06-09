@@ -1,3 +1,6 @@
+https://f-droid.org/en/packages/org.openhab.habdroid/
+
+
 const byte room_count = 4;
 
 /* rooms enum */

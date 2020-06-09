@@ -1,0 +1,20 @@
+
+znapzend
+    glitches in setup (ignoring parameters)
+    weird idea about ignoring errors in pre/post run scripts
+    difficult to read output
+    ignored errors
+    interrupted run causes subsequent runs to fail, requires manual cleanup
+
+
+zfs-autobackup
+    testing in progress, easy setup
+
+https://github.com/jimsalterjrs/sanoid/
+    ?
+
+https://pve.proxmox.com/wiki/PVE-zsync
+    ?
+
+
+
