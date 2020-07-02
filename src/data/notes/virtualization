@@ -1,3 +1,5 @@
+https://mathiashueber.com/virtual-machine-audio-setup-get-pulse-audio-working/
+
 https://serverfault.com/questions/627238/kvm-libvirt-how-to-configure-static-guest-ip-addresses-on-the-virtualisation-ho
 https://www.spice-space.org/multiple-monitors.html
 
@@ -12,7 +14,7 @@ shared /shared 9p trans=virtio 0 0
 
 
 modprobe nbd
-qemu-nbd -c /dev/nbd0 /mnt/data/images/untrusted_progs.qcow2 
+qemu-nbd -c /dev/nbd0 /mnt/data/images/untrusted_progs.qcow2
 sudo mount /dev/nbd0p1 /mnt6/
 
 
@@ -28,8 +30,8 @@ git clone https://github.com/virt-manager/virt-bootstrap.git
 cd virt-bootstrap/
 sudo apt install python-pip
 sudo apt install python-passlib
-sudo apt install python-guestfs 
-sudo apt install libguestfs-dev 
+sudo apt install python-guestfs
+sudo apt install libguestfs-dev
 pip install -r ./requirements.txt
 sudo python setup.py  install
 
@@ -37,3 +39,9 @@ virt-builder -l
 
 virt-builder://ubuntu-18.04
 
+
+
+
+
+
+https://medium.com/kata-containers
