@@ -91,6 +91,13 @@ https://sinopia.io
 ontowiki
 	recommended
 	dead, needs maintenance, but seems well-developed, could take it over
+	on ubuntu 18.04:
+        https://vitux.com/how-to-install-php5-and-php7-on-ubuntu-18-04-lts/
+        http://docs.ontowiki.net/Ubuntu-Quick-Install-Guide.html
+        sudo apt-get install php5.6-xml php5.6-mbstring
+        sudo apt install virtuoso-opensource
+        sudo systemctl restart apache2
+        http://docs.ontowiki.net/Getting-Started-Users.html
 
 
 https://github.com/AtomGraph/Web-Client
