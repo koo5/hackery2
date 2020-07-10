@@ -8,12 +8,15 @@ do_backup_i(I) :-
 	stop(I).
 
 do_backup(I) :-
-	do_backup('/', I),
-	do_backup('/home/', I),
-	do_backup('/z/', I).
+	%do_backup('/', I),
+	%do_backup('/home/', I),
+	%do_backup('/z/', I).
+	do_backup('/intel500/', I),
+	do_backup('/mx500data/', I),
+	true.
 
 do_backup(Src, I) :-
-	shell2(['rm ',Src,'.sxbackup; ln -s ',Src,'.sxbackup-',I,' ',Src,'.sxbackup; ~/.local/bin/btrfs-sxbackup run ',Src]).
+	shell2(['rm ',Src,'.sxbackup; ln -s ',Src,'.sxbackup-',I,' ',Src,'.sxbackup; btrfs-sxbackup run ',Src]).
 
 do_backup_ext(Disks) :-
 	shell2(['virsh suspend xubuntu18_docker_raw_on_fat'], _), /*fixme, how to tell if it's suspended? */
@@ -25,7 +28,7 @@ do_backup_ext2(I) :-
 
 backup_offline_data(I) :-
 	dif(I, 1), % 1 is the source
-	shell2(['rm /bac1/offline_data/.sxbackup; ln -s /bac1/offline_data/.sxbackup-',I,' /bac1/offline_data/.sxbackup; ~/.local/bin/btrfs-sxbackup run /bac1/offline_data/']).
+	shell2(['rm /bac1/offline_data/.sxbackup; ln -s /bac1/offline_data/.sxbackup-',I,' /bac1/offline_data/.sxbackup; btrfs-sxbackup run /bac1/offline_data/']).
 	
 df :-
 	shell2(['df -h -l -x loop -x tmpfs -x devtmpfs -x squashfs']).

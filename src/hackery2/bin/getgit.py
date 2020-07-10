@@ -1,11 +1,13 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
 #this file is cc by-sa 3.0 with attribution required, because it is mostly just bits from SO pasted together
 
 import json
-import urllib2, urllib
+#import urllib2, urllib
+#import urllib
+import urllib.request, urllib.parse
 import sys, os
 
 try:
@@ -34,7 +36,7 @@ last_search = cachedir +'/'+"last_search"
 
 def name_search(s):
 	##TODO
-	f = urllib2.urlopen("https://api.github.com/search/repositories?q=" + urllib.quote_plus(s)).read()
+	f = urllib.request.urlopen("https://api.github.com/search/repositories?q=" + urllib.parse.quote_plus(s)).read()
 	#open("debug_result", "w").write(f)
 	x = json.loads(f) #at least you didnt see my fuck ups except for that one
 	r = []
@@ -59,37 +61,37 @@ again with a number"""
 
 
 if len(sys.argv) == 1:
-	print "whatcha lookin for?"
+	print ("whatcha lookin for?")
 else:
 	lookie = sys.argv[1]
 
 	if lookie.isdigit():
 		name = num_search(lookie)
 		if name == None:
-			print "wat"
+			print( "wat")
 		else:
 			cmd = "git clone https://github.com/"+name+".git"
-			print name + " : " + cmd
+			print (name + " : " + cmd)
 			os.system(cmd)
 	
 	else:
 		res = name_search(lookie)
 		if not res:
-			print "I can pretty safely say that there were no results."
+			print ("I can pretty safely say that there were no results.")
 		else:
 			sans_first = res[1:]
 			other = sans_first[:4]
 			if len(other):
-				print "other "+lookie+":"
+				print ("other "+lookie+":")
 				for i in other:
-					print i[1]
+					print (i[1])
 				if len(other) < len(sans_first):
-					print "..."
+					print ("...")
 			try:
-				print "Cloning " + res[0][1] + "..."
+				print ("Cloning " + res[0][1] + "...")
 				os.system("git clone https://github.com/"+res[0][1]+".git")
 			except Exception as e:
-				print "An error occured:", e
+				print ("An error occured:", e)
 
 		#save it for later
 		o = open(last_search, "w")
