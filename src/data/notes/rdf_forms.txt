@@ -90,7 +90,7 @@ https://sinopia.io
 
 ontowiki
 	recommended
-	dead, needs maintenance, but seems well-developed, could take it over
+	dead, needs maintenance, but seems well-developed, and works, and installation is fairly easy
 	on ubuntu 18.04:
         https://vitux.com/how-to-install-php5-and-php7-on-ubuntu-18-04-lts/
         http://docs.ontowiki.net/Ubuntu-Quick-Install-Guide.html
