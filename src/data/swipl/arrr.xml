@@ -1,0 +1,110 @@
+
+
+unddddddddddddddd
+module{exports:[ddd/1],name:ddd}[ :- use_module(library(prolog_source)),
+  :- use_module(library(listing)),
+  :- use_module(library(record)),
+  :- use_module(library(apply)),
+  :- use_module('../lodgeit2/master/lib/utils.pl',[pretty_term_string/2]),
+  :- use_module(a1,[a1//2]),
+  :- use_module(a2,[a2/2]),
+  clause{ comments:[ '$stream_position'(293,13,0,0) - "%:- record clause(term, expanded, variables, layout, comments)."
+		   ],
+	  expanded:print_clause(A) :- write('clause1:') ',' print_term(A,[]) ',' nl ',' write('clause2:') ',' pretty_term_string(A,B) ',' writeln(B) ',' nl,
+	  guid:c9,
+	  term:print_clause(A) :- write('clause1:') ',' print_term(A,[]) ',' nl ',' write('clause2:') ',' pretty_term_string(A,B) ',' writeln(B) ',' nl,
+	  variables:['X'=A,'Y'=B]
+	},
+  clause{ comments:[ '$stream_position'(529,24,8,0) - "%maplist(print_clause, Parts),",
+		     '$stream_position'(569,26,8,0) - "%maplist(print_part, Parts),"
+		   ],
+	  expanded:ddd(C) :- open(C,read,D) ',' load(D,E) ',' nl ',' nl ',' assertz(world(F{ files:[ G{ clauses:E,
+					       path:C
+					     }
+					  ]
+				  })) ',' ddd2(E),
+	  guid:c10,
+	  term:ddd(C) :- open(C,read,D) ',' load(D,E) ',' nl ',' nl ',' assertz(world(F{ files:[ G{ clauses:E,
+					   path:C
+					 }
+				      ]
+			      })) ',' ddd2(E),
+	  variables:['FN'=C,'In'=D,'Parts'=E]
+	},
+  clause{ comments:[],
+	  expanded:print_part(H) :- (('.'(H,term,I) ',' '.'(H,variables,J)) ',' write_term(I,
+			      [ variable_names(J),
+				quoted(true),
+				spacing(next_argument)
+			      ])) ',' writeln('.'),
+	  guid:c11,
+	  term:print_part(H) :- write_term(H '.' term,
+			  [ variable_names(H.variables),
+			    quoted(true),
+			    spacing(next_argument)
+			  ]) ',' writeln('.'),
+	  variables:['Part'=H]
+	},
+  clause{ comments:[],
+	  expanded:load(K,M) :- prolog_read_source_term(K,
+					   L,
+					   P,
+					   [ variable_names(O),
+					     comments(N)
+					   ]) ',' (L = end_of_file -> M = [] ; gensym(c,Q) ',' R = clause{ comments:N,
+			   expanded:P,
+			   guid:Q,
+			   term:L,
+			   variables:O
+			 } ',' M = [R|S] ',' load(K,S)),
+	  guid:c12,
+	  term:load(K,M) :- prolog_read_source_term(K,
+				       L,
+				       P,
+				       [ variable_names(O),
+					 comments(N)
+				       ]) ',' (L = end_of_file -> M = [] ; gensym(c,Q) ',' R = clause{ comments:N,
+		       expanded:P,
+		       guid:Q,
+		       term:L,
+		       variables:O
+		     } ',' M = [R|S] ',' load(K,S)),
+	  variables:[ 'In' = K,
+		      'Clauses' = M,
+		      'Term' = L,
+		      'Expanded' = P,
+		      'Vars' = O,
+		      'Comments' = N,
+		      'Guid' = Q,
+		      'Clause' = R,
+		      'Tail' = S
+		    ]
+	},
+  clause{ comments:[ '$stream_position'(1174,61,0,0) - "/* pretty-print term with print_term, capture the output into a string*/",
+		     '$stream_position'(1247,62,0,0) - "/*\npretty_term_string(Term, String) :-\n\tpretty_term_string(Term, String, []).\n\npretty_term_string(Term, String, Options) :-\n\tnew_memory_file(X),\n\topen_memory_file(X, write, S),\n\tprint_term(Term, [output(S), write_options([\n\t\tnumbervars(true),\n\t\tquoted(true),\n\t\tportray(true)\n\t\t| Options])]),\n\tclose(S),\n\tmemory_file_to_string(X, String).\n*/",
+		     '$stream_position'(1589,78,0,0) - "%do('flip order of ', ",
+		     '$stream_position'(1616,83,0,0) - "/*\napropos\n*/",
+		     '$stream_position'(1633,89,0,0) - "%ask_user(Question, Options) :-",
+		     '$stream_position'(1665,90,0,0) - "/*\na0toa1 :-\n\task_user('module name does not match file name', [correct_file_name, correct_module_name]),..\n*/",
+		     '$stream_position'(1831,100,8,0) - "%print_term(Module,[]),"
+		   ],
+	  expanded:ddd2(T) :- phrase(a1(U,V),T) ',' a2((U,V),W) ',' unddd(W),
+	  guid:c13,
+	  term:ddd2(T) :- phrase(a1(U,V),T) ',' a2((U,V),W) ',' unddd(W),
+	  variables:[ 'C' = T,
+		      'H' = U,
+		      'B' = V,
+		      'Module' = W
+		    ]
+	},
+  clause{ comments:[],
+	  expanded:unddd(X) :- a2((Y,Z),X) ',' writeln(unddddddddddddddd) ',' print_term(Y,[]) ',' print_term(Z,[]) ',' phrase(a1(Y,Z),A1) ',' print_term(A1,[]) ',' true,
+	  guid:c14,
+	  term:unddd(X) :- a2((Y,Z),X) ',' writeln(unddddddddddddddd) ',' print_term(Y,[]) ',' print_term(Z,[]) ',' phrase(a1(Y,Z),A1) ',' print_term(A1,[]) ',' true,
+	  variables:[ 'Module' = X,
+		      'H' = Y,
+		      'B' = Z,
+		      'C' = A1
+		    ]
+	}
+]
