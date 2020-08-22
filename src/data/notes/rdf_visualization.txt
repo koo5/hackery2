@@ -117,36 +117,44 @@ rdf:
 
 			rdf in js, pointers on how to start building something, but no ready solutions
 
-				https://github.com/bricaud/graphexp
-					Interactive visualization of the Gremlin graph database with D3.js
+                free but commercially used, looking robust
+                    https://github.com/bpmn-io/diagram-js
+                    https://github.com/jgraph/mxgraph
 
-                https://madsholten.github.io/sparql-visualizer/
+                nice but paid
+                   https://gojs.net
+                        interactive diagrams and graphs
+                        nice demos but no keyboard-friendly navigation (by default)
 
-				https://gojs.net
-				 	interactive diagrams and graphs
-					nice demos but no keyboard-friendly navigation (by default)
+                hmh
 
-				https://www.rubensworks.net/blog/2019/10/06/using-rdf-in-javascript/
-				https://www.google.com/search?q=js+scene+graph
-				https://rdf.js.org/
-				https://github.com/linkeddata/rdflib.js
-				https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
-				https://www.w3.org/wiki/SparqlImplementations
+                    https://github.com/bricaud/graphexp
+                        Interactive visualization of the Gremlin graph database with D3.js
 
-				d3.js
-					https://github.com/timrdf/vsr/wiki/d3
-					https://medium.com/dailyjs/the-trouble-with-d3-4a84f7de011f
-						https://docs.google.com/spreadsheets/d/1k-GVrhLw2_KdSvfCOt3RzF6otWfZQ5rbsBpVnTP425w/edit#gid=0
-					simple demo
-						https://github.com/jimmccusker/rdfviewer
-					cool demo
-						http://givingsense.eu/demo/bloomdisplay/d3TreeBloom.htm
-						https://onsem.wp.imt.fr/2014/03/18/web-visualization-of-a-simple-ontology/
+                    https://madsholten.github.io/sparql-visualizer/
 
-				cytoscape.js
-					didnt find anything rdf related, but i guess it would be a reasonable engine for building something
 
-				https://github.com/marklogic-community/grove-vue-visjs-graph
+                    https://www.rubensworks.net/blog/2019/10/06/using-rdf-in-javascript/
+                    https://www.google.com/search?q=js+scene+graph
+                    https://rdf.js.org/
+                    https://github.com/linkeddata/rdflib.js
+                    https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
+                    https://www.w3.org/wiki/SparqlImplementations
+
+                    d3.js
+                        https://github.com/timrdf/vsr/wiki/d3
+                        https://medium.com/dailyjs/the-trouble-with-d3-4a84f7de011f
+                            https://docs.google.com/spreadsheets/d/1k-GVrhLw2_KdSvfCOt3RzF6otWfZQ5rbsBpVnTP425w/edit#gid=0
+                        simple demo
+                            https://github.com/jimmccusker/rdfviewer
+                        cool demo
+                            http://givingsense.eu/demo/bloomdisplay/d3TreeBloom.htm
+                            https://onsem.wp.imt.fr/2014/03/18/web-visualization-of-a-simple-ontology/
+
+                    cytoscape.js
+                        didnt find anything rdf related, but i guess it would be a reasonable engine for building something
+
+                    https://github.com/marklogic-community/grove-vue-visjs-graph
 
 
 
@@ -223,7 +231,7 @@ rdf:
 
 			https://medium.com/@sdmonroe/vios-reference-implementation-3153a3d589cf
 				interesting wrt web based UI
-ssrrrrtstsffp
+
 			ClioPatria
 				http://cliopatria.swi-prolog.org/swish/pldoc/doc/home/swipl/src/ClioPatria/ClioPatria/web/tutorial/LoadPirates.txt
 				http://cliopatria.swi-prolog.org/browse/list_graph?graph=https%3A//cliopatria.swi-prolog.org/packs/vumix
