@@ -1,3 +1,5 @@
+#!/usr/bin/env swipl
+
 :- ['disks'].
 
 
@@ -11,7 +13,7 @@ do_backup(I) :-
 	%do_backup('/', I),
 	%do_backup('/home/', I),
 	%do_backup('/z/', I).
-	do_backup('/intel500/', I),
+	%do_backup('/intel500/', I),
 	do_backup('/mx500data/', I),
 	true.
 

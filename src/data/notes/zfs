@@ -1,3 +1,4 @@
+zfs list -t snapshot -o name -S creation | grep "@autozsys_" | tail -n +16 | xargs -n 1 zfs destroy -vr
 
 znapzend
     glitches in setup (ignoring parameters)
