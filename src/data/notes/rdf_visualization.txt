@@ -595,3 +595,8 @@ currently irrelevant:
 		https://www.semanticweb.org/wiki/OmegaWiki.html
 
 
+
+
+misc
+    https://atomgraph.github.io/Linked-Data-Templates/
+        something like the solid thing?
