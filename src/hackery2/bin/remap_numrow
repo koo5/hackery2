@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-echo $DIR
-cd "$DIR"
-
+cd ~/hackery/bin
 xkbcomp xkb.dump $DISPLAY #:0
-xset r rate 170 40
+xset r rate 200 33
