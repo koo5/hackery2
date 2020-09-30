@@ -435,6 +435,10 @@ rdf:
 		not so excited about:
 			blazegraph
 				crashes, ooms, poor performance (in my tests...)
+            orientdb
+                not a hypergraph
+                    https://github.com/orientechnologies/orientdb/issues/4078
+                        haha
 
 		dead
 			http://opoirel.free.fr/strixDB/strixdb.html
