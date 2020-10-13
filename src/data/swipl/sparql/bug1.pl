@@ -11,18 +11,18 @@ WARNING: you must edit /usr/local/lib/swipl/library/semweb/sparql_client.pl (or 
 
 main :-
 	debug(sparqlprog),
-	sparql_endpoint( l, 'http://192.168.123.10:10035/repositories/repo/'),
-	sparql_endpoint( r, 'https://integbio.jp/rdf/sparql'),
 
+    /*
+	sparql_endpoint( l, 'http://192.168.123.10:10035/repositories/repo/'),
 	findall(_,
 	(
         (l ?? rdf(S, P, O, Graph)),
         writeq(O),
         nl
     ),_),
+    */
 
 
+    sparql_endpoint( r, 'https://integbio.jp/rdf/sparql'),
 	(r ?? rdf(S, P, O, Graph)),
-
-
     nl.
