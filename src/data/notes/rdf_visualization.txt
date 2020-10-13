@@ -604,3 +604,11 @@ currently irrelevant:
 misc
     https://atomgraph.github.io/Linked-Data-Templates/
         something like the solid thing?
+
+
+
+
+graphql, etc
+    https://www.hypergraphql.org/documentation/
+    http://vos.openlinksw.com/owiki/wiki/VOS/VirtGenerateR2RMLLinkedDataView
+
