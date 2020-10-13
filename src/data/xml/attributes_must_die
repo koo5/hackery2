@@ -1,0 +1,34 @@
+<property>
+    <'in reaction to'>http://www.schnada.de/grapt/eriknaggum-attributes.html</'in reaction to'>
+</property>
+..or rather, don't treat attributes and child elements differently on the parser api level.
+so, err, attributes can't contain structured data. Their main purpose seems to be hiding text, so you should just use a special-purpose tag for that:
+
+```
+<what>barbecue</what> on
+<span
+    property="cal:dtstart"
+    content="2007-09-16T16:00:00-05:00"
+    datatype="xsd:dateTime"
+>
+    September 16th at 4pm
+</span>.
+```
+becomes:
+```
+<what>barbecue</what> on
+<span>
+    <hidden>
+        <property>cal:dtstart</property>
+        <content>2007-09-16T16:00:00-05:00</content>
+        <datatype>xsd:dateTime</datatype>
+    </hidden>
+    September 16th at 4pm
+</span>.
+```
+
+but ofc, the question "hidden from what" begs itself.
+
+
+
+
