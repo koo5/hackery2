@@ -36,12 +36,12 @@ stop(I) :-
 	shell2(['cryptdisks_stop bac', I]).
 
 start :-
-	maplist(start, [0,1,2,3]),
+	maplist(start, [0,1,2,3,4]),
 	shell2(['df -h']),
 	halt.
 
 stop :-
-	maplist(stop, [0,1,2,3]),
+	maplist(stop, [0,1,2,3,4]),
 	shell2(['df -h']),
 	halt.
 
