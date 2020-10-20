@@ -133,3 +133,22 @@ meta
 
 https://github.com/FormAlchemy/pyramid_formalchemy
     ?
+
+http://vos.openlinksw.com/owiki/wiki/VOS/VirtuosoFacetsWebService
+    The selection of facets and values is represented as an XML tree. Such a representation is easier to process in an application than the SPARQL source text
+
+
+https://github.com/AKSW/vue-rdform/blob/master/src/rdform.vue
+
+
+https://www.researchgate.net/publication/228854943_Tracking_rdf_graph_provenance_using_rdf_molecules
+
+https://solidproject.org/
+
+https://medium.com/@sdmonroe/vios-reference-implementation-3153a3d589cf
+
+http://vos.openlinksw.com/owiki/wiki/VOS/VirtuosoFacetsWebService
+
+
+https://www.w3.org/TR/xforms/
+    http://emacspeak.sourceforge.net/raman/xf-book-accessibility/online-access.html

@@ -10,7 +10,7 @@ def main(directory):
 	"""create DIRECTORY and cd into it.
 	'md' is a shorthand for mkdir+cd"""
 	try:
-		os.mkdir(directory)
+		os.makedirs(directory)
 	except FileExistsError as e:
 		print(e, sys.stderr)
 		return

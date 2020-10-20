@@ -1,0 +1,7 @@
+In [1]: import structlog
+
+In [2]: log = structlog.get_logger()
+
+In [3]: log.msg("greeted", whom="world", more_than_a_string=[1, 2, 3])
+2020-10-11 21:00.06 greeted                        more_than_a_string=[1, 2, 3] whom=world
+

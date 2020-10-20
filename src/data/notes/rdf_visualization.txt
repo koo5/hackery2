@@ -450,6 +450,10 @@ rdf:
 				Each form is based on SPARQL (with a little modification: each $variable will automatically generate a request form field).
 				"""
 
+        unknown but interesting
+            http://hypergraphdb.org/
+            https://www.tigergraph.com/graphstudio/
+
 
 	dead?
 		http://www.visgraph3.org/
@@ -611,4 +615,15 @@ misc
 graphql, etc
     https://www.hypergraphql.org/documentation/
     http://vos.openlinksw.com/owiki/wiki/VOS/VirtGenerateR2RMLLinkedDataView
+
+
+
+
+storage - technically
+    https://en.wikipedia.org/wiki/Lightning_Memory-Mapped_Database
+    redis
+    ..
+    kde project seems to have oscillated, from "nothing", to a generic triplestore, to a bunch of special-purpose stores (but eventually without the overarching model)..
+    then there's all the r2rml implementations...
+    ~2010: "Internally, virtuoso may be looked at as a relational database, with some added RDF features. "
 
