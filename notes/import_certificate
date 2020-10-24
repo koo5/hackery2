@@ -1,5 +1,0 @@
-sudo mkdir /usr/share/ca-certificates/custom
-sudo mkdir /usr/share/ca-certificates/custom
-sudo wget -O /usr/share/ca-certificates/custom/dead.crt https://ezekielold.cgcs.cz/cert/dead.pem --no-check-certificate
-sudo dpkg-reconfigure ca-certificates
-
