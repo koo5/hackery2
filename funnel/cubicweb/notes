@@ -1,0 +1,21 @@
+(15:42:00) matrix: <nchauvat> you want to get all the links from cubicweb.org ?
+(15:42:55) matrix: <nchauvat> is it https://www.cubicweb.org/link that you want ? in what format ? csv ?
+(15:44:41) matrix: <nchauvat> https://www.cubicweb.org/link?vid=ecsvexport will work
+(15:46:15) matrix: <nchauvat> sorry, cubicweb.org is not running on cubicweb 3.28, hence content-negotiated RDF is not available
+(15:47:24) matrix: <nchauvat> else you would have been able to `http Accept: text/turtle https://www.cubicweb.org/link` to get what you are looking for.
+(15:47:37) matrix: <nchauvat>  * else you would have been able to `http Accept:text/turtle https://www.cubicweb.org/link` to get what you are looking for.
+(15:47:58) matrix: <nchauvat> @koom does that answer your question ?
+(15:50:01) koom: right...reviewing....
+(15:53:18) koom: yeah, it's missing the "created by" field, but, hey, almost perfect, thanks
+(15:53:45) koom: a lot further than i got the other time i asked :)
+(15:59:29) koom: question 2, this database probably doesn't have a license on it?
+(16:00:29) koom: it'd be easiest for me to just store the dump somewhere public and to make it queryable through promnesia without worrying about somebody coming and demanding lost revenue:)
+(16:00:50) matrix: <nchauvat> with https://www.cubicweb.org/view?rql=Any+X%2CY%2CL+WHERE+X+is_instance_of+Link%2C+X+created_by+Y%2C+Y+login+L&vid=csvexport you would get the creator for each link
+(16:02:52) matrix: <nchauvat> promnesia is python, isn't it ? why don't you use https://forge.extranet.logilab.fr/cubicweb/cwclientlib/ on the server
+(16:03:02) matrix: <nchauvat> or https://forge.extranet.logilab.fr/open-source/cwclientlibjs/ directly in your browser extension ?
+(16:03:23) koom: nice, cubicweb really is awesome
+(16:03:56) matrix: <nchauvat> or just do a GET cubicweb.org/view?rql=Any+...&vid=csvexport with your usual http library
+(16:04:22) matrix: <nchauvat> @koom like cubicweb ? blog about it ! ;)
+(16:05:45) matrix: <nchauvat> and ping us when you build something nice with it
+(16:06:05) matrix: <nchauvat> regarding the license for the data, consider it CC0-4.0
+(16:06:18) matrix: <nchauvat>  * regarding the license for the data, consider it CC0-4.0 for the links
