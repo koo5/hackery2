@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7e8df383-cc84-4fb1-8caa-ab6c68744109" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Fractal.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +18,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../../.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../.." />
   </component>
   <component name="ProjectId" id="1jA1hRWuVZeUgFreNPYzqzhW6LQ" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -50,6 +51,7 @@
       <updated>1603232203025</updated>
       <workItem from="1603232204552" duration="14709000" />
       <workItem from="1603311244417" duration="629000" />
+      <workItem from="1604100350215" duration="2656000" />
     </task>
     <servers />
   </component>
