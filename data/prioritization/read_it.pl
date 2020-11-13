@@ -12,22 +12,44 @@ print_properties_of_edge(E) :-
 	findall(_,(
 		rdf(E,P,O,_),
 		maybe_shorten_uri(P, P2),
-		format('^ ~q = ~q ~n', [P2, O])
+		maybe_shorten(O, O2),
+		format('^ ~q = ~q ~n', [P2, O2])
 	),_).
 
 
 maybe_shorten_uri(Uri, PrefixedUri) :-
+	shorten_uri(Uri, PrefixedUri), !.
+maybe_shorten_uri(Uri, Uri) :- !.
+
+shorten_uri(Uri, PrefixedUri) :-
+	atomic(Uri),
 	rdf_current_prefix(Namespace_prefix, Namespace),
 	string_concat(Namespace,Short_name,Uri),
 	atomic_list_concat([Namespace_prefix,':',Short_name], PrefixedUri),
 	!.
-maybe_shorten_uri(Uri, Uri).
+
+maybe_shorten_literal(L, L2) :- 
+	shorten_literal(L, L2),!.
+
+maybe_shorten_literal(X,X) :- !.
+
+shorten_literal(literal(type(_,L2)), L2) :- !.
+shorten_literal(literal(L2), L2) :- !.
+
+
+maybe_shorten(X,Y) :-
+	shorten_literal(X,Y),!.
+maybe_shorten(X,Y) :-
+	shorten_uri(X,Y),!.
+maybe_shorten(X,X) :- !.
 
 
 print_maybe_resource_label(X) :-
 	(	rdf(X, rdfs:label, Label)
-	->	write(Label)
-	;	writeq(X)).
+	->	Y = Label
+	;	Y = X),
+	maybe_shorten(Y, Y2),
+	writeq(Y2).
 
 
 print_triple(S,P,O,G) :-
