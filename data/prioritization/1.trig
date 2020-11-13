@@ -2,14 +2,14 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
 @prefix p: <https://koo5.github.io/rdf/prio/> .
-@prefix : <#> .
+@prefix : <https://koo5.github.io/rdf/koo/prios/> .
 
 
 :id0
 	rdfs:label "reading up on web cache apis";
 	p:satisfies_curiosity_percent 1.
 	:g1 {:id0 p:facilitates :id1}
-		:g1 p:percent 1.
+		:g1 p:strength_percent 1.
 
 :id1
 	rdfs:label "reading up on web storage apis".
@@ -19,7 +19,7 @@
 	rdfs:label "jsonld-based excel-365 form input templates";
 	rdfs:comment "just a simple rewrite of our current desktop-excel-dotnetrdf code".
 	:g101 {:id100 p:facilitates :id101}
-		:g101 p:percent 1.
+		:g101 p:strength_percent 1.
 
 :id101
 	rdfs:label "saving testcases as json-ld directly from requests".
@@ -28,13 +28,13 @@
 
 
 :g102 {:id100 p:facilitates :id102}
-	:g102 p:percent 1.
+	:g102 p:strength_percent 1.
 
 :id102
 	rdfs:label "development of Robust in general".
 
 :g103 {:id101 p:facilitates :id103}
-	:g103 p:percent 5.
+	:g103 p:strength_percent 5.
 
 :id103
 	rdfs:label "maintenance of Robust testcases".
@@ -52,3 +52,10 @@
 	
 	
 :id201 rdfs:label "koordinator2000, further phases".
+
+:g202 {:id200 p:prerequisite_for :id202.}
+:g202 p:probability_percent 1.
+
+
+:id202 rdfs:label "fame, fortune and fuel (for other projects)";
+

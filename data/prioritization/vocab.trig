@@ -1,0 +1,15 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix p: <https://koo5.github.io/rdf/prio/> .
+
+p:facilitates rdfs:range p:Task.
+p:facilitates rdfs:domain p:Task.
+
+
+p:prerequisite_for rdfs:range p:Task.
+p:prerequisite_for rdfs:domain p:Task.
+
+# doesn't work yet:
+p:prerequisite_for owl:inverseOf p:requires.
