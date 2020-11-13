@@ -11,28 +11,33 @@
 :id0
 	rdfs:label "reading up on web cache apis";
 	p:satisfies_curiosity_percent 1.
-{:id0 p:facilitates :id1} :g1. :g1 p:percent 1.
+	:g1 {:id0 p:facilitates :id1}
+		:g1 p:percent 1.
 
 :id1
-	rdfs:label "reading up on web storage apis";
-
+	rdfs:label "reading up on web storage apis".
 
 
 :id100
 	rdfs:label "jsonld-based excel-365 form input templates";
 	rdfs:comment "just a simple rewrite of our current desktop-excel-dotnetrdf code".
-
-{:id100 p:facilitates :id101} :g101. :g101 p:percent 1.
+	:g101 {:id100 p:facilitates :id101}
+		:g101 p:percent 1.
 
 :id101
-	rdfs:label "saving testcases as json-ld directly from requests";
+	rdfs:label "saving testcases as json-ld directly from requests".
 
-{:id100 p:facilitates :id102} :g102. :g102 p:percent 1.
+
+
+
+:g102 {:id100 p:facilitates :id102}
+	:g102 p:percent 1.
 
 :id102
-	rdfs:label "development of Robust in general";
+	rdfs:label "development of Robust in general".
 
-{:id101 p:facilitates :id103} :g103. :g103 p:percent 5.
+:g103 {:id101 p:facilitates :id103}
+	:g103 p:percent 5.
 
 :id103
 	rdfs:label "maintenance of Robust testcases".
