@@ -1,0 +1,27 @@
+<biography xmlns:xlink="http://www.w3.org/1999/xlink/namespace/">
+
+  <image source="http://www.turing.org.uk/turing/pi1/bus.jpg"
+  width="152" height="345"/>
+  <person born='1912-06-23'
+  died='1954-06-07'><first_name>Alan</first_name>
+  <last_name>Turing</last_name> </person> was one of the first people
+  to truly deserve the name <emphasize>computer scientist</emphasize>.
+  Although his contributions to the field were too numerous to list,
+  his best-known are the eponymous <emphasize xlink:type="simple"
+  xlink:href="http://cogsci.ucsd.edu/~asaygin/tt/ttest.html">Turing
+  Test</emphasize> and <emphasize  xlink:type="simple"
+  xlink:href="http://mathworld.wolfram.com/TuringMachine.html">Turing
+  Machine</emphasize>.
+
+  <last_name>Turing</last_name> was also an accomplished
+  <profession>mathematician</profession> and
+  <profession>cryptographer</profession>. His assistance
+  was crucial in helping the Allies decode the German Enigma
+  machine.<footnote source="The Ultra Secret, F.W. Winterbotham,
+  1974">1</footnote>
+
+  He committed suicide on <date><month>June</month> <day>7</day>,
+  <year>1954</year></date> after being convicted of homosexuality
+  and forced to take female hormone injections.<footnote
+  source="Alan Turing: the Enigma, Andrew Hodges, 1983">2</footnote>
+</biography>

@@ -1,0 +1,147 @@
+conclusion
+    i am looking for a hands-free+eyes-free work/coding experience. None of the available voice-coding/voice-control stacks (Unimacro, vocola, dragonfly, caster) and ecosystems cater to a high-level, eyes-free experience, and neither do any of the alternatives. But the SR/grammar/command systems are there, and TTS is easy. It would be interesting to start with something simpler - to try to set up a good SR/TTS web-browsing experience, using any of the above stacks and other resources, or explore what other common tasks can be efficiently turned hands-free+eyes-free.
+
+
+
+resume:
+    DNF is a safe bet SR engine, although kaldi and WSR seem to be doing a good job and are integrated into some projects
+    caster seems to be the ideal base for experimentation with custom grammars/command sets
+
+    the stack could be:
+        caster
+        dragonfly
+        natlink
+        DNS
+
+    alternatively, if you have not shelled out for DNF yet, it would be interesting to explore:
+        vocola3
+        WSR
+
+    or:
+        caster
+        kaldi
+
+    of great use would be research into what the apis of the SR engines (DNF, kaldi, WSR) are, how/what grammars are supported at that level.
+        natlink - DNS
+        vocola3 - WSR
+        caster - (kaldi/WSR/natlink)
+
+
+
+meta
+    http://www.knowbrainer.com/forums/forum/messageview.cfm?catid=25&threadid=34641&enterthread=y
+
+
+alive
+    Natlink
+        https://github.com/dictation-toolbox/natlink
+        https://qh.antenna.nl/unimacro/aboutunimacro/index.html
+        Natlink is an extension to Dragon NaturallySpeaking to allow scripting beyond the Visual Basic Scripts that the speech recognition program normally supports.
+        In each Natlink release also Vocola and Unimacro are included.
+        Other packages, like Dragonfly, need Natlink in order to work with Dragon, but should be separately installed.
+        https://dictation-toolbox.github.io/dictation-toolbox.org/natlink.html
+        https://qh.antenna.nl/unimacro/index.html
+
+    Unimacro
+        https://qh.antenna.nl/unimacro/index.html
+        python api for writing natlink/DNS command grammars
+
+    Vocolaaa
+        voice command DSL
+        alternative to Dragon Macro Language
+
+    https://github.com/dictation-toolbox/dragonfly
+        probably best start for understanding how interaction with DNF works
+            https://dragonfly2.readthedocs.io/en/latest/
+            https://dragonfly2.readthedocs.io/en/latest/grammar.html
+        depends on natlink + DNS:
+            https://dragonfly2.readthedocs.io/en/latest/installation.html
+            https://dictation-toolbox.github.io/dictation-toolbox.org/natlink.html
+
+
+    https://caster.readthedocs.io/en/latest/
+        Caster is built on Dragonfly.
+        If I were going to start from scratch, that's probably where I would start.
+        Caster was built _for_ voice coding.
+        https://caster.readthedocs.io/en/latest/readthedocs/Rule_Construction/Intro_Into_Rules_and_Grammars/
+        ```
+        Caster groups sets of CCR commands together so that they can be de/activated together. For example, you might want to turn Python and SQL on at the same time, but then switch over to C++ and SQL. To activate a command set, you say enable <something> where <something> is the name of the set. So, saying enable Python turns on Python.
+        Command Standards and Compatibility
+
+        Caster also has a standard set of language command words ("specs"). For instance, "if" is the same word ("iffae" at time of writing) for Python, C++, Rust, etc. This reduces cognitive load required to program by voice. You don't have to re-learn all of the basic commands for each language you want to use.
+
+        However, this also creates the need for compatibility checking. For example, suppose you said enable Python to enable Python, then enable C plus plus to enable C++. If you then said iffae to get Caster to output an "if" statement, would you mean the Python if statement or the C++ if statement? Caster's default behavior is to shut off incompatible command sets, favoring the latest one you activated. So, in the Python/C++ example, Python would get disabled and C++ would remain active.
+        ```
+        ```
+
+        Rule, CompoundRule, MappingRule: the original Dragonfly rule types. These can be used with Caster but not for CCR.
+        MergeRule: the basic Caster CCR building block. It is similar to Dragonfly's MappingRule but has a few extra properties.
+        SelfModifyingRule: this is a type of MergeRule which modifies its own command set based on some kind of user input. NodeRule, Alias, ChainAlias, and HistoryRule are all SelfModifyingRules.
+        ```
+
+add-ons
+
+    https://github.com/dictation-toolbox/aenea
+        A system to allow speech recognition via Dragonfly on one computer to send events to another.
+        Easily add custom Python RPCs run on the server (Linux host) that will be available from your grammars (see server/linux_x11/plugins and client/_server_plugin_example.py)
+        Lacks ability to use context dependent editing commands (select that, etc)
+
+    https://github.com/daanzu/kaldi-active-grammar
+        "context-dependent" grammars system for DNS/other recognizers
+        https://www.youtube.com/watch?v=Qk1mGbIJx3s
+
+    https://github.com/jgarvin/mandimus
+        DNS <-> emacs
+
+
+grammars/command sets
+    https://github.com/dictation-toolbox/dragonfly-scripts
+    https://github.com/barrysims/dragonfly
+    https://github.com/ccrusius/dragonfly-modules
+    https://github.com/tjanpool/myDragonflyScripts
+    https://github.com/nielmclaren/JarvisGrammars
+    https://github.com/jiqimaogou/NatLink-MacroSystem/blob/master/_bringme.py
+    https://github.com/danzel/NatlinkVisualStudioMacros
+    https://github.com/tgrosinger/aenea-grammars
+    https://github.com/simianhacker/code-by-voice/blob/master/macros/_bash.py
+
+
+
+helpers
+    https://github.com/tanabarr/natlink-custom-scripts
+    https://github.com/mdbridge/bit-bucket
+
+
+tips
+    https://github.com/tgrosinger/aenea-grammars
+
+
+
+troubleshooting
+    natlink
+        http://www.knowbrainer.com/forums/forum/messageview.cfm?catid=25&threadid=30173&enterthread=y
+
+
+dead
+    http://voicecode.io/
+        https://github.com/VoiceCode
+        https://sourceforge.net/projects/voicecode/
+
+deprecated
+    https://github.com/tanabarr/natlink-py-scripts
+
+
+
+alternatives
+
+    https://serenade.ai
+        claims to be a higher-level approach to editing code, but it's still text-fiddling
+
+    talon
+        text-fiddling
+        https://www.youtube.com/watch?v=ddFI63dgpaI
+        https://news.ycombinator.com/item?id=22405178
+        ships with kaldi
+
+
+

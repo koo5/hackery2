@@ -1,0 +1,21 @@
+zfs list -t snapshot -o name -S creation | grep "@autozsys_" | tail -n +16 | xargs -n 1 zfs destroy -vr
+
+znapzend
+    glitches in setup (ignoring parameters)
+    weird idea about ignoring errors in pre/post run scripts
+    difficult to read output
+    ignored errors
+    interrupted run causes subsequent runs to fail, requires manual cleanup
+
+
+zfs-autobackup
+    testing in progress, easy setup
+
+https://github.com/jimsalterjrs/sanoid/
+    ?
+
+https://pve.proxmox.com/wiki/PVE-zsync
+    ?
+
+
+overall, i prefer btrfs, it's saner, at least for home/desktop use. Zfs may come with more robustness and functionality for bigger deployments.

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<?xml-stylesheet type="text/css" href="rule.css"?> 
+ <tables> 
+  <m:table xmlns:m="http://www.google.co.in"> 
+   <m:tr> 
+    <m:td>Apple</m:td> 
+    <m:td>Banana</m:td> 
+   </m:tr> 
+  </m:table> 
+  <n:table xmlns:n="http://www.yahoo.co.in"> 
+   <n:height>100</n:height> 
+   <n:width>150</n:width> 
+  </n:table> 
+ </tables> 
+ 

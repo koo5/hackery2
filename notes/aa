@@ -1,0 +1,132 @@
+1+ 9  10/ 22] *(164 / 176b) 0010 0x00A[*][X]
+ssh into azure
+>that didnt parse, i got 3 words: ssh, into, azure
+to ssh into something is an action
+>ok
+
+
+
+
+result = "ssh $computer"
+result = "ssh $user@$computer"
+
+
+
+
+https://github.com/automenta/narchy/blob/skynet2/README.md
+
+
+
+
+http://universaldependencies.org/
+
+
+
+
+
+< vector fonts:
+---
+> protege is an ontology editor
+3,32c3,4
+< https://www.google.cz/search?client=ubuntu&channel=fs&q=engraving+font+truetype&ie=utf-8&oe=utf-8
+< 
+< http://soft9000.com/HersheyShowcase/
+< https://github.com/automenta/narchy/tree/skynet2/app/src/main/resources/spacegraph/font/hershey
+< 
+< 
+< https://github.com/koo5/lemon-3/blob/master/data/l1
+< http://paulbourke.net/dataformats/hershey/
+< 
+< http://imajeenyus.com/computer/20150110_single_line_fonts/index.shtml
+< 
+< https://github.com/osresearch/vst/blob/master/teensyv/asteroids_font.c
+< 
+< https://www.behance.net/gallery/24840741/Kandinsky-Alphabet
+< 
+< 
+< 
+< python rdf:
+< http://www.slideshare.net/alchueyr/getting-the-most-out-of-sparql-with-python
+< http://www.michelepasin.org/blog/2011/02/24/survey-of-pythonic-tools-for-rdf-and-linked-data-programming/
+< oldman
+< 
+< 
+< 
+< 
+< 
+< [ context spring, summer;
+< keyword vegetable, pestovani;
+< url http://hobby.idnes.cz/pestovani-zeleniny-v-samozavlazovacich-truhlicich-fhw-/hobby-zahrada.aspx?c=A120521_132022_hobby-domov_mce;
+< url https://www.google.cz/search?client=ubuntu&channel=fs&q=samozavlazovaci+truhlik
+---
+> [tags (c algos low-level neat)
+> "http://ccodearchive.net/list.html"
+38,55d9
+< health, food:
+< http://hobby.idnes.cz/kysane-zeli-testy-0m7-/hobby-domov.aspx?c=A130212_111536_hobby-domov_mce
+< 
+< 
+< 
+< 
+< BI:
+< https://github.com/getredash/redash
+< http://www.semantacorp.com/
+< 
+< 
+< 
+< 
+< language design
+< http://blog.thezerobit.com/2014/06/05/the-flow-of-code.html
+< 
+< 
+< 
+57d10
+< gui
+59d11
+< qt
+61,62d12
+< http://nucleic.github.io/enaml/docs/
+< https://news.ycombinator.com/item?id=9677375
+64d13
+< wpf
+66c15
+< delphi
+---
+> personal
+68c17
+< https://kivy.org/docs/guide/advancedgraphics.html
+---
+> A customer enters a card X. A customer enters a code Y. If the code Y is valid then SimpleMat accepts the card X. If the code Y is not valid then SimpleMat rejects the card X.
+70,71d18
+< https://python.libhunt.com/project/kivy/vs/pyside?rel=cmp-cmp
+< https://python.libhunt.com/categories/290-gui
+73c20
+< http://takluyver.github.io/posts/so-you-want-to-write-a-desktop-app-in-python.html
+---
+> https://www.yandex.com/images/search?cbir_id=N9bDTcymg27It8MZj_eYEw&img_url=http%3A%2F%2Forig07.deviantart.net%2Fd157%2Ff%2F2012%2F024%2Ff%2F2%2Fcloud_painting_by_mamas_art-d4ni017.jpg&rpt=imagelike&_=1442034891762q
+80,81d26
+< cppout optimization:
+< Object-Relative Addressing: Compressed Pointers in 64-bit Java Virtual Machines
+
+
+
+
+
+
+docker run -it swipl
+
+
+
+print_term(whatever, Options).
+term_string(whatever, String).
+
+
+
+
+http://zvon.org/xxl/xlink/xlink_extend/OutputExamples/xml10_out.xml.html
+https://www.xml.com/pub/2000/09/xlink/index.html#type
+https://www.w3.org/TR/xlink11/#linking-elements
+
+
+
+

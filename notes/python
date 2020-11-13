@@ -1,0 +1,32 @@
+[a :note; :contents """
+TriOptima/tri.struct
+tri.struct supplies classes that can be used like dictionaries and as objects with attribute access at the same time
+https://github.com/TriOptima/tri.struct
+see also my dotdict
+"""].
+
+
+[a :note; :contents """
+https://github.com/jlubcke/pytest-pycharm
+Plugin for py.test to enter PyCharm debugger on uncaught exceptions
+"""].
+
+
+[:keyphrase "for each line of input:";
+:code [
+:lang :python;
+:contents """
+import sys
+for line in sys.stdin.readlines():
+"""]]
+
+
+[:keyphrase "standard_python_header"
+:code """#!/usr/bin/env python3"""
+:note """"coding" no longer necessary, with python 3"]
+
+[:contents """
+bash --init-file "venv/bin/activate"
+fish -C ". venv/bin/activate.fish"
+"""].
+
