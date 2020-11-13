@@ -1,0 +1,2 @@
+# note: each item will eventually be inferred to be of rdf:type p:Task, and will be assigned a "person" "koo5". Later possibly also "author", parsed_ts, ..
+

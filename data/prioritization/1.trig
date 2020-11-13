@@ -5,9 +5,6 @@
 @prefix : <#> .
 
 
-# note: each item will be inferred to be of rdf:type p:Task, and will be assigned a "person" "koo5". Later possibly also "author", parsed_ts, ..
-
-
 :id0
 	rdfs:label "reading up on web cache apis";
 	p:satisfies_curiosity_percent 1.
