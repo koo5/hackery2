@@ -18,7 +18,7 @@ do_backup(I) :-
 	true.
 
 do_backup(Src, I) :-
-	shell2(['rm ',Src,'.sxbackup; ln -s ',Src,'.sxbackup-',I,' ',Src,'.sxbackup; btrfs-sxbackup run ',Src]).
+	shell2(['rm ',Src,'.sxbackup; ln -s ',Src,'.sxbackup-',I,' ',Src,'.sxbackup; nice -n 19 ionice -c 3 btrfs-sxbackup run ',Src]).
 
 do_backup_ext(Disks) :-
 	shell2(['virsh suspend xubuntu18_docker_raw_on_fat'], _), /*fixme, how to tell if it's suspended? */
@@ -45,7 +45,7 @@ do_backup_all :-
 start_and_find_disks(Disks) :-
 	findall(X, 
 		(
-			between(0,3,X),
+			between(0,4,X),
 			try_ensure_mounted(X)
 		),
 		Disks).
@@ -58,9 +58,9 @@ do_backup_with_disks(Disks) :-
 
 	/* these three can be ordered in any way, everything could even be done in parallel if it wasnt for sxbackup symlink limitation */
 
-	foreach( (dif(I,1),member(I,Disks)), backup_offline_data(I)),
 	all(Disks,do_backup),
 	
+	foreach( (dif(I,1),member(I,Disks)), backup_offline_data(I)),
 
 	df,
 	all(Disks,stop).
