@@ -20,6 +20,9 @@ rdf:
 
 		software, roughly ordered by immediate relevance:
 
+			https://github.com/sebferre/sparklis
+				CNL
+
 			https://www.tomsawyer.com/graph-database-browser/
 				recommended?
 				viewing/explorations

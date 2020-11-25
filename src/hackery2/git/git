@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+my $path_to_git = '/usr/local/bin/git';
+exit(system($path_to_git, @ARGV))
+    if @ARGV < 2 or $ARGV[0] ne 'clone';
+# Override git-clone here...
+# - https://stackoverflow.com/questions/3538774/is-it-possible-to-override-git-command-by-git-alias
