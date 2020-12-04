@@ -1,0 +1,34 @@
+<https://koo5.github.io/rdf/koo/prios/id0> <http://www.w3.org/2000/01/rdf-schema#label> "reading up on web cache apis" .
+<https://koo5.github.io/rdf/koo/prios/id0> <https://koo5.github.io/rdf/prio/satisfies_curiosity_percent> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://koo5.github.io/rdf/koo/prios/id0> <https://koo5.github.io/rdf/prio/facilitates> <https://koo5.github.io/rdf/koo/prios/id1> <https://koo5.github.io/rdf/koo/prios/g1> .
+<https://koo5.github.io/rdf/koo/prios/id0> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g1> .
+<https://koo5.github.io/rdf/koo/prios/id1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g1> .
+<https://koo5.github.io/rdf/koo/prios/g1> <https://koo5.github.io/rdf/prio/strength_percent> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://koo5.github.io/rdf/koo/prios/id1> <http://www.w3.org/2000/01/rdf-schema#label> "reading up on web storage apis" .
+<https://koo5.github.io/rdf/koo/prios/id100> <http://www.w3.org/2000/01/rdf-schema#label> "jsonld-based excel-365 form input templates" .
+<https://koo5.github.io/rdf/koo/prios/id100> <http://www.w3.org/2000/01/rdf-schema#comment> "just a simple rewrite of our current desktop-excel-dotnetrdf code" .
+<https://koo5.github.io/rdf/koo/prios/id100> <https://koo5.github.io/rdf/prio/facilitates> <https://koo5.github.io/rdf/koo/prios/id101> <https://koo5.github.io/rdf/koo/prios/g101> .
+<https://koo5.github.io/rdf/koo/prios/id100> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g101> .
+<https://koo5.github.io/rdf/koo/prios/id101> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g101> .
+<https://koo5.github.io/rdf/koo/prios/g101> <https://koo5.github.io/rdf/prio/strength_percent> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://koo5.github.io/rdf/koo/prios/id101> <http://www.w3.org/2000/01/rdf-schema#label> "saving testcases as json-ld directly from requests" .
+<https://koo5.github.io/rdf/koo/prios/id100> <https://koo5.github.io/rdf/prio/facilitates> <https://koo5.github.io/rdf/koo/prios/id102> <https://koo5.github.io/rdf/koo/prios/g102> .
+<https://koo5.github.io/rdf/koo/prios/id100> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g102> .
+<https://koo5.github.io/rdf/koo/prios/id102> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g102> .
+<https://koo5.github.io/rdf/koo/prios/g102> <https://koo5.github.io/rdf/prio/strength_percent> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://koo5.github.io/rdf/koo/prios/id102> <http://www.w3.org/2000/01/rdf-schema#label> "development of Robust in general" .
+<https://koo5.github.io/rdf/koo/prios/id101> <https://koo5.github.io/rdf/prio/facilitates> <https://koo5.github.io/rdf/koo/prios/id103> <https://koo5.github.io/rdf/koo/prios/g103> .
+<https://koo5.github.io/rdf/koo/prios/id101> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g103> .
+<https://koo5.github.io/rdf/koo/prios/id103> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g103> .
+<https://koo5.github.io/rdf/koo/prios/g103> <https://koo5.github.io/rdf/prio/strength_percent> "5"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://koo5.github.io/rdf/koo/prios/id103> <http://www.w3.org/2000/01/rdf-schema#label> "maintenance of Robust testcases" .
+<https://koo5.github.io/rdf/koo/prios/id200> <http://www.w3.org/2000/01/rdf-schema#label> "koordinator2000, initial implementation" .
+<https://koo5.github.io/rdf/koo/prios/id200> <https://koo5.github.io/rdf/prio/prerequisite_for> <https://koo5.github.io/rdf/koo/prios/id201> .
+<https://koo5.github.io/rdf/koo/prios/id200> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> .
+<https://koo5.github.io/rdf/koo/prios/id201> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> .
+<https://koo5.github.io/rdf/koo/prios/id201> <http://www.w3.org/2000/01/rdf-schema#label> "koordinator2000, further phases" .
+<https://koo5.github.io/rdf/koo/prios/id200> <https://koo5.github.io/rdf/prio/prerequisite_for> <https://koo5.github.io/rdf/koo/prios/id202> <https://koo5.github.io/rdf/koo/prios/g202> .
+<https://koo5.github.io/rdf/koo/prios/id200> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g202> .
+<https://koo5.github.io/rdf/koo/prios/id202> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://koo5.github.io/rdf/prio/Task> <https://koo5.github.io/rdf/koo/prios/g202> .
+<https://koo5.github.io/rdf/koo/prios/g202> <https://koo5.github.io/rdf/prio/probability_percent> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://koo5.github.io/rdf/koo/prios/id202> <http://www.w3.org/2000/01/rdf-schema#label> "fame, fortune and fuel (for other projects)" .

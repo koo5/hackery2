@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<?xml-stylesheet type="text/css" href="rule.css"?> 
+ <tables> 
+  <table> 
+   <tr> 
+    <td>Apple</td> 
+    <td>Banana</td> 
+   </tr> 
+  </table> 
+  <table> 
+   <height>100</height> 
+   <width>150</width> 
+  </table> 
+ </tables> 
+ 

@@ -1,0 +1,2 @@
+reset;echo -e "\e[3J"; swipl -s process_data.pl  -g "debug,process_data(_, '/home/koom/lodgeit2/f/tests/endpoint_tests/ledger/BankDemo2.xlsx-LodgeiT_Request_July4.xml'), halt."  2>&1 1> arrr | tee err; and begin; grep -q -E -i 'Warn|err' err; or  mcedit arrr ; end
+reset;echo -e "\e[3J"; swipl -s process_data.pl  -g "debug,process_data2(_, '/home/koom/lodgeit2/f/tests/endpoint_tests/ledger/BankDemo2.xlsx-LodgeiT_Request_July4.xml'), halt."  2>&1 1> arrr.xml | tee err; and begin; grep -q -E -i 'Warn|err' err; or  google-chrome arrr.xml ; end

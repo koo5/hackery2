@@ -1,6 +1,0 @@
-
-split([], [], []).
-split([A], [A], []).
-split([A,B|Rest], [A|RestA], [B|RestB]) :-
-	split(Rest, RestA, RestB).
-

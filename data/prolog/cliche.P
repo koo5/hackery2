@@ -1,0 +1,17 @@
+%use_module(format).
+:- import format/2 from format.
+
+cliche --> 
+    thing,
+    " is a ", 
+    type_of_thing, 
+    " trapped in a ", 
+    opposite_type_of_thing, 
+    " body.".
+thing --> "Cygwin".
+type_of_thing --> "Unix OS".
+opposite_type_of_thing --> "Windows'".
+
+%work :-
+%	phrase(cliche, X, []),format('~s~n', [X]),
+%	phrase(cliche, X, "body."),format('~s~n', [X]).

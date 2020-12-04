@@ -1,0 +1,4 @@
+kingston ssd - unsupported / difficult to update firmware without windows, bootable linux iso exists but doesnt work
+( https://gitlab.com/vinibali/kingston_fw_updater )
+intel and crucial: download their iso, dd, boot, flash (???!)
+

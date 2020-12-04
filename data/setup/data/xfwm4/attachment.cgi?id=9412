@@ -1,0 +1,283 @@
+From a637763130a9bc55eb70ef3023317114b8d708d2 Mon Sep 17 00:00:00 2001
+From: Ignacio Losiggio <iglosiggio@gmail.com>
+Date: Mon, 23 Jul 2018 16:12:00 -0300
+Subject: [PATCH] cycling: Add cycling through all windows on the current
+ workspace
+
+Bug: 8865
+
+Simple implementation that adds the posibility of cycling through all
+the windows in the current workspace regardless of monitor.
+
+The function `clientInMonitor` did have an off-by -one pixel bug whose
+solution was provided by @GreyAlien502 (link at the end of the message).
+I do not currently have a multi-monitor setup to test this simple
+bugfix.
+
+Provided solution:
+https://github.com/iglosiggio/xfwm4/commit/d9874d75bd8a7df0aa594b8528f8f521f9014ffb#r33866008
+---
+ defaults/defaults                          |  1 +
+ settings-dialogs/tweaks-settings.c         |  5 +++
+ settings-dialogs/xfwm4-tweaks-dialog.glade | 16 ++++++++++
+ src/client.h                               |  1 +
+ src/cycle.c                                |  4 +++
+ src/focus.c                                | 24 ++++++++++++++
+ src/misc.c                                 | 37 ++++++++++++++++++++++
+ src/misc.h                                 |  6 ++++
+ src/settings.c                             |  7 ++++
+ src/settings.h                             |  1 +
+ 10 files changed, 102 insertions(+)
+
+diff --git a/defaults/defaults b/defaults/defaults
+index 38d34704b..350dffc4c 100644
+--- a/defaults/defaults
++++ b/defaults/defaults
+@@ -14,6 +14,7 @@ cycle_minimum=true
+ cycle_preview=true
+ cycle_tabwin_mode=0
+ cycle_workspaces=false
++cycle_monitor=false
+ double_click_action=maximize
+ double_click_distance=5
+ double_click_time=250
+diff --git a/settings-dialogs/tweaks-settings.c b/settings-dialogs/tweaks-settings.c
+index d5f711be6..e0d04237c 100644
+--- a/settings-dialogs/tweaks-settings.c
++++ b/settings-dialogs/tweaks-settings.c
+@@ -175,6 +175,7 @@ wm_tweaks_dialog_configure_widgets (GtkBuilder *builder)
+     GtkWidget *cycle_draw_frame = GTK_WIDGET (gtk_builder_get_object (builder, "cycle_draw_frame"));
+     GtkWidget *cycle_raise = GTK_WIDGET (gtk_builder_get_object (builder, "cycle_raise"));
+     GtkWidget *cycle_tabwin_mode = GTK_WIDGET (gtk_builder_get_object (builder, "cycle_tabwin_mode"));
++    GtkWidget *cycle_monitor = GTK_WIDGET (gtk_builder_get_object (builder, "cycle_monitor"));
+ 
+     /* Focus tab */
+     GtkWidget *prevent_focus_stealing_check = GTK_WIDGET (gtk_builder_get_object (builder, "prevent_focus_stealing_check"));
+@@ -326,6 +327,10 @@ wm_tweaks_dialog_configure_widgets (GtkBuilder *builder)
+                             "/general/cycle_tabwin_mode",
+                             G_TYPE_INT,
+                             (GObject *)cycle_tabwin_mode, "active");
++    xfconf_g_property_bind (xfwm4_channel,
++                            "/general/cycle_monitor",
++                            G_TYPE_BOOLEAN,
++                            (GObject *)cycle_monitor, "active");
+ 
+     /* Focus tab */
+     xfconf_g_property_bind (xfwm4_channel,
+diff --git a/settings-dialogs/xfwm4-tweaks-dialog.glade b/settings-dialogs/xfwm4-tweaks-dialog.glade
+index 38135a7e9..e701233d8 100644
+--- a/settings-dialogs/xfwm4-tweaks-dialog.glade
++++ b/settings-dialogs/xfwm4-tweaks-dialog.glade
+@@ -217,6 +217,22 @@ or "skip taskbar" properties set</property>
+                     <property name="position">5</property>
+                   </packing>
+                 </child>
++                <child>
++                  <object class="GtkCheckButton" id="cycle_monitor">
++                    <property name="label" translatable="yes">Cycle only through windows in the active monitor</property>
++                    <property name="use_action_appearance">False</property>
++                    <property name="visible">True</property>
++                    <property name="can_focus">True</property>
++                    <property name="receives_default">False</property>
++                    <property name="use_underline">True</property>
++                    <property name="draw_indicator">True</property>
++                  </object>
++                  <packing>
++                    <property name="expand">False</property>
++                    <property name="fill">False</property>
++                    <property name="position">5</property>
++                  </packing>
++                </child>
+               </object>
+             </child>
+             <child type="tab">
+diff --git a/src/client.h b/src/client.h
+index 89d2d82f3..907993d4e 100644
+--- a/src/client.h
++++ b/src/client.h
+@@ -75,6 +75,7 @@
+ #define SEARCH_INCLUDE_SKIP_TASKBAR     (1<<5)
+ #define SEARCH_SAME_APPLICATION         (1<<6)
+ #define SEARCH_DIFFERENT_APPLICATION    (1<<7)
++#define SEARCH_THIS_MONITOR             (1<<8)
+ 
+ #define NO_UPDATE_FLAG                  0
+ #define UPDATE_BUTTON_GRABS             (1<<0)
+diff --git a/src/cycle.c b/src/cycle.c
+index e2279ffe8..e84352053 100644
+--- a/src/cycle.c
++++ b/src/cycle.c
+@@ -85,6 +85,10 @@ clientGetCycleRange (ScreenInfo *screen_info)
+     {
+         range |= SEARCH_INCLUDE_ALL_WORKSPACES;
+     }
++    if (screen_info->params->cycle_monitor)
++    {
++        range |= SEARCH_THIS_MONITOR;
++    }
+ 
+     return range;
+ }
+diff --git a/src/focus.c b/src/focus.c
+index af050236d..9afa96477 100644
+--- a/src/focus.c
++++ b/src/focus.c
+@@ -30,6 +30,7 @@
+ #include <X11/Xutil.h>
+ #include <X11/Xatom.h>
+ #include <X11/extensions/shape.h>
++#include <X11/extensions/Xrandr.h>
+ 
+ #include <glib.h>
+ #include <gdk/gdk.h>
+@@ -285,6 +286,29 @@ clientSelectMask (Client * c, Client *other, guint mask, guint type)
+     {
+         return FALSE;
+     }
++    if ((mask & SEARCH_THIS_MONITOR))
++    {
++        int i;
++        int monitor_count;
++        XRRMonitorInfo *monitors;
++
++        monitors = XRRGetMonitors(clientGetXDisplay(c), c->window, True, &monitor_count);
++
++        for (i = 0; i < monitor_count; i++)
++        {
++            if (cursorInMonitor(monitors + i, c->screen_info) && clientInMonitor(monitors + i, c))
++            {
++                break;
++            }
++        }
++
++        if (i == monitor_count)
++        {
++            return FALSE;
++        }
++
++        XRRFreeMonitors(monitors);
++    }
+     if (c->type & type)
+     {
+         return TRUE;
+diff --git a/src/misc.c b/src/misc.c
+index 05db3dbb6..1d1acd36f 100644
+--- a/src/misc.c
++++ b/src/misc.c
+@@ -28,6 +28,7 @@
+ #include <X11/Xlib.h>
+ #include <X11/Xutil.h>
+ #include <X11/Xmd.h>
++#include <X11/extensions/Xrandr.h>
+ #include <glib.h>
+ #include <gtk/gtk.h>
+ #include <gdk/gdk.h>
+@@ -258,3 +259,39 @@ get_atom_name (DisplayInfo *display_info, Atom atom)
+     return value;
+ }
+ 
++gboolean
++cursorInMonitor(XRRMonitorInfo *monitor, ScreenInfo *screen_info)
++{
++    int monitor_min_x = monitor->x;
++    int monitor_min_y = monitor->y;
++    int monitor_max_x = monitor->x + monitor->width;
++    int monitor_max_y = monitor->y + monitor->height;
++
++    int cursor_x;
++    int cursor_y;
++
++    /* Estos son datos basura que no voy a usar */
++    Window w1, w2;
++    int x2, y2;
++    unsigned int mask;
++
++    XQueryPointer (myScreenGetXDisplay(screen_info), screen_info->xroot, &w1, &w2, &cursor_x, &cursor_y, &x2, &y2, &mask);
++
++    return cursor_x >= monitor_min_x && cursor_x < monitor_max_x
++        && cursor_y >= monitor_min_y && cursor_y < monitor_max_y;
++}
++
++gboolean
++clientInMonitor(XRRMonitorInfo *m, Client *c)
++{
++    int m_x1 = m->x;
++    int m_x2 = m->x + m->width;
++    int m_y1 = m->y;
++    int m_y2 = m->x + m->height;
++    int c_x1 = c->x;
++    int c_x2 = c->x + c->width;
++    int c_y1 = c->y;
++    int c_y2 = c->x + c->height;
++    return m_x1 < c_x2 && m_x2 > c_x1
++        && m_y1 < c_y2 && m_y2 > c_y1;
++}
+diff --git a/src/misc.h b/src/misc.h
+index 73b864daf..b9fd3a82f 100644
+--- a/src/misc.h
++++ b/src/misc.h
+@@ -30,6 +30,7 @@
+ 
+ #include <X11/X.h>
+ #include <X11/Xlib.h>
++#include <X11/extensions/Xrandr.h>
+ #include <glib.h>
+ #include "screen.h"
+ 
+@@ -84,4 +85,9 @@ void                     placeSidewalks                         (ScreenInfo *,
+ gchar*                   get_atom_name                          (DisplayInfo *,
+                                                                  Atom);
+ 
++gboolean                 cursorInMonitor                        (XRRMonitorInfo *,
++                                                                 ScreenInfo *);
++
++gboolean                 clientInMonitor                        (XRRMonitorInfo *,
++                                                                 Client *c);
+ #endif /* INC_MISC_H */
+diff --git a/src/settings.c b/src/settings.c
+index ccb14319f..9eba7a85f 100644
+--- a/src/settings.c
++++ b/src/settings.c
+@@ -680,6 +680,7 @@ loadSettings (ScreenInfo *screen_info)
+         {"cycle_minimum", NULL, G_TYPE_BOOLEAN, TRUE},
+         {"cycle_preview", NULL, G_TYPE_BOOLEAN, TRUE},
+         {"cycle_tabwin_mode", NULL, G_TYPE_INT, FALSE},
++        {"cycle_monitor", NULL, G_TYPE_BOOLEAN, FALSE},
+         {"cycle_workspaces", NULL, G_TYPE_BOOLEAN, TRUE},
+         {"double_click_action", NULL, G_TYPE_STRING, TRUE},
+         {"double_click_distance", NULL, G_TYPE_INT, TRUE},
+@@ -784,6 +785,8 @@ loadSettings (ScreenInfo *screen_info)
+         CLAMP (getIntValue ("cycle_tabwin_mode", rc), 0, 1);
+     screen_info->params->cycle_workspaces =
+         getBoolValue ("cycle_workspaces", rc);
++    screen_info->params->cycle_monitor =
++        getBoolValue ("cycle_monitor", rc);
+     screen_info->params->focus_hint =
+         getBoolValue ("focus_hint", rc);
+     screen_info->params->focus_new =
+@@ -1343,6 +1346,10 @@ cb_xfwm4_channel_property_changed(XfconfChannel *channel, const gchar *property_
+                 {
+                     screen_info->params->cycle_preview = g_value_get_boolean (value);
+                 }
++                else if (!strcmp (name, "cycle_monitor"))
++                {
++                    screen_info->params->cycle_monitor = g_value_get_boolean (value);
++                }
+                 else if (!strcmp (name, "focus_hint"))
+                 {
+                     screen_info->params->focus_hint = g_value_get_boolean (value);
+diff --git a/src/settings.h b/src/settings.h
+index f20c6db46..bdcf70fff 100644
+--- a/src/settings.h
++++ b/src/settings.h
+@@ -215,6 +215,7 @@ struct _XfwmParams
+     gboolean cycle_minimum;
+     gboolean cycle_preview;
+     gboolean cycle_workspaces;
++    gboolean cycle_monitor;
+     gboolean focus_hint;
+     gboolean focus_new;
+     gboolean full_width_title;
+-- 
+2.25.0
+

@@ -1,0 +1,52 @@
+Description: dark
+(dims or) lightens all background colors besides transparent
+doesnt seem to have effect in terminator, but does in gnome terminal.
+you will want to change your cursor settings and palette.
+do rougly this:
+apt-get build-dep libvte
+apt-get source libvte
+#cd inside, apply patch
+dpkg-buildpackage
+dpkg -i ...
+
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: http://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- vte3-0.34.9.orig/src/vtedraw.c
++++ vte3-0.34.9/src/vtedraw.c
+@@ -1218,6 +1218,15 @@ _vte_draw_fill_rectangle (struct _vte_dr
+ {
+ 	g_return_if_fail (draw->started);
+ 
++	PangoColor * dark = pango_color_copy(color);
++	dark->red = 65535 - color->red * 0.1;
++	dark->green = 65535 - color->green * 0.3;
++	dark->blue = 65535 - color->blue * 0.1;
+
++	//it says "dark" but those "65535 - "'s actually shift everything towards white (and invert)
++	dark->red = 65535 - dark->red;
++	dark->green = 65535 - dark->green;
++	dark->blue = 65535 - dark->green;
++
+ 	_vte_debug_print (VTE_DEBUG_DRAW,
+ 			"draw_fill_rectangle (%d, %d, %d, %d, color=(%d,%d,%d,%d))\n",
+ 			x,y,width,height,
+@@ -1226,6 +1235,6 @@ _vte_draw_fill_rectangle (struct _vte_dr
+ 
+ 	cairo_set_operator (draw->cr, CAIRO_OPERATOR_OVER);
+ 	cairo_rectangle (draw->cr, x, y, width, height);
+-	_vte_draw_set_source_color_alpha (draw, color, alpha);
++	_vte_draw_set_source_color_alpha (draw, dark, alpha);
+ 	cairo_fill (draw->cr);
+ }

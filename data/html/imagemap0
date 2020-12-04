@@ -1,0 +1,9 @@
+<img src="url/to/your/image.jpg" alt="" usemap="#imagemap0" />
+<map name="imagemap0" id="Map">
+    <area alt="flower" title="" href="#w" shape="rect" coords="536,719,223,146" />
+    <area alt="head" title="" href="#n" shape="rect" coords="598,10,841,256" />
+    <area alt="hand" title="" href="#e" shape="rect" coords="1130,5,1372,189" />
+    <area alt="crotch" title="" href="#s" shape="rect" coords="776,477,1106,797" />
+    [...]
+</map>
+

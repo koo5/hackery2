@@ -1,0 +1,36 @@
+parent(katherine, bertrand). parent(amberley, bertrand).
+parent(katherine, frank).
+parent(amberley, frank).
+parent(katherine, rachel). parent(amberley, rachel).
+parent(dora, kate).
+parent(dora, john).
+parent(peter, conrad).
+female(katherine).
+female(rachel).
+female(dora).
+female(peter).
+female(kate).
+parent(bertrand, kate).
+parent(bertrand, john).
+parent(bertrand, conrad).
+male(amberley).
+male(frank).
+male(bertrand).
+male(conrad).
+male(john).
+
+ancestor(Old,Young) :-
+	parent(Old,Young).
+ancestor(Old,Young) :-
+	ancestor(Old,Middle),
+	ancestor(Middle,Young).
+
+
+
+work() :-
+	findall([X,Y], ancestor(X,Y), L).
+
+
+
+
+

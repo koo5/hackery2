@@ -1,0 +1,20 @@
+ time python3 -m cProfile -o ooo <file>; pyprof2calltree -o oooo -i ooo; kcachegrind oooo
+ 
+===
+
+https://github.com/benfred/py-spy
+
+==
+
+
+https://functiontrace.com/ https://profiler.firefox.com/
+
+
+===
+
+https://github.com/jlfwong/speedscope
+
+
+===
+
+stay away from: 

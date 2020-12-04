@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1aUbXXaRWKeur1oMlgqiMmwS1WF" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Shell Script" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="" />
+      <created>1586793159463</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1586793159463</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="320" y="40" width="639" height="642" key="find.popup" timestamp="1601758856109">
+      <screen x="0" y="0" width="1280" height="720" />
+    </state>
+    <state x="320" y="40" width="639" height="642" key="find.popup/0.0.1280.720/0.0.1024.744/0.0.1024.744@0.0.1280.720" timestamp="1601758856109" />
+    <state x="303" y="40" width="672" height="679" key="search.everywhere.popup" timestamp="1594565452983">
+      <screen x="0" y="0" width="1280" height="720" />
+    </state>
+    <state x="303" y="40" width="672" height="679" key="search.everywhere.popup/0.0.1280.720@0.0.1280.720" timestamp="1594565452983" />
+  </component>
+</project>

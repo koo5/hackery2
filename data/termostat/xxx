@@ -1,0 +1,23 @@
+https://f-droid.org/en/packages/org.openhab.habdroid/
+
+
+const byte room_count = 4;
+
+/* rooms enum */
+const byte cr = 0; // cold room
+const byte tr = 1; // thermostat room
+const byte sr1 = 2; // side room 1
+const byte sr2 = 3; // side room 2
+
+long long v[room_count]; // radiator valves, 0(closed) - 500(open)
+
+float d[room_count]; // difference between measured and set temperature, in degrees C
+
+void adjust_valves()
+{
+    v[tr] = 500+5*d[cr];
+    v[sr1] = 500*-5*d[sr1];
+    v[sr2] = 500*-5*d[sr2];
+}
+
+

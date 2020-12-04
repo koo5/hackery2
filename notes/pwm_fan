@@ -1,0 +1,43 @@
+https://www.baldengineer.com/pwm-3-pin-pc-fan-arduino.html
+https://electronics.stackexchange.com/questions/328564/effect-of-switching-supply-on-a-hall-effect-sensor
+https://electronics.stackexchange.com/questions/393983/dealing-with-coupling-of-pwm-noise-into-hall-sensors-as-spikes-in-bldc-driver-ci
+https://electronics.stackexchange.com/questions/153874/reduce-noise-from-a-hall-effect-sensor
+
+
+
+
+L9110 2-CHANNEL MOTOR DRIVER
+https://laskarduino.cz/motory-radice/143008-h-mustek-radic-l9110s.html
+https://drive.google.com/file/d/0B4B30jzMyzG8MU1EY0lqMWhoZ0k/view
+https://www.elecrow.com/download/datasheet-l9110.pdf
+12v 800ma max, but gets hot quickly at 12v 300ma
+does not seem to care if only one of the two output pins is used (with motor to ground) and the other is left free, but free pin still heats up.
+can only drive two motors, when both 0A and 1A are on, the outputs are off
+
+
+
+
+L298N
+https://laskarduino.cz/motory-radice/143010-h-mustek-pro-krokovy-motor-l298n-dualni-motorovy-modul.html
+https://www.gme.cz/modul-2x-h-mustek-s-l298n
+probably works the same as L9110 but with higher voltage?
+
+
+
+
+
+L293D
+https://www.arduino.cc/documents/datasheets/H-bridge_motor_driver.PDF
+This device is suitable for use in switching applications at frequencies up to 5 kHz.
+max 36V
+600mA OUTPUT CURRENT CAPABILITY PER CHANNEL (continuous)
+1.2A PEAK OUTPUT CURRENT (non repetitive) PER CHANNEL
+separate driving of each channel?
+
+
+
+
+
+4 channels high side 289kc
+https://www.gme.cz/ssr-rele-modul-4-kanaly-2a-250vac
+

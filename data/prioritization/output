@@ -1,0 +1,148 @@
+
+first verbosely:
+====================
+'reading up on web cache apis':
+ rdfs:label 'reading up on web cache apis'
+
+ p:satisfies_curiosity_percent '1'
+
+ p:facilitates 'reading up on web storage apis'
+^ 'p:strength_percent' = '1' 
+
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+'reading up on web storage apis':
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+ rdfs:label 'reading up on web storage apis'
+
+'jsonld-based excel-365 form input templates':
+ rdfs:label 'jsonld-based excel-365 form input templates'
+
+ rdfs:comment 'just a simple rewrite of our current desktop-excel-dotnetrdf code'
+
+ p:facilitates 'saving testcases as json-ld directly from requests'
+^ 'p:strength_percent' = '1' 
+
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+ p:facilitates 'development of Robust in general'
+^ 'p:strength_percent' = '1' 
+
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+'saving testcases as json-ld directly from requests':
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+ rdfs:label 'saving testcases as json-ld directly from requests'
+
+ p:facilitates 'maintenance of Robust testcases'
+^ 'p:strength_percent' = '5' 
+
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '5' 
+
+'jsonld-based excel-365 form input templates':
+ rdfs:label 'jsonld-based excel-365 form input templates'
+
+ rdfs:comment 'just a simple rewrite of our current desktop-excel-dotnetrdf code'
+
+ p:facilitates 'saving testcases as json-ld directly from requests'
+^ 'p:strength_percent' = '1' 
+
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+ p:facilitates 'development of Robust in general'
+^ 'p:strength_percent' = '1' 
+
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+'development of Robust in general':
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+ rdfs:label 'development of Robust in general'
+
+'saving testcases as json-ld directly from requests':
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '1' 
+
+ rdfs:label 'saving testcases as json-ld directly from requests'
+
+ p:facilitates 'maintenance of Robust testcases'
+^ 'p:strength_percent' = '5' 
+
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '5' 
+
+'maintenance of Robust testcases':
+ rdf:type 'p:Task'
+^ 'p:strength_percent' = '5' 
+
+ rdfs:label 'maintenance of Robust testcases'
+
+'koordinator2000, initial implementation':
+ rdfs:label 'koordinator2000, initial implementation'
+
+ p:prerequisite_for 'koordinator2000, further phases'
+
+ rdf:type 'p:Task'
+
+ p:prerequisite_for 'fame, fortune and fuel (for other projects)'
+^ 'p:probability_percent' = '1' 
+
+ rdf:type 'p:Task'
+^ 'p:probability_percent' = '1' 
+
+'koordinator2000, further phases':
+ rdf:type 'p:Task'
+
+ rdfs:label 'koordinator2000, further phases'
+
+'koordinator2000, initial implementation':
+ rdfs:label 'koordinator2000, initial implementation'
+
+ p:prerequisite_for 'koordinator2000, further phases'
+
+ rdf:type 'p:Task'
+
+ p:prerequisite_for 'fame, fortune and fuel (for other projects)'
+^ 'p:probability_percent' = '1' 
+
+ rdf:type 'p:Task'
+^ 'p:probability_percent' = '1' 
+
+'fame, fortune and fuel (for other projects)':
+ rdf:type 'p:Task'
+^ 'p:probability_percent' = '1' 
+
+ rdfs:label 'fame, fortune and fuel (for other projects)'
+
+
+then less verbosely:
+====================
+'reading up on web cache apis' p:facilitates 'reading up on web storage apis'
+^ 'p:strength_percent' = '1' 
+
+'jsonld-based excel-365 form input templates' p:facilitates 'saving testcases as json-ld directly from requests'
+^ 'p:strength_percent' = '1' 
+
+'jsonld-based excel-365 form input templates' p:facilitates 'development of Robust in general'
+^ 'p:strength_percent' = '1' 
+
+'saving testcases as json-ld directly from requests' p:facilitates 'maintenance of Robust testcases'
+^ 'p:strength_percent' = '5' 
+
+'koordinator2000, initial implementation' p:prerequisite_for 'koordinator2000, further phases'
+
+'koordinator2000, initial implementation' p:prerequisite_for 'fame, fortune and fuel (for other projects)'
+^ 'p:probability_percent' = '1' 
+
+

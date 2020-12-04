@@ -1,0 +1,30 @@
+```
+http://backhub.co 
+	is paid,
+
+https://gibu.futureglobe.de/ 
+	didn't work, 
+
+https://github.com/gavinr/github-csv-tools 
+	only does one repo
+
+and the winner is: 
+	https://github.com/josegonzalez/python-github-backup
+
+	warning: 
+		https://github.com/josegonzalez/python-github-backup/issues/124
+
+	usage:
+
+pip install --user github-backup
+
+github-backup  --releases --fork --private --gists --starred-gists --wikis --lfs --repositories --milestones --hooks --labels --pull-details --pull-commits  --pull-comments --pulls --issue-events  --issue-comments  --issues --all  --following --followers  --watched  --all-starred  --starred  --incremental  --repositories --private  --token XXXXXXXXXX --output-directory ./github_backup/0  koo5
+
+# get a token here: https://github.com/settings/tokens
+# for organizations, add --organization
+# there is no way to make it get only open pull requests :|
+
+======
+
+I couldn't find any tool that automates the whole proocess. For listing at least *public* organizations, see also hackery2/src/hackery2/git/ru.r
+

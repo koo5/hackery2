@@ -1,0 +1,9 @@
+	function talkAboutThisTriple()
+	{
+		const xhr = new XMLHttpRequest();
+		const url = 'http://127.0.0.1:8000';
+		xhr.open('GET', url);
+		xhr.onreadystatechange = log;
+		xhr.send();
+	}
+

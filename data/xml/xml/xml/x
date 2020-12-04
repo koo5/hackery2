@@ -1,0 +1,45 @@
+DOCUMENT
+version=1.0
+encoding=UTF-8
+URL=table.xml
+standalone=true
+  PI xml-stylesheet
+    content=type="text/css" href="rule.css"
+  ELEMENT tables
+    TEXT compact
+      content=    
+    ELEMENT table
+      TEXT compact
+        content=     
+      ELEMENT tr
+        TEXT compact
+          content=      
+        ELEMENT td
+          TEXT compact
+            content=Apple
+        TEXT compact
+          content=      
+        ELEMENT td
+          TEXT compact
+            content=Banana
+        TEXT compact
+          content=     
+      TEXT compact
+        content=    
+    TEXT compact
+      content=    
+    ELEMENT table
+      TEXT compact
+        content=     
+      ELEMENT height
+        TEXT compact
+          content=100
+      TEXT compact
+        content=     
+      ELEMENT width
+        TEXT compact
+          content=150
+      TEXT compact
+        content=    
+    TEXT compact
+      content=   

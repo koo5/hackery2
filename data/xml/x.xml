@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="1.xsl" ?>
+<catalog>
+
+<asdrst[]rstrst/>
+
+<cd>
+<title>Empire Burlesque</title>
+<artist>Johnny</artist>
+<country>USA</country>
+<company>Columbia</company>
+<price>10.90</price>
+<url>http://www.yahoo.com</url>
+</cd>
+<sample>
+  <link xml:link="simple" href="http://www.google.com"> Google page </link>
+</sample>  
+</catalog>

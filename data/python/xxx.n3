@@ -1,0 +1,229 @@
+@prefix ns1: <https://lodgeit.net.au/#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ns1:depreciation_calculator_sheets ns1:is_multi false ;
+    ns1:sheets ( [ ns1:example_doc [ rdf:first [ a7 ns1:depreciation_query ;
+                                ns1:depreciation_query_has_type [ a ns1:value ;
+                                        ns1:value ns1:depreciation_pool_from_start ] ;
+                                ns1:depreciation_query_method [ a ns1:value ;
+                                        ns1:value "diminishing_value"^^xsd:string ] ;
+                                ns1:depreciation_query_pool [ a ns1:value ;
+                                        ns1:value "general_pool"^^xsd:string ] ;
+                                ns1:depreciation_query_to_date [ a ns1:value ;
+                                        ns1:value "2019-02-02T00:00:00"^^xsd:dateTime ] ] ;
+                        rdf:rest ( [ a ns1:depreciation_query ;
+                                    ns1:depreciation_query_asset_id [ a ns1:value ;
+                                            ns1:value "car456"^^xsd:string ] ;
+                                    ns1:depreciation_query_from_date [ a ns1:value ;
+                                            ns1:value "2017-06-01T00:00:00"^^xsd:dateTime ] ;
+                                    ns1:depreciation_query_has_type [ a ns1:value ;
+                                            ns1:value ns1:depreciation_between_two_dates ] ;
+                                    ns1:depreciation_query_method [ a ns1:value ;
+                                            ns1:value "diminishing_value"^^xsd:string ] ;
+                                    ns1:depreciation_query_to_date [ a ns1:value ;
+                                            ns1:value "2019-02-02T00:00:00"^^xsd:dateTime ] ] [ a ns1:depreciation_query ;
+                                    ns1:depreciation_query_asset_id [ a ns1:value ;
+                                            ns1:value "car123"^^xsd:string ] ;
+                                    ns1:depreciation_query_has_type [ a ns1:value ;
+                                            ns1:value ns1:written_down_value ] ;
+                                    ns1:depreciation_query_method [ a ns1:value ;
+                                            ns1:value "diminishing_value"^^xsd:string ] ;
+                                    ns1:depreciation_query_written_down_date [ a ns1:value ;
+                                            ns1:value "2017-06-01T00:00:00"^^xsd:dateTime ] ] [ a ns1:depreciation_query ;
+                                    ns1:depreciation_query_asset_id [ a ns1:value ;
+                                            ns1:value "car123"^^xsd:string ] ;
+                                    ns1:depreciation_query_has_type [ a ns1:value ;
+                                            ns1:value ns1:profit_and_loss ] ;
+                                    ns1:depreciation_query_method [ a ns1:value ;
+                                            ns1:value "diminishing_value"^^xsd:string ] ;
+                                    ns1:depreciation_query_termination_date [ a ns1:value ;
+                                            ns1:value "2019-07-07T00:00:00"^^xsd:dateTime ] ;
+                                    ns1:depreciation_query_termination_value [ a ns1:value ;
+                                            ns1:value 500 ] ] ) ;
+                        ns1:template ns1:depreciation_queries ] ;
+                ns1:name_prefix "depreciation_queries"^^xsd:string ;
+                ns1:root ns1:depreciation_queries ] [ ns1:example_doc [ rdf:first [ a ns1:depreciation_event ;
+                                ns1:depreciation_event_asset [ a ns1:value ;
+                                        ns1:value "car123"^^xsd:string ] ;
+                                ns1:depreciation_event_date [ a ns1:value ;
+                                        ns1:value "2017-06-01T00:00:00"^^xsd:dateTime ] ;
+                                ns1:depreciation_event_has_type [ a ns1:value ;
+                                        ns1:value ns1:transfer_asset_to_pool ] ;
+                                ns1:depreciation_event_pool [ a ns1:value ;
+                                        ns1:value "general_pool"^^xsd:string ] ] ;
+                        rdf:rest ( [ a ns1:depreciation_event ;
+                                    ns1:depreciation_event_asset [ a ns1:value ;
+                                            ns1:value "car456"^^xsd:string ] ;
+                                    ns1:depreciation_event_date [ a ns1:value ;
+                                            ns1:value "2017-08-01T00:00:00"^^xsd:dateTime ] ;
+                                    ns1:depreciation_event_has_type [ a ns1:value ;
+                                            ns1:value ns1:transfer_asset_to_pool ] ;
+                                    ns1:depreciation_event_pool [ a ns1:value ;
+                                            ns1:value "general_pool"^^xsd:string ] ] [ a ns1:depreciation_event ;
+                                    ns1:depreciation_event_asset [ a ns1:value ;
+                                            ns1:value "car123"^^xsd:string ] ;
+                                    ns1:depreciation_event_date [ a ns1:value ;
+                                            ns1:value "2021-06-01T00:00:00"^^xsd:dateTime ] ;
+                                    ns1:depreciation_event_has_type [ a ns1:value ;
+                                            ns1:value ns1:asset_disposal ] ] [ a ns1:depreciation_event ;
+                                    ns1:depreciation_event_asset [ a ns1:value ;
+                                            ns1:value "car456"^^xsd:string ] ;
+                                    ns1:depreciation_event_date [ a ns1:value ;
+                                            ns1:value "2020-07-31T00:00:00"^^xsd:dateTime ] ;
+                                    ns1:depreciation_event_has_type [ a ns1:value ;
+                                            ns1:value ns1:asset_disposal ] ] ) ;
+                        ns1:template ns1:depreciation_events ] ;
+                ns1:name_prefix "depreciation_events"^^xsd:string ;
+                ns1:root ns1:depreciation_events ] [ ns1:example_doc [ rdf:first [ a ns1:depreciation_asset ;
+                                ns1:cost [ a ns1:value ;
+                                        ns1:value 1000 ] ;
+                                ns1:effective_life_years [ a ns1:value ;
+                                        ns1:value 5 ] ;
+                                ns1:id [ a ns1:value ;
+                                        ns1:value "car123"^^xsd:string ] ;
+                                ns1:start_date [ a ns1:value ;
+                                        ns1:value "2017-05-01T00:00:00"^^xsd:dateTime ] ] ;
+                        rdf:rest ( [ a ns1:depreciation_asset ;
+                                    ns1:cost [ a ns1:value ;
+                                            ns1:value 2000 ] ;
+                                    ns1:effective_life_years [ a ns1:value ;
+                                            ns1:value 8 ] ;
+                                    ns1:id [ a ns1:value ;
+                                            ns1:value "car456"^^xsd:string ] ;
+                                    ns1:start_date [ a ns1:value ;
+                                            ns1:value "2015-03-16T00:00:00"^^xsd:dateTime ] ] ) ;
+                        ns1:template ns1:depreciation_assets ] ;
+                ns1:name_prefix "depreciation_assets"^^xsd:string ;
+                ns1:root ns1:depreciation_assets ] ) .
+
+ns1:hirepurchase_calculator_sheets ns1:is_multi true ;
+    ns1:sheets ( [ ns1:example_doc [ ns1:begin_date [ a ns1:value ;
+                                ns1:value "2019-10-10T00:00:00"^^xsd:dateTime ] ;
+                        ns1:hp_contract [ a ns1:hp_contract ;
+                                ns1:cash_price [ a ns1:value ;
+                                        ns1:value "321321.27"^^xsd:string ] ;
+                                ns1:contract_number [ a ns1:value ;
+                                        ns1:value "xxxx"^^xsd:string ] ;
+                                ns1:currency [ a ns1:value ;
+                                        ns1:value "AUD"^^xsd:string ] ;
+                                ns1:hp_contract_has_payment_type [ a ns1:value ;
+                                        ns1:value ns1:hp_contract_payment_type_advance ] ;
+                                ns1:hp_installments () ;
+                                ns1:interest_rate [ a ns1:value ;
+                                        ns1:value "5"^^xsd:string ] ;
+                                ns1:number_of_installments [ a ns1:value ;
+                                        ns1:value 30 ] ] ] ;
+                ns1:name_prefix "HP"^^xsd:string ;
+                ns1:root ns1:hp_calculator_query ] ) .
+
+ns1:depreciation_between_two_dates a ns1:depreciation_query_type .
+
+ns1:depreciation_event_has_type rdfs:range ns1:depreciation_event_type .
+
+ns1:depreciation_query_has_type rdfs:range ns1:depreciation_query_type .
+
+ns1:hp_contract_has_payment_type rdfs:range ns1:hp_contract_payment_type .
+
+ns1:hp_contract_payment_type_advance a ns1:hp_contract_payment_type ;
+    rdfs:label "advance"^^xsd:string .
+
+ns1:profit_and_loss a ns1:depreciation_query_type .
+
+ns1:written_down_value a ns1:depreciation_query_type .
+
+ns1:asset_disposal a ns1:depreciation_event_type .
+
+ns1:depreciation_assets ns1:cardinality ns1:multi ;
+    ns1:class ns1:depreciation_asset ;
+    ns1:fields ( [ ns1:property ns1:id ] [ ns1:property ns1:start_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:cost ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:effective_life_years ;
+                ns1:type xsd:integer ] ) ;
+    ns1:position [ ns1:col "A"^^xsd:string ;
+            ns1:row "1"^^xsd:string ] ;
+    ns1:title "depreciation_assets"^^xsd:string .
+
+ns1:depreciation_events ns1:cardinality ns1:multi ;
+    ns1:class ns1:depreciation_event ;
+    ns1:fields ( [ ns1:property ns1:depreciation_event_has_type ;
+                ns1:type ns1:uri ] [ ns1:property ns1:depreciation_event_asset ] [ ns1:property ns1:depreciation_event_pool ] [ ns1:property ns1:depreciation_event_date ;
+                ns1:type xsd:dateTime ] ) ;
+    ns1:position [ ns1:col "A"^^xsd:string ;
+            ns1:row "1"^^xsd:string ] ;
+    ns1:title "depreciation_events"^^xsd:string .
+
+ns1:depreciation_queries ns1:cardinality ns1:multi ;
+    ns1:class ns1:depreciation_query ;
+    ns1:fields ( [ ns1:property ns1:depreciation_query_has_type ;
+                ns1:type ns1:uri ] [ ns1:property ns1:depreciation_query_asset_id ] [ ns1:property ns1:depreciation_query_pool ] [ ns1:property ns1:depreciation_query_from_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:depreciation_query_to_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:depreciation_query_written_down_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:depreciation_query_method ] [ ns1:property ns1:depreciation_query_termination_value ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:depreciation_query_termination_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:depreciation_query_total_depreciation ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:depreciation_query_depreciation_value ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:depreciation_query_written_down_value ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:depreciation_query_profit_and_loss ;
+                ns1:type xsd:decimal ] ) ;
+    ns1:position [ ns1:col "A"^^xsd:string ;
+            ns1:row "1"^^xsd:string ] ;
+    ns1:title "depreciation_queries"^^xsd:string .
+
+ns1:hp_calculator_query ns1:cardinality ns1:single ;
+    ns1:class ns1:hp_calculator_query ;
+    ns1:fields ( [ ns1:comment "ignored for Investment Calculator"^^xsd:string ;
+                ns1:property ns1:begin_date ;
+                ns1:type xsd:dateTime ] [ ns1:comment "ignored for Investment Calculator"^^xsd:string ;
+                ns1:property ns1:end_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:hp_contract ;
+                ns1:template ns1:hp_contract ] ) ;
+    ns1:position [ ns1:col "A"^^xsd:string ;
+            ns1:row "1"^^xsd:string ] ;
+    ns1:title "Standalone Calculator Query Parameters"^^xsd:string .
+
+ns1:hp_installments ns1:cardinality ns1:multi ;
+    ns1:class ns1:hp_installment ;
+    ns1:fields ( [ ns1:property ns1:installment_number ;
+                ns1:type xsd:integer ] [ ns1:property ns1:opening_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:opening_balance ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:interest_amount ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:installment_amount ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:closing_date ;
+                ns1:type xsd:dateTime ] [ ns1:property ns1:closing_balance ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:total_repayments_through_period ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:total_interest_payments_through_period ;
+                ns1:type xsd:decimal ] ) ;
+    ns1:position [ ns1:col "E"^^xsd:string ;
+            ns1:row "20"^^xsd:string ] ;
+    ns1:title "Installments"^^xsd:string .
+
+ns1:transfer_asset_to_pool a ns1:depreciation_event_type .
+
+ns1:depreciation_pool_from_start a ns1:depreciation_query_type .
+
+ns1:hp_contract ns1:cardinality ns1:single ;
+    ns1:class ns1:hp_contract ;
+    ns1:fields ( [ ns1:property ns1:contract_number ] [ ns1:property ns1:currency ] [ ns1:property ns1:cash_price ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:interest_rate ;
+                ns1:type xsd:decimal ] [ ns1:note "dunno what type here"^^xsd:string ;
+                ns1:property ns1:interest_period ] [ ns1:note "dunno what type here"^^xsd:string ;
+                ns1:property ns1:repayment_period ] [ ns1:property ns1:number_of_installments ;
+                ns1:type xsd:integer ] [ ns1:property ns1:repayment_amount ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:total_payments ;
+                ns1:type xsd:integer ] [ ns1:property ns1:total_interest ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:repayment_balance ;
+                ns1:type xsd:decimal ] [ ns1:property ns1:hp_contract_has_payment_type ;
+                ns1:type ns1:uri ] [ ns1:property ns1:hp_installments ;
+                ns1:template ns1:hp_installments ] ) ;
+    ns1:position [ ns1:col "A"^^xsd:string ;
+            ns1:row "5"^^xsd:string ] ;
+    ns1:title "Hirepurchase Contract"^^xsd:string .
+
+[] rdf:first [ a ns1:depreciation_query ;
+            ns1:depreciation_query_has_type [ ns1:value ns1:depreciation_pool_from_start ] ] ;
+    rdf:rest ( [ a ns1:depreciation_query ;
+                ns1:depreciation_query_has_type [ ns1:value ns1:depreciation_pool_from_start ] ] ) .
+
