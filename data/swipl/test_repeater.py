@@ -20,7 +20,8 @@ def cmd(out_file, cmd):
 
 @click.command()
 @click.option('-r', '--results_path', type=str, default='test_runs')
-def run(results_path):
+@click.option('-p', '--ctest_parallelism', type=int, default=1)
+def run(results_path,ctest_parallelism):
 	
 	#os.path.expanduser
 	base_path = (results_path)
@@ -32,7 +33,7 @@ def run(results_path):
 		with open(testsrun_dir_path+"/out.txt", "w") as f:
 			cmd(f,'bash -c "git show --pretty=oneline | head -n 1"')
 			cmd(f,'git status')
-			cmd(f,'ctest -j 8 --output-on-failure')
+			cmd(f,'ctest -j '+str(ctest_parallelism)+' --output-on-failure')
 			cmd(f,'gcc -v')
 			cmd(f,'uname -a')
 			cmd(f,'lscpu')
