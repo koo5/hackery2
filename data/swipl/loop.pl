@@ -1,3 +1,10 @@
+%!  path_term_to_list__fl(+Term_In, -List_Out) is det.
+%
+%   Takes a term in the form aaa/bbb/ccc/..., that is, through default
+%   operator priority, ((aaa/bbb)/ccc)/..., and produces a list:
+%   [aaa, bbb, ccc...]
+%
+
 path_term_to_list__fl(Term_In, List_Out) :-
 	imp((
 		>Term = Term_In,
@@ -15,6 +22,11 @@ path_term_to_list__fl(Term_In, List_Out) :-
 		),
 		List_Out = <List 
 	)).
+
+
+
+
+
 
 
 
