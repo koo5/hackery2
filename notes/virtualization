@@ -1,3 +1,11 @@
+virsh domxml-to-native qemu-argv xxxx
+
+
+https://www.reddit.com/r/VFIO/comments/80p1q7/high_kvmqemu_cpu_utilization_when_windows_10/
+
+
+
+
 https://mathiashueber.com/virtual-machine-audio-setup-get-pulse-audio-working/
 
 https://serverfault.com/questions/627238/kvm-libvirt-how-to-configure-static-guest-ip-addresses-on-the-virtualisation-ho
