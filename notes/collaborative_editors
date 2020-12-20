@@ -1,0 +1,111 @@
+
+
+
+
+
+# real-time collaborative (embeddable) (rich-) text editors
+
+
+## meta
+	https://namiwang.github.io/2020/11/12/building-a-roam-like-networked-heavily-customized-realtime-editor-part-1.html
+	https://dev.to/kannndev/let-s-build-a-collaborative-rich-text-editor-32n3	
+	https://news.ycombinator.com/item?id=19720279
+	
+
+## the options
+
+
+### ShareDB + quill
+	https://github.com/share/sharedb/tree/master/examples/rich-text
+		https://quilljs.com/	
+	
+
+
+### firepad
+	firebase platform paid / non-commercial licensing? / alternatives?
+		https://sapphire-db.com/start/main
+	
+	https://demo.firepad.io/#Ab5oKwY1Di
+	https://github.com/FirebaseExtended/firepad/blob/master/examples/richtext-simple.html
+	
+	fast setup
+
+
+### prosemirror
+	server code missing / paid / non-commercial licensing?
+		- nextcloud?
+		
+		- https://juretriglav.si/open-source-collaborative-text-editors/
+			https://github.com/jure/pubsweet-blogger/issues
+			not a huge community..
+
+	https://gitlab.coko.foundation/wax/wax-prosemirror
+
+#### atlaskit
+	https://github.com/jure/pubsweet-blogger/blob/master/app/components/component-atlaskit-editor/src/Editor.tsx#L5
+	
+#### https://prosemirror.net/examples/collab/#edit-Example
+	looks more or less perfect, since there is a server too
+	we'd posseibly just tweak the ui a bit.
+	
+	git@github.com:ProseMirror/website.git
+		currently throwing: https://gist.github.com/koo5/e8035311da5149e7985fd4f34aa65e6c	
+
+	git@github.com:ProseMirror/prosemirror-example-setup.git
+		incomplete
+
+	https://marijnhaverbeke.nl/blog/collaborative-editing.html
+	https://discuss.prosemirror.net/
+
+	
+#### nextcloud has one
+	https://nextcloud.com/blog/nextcloud-introduces-collaborative-rich-text-editor/
+	- could it be re-embedded?
+	- based on prosemirror
+
+
+
+### CKEditor
+	server code missing / paid / non-commercial licensing?
+
+	https://ckeditor.com/collaboration/real-time-collaborative-editing/
+	https://onlinehtmleditor.dev/collaboration/#doce15aa0c730%20
+	probably cool
+	https://ckeditor.com/docs/ckeditor5/latest/features/collaboration/real-time-collaboration/real-time-collaboration.html?docId=edef3b3c3cda4a0d2e5d85433e8815cea
+	https://ckeditor.com/blog/Lessons-learned-from-creating-a-rich-text-editor-with-real-time-collaboration/
+	https://juretriglav.si/open-source-collaborative-text-editors/
+
+
+### bytemd
+	you have to `npm i` both in the example directory and in the root dir and possibly in the other example dir.
+	still, the svelte component crashes the sapper server somehow (basically the server exits instead of starting up, no error given)
+	probably can be followeed up with
+	not too active but seems maintained + maybe big backer
+	
+	so...probably not a bad choice 
+	
+
+
+### ?
+	
+
+
+
+### etherpad
+	git@github.com:ether/etherpad-lite-jquery-plugin.git
+	simple iframe embeedding, if it can be made to be flexible wrt width/height, could work
+	https://github.com/ether/etherpad-lite/wiki/Alternative-clients
+
+
+
+# non-collaborative rich text editors
+	### quill
+		https://github.com/typewriter-editor/typewriter
+			active
+			
+
+
+# collaborative graph editing
+	https://github.com/collabserver/collabserver-grapheditor
+	
+	

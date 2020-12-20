@@ -174,3 +174,5 @@ http://vos.openlinksw.com/owiki/wiki/VOS/VirtuosoFacetsWebService
 
 https://www.w3.org/TR/xforms/
     http://emacspeak.sourceforge.net/raman/xf-book-accessibility/online-access.html
+
+https://github.com/MaillPierre/formulis
