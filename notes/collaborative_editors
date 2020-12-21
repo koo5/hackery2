@@ -7,6 +7,9 @@
 
 
 ## meta
+	https://pierrehedkvist.com/posts/4-open-source-collaborative-editors	
+	https://juretriglav.si/open-source-collaborative-text-editors/
+
 	https://namiwang.github.io/2020/11/12/building-a-roam-like-networked-heavily-customized-realtime-editor-part-1.html
 	https://dev.to/kannndev/let-s-build-a-collaborative-rich-text-editor-32n3	
 	https://news.ycombinator.com/item?id=19720279
@@ -63,11 +66,14 @@
 	- could it be re-embedded?
 	- based on prosemirror
 
+#### https://github.com/yjs/yjs/
+	?
 
 
 ### CKEditor
 	server code missing / paid / non-commercial licensing?
-
+		https://ckeditor.com/wysiwyg-editor-open-source/
+		
 	https://ckeditor.com/collaboration/real-time-collaborative-editing/
 	https://onlinehtmleditor.dev/collaboration/#doce15aa0c730%20
 	probably cool
@@ -86,11 +92,6 @@
 	
 
 
-### ?
-	
-
-
-
 ### etherpad
 	git@github.com:ether/etherpad-lite-jquery-plugin.git
 	simple iframe embeedding, if it can be made to be flexible wrt width/height, could work
@@ -99,7 +100,7 @@
 
 
 # non-collaborative rich text editors
-	### quill
+	### quill by itself
 		https://github.com/typewriter-editor/typewriter
 			active
 			
