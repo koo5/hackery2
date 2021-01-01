@@ -19,7 +19,7 @@ def cmd(out_file, cmd):
 	
 
 @click.command()
-@click.option('-r', '--results_path', type=str, default='test_runs')
+@click.option('-r', '--results_path', type=str, default='../test_runs')
 @click.option('-p', '--ctest_parallelism', type=int, default=1)
 def run(results_path,ctest_parallelism):
 	
