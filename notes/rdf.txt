@@ -55,7 +55,7 @@ rdf:
 				"you can run SPARQL queries against AnzoGraph."
 
 
-			mind-mapping sw potentially usable with rdf:
+			mindmapping/mind-mapping sw potentially usable with rdf:
 				meta:
 					http://www.opensourcecreative.org/ep040/
 
@@ -81,7 +81,7 @@ rdf:
 					inforapid
 						http://www.buildyourmap.com/
 						many import formats
-						rdf import, somewhat usable, but skips nodes
+						rdf import, somewhat usable, but skips some nodes
 						"build sitemap"
 						"watch clipboard"
 
