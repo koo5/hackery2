@@ -20,21 +20,42 @@
 :- dynamic loaded_file/1.
 :- dynamic loaded_file/2.
 
+cmdline_main :-
+	ArgSpec = [
+		[opt(fn), type(atom), shortflags([f]), longflags([fn]),
+			help('the main .pl file of your codebase')]],
+	current_prolog_flag(argv, Args),
+	opt_parse(ArgSpec , Args, Opts, []),
+	memberchk(fn(Fn), Opts),
+	run(Fn).
+
 run(Source_File_Specifier) :-
-	exists_source(Source_File_Specifier, Fn),
-	open_and_parse_file(Fn).
+	open_and_parse_file(Source_File_Specifier,_).
 
-
-open_and_parse_file(Fn) :-
-	setup_call_cleanup(
-		open(Fn, read, In),
-		(
-			assert(loaded_file(Fn)),
-			read_src(In,Imports),
-			assert(loaded_file(Fn,Imports))
-		),
-		close(In)
+open_and_parse_file(Source_File_Specifier,Fn) :-
+	(	exists_source(Source_File_Specifier, Fn)
+	->	true
+	;	throw(error(["doesn't look like something i can load:", Source_File_Specifier]))),
+	(	loaded_file(Fn)
+	->	true
+	;	(
+			setup_call_cleanup(
+				open(Fn, read, In),
+				(
+					assert(loaded_file(Fn)),
+					read_src(In,Ast),
+					assert(loaded_file(Fn,Ast)),
+					maplist(write_ast_line,Ast),
+					true
+				),
+				close(In)
+			)
+		)
 	).
+
+write_ast_line(Ast) :-
+	writeq(Ast),
+	nl.
 
 read_src(In,[(Clause, Imports)|Tail]) :-
 	prolog_read_source_term(In, Term, Expanded,
@@ -63,22 +84,27 @@ read_src(In,[(Clause, Imports)|Tail]) :-
 read_src(_,[]) :- true.
 
 
+
+/* we dont care about imports. Resolving predicate names or somesuch is out of scope of this script. */
+
 recurse(X, [import(Specifier,Fn)]) :-
 	(	X = ':-'(use_module(Specifier))
 		;
 		X = ':-'(use_module(Specifier,_Imports))
-		;
-		X = ':-'([Specifier])
 	),
 	!,
-	(	exists_source(Specifier, Fn)
-	->	true
-	;	throw(error(["doesn't look like something i can load:", Fn]))),
-	(	loaded_file(Fn)
-	->	true
-	;	open_and_parse_file(Fn)).
+	open_and_parse_file(Specifier,Fn).
+	
+recurse(X, Imports) :-
+	X = ':-'(Specifiers),
+	is_list(Specifiers),
+	!,
+	maplist(make_import,Specifiers,Imports).
 	
 recurse(_, []) :- true.	
+
+make_import(Specifier,import(Specifier,Fn)) :-
+	open_and_parse_file(Specifier,Fn).
 
 
 /*
