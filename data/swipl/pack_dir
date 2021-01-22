@@ -1,0 +1,1 @@
+swipl -q -g "absolute_file_name(pack(.),D,[file_type(directory)]), write(D), halt"
