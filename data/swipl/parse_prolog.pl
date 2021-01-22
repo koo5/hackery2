@@ -81,12 +81,68 @@ recurse(X, [import(Specifier,Fn)]) :-
 recurse(_, []) :- true.	
 
 
+/*
+it works like this right now:
+
+swipl -s parse_prolog.pl -g "debug,run('parseme.pl'),halt."
+:-use_module(ops)
+
+:-module(_40382,[op(812,fx,!),op(812,fx,?)])
+
+:-dynamic ddd/0
+
+x:-y
+
+end_of_file
+
+:-['dep.pl']
+
+:-assert(ddd)
+
+x:-ddd(!lalala,!tralala)
+
+:-['parseme.pl']
+
+end_of_file
+
+!blabla
+
+:-ddd
+
+end_of_file
+
+koom@dev ~/work/hackery2/data/swipl (master)> 
+
+
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 /*
+
+for now unused stuff from indent.pl
+
 %%	term_pi(+Term, -PI)
 
 term_pi(Head :- _, PI) :- !,
