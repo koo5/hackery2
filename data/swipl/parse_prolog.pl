@@ -34,8 +34,10 @@ run(Source_File_Specifier) :-
 
 open_and_parse_file(Source_File_Specifier,Fn) :-
 	(	exists_source(Source_File_Specifier, Fn)
-	->	true
-	;	throw(error(["doesn't look like something i can load:", Source_File_Specifier]))),
+	->	open_and_parse_file2(Fn)
+	;	Fn = error("doesn't look like something i can load:")).
+	
+open_and_parse_file2(Fn) :-	
 	(	loaded_file(Fn)
 	->	true
 	;	(
@@ -87,17 +89,26 @@ read_src(_,[]) :- true.
 
 /* we dont care about imports. Resolving predicate names or somesuch is out of scope of this script. */
 
-recurse(X, [import(Specifier,Fn)]) :-
-	(	X = ':-'(use_module(Specifier))
-		;
-		X = ':-'(use_module(Specifier,_Imports))
-	),
-	!,
-	open_and_parse_file(Specifier,Fn).
-	
 recurse(X, Imports) :-
-	X = ':-'(Specifiers),
-	is_list(Specifiers),
+	(
+		(
+			X = ':-'(Specifiers),
+			is_list(Specifiers)
+		)
+	;	(
+			X = ':-'(use_module(Specifiers)),
+			is_list(Specifiers)
+		)
+	;	(
+			X = ':-'(use_module(Specifier)),
+			\+is_list(Specifier),
+			Specifiers = [Specifier]
+		)
+	;	(
+			X = ':-'(use_module(Specifier,_Imports)),
+			Specifiers = [Specifier]
+		)
+	),
 	!,
 	maplist(make_import,Specifiers,Imports).
 	
