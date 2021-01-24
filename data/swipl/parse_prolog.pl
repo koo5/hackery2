@@ -1,5 +1,7 @@
 /*
 	this is a proof-of-concept of obtaining prolog AST, inspired by https://github.com/SWI-Prolog/packages-indent/blob/master/indent.pl
+	maybe this is doing it better: ?
+		https://www.swi-prolog.org/pldoc/doc/_SWI_/library/prolog_colour.pl?show=src#prolog_colourise_stream/3
 */
 
 :- use_module(library(prolog_source)).
