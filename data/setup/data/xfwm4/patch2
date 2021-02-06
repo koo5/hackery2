@@ -1,0 +1,116 @@
+diff --git a/src/focus.c b/src/focus.c
+index af050236d..9afa96477 100644
+--- a/src/focus.c
++++ b/src/focus.c
+@@ -30,6 +30,7 @@
+ #include <X11/Xutil.h>
+ #include <X11/Xatom.h>
+ #include <X11/extensions/shape.h>
++#include <X11/extensions/Xrandr.h>
+ 
+ #include <glib.h>
+ #include <gdk/gdk.h>
+@@ -285,6 +286,29 @@ clientSelectMask (Client * c, Client *other, guint mask, guint type)
+     {
+         return FALSE;
+     }
++    if ((mask & SEARCH_THIS_MONITOR))
++    {
++        int i;
++        int monitor_count;
++        XRRMonitorInfo *monitors;
++
++        monitors = XRRGetMonitors(clientGetXDisplay(c), c->window, True, &monitor_count);
++
++        for (i = 0; i < monitor_count; i++)
++        {
++            if (cursorInMonitor(monitors + i, c->screen_info) && clientInMonitor(monitors + i, c))
++            {
++                break;
++            }
++        }
++
++        if (i == monitor_count)
++        {
++            return FALSE;
++        }
++
++        XRRFreeMonitors(monitors);
++    }
+     if (c->type & type)
+     {
+         return TRUE;
+diff --git a/src/misc.c b/src/misc.c
+index 05db3dbb6..1d1acd36f 100644
+--- a/src/misc.c
++++ b/src/misc.c
+@@ -28,6 +28,7 @@
+ #include <X11/Xlib.h>
+ #include <X11/Xutil.h>
+ #include <X11/Xmd.h>
++#include <X11/extensions/Xrandr.h>
+ #include <glib.h>
+ #include <gtk/gtk.h>
+ #include <gdk/gdk.h>
+@@ -258,3 +259,39 @@ get_atom_name (DisplayInfo *display_info, Atom atom)
+     return value;
+ }
+ 
++gboolean
++cursorInMonitor(XRRMonitorInfo *monitor, ScreenInfo *screen_info)
++{
++    int monitor_min_x = monitor->x;
++    int monitor_min_y = monitor->y;
++    int monitor_max_x = monitor->x + monitor->width;
++    int monitor_max_y = monitor->y + monitor->height;
++
++    int cursor_x;
++    int cursor_y;
++
++    /* Estos son datos basura que no voy a usar */
++    Window w1, w2;
++    int x2, y2;
++    unsigned int mask;
++
++    XQueryPointer (myScreenGetXDisplay(screen_info), screen_info->xroot, &w1, &w2, &cursor_x, &cursor_y, &x2, &y2, &mask);
++
++    return cursor_x >= monitor_min_x && cursor_x < monitor_max_x
++        && cursor_y >= monitor_min_y && cursor_y < monitor_max_y;
++}
++
++gboolean
++clientInMonitor(XRRMonitorInfo *m, Client *c)
++{
++    int m_x1 = m->x;
++    int m_x2 = m->x + m->width;
++    int m_y1 = m->y;
++    int m_y2 = m->x + m->height;
++    int c_x1 = c->x;
++    int c_x2 = c->x + c->width;
++    int c_y1 = c->y;
++    int c_y2 = c->x + c->height;
++    return m_x1 < c_x2 && m_x2 > c_x1
++        && m_y1 < c_y2 && m_y2 > c_y1;
++}
+diff --git a/src/misc.h b/src/misc.h
+index 73b864daf..b9fd3a82f 100644
+--- a/src/misc.h
++++ b/src/misc.h
+@@ -30,6 +30,7 @@
+ 
+ #include <X11/X.h>
+ #include <X11/Xlib.h>
++#include <X11/extensions/Xrandr.h>
+ #include <glib.h>
+ #include "screen.h"
+ 
+@@ -84,4 +85,9 @@ void                     placeSidewalks                         (ScreenInfo *,
+ gchar*                   get_atom_name                          (DisplayInfo *,
+                                                                  Atom);
+ 
++gboolean                 cursorInMonitor                        (XRRMonitorInfo *,
++                                                                 ScreenInfo *);
++
++gboolean                 clientInMonitor                        (XRRMonitorInfo *,
++                                                                 Client *c);
+ #endif /* INC_MISC_H */
