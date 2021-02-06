@@ -28,7 +28,7 @@ run :-
 	print_term(Ast, []).
 
 
-xml_element(element(Name,Attrs,Children)) --> [start(Name,Attrs)], xml_elements(Children), maybe_some_spurious_ends, [end(Name)].
+xml_element(element(Name,Attrs,Children)) --> [start(Name,Attrs)], xml_elements(Children), maybe_some_spurious_ends_but_not(Name), [end(Name)].
 
 xml_element(pcdata(Data)) --> [pcdata(Data)].
 
@@ -38,11 +38,12 @@ xml_elements([]) --> [].
 
 xml_elements([Child|Children]) --> xml_element(Child), xml_elements(Children).
 
-maybe_some_spurious_ends --> spurious_end, maybe_some_spurious_ends.
-maybe_some_spurious_ends --> [].
 
-/* this will take prolog down the wrong path first, but whateever. */
-spurious_end --> [end(_)].
+maybe_some_spurious_ends_but_not(_) --> [].
+
+maybe_some_spurious_ends_but_not(But_we_are_expecting_end_of) --> spurious_end(But_we_are_expecting_end_of), maybe_some_spurious_ends_but_not(But_we_are_expecting_end_of).
+
+spurious_end(But_we_are_expecting_end_of) --> [end(End)], {dif(End, But_we_are_expecting_end_of)}.
 
 
 
