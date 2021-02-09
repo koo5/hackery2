@@ -1,0 +1,19 @@
+So, the main distinction to see is between the resources listed in these two files:
+
+rdf_explore_manage.txt is about software that:
+	* sees rdf as a method to encode graphs. There are graph visualizers.
+	* allows you to explore rdf data in a tabular form. Subject predicate object columns, one row for each triple.
+	* is like ontowiki, basically a readymade user application with a fixed-ish UI, and that just happens to use RDF underneath.
+	* is specialized for editing RDFS/OWL ontologies
+
+whereas rdf_forms.txt is about libraries that allow you to generate user interfaces for/from rdf data / generate user interfaces by writing rdf declarations
+
+
+
+
+
+
+see also:
+	https://github.com/koo5/understand_humans/tree/master/mrkev is about:
+		augmented_text.txt
+
