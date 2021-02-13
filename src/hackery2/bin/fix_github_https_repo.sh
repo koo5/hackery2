@@ -2,7 +2,10 @@
 # https://gist.githubusercontent.com/AbdElraoufSabri/7fac905f1ee08e9127a7d0ff4f08abb6/raw/71516e67e85378b9b8d26e548362150bfa4effcc/fix_github_https_repo.sh
 #-- Script to automate https://help.github.com/articles/why-is-git-always-asking-for-my-password
 
-REPO_URL=`git remote -v | grep -m1 '^origin' | sed -Ene's#.*(https://[^[:space:]]*).*#\1#p'`
+REMOTE_NAME="$1"
+echo "fixing $REMOTE_NAME ..."
+
+REPO_URL=`git remote -v | grep -m1 "^$REMOTE_NAME" | sed -Ene's#.*(https://[^[:space:]]*).*#\1#p'`
 if [ -z "$REPO_URL" ]; then
   echo "-- ERROR:  Could not identify Repo url."
   echo "   It is possible this repo is already using SSH instead of HTTPS."
@@ -28,7 +31,7 @@ echo "      to "
 echo "  '$NEW_URL'"
 echo ""
 
-CHANGE_CMD="git remote set-url origin $NEW_URL"
+CHANGE_CMD="git remote set-url $REMOTE_NAME $NEW_URL"
 `$CHANGE_CMD`
 
 echo "Success"
