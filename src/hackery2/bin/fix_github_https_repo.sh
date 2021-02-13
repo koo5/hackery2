@@ -3,6 +3,7 @@
 #-- Script to automate https://help.github.com/articles/why-is-git-always-asking-for-my-password
 
 REMOTE_NAME="$1"
+REMOTE_NAME=${1-origin}
 echo "fixing $REMOTE_NAME ..."
 
 REPO_URL=`git remote -v | grep -m1 "^$REMOTE_NAME" | sed -Ene's#.*(https://[^[:space:]]*).*#\1#p'`
