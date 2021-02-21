@@ -28,14 +28,22 @@ def main(input_file, output_file, un_great_suspender_ize, remove_empty, pretty_p
     print('loading %s'%input_file)
     with open(input_file, 'r') as f:
         j = json.load(f)
+    print('have '+ str(count(j)) + ' items')
     print('deduping...')
     dedupe(j)
+    print('have '+ str(count(j)) + ' items')
     with open(output_file, 'w') as f:
         if pretty_print:
             o = {'indent':4}
         else:
             o = {}
         json.dump(j, f, **o)
+
+def count(x):
+    r = 1
+    if 'children' in x:
+        r += sum([count(ch) for ch in x['children']])
+    return r
 
 def dedupe(x):
     assert(type(x) == dict)

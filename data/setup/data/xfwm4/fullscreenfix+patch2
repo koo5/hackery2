@@ -1,7 +1,32 @@
-diff --git a/src/focus.c b/src/focus.c
-index af050236d..9afa96477 100644
---- a/src/focus.c
-+++ b/src/focus.c
+Description: blabla
+ TODO: Put a short summary on the line above and replace this paragraph
+ with a longer explanation of this change. Complete the meta-information
+ with other relevant fields (see below for details). To make it easier, the
+ information below has been extracted from the changelog. Adjust it or drop
+ it.
+ .
+ xfwm4 (4.12.5-1ubuntu0.18.04.1) bionic-proposed; urgency=medium
+ .
+   * SRU backport to keep maximized windows after exiting fullscreen
+     videos in Firefox (LP: #1796144)
+Author: Sean Davis <smd.seandavis@gmail.com>
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/1796144
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: 2021-02-21
+
+--- xfwm4-4.12.5.orig/src/focus.c
++++ xfwm4-4.12.5/src/focus.c
 @@ -30,6 +30,7 @@
  #include <X11/Xutil.h>
  #include <X11/Xatom.h>
@@ -10,11 +35,20 @@ index af050236d..9afa96477 100644
  
  #include <glib.h>
  #include <gdk/gdk.h>
-@@ -285,6 +286,29 @@ clientSelectMask (Client * c, Client *other, guint mask, guint type)
+@@ -210,7 +211,7 @@ clientFocusNew(Client * c)
+     {
+         if (client_focus)
+         {
+-            clientAdjustFullscreenLayer (client_focus, FALSE);
++//            clientAdjustFullscreenLayer (client_focus, FALSE);
+         }
+         clientRaise (c, None);
+         clientShow (c, TRUE);
+@@ -285,6 +286,29 @@ clientSelectMask (Client * c, Client *ot
      {
          return FALSE;
      }
-+    if ((mask & SEARCH_THIS_MONITOR))
++    if (1)
 +    {
 +        int i;
 +        int monitor_count;
@@ -40,10 +74,26 @@ index af050236d..9afa96477 100644
      if (c->type & type)
      {
          return TRUE;
-diff --git a/src/misc.c b/src/misc.c
-index 05db3dbb6..1d1acd36f 100644
---- a/src/misc.c
-+++ b/src/misc.c
+@@ -504,7 +528,7 @@ clientUpdateFocus (ScreenInfo *screen_in
+     if (c2)
+     {
+         clientSetNetState (c2);
+-        clientAdjustFullscreenLayer (c2, FALSE);
++//        clientAdjustFullscreenLayer (c2, FALSE);
+         frameQueueDraw (c2, FALSE);
+         clientUpdateOpacity (c2);
+     }
+@@ -522,7 +546,7 @@ clientUpdateFocus (ScreenInfo *screen_in
+             FLAG_UNSET (c->flags, CLIENT_FLAG_DEMANDS_ATTENTION);
+         }
+         clientSetNetState (c);
+-        clientAdjustFullscreenLayer (c, TRUE);
++//        clientAdjustFullscreenLayer (c, TRUE);
+         frameQueueDraw (c, FALSE);
+         clientUpdateOpacity (c);
+     }
+--- xfwm4-4.12.5.orig/src/misc.c
++++ xfwm4-4.12.5/src/misc.c
 @@ -28,6 +28,7 @@
  #include <X11/Xlib.h>
  #include <X11/Xutil.h>
@@ -52,7 +102,7 @@ index 05db3dbb6..1d1acd36f 100644
  #include <glib.h>
  #include <gtk/gtk.h>
  #include <gdk/gdk.h>
-@@ -258,3 +259,39 @@ get_atom_name (DisplayInfo *display_info, Atom atom)
+@@ -262,3 +263,39 @@ get_atom_name (DisplayInfo *display_info
      return value;
  }
  
@@ -92,10 +142,8 @@ index 05db3dbb6..1d1acd36f 100644
 +    return m_x1 < c_x2 && m_x2 > c_x1
 +        && m_y1 < c_y2 && m_y2 > c_y1;
 +}
-diff --git a/src/misc.h b/src/misc.h
-index 73b864daf..b9fd3a82f 100644
---- a/src/misc.h
-+++ b/src/misc.h
+--- xfwm4-4.12.5.orig/src/misc.h
++++ xfwm4-4.12.5/src/misc.h
 @@ -30,6 +30,7 @@
  
  #include <X11/X.h>
@@ -104,7 +152,7 @@ index 73b864daf..b9fd3a82f 100644
  #include <glib.h>
  #include "screen.h"
  
-@@ -84,4 +85,9 @@ void                     placeSidewalks                         (ScreenInfo *,
+@@ -73,4 +74,9 @@ void                     placeSidewalks
  gchar*                   get_atom_name                          (DisplayInfo *,
                                                                   Atom);
  

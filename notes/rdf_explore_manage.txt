@@ -131,8 +131,8 @@
                         Interactive visualization of the Gremlin graph database with D3.js
 
                     https://madsholten.github.io/sparql-visualizer/
-
-
+					
+					
                     https://www.rubensworks.net/blog/2019/10/06/using-rdf-in-javascript/
                     https://www.google.com/search?q=js+scene+graph
                     https://rdf.js.org/
@@ -140,7 +140,23 @@
                     https://raptorlicious.blogspot.com/2017/08/1st-stages-of-exploring-sigmajs-for-use.html
                     https://www.w3.org/wiki/SparqlImplementations
 
+
+					new and cool
+						https://github.com/magjac/d3-graphviz
+						https://github.com/dagrejs/dagre-d3/wiki#demos
+						https://github.com/mdaines/viz.js/wiki
+						https://github.com/vasturiano/react-force-graph#react-force-graph
+						https://github.com/vasturiano/force-graph
+						http://vis.arc.vt.edu/projects/zbb/
+						https://www.web3d.org/x3dv4-implementations
+						http://stars.chromeexperiments.com/
+						http://haylyn.io/
+						
+						https://github.com/dletta/visualGraph
+					
+
                     d3.js
+						
                         https://github.com/timrdf/vsr/wiki/d3
                         https://medium.com/dailyjs/the-trouble-with-d3-4a84f7de011f
                             https://docs.google.com/spreadsheets/d/1k-GVrhLw2_KdSvfCOt3RzF6otWfZQ5rbsBpVnTP425w/edit#gid=0
@@ -150,7 +166,9 @@
                             http://givingsense.eu/demo/bloomdisplay/d3TreeBloom.htm
                             https://onsem.wp.imt.fr/2014/03/18/web-visualization-of-a-simple-ontology/
 
+
                     cytoscape.js
+						https://dmx-systems.github.io/cytoscape-edge-connections/
                         didnt find anything rdf related, but i guess it would be a reasonable engine for building something
 
                     https://github.com/marklogic-community/grove-vue-visjs-graph

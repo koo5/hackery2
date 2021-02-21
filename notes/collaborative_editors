@@ -110,3 +110,19 @@
 	https://github.com/collabserver/collabserver-grapheditor
 	
 	
+
+# about editors
+	https://medium.com/content-uneditable/contenteditable-the-good-the-bad-and-the-ugly-261a38555e9c
+
+# safe rich text  /  html sanitization
+	https://stackoverflow.com/questions/39784400/securely-render-arbitrary-user-uploaded-content-from-a-wsywig-editor
+	->	
+		https://github.com/cure53/DOMPurify
+		https://github.com/google/closure-library/tree/master/closure/goog/html/sanitizer
+		
+	https://www.html5rocks.com/en/tutorials/security/sandboxed-iframes/
+	https://www.tiny.cloud/docs/configure/content-filtering/
+	https://github.com/owasp/java-html-sanitizer
+	http://www.gwtproject.org/doc/latest/DevGuideSecuritySafeHtml.html
+	https://draftjs.org/docs/api-reference-data-conversion/
+	
