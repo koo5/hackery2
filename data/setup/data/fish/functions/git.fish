@@ -18,3 +18,12 @@ end
 function d
 	git diff $argv
 end
+function gw
+	git show $argv
+end
+function cm
+	git commit -m $argv
+end
+function cam
+	git commit -a -m $argv
+end
