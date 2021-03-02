@@ -138,12 +138,15 @@
 		i use that
 		gitk --all
 		maybe i had to hack the colors (low contrast)
+
 	gitg
 		seems better
 	
-	git gui blame
-	
+	qgit
+		the usual
+
 	tig
+		hmh, too steep learning curve for me
 		
 	giggle
 		low contrast colors
@@ -160,6 +163,12 @@
 	
 
 	https://www.gitkraken.com/download
+		looking good, but doesnt run for me
+		
+	ungit
+		npm install -g ungit;ungit
+
+
 		
 	https://github.com/gitextensions/gitextensions/releases/
 	
@@ -189,4 +198,5 @@ fun event visualization:
 	
 	https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet
 	
-	
+	git gui blame
+
