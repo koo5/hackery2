@@ -1,4 +1,192 @@
-https://news.ycombinator.com/item?id=23377012
-git subrepo
-	i gave up with it, too complicated, git submodules are easy compared to it. 
-https://github.com/newren/git-filter-repo
+
+# alternatives
+	obviously, the first long-term vision to consider is throwing away text-based version control! 
+	mid-term, maybe fossil is a better alternative?
+
+
+
+# submodules:
+	git subrepo
+		https://news.ycombinator.com/item?id=23377012
+		i gave up with it, too complicated, git submodules are easy compared to it. 
+
+
+
+# manipulating history:
+	https://github.com/newren/git-filter-repo
+		yup i think this was a success
+	
+	
+
+# workflow:
+	there's the gerrit style, apparently mainly used in big projects. Your commit is your PR, and you keep amending your commit. Thus, losing your own personal history. I'm sure it fits big projects where changes are carefully scoped and planned.
+
+
+	because no matter how i search, there isn't a magical "reorganize all these changes you made across all the repos in past month, while you were working towards making xyz work, reorganize them into a nice set of commits with clean purpose and scope"		
+	
+	
+	i'm testing no-ff merges now. 
+		https://nvie.com/img/merge-without-ff@2x.png
+		`"git log --first-parent origin/master" as the sequence of the important things`
+		
+		to be addressed:
+			 broken bisect, and blame mysteries 
+			 https://stackoverflow.com/questions/20240526/how-to-git-bisect-only-on-one-branchs-commits
+			 - because what you get when you merge is commits from both branches interleaved, ordered by time
+		
+			solution:
+				Yes: with Git 2.29 (Q4 2020), "git bisect"(man) learns the "--first-parent" option to find the first breakage along the first-parent chain.
+		
+		protect first-parent:	
+			http://bit-booster.blogspot.com/2016/02/no-foxtrots-allowed.html
+			
+			https://git-blame.blogspot.com/2012/03/fun-with-first-parent.html
+			
+			https://git-blame.blogspot.com/2015/03/fun-with-non-fast-forward.html
+			
+			https://devblog.nestoria.com/post/98892582763/maintaining-a-consistent-linear-history-for-git-log
+			
+			
+				
+		
+		
+		This should be enough to:
+			
+			* allow full granularity "snapshot" commits into master,
+			
+			* prevent conflicts between changes contained in a squashed-in commit and the same changes left unsquashed (when you squash-merge a topic branch into develop but forget to throw it away and you continue piling commits onto it.. This could be solved by some higher-level workflow manager but it isnt.)
+			
+			* and at the same time, some abstraction (if you want to go by feature/topic, "just" look at all *merges* and hopefully reasonable git-blame behavior?
+												
+		may have to throw away `git log` in favor for some graphical tool (gitk) 
+			because:
+				too much noise-commits (snapshot commits make it to main)
+			`
+			git log --graph --decorate --pretty=oneline --abbrev-commit
+			`
+			seems to do well.
+			mmm https://gist.github.com/datagrok/4221767
+			
+
+			
+		not all merges need no-ff, if it's a one or two commit fix or somesuch, why not ff it.
+		
+		
+			
+		
+			
+	rebases:
+		```	$ git rebase master server
+			This replays your server work on top of your master work```
+		
+		
+		```	$ git rebase --onto master server client
+			This basically says, “Take the client branch, figure out the patches since it diverged from the server branch, and replay these patches in the client branch as if it was based directly off the master branch instead.” It’s a bit complex, but the result is pretty cool.```
+		^I'd do the same with cherry pick but that doesn't matter i guess..
+		
+		"Thus, a rebase is just a merge that forgets where it came from. 
+		[...]
+		history display capabilities are weak and need active assistance from the user to keep things manageable. Surely a better approach is to record the complete ancestry of every check-in but then fix the tool to show a "clean" history in those instances where a simplified display is desirable and edifying"
+			
+
+
+
+
+	how to call development branch, i prefer "dev"
+	
+	i'm kinda uncomfortable with running a dev and a main branch in parallel forever. Like, you kinda risk that they get out of sync, with, like, merging something from dev but omitting a partiicular commit accidentally, and then you're forever working with two different branches and you think they're the same. So i guess i prefer forking a dev<some random number> off of main every time that the previous dev is merged into main?
+	
+	
+
+# basics
+	"$ git checkout -b myfeature develop"
+	https://nvie.com/posts/a-successful-git-branching-model/
+	https://wincent.com/wiki/git_rebase%3A_you%27re_doing_it_wrong
+	http://bit-booster.blogspot.com/2016/02/no-foxtrots-allowed.html
+	"Have you ever wanted to see each commit on your branch as a diff, but "git log -p" is clearly missing diffs, and "git log -p -m" has way too many diffs?"
+	
+	and the good from the traditional view:
+		"There's a middle ground between squashing and leaving a load of disorganised crap in the history. Rebase before merging. It gives you a chance to clean up the rubbish, but it doesn't force you to squash an entire feature's work into a single commit. You can preserve the logical changes without letting the crap into your history."
+		"I agree here. Be a good steward of your commits, and let `rebase -i` be your tool for that. A bunch of "err, try this instead" should be washed away, but it doesn't help to commit "Add Huge Feature" +10,000/-2,000 because "I should squash my feature""
+	
+		https://blog.sebastian-daschner.com/entries/git-commit-fixup-autosquash
+			worth a try
+	
+			"--autosquash
+				When the commit log message begins with "squash! ..." (or "fixup! ..."), and there is a commit whose title begins with the same ..., automatically modify the todo list of rebase -i so that the commit marked for squashing comes right after the commit to be modified, and change the action of the moved commit from pick to squash (or fixup)."
+				
+		
+	
+# opinions
+	
+
+	https://mijingo.com/blog/why-you-shouldnt-use-git-fast-forward
+		- makes sense for small operations
+	https://sandofsky.com/workflow/git-workflow/
+		- makes sense for bigger operations
+	
+
+# visualizers:
+	meta:
+		* it's possibly useful to abandon the focus on a time series, and instead explore the graph purely in terms of dependencies?
+		
+		* ```begin the commit message with a single short
+       (less than 50 character) line summarizing the change, followed by a blank line and
+       then a more thorough description```
+		
+	gitk
+		i use that
+		gitk --all
+		maybe i had to hack the colors (low contrast)
+	gitg
+		seems better
+	
+	git gui blame
+	
+	tig
+		
+	giggle
+		low contrast colors
+		slow?
+	gmaster
+		windows-only
+		but looks good
+	
+	https://stackoverflow.com/a/15562953
+
+
+	git log --all --decorate --oneline --graph
+		https://stackoverflow.com/questions/1838873/visualizing-branch-topology-in-git/34467298#34467298
+	
+
+	https://www.gitkraken.com/download
+		
+	https://github.com/gitextensions/gitextensions/releases/
+	
+	https://levelup.gitconnected.com/how-to-use-git-blame-effectively-6228f3f7da5d
+	
+	https://github.com/bgrainger/GitBlame
+		windows-only
+		
+	http://lingo.github.io/flame/
+	
+	
+
+fun event visualization:
+	gource
+		not bad
+		
+
+
+	
+	
+# misc
+	```	git init
+		git commit --allow-empty -m "Initial commit"
+		```
+
+	gitsome
+	
+	https://github.com/ohmyzsh/ohmyzsh/wiki/Cheatsheet
+	
+	
