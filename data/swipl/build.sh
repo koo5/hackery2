@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+
+#
+# git clone https://github.com/SWI-Prolog/swipl.git swipl
+# cd swipl
+#
+# and then run this script.
+
 set -x
 set -e
 
