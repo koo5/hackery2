@@ -78,8 +78,8 @@
 	rebases:
 		```	$ git rebase master server
 			This replays your server work on top of your master work```
-		
-		
+			(since the point where server and master diverged)
+				
 		```	$ git rebase --onto master server client
 			This basically says, “Take the client branch, figure out the patches since it diverged from the server branch, and replay these patches in the client branch as if it was based directly off the master branch instead.” It’s a bit complex, but the result is pretty cool.```
 		^I'd do the same with cherry pick but that doesn't matter i guess..
@@ -141,7 +141,7 @@
 
 	gitg
 		seems better
-	
+
 	qgit
 		the usual
 
@@ -151,25 +151,24 @@
 	giggle
 		low contrast colors
 		slow?
+
+	ungit
+		cool
+		npm install -g ungit;ungit
+
+	gitkraken
+		looking good, but doesnt run for me
+
 	gmaster
 		windows-only
 		but looks good
 	
 	https://stackoverflow.com/a/15562953
-
+		?
 
 	git log --all --decorate --oneline --graph
 		https://stackoverflow.com/questions/1838873/visualizing-branch-topology-in-git/34467298#34467298
 	
-
-	https://www.gitkraken.com/download
-		looking good, but doesnt run for me
-		
-	ungit
-		npm install -g ungit;ungit
-
-
-		
 	https://github.com/gitextensions/gitextensions/releases/
 	
 	https://levelup.gitconnected.com/how-to-use-git-blame-effectively-6228f3f7da5d
@@ -183,9 +182,6 @@
 
 fun event visualization:
 	gource
-		not bad
-		
-
 
 	
 	

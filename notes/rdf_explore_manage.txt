@@ -116,14 +116,14 @@
 
 			rdf in js, pointers on how to start building something, but no ready solutions
 
-                free but commercially used, looking robust
-                    https://github.com/bpmn-io/diagram-js
-                    https://github.com/jgraph/mxgraph
-
                 nice but paid
                    https://gojs.net
                         interactive diagrams and graphs
                         nice demos but no keyboard-friendly navigation (by default)
+
+                free but commercially used, looking robust
+                    https://github.com/bpmn-io/diagram-js
+                    https://github.com/jgraph/mxgraph
 
                 hmh
 
@@ -141,10 +141,12 @@
                     https://www.w3.org/wiki/SparqlImplementations
 
 
-					new and cool
-						https://github.com/magjac/d3-graphviz
-						https://github.com/dagrejs/dagre-d3/wiki#demos
+					diagramming
 						https://github.com/mdaines/viz.js/wiki
+						https://github.com/magjac/d3-graphviz
+
+					new and cool
+						https://github.com/dagrejs/dagre-d3/wiki#demos
 						https://github.com/vasturiano/react-force-graph#react-force-graph
 						https://github.com/vasturiano/force-graph
 						http://vis.arc.vt.edu/projects/zbb/
