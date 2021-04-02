@@ -36,7 +36,7 @@ the UI could use some improvement: To make one cell a sum of a few other cells, 
 * click-drag-release a selection of cells
 * click above on "Entry line"
 * press return.
-* 
+
 idk, maybe there are some shortcuts.
 
 you get a nice comprehensive help after pressing F1..
