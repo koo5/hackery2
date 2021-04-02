@@ -7,6 +7,7 @@
 			non-rdf interfaces:
                 https://comunica.github.io/Article-ISWC2018-Demo-GraphQlLD/
                     GraphQL to sparql and back, seems usable, recommended alternative to stardog's
+                    - but no subscriptions
 
 				stardog
 				anzo

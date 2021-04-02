@@ -104,6 +104,22 @@
 						an issue with all of them so for is a lack of automatic layouting for "non-primary" connections, ie, nodes are layouted by their "part-of" relationship, and you can choose different presentations of that, or move a child node into different slots of the parent node, but once you add a "custom" relation, you have to position it yourself. But we could tackle that.
 
 
+			dmx
+				https://demo.dmx.systems/systems.dmx.webclient/#/topicmap/2767
+				https://dmx.readthedocs.io/en/latest/tutorial.html
+				can this manage arbitrary rdf?
+				
+				"""
+				Create a topic type “Tree name”. It can keep the default data type “text”. Create an association between the “Tree name” and the “Tree”. By dragging from the child type (“Tree name”) to the parent type (“Tree”) you assign the right order on the fly.
+
+				Create a topic type “Blooming period”. Edit it and change its data type to “value”. Create an association between the topic type “Blooming period” and the topic type “Tree”."""
+				
+				blah blah blah.
+				
+				https://dmx.readthedocs.io/en/latest/plugins.html#the-tableview-plugin
+				
+			
+
 			CNL-based:
 
 				https://www.cognitum.eu/semantics/examples/FIBO.aspx

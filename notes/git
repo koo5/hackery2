@@ -196,3 +196,11 @@ fun event visualization:
 	
 	git gui blame
 
+
+
+guis
+	pip install --user git-annex-gui
+	
+	
+
+

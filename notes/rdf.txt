@@ -204,3 +204,8 @@ storage - technically
     then there's all the r2rml implementations...
     ~2010: "Internally, virtuoso may be looked at as a relational database, with some added RDF features. "
 
+
+
+https://github.com/BruJu/PREC
+	PREC is a WIP set of tools to convert any Property Graph into RDF.
+	

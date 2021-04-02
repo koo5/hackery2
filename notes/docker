@@ -1,3 +1,24 @@
+docker is not a reliable container / manager / thingy. You're gonna end up into situations when no error is indicated, your container is running, but the port is not being forwarded. And probably other jokes like that.
+
+so grab:
+https://ubuntu.com/kubernetes/install#single-node
+
+
+
+a gui will help you manage all that. On windows, Docker desktop. On linux, Portainer.
+
+
 https://www.docker.com/blog/simplifying-kubernetes-with-docker-compose-and-friends/
+	aaaand it's dead
+	
+	
+
 https://www.reddit.com/r/docker/comments/es7n2u/containers_fail_to_start_on_reboot_until_i_do_a/
+
+
+
 docker stack ps robust73 --no-trunc
+
+
+
+All our images are based on minideb a minimalist Debian based container image which gives you a small base container image and the familiarity of a leading Linux distribution.
