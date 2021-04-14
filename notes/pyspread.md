@@ -30,12 +30,13 @@ bingo!
 
 ## observations
 the UI could use some improvement: To make one cell a sum of a few other cells, follow these steps exactly:
-	click on a cell
-	click above on "Entry line"
-	press insert
-	click-drag-release a selection of cells
-	click above on "Entry line"
-	press return.
+* click on a cell
+* click above on "Entry line"
+* press insert
+* click-drag-release a selection of cells
+* click above on "Entry line"
+* press return.
+
 idk, maybe there are some shortcuts.
 
 you get a nice comprehensive help after pressing F1..
