@@ -9,7 +9,7 @@ sudo ntpdate  -v  ntp.ubuntu.com &&
 {
 {
 sudo aptdcon --refresh &&
-sudo unattended-upgrade -d
+sudo unattended-upgrade #--debug
 } ||
 sudo yum update  -y --security
 } && {

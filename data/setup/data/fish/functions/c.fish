@@ -1,3 +1,3 @@
 function c
-	git commit $argv
+	cat $argv
 end
