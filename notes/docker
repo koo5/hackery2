@@ -1,4 +1,9 @@
-docker is not a reliable container / manager / thingy. You're gonna end up into situations when no error is indicated, your container is running, but the port is not being forwarded. And probably other jokes like that.
+
+
+
+"docker stack" is not a reliable orchestrator. You're gonna end up into situations when no error is indicated, your container is running, but the port is not being forwarded. Or your logs stop printing. Or your container is not brought up. And other jokes like that.
+
+
 
 so grab:
 https://ubuntu.com/kubernetes/install#single-node
@@ -6,6 +11,7 @@ https://ubuntu.com/kubernetes/install#single-node
 
 
 a gui will help you manage all that. On windows, Docker desktop. On linux, Portainer.
+
 
 
 https://www.docker.com/blog/simplifying-kubernetes-with-docker-compose-and-friends/
@@ -22,3 +28,17 @@ docker stack ps robust73 --no-trunc
 
 
 All our images are based on minideb a minimalist Debian based container image which gives you a small base container image and the familiarity of a leading Linux distribution.
+
+
+
+https://github.com/SUSE/zypper-docker
+
+
+
+https://docs.docker.com/config/containers/multi-service_container/
+https://github.com/GrahamDumpleton/mod_wsgi-docker/issues/34
+https://hub.docker.com/r/itech/docker-unattended-upgrade
+https://pythonspeed.com/articles/security-updates-in-docker/
+
+
+
