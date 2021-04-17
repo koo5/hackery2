@@ -951,3 +951,4 @@ augmented_text.txt
 
 
 
+mount solid pod data as a fuse fs?
