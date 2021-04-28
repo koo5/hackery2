@@ -1,3 +1,5 @@
+#!/usr/bin/env fish
+
 function remove-docker-containers
 	echo "Stop running shit"
 	docker stop (docker ps -q)
@@ -20,3 +22,5 @@ function CLEAN-THE-FUCKING-DOCKER
 end
 
 # - https://gist.github.com/schleumer/3d7acf1bad48ef7a98945aafde90344d
+
+CLEAN-THE-FUCKING-DOCKER

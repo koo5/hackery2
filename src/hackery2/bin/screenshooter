@@ -1,0 +1,11 @@
+#!/usr/bin/env python3.8
+
+import subprocess, shlex, sys
+
+for line in subprocess.check_output(['procs'], text=True):
+	if 'xfce4-screenshooter' in line:
+		print('already running')
+		exit(0)
+
+exit(subprocess.check_call(['xfce4-screenshooter']))
+
