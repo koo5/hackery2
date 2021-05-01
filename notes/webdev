@@ -14,3 +14,80 @@ https://www.swyx.io/svelte-amplify-datastore/#graphql-as-contract
 https://medium.com/dailyjs/stop-painful-javascript-debug-and-embrace-intellij-with-source-map-6fe68eda8555
 
 
+
+
+	
+svelte sortable table
+
+	https://sveltematerialui.com/demo/data-table/
+		seems very nice, but doesn't play with snowpack
+		works in build, only breaks in dev
+		supposedly plays with vite though, which is weird
+		https://stackoverflow.com/questions/61970250/getting-svelte-material-ui-working-with-snowpack-and-sass
+			hmh, i didnt have any isssues with css..
+		
+		
+	https://smeltejs.com/components/data-tables
+		looks usable, but not as polished
+		snowpack maybe possible
+		https://github.com/matyunya/smelte/issues/193
+			https://github.com/khanguyen88/smelte-typescript-snowpack
+	
+	
+	https://vincjo.fr/svelte-simple-datatables/
+		has what seems as glitches in sorting arrows, but maybe it's intentional?
+		but seems usable, and nice search
+		```
+		Uncaught TypeError: Cannot read property 'getBoundingClientRect' of undefined
+		```
+		seems to be fixed by wrapping it with a <div>
+
+		```
+		Unhandled Runtime Error
+		TypeError: th is undefined
+		```
+		what now?
+		
+	https://material-ui.com/components/tables/
+		so what does it take to use the WebComponent (?) directly?
+		https://codelabs.developers.google.com/codelabs/mdc-101-web#2
+		https://material-ui.com/
+			...
+			vuetify project also looks impressive
+		
+		
+	https://github.com/dasDaniel/svelte-table
+		not very polished
+	
+	https://ivosdc.github.io/svelte-generic-crud-table/
+		quite ok
+	
+	https://svelte-materialify.vercel.app/components/data-table/
+		apparently not complete yet?
+		
+	https://sveltestrap.js.org/?path=/story/components--table
+		no sorting
+	
+	https://github.com/bsssshhhhhhh/svelte-data-grid
+		no sorting(?)
+
+	https://github.com/mattiash/svelte-tablesort
+		todo
+
+
+
+
+
+
+
+
+
+https://necolas.github.io/normalize.css/
+	hmm, more reasonable than https://github.com/tailwindcss ?
+	
+
+https://glitch.com/create
+http://nymph.io/
+https://markodenic.com/use-console-log-like-a-pro/
+https://svelte.nodegui.org/docs/guides/tutorial/
+	https://github.com/bradyjoslin/svelte-nodegui-wasm-starter
