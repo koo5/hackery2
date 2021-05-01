@@ -19,6 +19,9 @@ https://medium.com/dailyjs/stop-painful-javascript-debug-and-embrace-intellij-wi
 	
 svelte sortable table
 
+	see:
+		https://github.com/koo5/esp-wifi-manager/tree/sortable_table_component_showdown
+
 	maybe:
 
 		https://material-ui.com/components/tables/
@@ -42,6 +45,8 @@ svelte sortable table
 				
 			https://smeltejs.com/components/data-tables
 				looks usable, but not as polished
+				issue
+					https://github.com/matyunya/smelte/issues/235
 				snowpack maybe possible
 				https://github.com/matyunya/smelte/issues/193
 					https://github.com/khanguyen88/smelte-typescript-snowpack
