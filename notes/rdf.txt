@@ -952,3 +952,16 @@ augmented_text.txt
 
 
 mount solid pod data as a fuse fs?
+
+
+
+
+
+URI vs URL:
+	```
+	Steve Pepper has written an article on how to cure the web's identity crisis [Pepper2004]. The argumentation there is sounds correct. He proposes to solve the distinction of Resource VS Concept by using Topic Map syntax. Topic Maps do determine between addressable subjects and non-addressable subjects. The use of resourceRef or subjectIndicatorRef state a clear message about the topic in question: it is addressable (its a document) or it is not addressable (it is a concept) and in the Topic Map Community, usually one URI is not used in both uses. Also, the Topic Map community treats all concepts in the context of a Topic Map - every resource (be it addressable or not) is first re-instantiated in a local Topic Map using a local identifier (usually something like <topic id="opera">).
+
+	Pepper suggests to expand the use of rdf:about with rdf:subject and rdf:indicator to extend the identification. But Pepper didn't take the last needed step: to create a new view on RDF where each Resource is re-instantiated in the current ontology. He does not propose to create topics versus resources. We more tend towards SKOS: there, each Topic is called a Concept and is identified uniquely inside the SKOS ConceptScheme, using the URI of the concept scheme [SKOS-Effort].
+	```
+	- http://www.dfki.uni-kl.de/~sauermann/2006/01-pimo-report/pimOntologyLanguageReport.html
+

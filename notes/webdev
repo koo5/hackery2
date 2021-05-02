@@ -100,6 +100,10 @@ svelte sortable table
 
 
 
+As many people said, webpack 5 has made decent performance gains, and if you are targeting modern browsers, consider replacing Babel/TS with esbuild. These should already get you pretty far. 
+
+
+
 
 
 
@@ -113,3 +117,7 @@ http://nymph.io/
 https://markodenic.com/use-console-log-like-a-pro/
 https://svelte.nodegui.org/docs/guides/tutorial/
 	https://github.com/bradyjoslin/svelte-nodegui-wasm-starter
+https://www.w3schools.com/w3css/w3css_intro.asp
+https://daml.com/
+
+
