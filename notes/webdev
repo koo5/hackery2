@@ -84,6 +84,10 @@ svelte sortable table
 				no pagination, just primitive sorting, but works!
 
 
+		https://github.com/chuvikovd/svelte-headless-datatable
+			headless
+
+
 
 	irrelevant
 
@@ -119,5 +123,19 @@ https://svelte.nodegui.org/docs/guides/tutorial/
 	https://github.com/bradyjoslin/svelte-nodegui-wasm-starter
 https://www.w3schools.com/w3css/w3css_intro.asp
 https://daml.com/
+
+
+
+sticky nav
+	?
+		```
+			nav {
+				position: sticky;
+				top: 0px;
+			}
+
+		```
+
+
 
 
