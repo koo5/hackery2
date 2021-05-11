@@ -29,7 +29,11 @@ svelte sortable table
 			https://codelabs.developers.google.com/codelabs/mdc-101-web#2
 			https://material-ui.com/
 				...
-				vuetify project also looks impressive
+				
+				
+		vuetify project also looks impressive:
+			https://vuetifyjs.com/en/components/data-tables/
+			
 			
 	the contenders:
 
@@ -136,6 +140,23 @@ sticky nav
 
 		```
 
+https://medium.com/hypefactors/busting-spa-chunk-cache-for-active-users-after-a-deploy-a9a06242edb1
 
+
+
+
+
+
+https://github.com/kolodziejczak-sz/svelte-redux-connect#readme
+
+
+
+
+
+
+
+
+https://pyodide.org/en/stable/
+https://pypyjs.org/
 
 
