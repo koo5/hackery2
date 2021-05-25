@@ -206,6 +206,8 @@ rdf_forms.txt:
 	https://aksw.org/Projects/JekyllRDF.html
 		The approach is based on devising a declarative DSL to create templates to render instance data.
 	
+
+	https://vemonet.github.io/json-ld-editor-react/
 	
 
 rdf_explore_manage.txt

@@ -1,21 +1,6 @@
 svelte bootstrap alternatives 
 	https://www.reddit.com/r/sveltejs/comments/j7w1es/what_ui_component_libraries_do_you_use/
 
-https://www.reddit.com/r/sveltejs/comments/morl1n/realtime_backend_for_svelte_projects/
-
-	https://supabase.io/
-	https://appwrite.io/
-
-https://www.swyx.io/svelte-amplify-datastore/#graphql-as-contract
-
-
-
-
-https://medium.com/dailyjs/stop-painful-javascript-debug-and-embrace-intellij-with-source-map-6fe68eda8555
-
-
-
-
 	
 svelte sortable table
 
@@ -56,6 +41,10 @@ svelte sortable table
 					https://github.com/khanguyen88/smelte-typescript-snowpack
 			
 
+			https://carbon-svelte.vercel.app/components/DataTable#sortable
+-with-nested-object-values
+				hmm!
+				
 		one-offs
 		
 			https://vincjo.fr/svelte-simple-datatables/
@@ -104,8 +93,17 @@ svelte sortable table
 		https://github.com/bsssshhhhhhh/svelte-data-grid
 			no sorting(?)
 
+		https://tachyons.io/components/tables/striped-dark/index.html
+			meh
+			
+		https://headlessui.dev/
+			huh
+			
+		https://svelte-atoms.web.app/Table
+			nope, very basic
 
-
+		https://materializecss.com/
+			that's all?
 
 
 As many people said, webpack 5 has made decent performance gains, and if you are targeting modern browsers, consider replacing Babel/TS with esbuild. These should already get you pretty far. 
@@ -160,3 +158,20 @@ https://pyodide.org/en/stable/
 https://pypyjs.org/
 
 
+
+
+
+https://www.reddit.com/r/sveltejs/comments/morl1n/realtime_backend_for_svelte_projects/
+
+	https://supabase.io/
+	https://appwrite.io/
+
+https://www.swyx.io/svelte-amplify-datastore/#graphql-as-contract
+
+
+
+
+https://medium.com/dailyjs/stop-painful-javascript-debug-and-embrace-intellij-with-source-map-6fe68eda8555
+
+nice "linux terminal" div class
+	https://tecadmin.net/how-to-install-python-3-9-on-ubuntu-18-04/
