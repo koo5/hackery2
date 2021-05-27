@@ -82,7 +82,7 @@ https://github.com/influxdata/kapacitor
 	
 
 https://github.com/sensu/sensu-go
-	commercial, limited free
+	commercial, limited free, source available
 	docs show lack of maintenance
 	event-oriented
 	```Agents automatically register with Sensu as entities when you start them up and connect to the Sensu backend with no need for further provisioning. You only need to specify the IP address for the Sensu backend server ```
@@ -112,7 +112,11 @@ https://github.com/sensu/sensu-go
             --keepalive-interval=5 --keepalive-warning-timeout=10 --subscriptions linux \
             --api-host 0.0.0.0 --cache-dir /var/lib/sensu
 		```
-
+		
+		security:
+			docker probably makes most sense
+			
+		
 
 
 

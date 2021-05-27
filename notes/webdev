@@ -36,7 +36,7 @@ svelte sortable table
 				looks usable, but not as polished
 				issue
 					https://github.com/matyunya/smelte/issues/235
-				snowpack maybe possible
+				snowpack maybe possible, is supposed to work
 				https://github.com/matyunya/smelte/issues/193
 					https://github.com/khanguyen88/smelte-typescript-snowpack
 			
