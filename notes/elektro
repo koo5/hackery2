@@ -17,3 +17,17 @@ esp32 ota
 
 433mhz 4xrelay module
 https://www.youtube.com/watch?v=__isLuqLXUU
+
+
+
+
+https://randomnerdtutorials.com/getting-started-micropython-esp32-esp8266/
+https://randomnerdtutorials.com/esp32-esp8266-micropython-web-server/
+https://github.com/jczic/MicroWebSrv2
+https://docs.micropython.org/en/latest/develop/cmodules.html
+https://github.com/pfalcon/pycopy
+https://github.com/pfalcon/pycopy/tree/master/ports/esp32
+
+
+https://play.google.com/store/apps/details?id=snr.lab.iotmqttpanel.prod
+

@@ -1,2 +1,177 @@
 svelte bootstrap alternatives 
 	https://www.reddit.com/r/sveltejs/comments/j7w1es/what_ui_component_libraries_do_you_use/
+
+	
+svelte sortable table
+
+	see:
+		https://github.com/koo5/esp-wifi-manager/tree/sortable_table_component_showdown
+
+	maybe:
+
+		https://material-ui.com/components/tables/
+			so what does it take to use the WebComponent (?) directly?
+			https://codelabs.developers.google.com/codelabs/mdc-101-web#2
+			https://material-ui.com/
+				...
+				
+				
+		vuetify project also looks impressive:
+			https://vuetifyjs.com/en/components/data-tables/
+			
+			
+	the contenders:
+
+		frameworks
+
+			https://sveltematerialui.com/demo/data-table/
+				seems very nice, but doesn't play with snowpack
+				works in build, only breaks in dev
+				supposedly plays with vite though, which is weird
+				https://stackoverflow.com/questions/61970250/getting-svelte-material-ui-working-with-snowpack-and-sass
+					hmh, i didnt have any isssues with css..
+				
+				
+			https://smeltejs.com/components/data-tables
+				looks usable, but not as polished
+				issue
+					https://github.com/matyunya/smelte/issues/235
+				snowpack maybe possible, is supposed to work
+				https://github.com/matyunya/smelte/issues/193
+					https://github.com/khanguyen88/smelte-typescript-snowpack
+			
+
+			https://carbon-svelte.vercel.app/components/DataTable#sortable
+-with-nested-object-values
+				hmm!
+				
+		one-offs
+		
+			https://vincjo.fr/svelte-simple-datatables/
+				seems kinda usable, has nice search, but too many issues for now, it seems
+				has what seems as glitches in sorting arrows, but maybe it's intentional?
+				
+				```
+				Uncaught TypeError: Cannot read property 'getBoundingClientRect' of undefined
+				```
+				seems to be fixed by wrapping it with a <div>
+
+				```
+				Unhandled Runtime Error
+				TypeError: th is undefined
+				```
+				- https://github.com/vincjo/svelte-simple-datatables/issues/26
+				
+				also: https://github.com/vincjo/svelte-simple-datatables/issues/21
+				
+				
+			https://github.com/dasDaniel/svelte-table
+				todo
+				not very polished
+				sorting works
+			
+			https://ivosdc.github.io/svelte-generic-crud-table/
+				looks quite ok 
+			
+			https://github.com/mattiash/svelte-tablesort
+				no pagination, just primitive sorting, but works!
+
+
+		https://github.com/chuvikovd/svelte-headless-datatable
+			headless
+
+
+
+	irrelevant
+
+		https://svelte-materialify.vercel.app/components/data-table/
+			apparently not complete yet?
+			
+		https://sveltestrap.js.org/?path=/story/components--table
+			no sorting
+		
+		https://github.com/bsssshhhhhhh/svelte-data-grid
+			no sorting(?)
+
+		https://tachyons.io/components/tables/striped-dark/index.html
+			meh
+			
+		https://headlessui.dev/
+			huh
+			
+		https://svelte-atoms.web.app/Table
+			nope, very basic
+
+		https://materializecss.com/
+			that's all?
+
+
+As many people said, webpack 5 has made decent performance gains, and if you are targeting modern browsers, consider replacing Babel/TS with esbuild. These should already get you pretty far. 
+
+
+
+
+
+
+
+https://necolas.github.io/normalize.css/
+	hmm, more reasonable than https://github.com/tailwindcss ?
+	
+
+https://glitch.com/create
+http://nymph.io/
+https://markodenic.com/use-console-log-like-a-pro/
+https://svelte.nodegui.org/docs/guides/tutorial/
+	https://github.com/bradyjoslin/svelte-nodegui-wasm-starter
+https://www.w3schools.com/w3css/w3css_intro.asp
+https://daml.com/
+
+
+
+sticky nav
+	?
+		```
+			nav {
+				position: sticky;
+				top: 0px;
+			}
+
+		```
+
+https://medium.com/hypefactors/busting-spa-chunk-cache-for-active-users-after-a-deploy-a9a06242edb1
+
+
+
+
+
+
+https://github.com/kolodziejczak-sz/svelte-redux-connect#readme
+
+
+
+
+
+
+
+
+https://pyodide.org/en/stable/
+https://pypyjs.org/
+
+
+
+
+
+https://www.reddit.com/r/sveltejs/comments/morl1n/realtime_backend_for_svelte_projects/
+
+	https://supabase.io/
+	https://appwrite.io/
+
+https://www.swyx.io/svelte-amplify-datastore/#graphql-as-contract
+
+
+
+
+https://medium.com/dailyjs/stop-painful-javascript-debug-and-embrace-intellij-with-source-map-6fe68eda8555
+
+nice "linux terminal" div class
+	https://tecadmin.net/how-to-install-python-3-9-on-ubuntu-18-04/

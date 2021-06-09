@@ -204,3 +204,44 @@ guis
 	
 
 
+https://myrepos.branchable.com/
+
+
+https://github.com/jbalint/banshee-sympatico/blob/master/git_repo_monitor/src/main.rs
+
+
+
+github requires you to generate a different deploy key for each submodule. Because FUCK YOU. Supposedly, having something like this in ~/.ssh/config should help:
+	```
+	
+  Host github.com
+  User git
+  Hostname github.com
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/id_ed25519
+  IdentityFile ~/.ssh/id_ed25519_2
+  IdentityFile ~/.ssh/id_ed25519_3
+	
+	```
+	
+in practice, FUCK YOU:
+
+Having multiple IdentityFiles doesn't work in the dual git account case, because ssh will retry until one key is accepted. Since both keys are accepted by github.com, ssh will stop at the first one. After this authentication, git proceeds to try to access some resource on the host, and only at this point does the authentication fail. As far as ssh is concerned, the operation was successful. Unfortunately. 
+	
+	
+	
+```GIT_SSH_COMMAND='ssh -i /root/.ssh/id_ed25519_3 -o IdentitiesOnly=yes' git submodule update --init```
+
+
+or FUCK YOU like this: https://gist.github.com/gubatron/d96594d982c5043be6d4
+
+or rather switch to gitlab. Or create a new github account for your server(s).
+
+
+
+
+
+https://www.conventionalcommits.org/en/v1.0.0/
+
+
+
