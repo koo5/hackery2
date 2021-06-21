@@ -1,1 +1,6 @@
 https://www.amazon.com/Kingwin-Adapter-Drives-Play-Supports-Transfer/dp/B0064VP73O/ref=cm_cr_arp_d_product_top?ie=UTF8
+
+
+
+
+The pattern that is particularly concerning to me when choosing a format to publish my reviews in, is that the formats that Google invented on their own have changed the most often. Over the years, Google has gone from recommending uploading a text file, to parsing RDFa with a slightly modified Microformats vocabulary, to going all-in on Microdata, to then replacing Microdata with JSON-LD and the new Schema.org vocabulary. In the mean time, the Microformats hReview vocabulary hasn't changed, and has continued to be parsed by Google since it is so widely deployed. It would seem there is some advantage to using a format that was developed externally from Google, since they are unable to simply turn their backs on it and replace it with a new format whenever they want.
