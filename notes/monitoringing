@@ -9,6 +9,11 @@ alerting
 	https://discourse.sensu.io/t/alerting-solution/2112
 
 
+plotting / dashboard
+	https://grafana.com/
+	https://nasa.github.io/openmct/
+	
+
 
 todo:
 	https://en.wikipedia.org/wiki/Cacti_(software)
@@ -18,7 +23,6 @@ todo:
 	https://www.nomadproject.io/docs/integrations/consul-integration
 	https://hub.docker.com/r/mattogodoy/omni
 	https://www.zabbix.com/
-	https://grafana.com/
 	https://github.com/netdata/netdata/wiki
 	https://www.influxdata.com/integration/alerta/
 	https://alerta.io/
