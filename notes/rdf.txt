@@ -967,3 +967,18 @@ URI vs URL:
 	```
 	- http://www.dfki.uni-kl.de/~sauermann/2006/01-pimo-report/pimOntologyLanguageReport.html
 
+
+
+
+
+
+
+
+Web3 stuff
+	theGraph
+		- index IPFS-stored data
+		https://github.com/graphprotocol/everest/tree/bbfc5296fbbe3f3323c4e385d105af0a4244681f
+		
+	https://comunica.dev/
+		...
+
