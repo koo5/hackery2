@@ -38,12 +38,19 @@ item_is_not_used(X, Used_Item) :-
 	X \= Used_Item,
 	X = p(A,B),
 	Used_Item \= p(B,A).
-		
+
 
 finish(Used) :-
 	start(p(_,B)),
 	length(Used,9),
-	path(Used,Used,B,_C)/*,
-	writeq(Used),nl*/.
+	path(Used,Used,B,_C).
 
-:- findall(_,(setof(Used,finish(Used),Useds),maplist(writeln,Useds)),_).
+
+allsols :-
+	findall(_,(finish(Used),writeln(Used)),_).
+
+
+allsols2 :-
+	findall(_,(setof(Used,finish(Used),Useds),maplist(writeln,Useds)),_).
+	
+
