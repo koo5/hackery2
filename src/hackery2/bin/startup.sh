@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+echo "hello `date`" | systemd-cat
 bash -v "$DIR/startup2.sh"
 ping 8.8.8.8
 cat
