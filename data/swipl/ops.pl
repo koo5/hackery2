@@ -3,4 +3,5 @@
 
 :- dynamic ddd/0.
 
-x :- y.
+x :- !y.
+
