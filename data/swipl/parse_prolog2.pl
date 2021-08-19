@@ -108,15 +108,32 @@ do_import0(Ctx, _, [], Ctx).
 do_imports(_, Ctx, [], [], Ctx).
 
 
-do_imports(Cype,
+do_imports(Type,
 		   Ctx_Accum,
 		   [Specifier|Specifiers],
 		   [import{type: Type, specifier: Specifier, fn: Fn}|Imports],
 		   Ctx_Final)
 :-
 	Type = incl,
-	open_and_parse_file(Ctx_Accum, Specifier, Ctx2).
-	do_imports(Type, Ctx_FinalSpecifiers,Imports).
+	open_and_parse_file(Ctx_Accum, Specifier, _, Ctx2).
+	do_imports(Type, Ctx2, Specifiers, Imports, Ctx_Final).
+
+do_imports(Type,
+		   Ctx_Accum,
+		   [Specifier|Specifiers],
+		   [import{type: Type, specifier: Specifier, fn: Fn}|Imports],
+		   Ctx_Final)
+:-
+	Type = imp,
+	/* 
+	first directive has to be `module`. Ops declared in it will be returned.
+	does imported module see our ops?
+	*/
+	
+	open_and_parse_file(Ctx_Accum, Specifier, Exported_Ctx, _).
+	do_imports(Type, Exported_Ctx, Specifiers, Imports, Ctx_Final).
+
+
 
 
 write_ast_line(Ast) :-
