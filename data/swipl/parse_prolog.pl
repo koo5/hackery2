@@ -11,26 +11,26 @@
 :- use_module(library(http/json)).
 
 :- dynamic opened_file/1.
+:- dynamic opened_file/2.
 
 cmdline_main :-
 	ArgSpec = [
 		[opt(fn), type(atom), shortflags([f]), longflags([fn]),
-			help('prolog term -- the main .pl file of your codebase')]],
+			help('the main .pl file of your codebase')]],
 	current_prolog_flag(argv, Args),
 	opt_parse(ArgSpec , Args, Opts, []),
-	memberchk(fn(Fn0), Opts),
-	term_string(Fn, Fn0),
+	memberchk(fn(Fn), Opts),
 	run(Fn).
 
 run(Source_File_Specifier) :-
-	open_and_parse_file([], Source_File_Specifier, _).
+	open_and_parse_file(Source_File_Specifier,_).
 
-open_and_parse_file(Ctx_Accum, Source_File_Specifier, Ctx_Final) :-
+open_and_parse_file(Source_File_Specifier,Fn) :-
 	(	exists_source(Source_File_Specifier, Fn)
-	->	open_and_parse_file2(Ctx_Accum, Fn, Ctx_Final)
-	;	throw(err('doesnt look like something i can load', Source_File_Specifier))).
+	->	open_and_parse_file2(Fn)
+	;	Fn = error("doesn't look like something i can load:")).
 	
-open_and_parse_file2(Ctx_Accum, Fn, Ctx_Final) :-	
+open_and_parse_file2(Fn) :-	
 	(	opened_file(Fn)
 	->	true
 	;	(
@@ -39,20 +39,17 @@ open_and_parse_file2(Ctx_Accum, Fn, Ctx_Final) :-
 				(
 					assert(opened_file(Fn)),
 					debug(parse_prolog(files), 'now reading ~q', [Fn]),
-					read_src(In,Ast,Ctx_Accum,Ctx_Final),
+					read_src(In,Ast),
+					assert(opened_file(Fn,Ast)),
+					%maplist(write_ast_line,Ast),
+					true
 				),
 				close(In)
 			)
 		)
 	).
 
-ctx_ops(Ctx) :-
-	findall(Op, member(op(Op), Ctx), Ops).
-
-read_src(_,[end],Ctx,Ctx).
-
-read_src(In,[Clause|Tail],Ctx_Accum,Ctx_Final) :-
-	ctx_ops(Ctx_Accum, Ops),
+read_src(In,[Clause|Tail]) :-
 	prolog_read_source_term(In, Term, Expanded,
 				[ variable_names(Vars),
 				  term_position(Start),
@@ -71,52 +68,41 @@ read_src(In,[Clause|Tail],Ctx_Accum,Ctx_Final) :-
 	},
 	write_ast_line(Clause0),
 	dif(Expanded, end_of_file),
-	do_import0(Ctx_Accum, Expanded, Imports, Ctx2),
+	recurse(Expanded, Imports),
 	Clause = Clause0.put(imports, Imports),
 	!,
-	read_src(In,Tail,Ctx2,Ctx_Final).
+	read_src(In,Tail).
 	
-do_import0(Ctx_Accum, X, Imports, Ctx_Final) :-
+read_src(_,[end]) :- true.
+
+recurse(X, Imports) :-
 	(
 		(
 			X = ':-'(Specifiers),
-			is_list(Specifiers),
-			Type = incl
+			is_list(Specifiers)
 		)
 	;	(
 			X = ':-'(use_module(Specifiers)),
-			is_list(Specifiers),
-			Type = imp
+			is_list(Specifiers)
 		)
 	;	(
 			X = ':-'(use_module(Specifier)),
 			\+is_list(Specifier),
-			Type = imp
+			Specifiers = [Specifier]
 		)
 	;	(
 			/* we dont care about explicit import lists. Resolving predicate names or somesuch is out of scope of this script. */
 			X = ':-'(use_module(Specifier,_Imports)),
-			Type = imp
+			Specifiers = [Specifier]
 		)
 	),
-	do_imports(Type, Ctx_Accum, Specifiers, Imports, Ctx_Final),
-	!.
+	!,
+	maplist(make_import,Specifiers,Imports).
 	
-do_import0(Ctx, _, [], Ctx).	
+recurse(_, []) :- true.	
 
-
-do_imports(_, Ctx, [], [], Ctx).
-
-
-do_imports(Cype,
-		   Ctx_Accum,
-		   [Specifier|Specifiers],
-		   [import{type: Type, specifier: Specifier, fn: Fn}|Imports],
-		   Ctx_Final)
-:-
-	Type = incl,
-	open_and_parse_file(Ctx_Accum, Specifier, Ctx2).
-	do_imports(Type, Ctx_FinalSpecifiers,Imports).
+make_import(Specifier,import(Specifier,Fn)) :-
+	open_and_parse_file(Specifier,Fn).
 
 
 write_ast_line(Ast) :-
