@@ -7,20 +7,11 @@
 :- use_module(library(prolog_source)).
 :- use_module(library(pprint)).
 :- use_module(library(listing)).
-:- use_module(library(record)).
 :- use_module(library(apply)).
+:- use_module(library(http/json)).
 
-:- record
-	clause(term,			% The term itself
-	       expanded,
-	       variables,		% its variables
-	       input,			% source-stream
-	       start,			% stream-position at start
-	       layout,			% complete layout
-	       comment).		% list of comments
-
-:- dynamic loaded_file/1.
-:- dynamic loaded_file/2.
+:- dynamic opened_file/1.
+:- dynamic opened_file/2.
 
 cmdline_main :-
 	ArgSpec = [
@@ -40,16 +31,17 @@ open_and_parse_file(Source_File_Specifier,Fn) :-
 	;	Fn = error("doesn't look like something i can load:")).
 	
 open_and_parse_file2(Fn) :-	
-	(	loaded_file(Fn)
+	(	opened_file(Fn)
 	->	true
 	;	(
 			setup_call_cleanup(
 				open(Fn, read, In),
 				(
-					assert(loaded_file(Fn)),
+					assert(opened_file(Fn)),
+					debug(parse_prolog(files), 'now reading ~q', [Fn]),
 					read_src(In,Ast),
-					assert(loaded_file(Fn,Ast)),
-					maplist(write_ast_line,Ast),
+					assert(opened_file(Fn,Ast)),
+					%maplist(write_ast_line,Ast),
 					true
 				),
 				close(In)
@@ -57,39 +49,31 @@ open_and_parse_file2(Fn) :-
 		)
 	).
 
-write_ast_line(Ast) :-
-	writeq(Ast),
-	nl.
-
-read_src(In,[(Clause, Imports)|Tail]) :-
+read_src(In,[Clause|Tail]) :-
 	prolog_read_source_term(In, Term, Expanded,
 				[ variable_names(Vars),
 				  term_position(Start),
 				  subterm_positions(Layout),
-				  comments(Comment)
+				  comments(Comment),
+				  operators(Ops)
 				]),
-	make_clause([ term(Term),
-			  expanded(Expanded),
-		      variables(Vars),
-		      input(In),
-		      start(Start),
-		      layout(Layout),
-		      comment(Comment)
-		    ], Clause),
-	%writeq(Clause),
-	assertion(nonvar(Clause)),
-	writeq(Expanded),
-	nl,nl,
+	Clause0 = clause{
+              term:(Term),
+			  expanded:(Expanded),
+		      variables:(Vars),
+		      input:(In),
+		      start:(Start),
+		      layout:(Layout),
+		      comment:(Comment)
+	},
+	write_ast_line(Clause0),
 	dif(Expanded, end_of_file),
 	recurse(Expanded, Imports),
+	Clause = Clause0.put(imports, Imports),
 	!,
 	read_src(In,Tail).
 	
-read_src(_,[]) :- true.
-
-
-
-/* we dont care about imports. Resolving predicate names or somesuch is out of scope of this script. */
+read_src(_,[end]) :- true.
 
 recurse(X, Imports) :-
 	(
@@ -107,6 +91,7 @@ recurse(X, Imports) :-
 			Specifiers = [Specifier]
 		)
 	;	(
+			/* we dont care about explicit import lists. Resolving predicate names or somesuch is out of scope of this script. */
 			X = ':-'(use_module(Specifier,_Imports)),
 			Specifiers = [Specifier]
 		)
@@ -118,6 +103,11 @@ recurse(_, []) :- true.
 
 make_import(Specifier,import(Specifier,Fn)) :-
 	open_and_parse_file(Specifier,Fn).
+
+
+write_ast_line(Ast) :-
+	json_write(user_output, Ast, [serialize_unknown(true)]),
+	nl.
 
 
 /*
@@ -164,23 +154,9 @@ koom@dev ~/work/hackery2/data/swipl (master)>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
 
-for now unused stuff from indent.pl
+for now unused stuff from indent.pl :
 
 %%	term_pi(+Term, -PI)
 
