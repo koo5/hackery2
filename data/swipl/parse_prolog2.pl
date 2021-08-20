@@ -15,6 +15,7 @@
 :- use_module(library(http/json)).
 
 :- dynamic seen/1.
+:- dynamic seeing/1.
 
 cmdline_main :-
 	ArgSpec = [
@@ -43,16 +44,22 @@ run(Source_File_Specifier) :-
 do_import(Ctx_Given, Source_File_Specifier, import{specifier: Source_File_Specifier, fn: Fn}, Ctx_Exported) :-
 	T = opened_file(Source_File_Specifier, Fn, Ctx_Exported),
 	(	seen(T)
-	->	debug(parse_prolog(files), 'seen. skipping: ~q', [Fn])
+	->	debug(parse_prolog(files), 'seen. skipping: ~q', [T])
 	;	(	exists_source(Source_File_Specifier, Fn)
-		->	setup_call_cleanup(
-				open(Fn, read, In),
-				(
-					assert(seen(T)),
-					debug(parse_prolog(files), 'now reading ~q', [Fn]),
-					read_src(Source_File_Specifier,In,_,Ctx_Given,[],Ctx_Exported)
+		->	(
+				(	seeing(Fn)
+				->	throw(err('we be cyclin\'', Source_File_Specifier))
+				;	assert(seeing(Fn))),
+				setup_call_cleanup(
+					open(Fn, read, In),
+					(
+						debug(parse_prolog(files), 'now reading ~q', [Fn]),
+						read_src(Source_File_Specifier,In,_,Ctx_Given,[],Ctx_Exported),
+						assert(seen(T))					
+					),
+					close(In)
 				),
-				close(In)
+				retractall(seeing(Fn))
 			)
 		;	throw(err('doesnt look like something i can load', Source_File_Specifier))
 		)
@@ -74,13 +81,17 @@ read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_
 	append(Ctx_at_import_site, Ctx_Local, Ctx_Current),
 	ctx_ops(Ctx_Current, Ops),
 	debug(parse_prolog(ops), 'read with ops: ~q', [Ops]),
+	push_operators(Ops),
 	prolog_read_source_term(In, Term, Expanded,
-				[ variable_names(Vars),
+				[ 
+				  syntax_errors(error),
+				  variable_names(Vars),
 				  term_position(Start),
 				  subterm_positions(Layout),
-				  comments(Comment),
-				  operators(Ops)
+				  comments(Comment)
+				  %operators(Ops)
 				]),
+	pop_operators,
 
 	Clause0 = clause{
               term:(Term),
@@ -120,20 +131,32 @@ read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_
 					exportlist_ops(PublicList, Ops_exported_from_here),
 					Ctx_Exported = Ops_exported_from_here,
 					
-					(	false%Source_File_Specifier = library(_)
+					(	Source_File_Specifier = library(_)
 					->	Clauses = []
 					;	read_src(Source_File_Specifier,In,Clauses,Ctx_at_import_site,Ctx_Local,_))
 							
 				)
 			;	(
 					/* this line isnt a module declaration, just an ordinary statement or an import */
-					(	maybe_do_imports(Ctx_Current, Expanded, Imports, Ctx_Local2)
-					->	Clause = Clause0.put(imports, Imports)
+					(	maybe_do_imports(Ctx_Current, Expanded, Imports, Imported_ops)
+					->	(	
+							Clause = Clause0.put(imports, Imports),
+							append(Ctx_Local, Imported_ops, Ctx_Local2)
+						)
 					;	(
-							Clause = Clause0,
-							Ctx_Local2 = Ctx_Local
+							(	(
+									Expanded = ':-'(Op),
+									Op = op(_,_,_)
+								)
+							->	append(Ctx_Local, [Op], Ctx_Local2)
+							;	(
+									Clause = Clause0,
+									Ctx_Local2 = Ctx_Local
+								)
+							)
 						)
 					),
+					debug(parse_prolog(ops), 'read next statement with local ops: ~q', [Ctx_Local2]),
 					read_src(Source_File_Specifier,In,Clauses,Ctx_at_import_site,Ctx_Local2,Ctx_Exported)
 				)
 			)
@@ -174,7 +197,8 @@ maybe_do_imports(Ctx_Given, X, Ast, Ctx_exported_final) :-
 			Imports = [use_module(File, ImportList)]
 		)
 	),
-	do_imports(Ctx_Given, Imports, Ast, [], Ctx_exported_final).
+	do_imports(Ctx_Given, Imports, Ast, [], Ctx_exported_final),
+	debug(parse_prolog(ops), 'imported ops: ~q', [Ctx_exported_final]).
 
 do_imports(_, [], [], Ctx_exported_final, Ctx_exported_final).
 
@@ -221,7 +245,12 @@ write_ast_line(Ast) :-
 	;	true).
 
 ctx_ops(Ctx,Ops) :-
-	findall(Op, member(op(Op), Ctx), Ops).
+	exportlist_ops(Ctx,Ops).
+
+op_matchers(except(ExceptList), ImportedOpMatchers) :-
+	!,
+	maplist(dif(X), ExceptList),
+	ImportedOpMatchers = [X].
 
 op_matchers(ImportList, ImportedOpMatchers) :-
 	(	ImportList = all
