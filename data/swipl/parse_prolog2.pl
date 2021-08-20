@@ -15,12 +15,21 @@
 cmdline_main :-
 	ArgSpec = [
 		[opt(fn), type(atom), shortflags([f]), longflags([fn]),
-			help('prolog term -- the main .pl file of your codebase')]],
+			help('file path string -- the main .pl file of your codebase')],
+		[opt(sp), type(atom), shortflags([s]), longflags([spec]),
+			help('prolog term / file specifier -- the main .pl file of your codebase')]
+	],
 	current_prolog_flag(argv, Args),
 	opt_parse(ArgSpec , Args, Opts, []),
-	memberchk(fn(Fn0), Opts),
-	term_string(Fn, Fn0),
-	run(Fn).
+	(	memberchk(fn(Fn0), Opts)
+	->	run(Fn0)
+	;	(	memberchk(sp(Fn0), Opts)
+		->	(
+				term_string(Fn, Fn0),
+				run(Fn)
+			)
+		)
+	).
 
 run(Source_File_Specifier) :-
 	do_import([], Source_File_Specifier, _, _).
@@ -36,7 +45,7 @@ do_import(Ctx_Given, Source_File_Specifier, import{specifier: Source_File_Specif
 				(
 					assert(opened_file(Fn)),
 					debug(parse_prolog(files), 'now reading ~q', [Fn]),
-					read_src(In,[],Ctx_Given,Ctx_Local,Ctx_Exported),
+					read_src(In,_,Ctx_Given,[],Ctx_Exported)
 				),
 				close(In)
 			)
@@ -56,7 +65,7 @@ Ctx_Exported returns ops to be "added" at import site.
 */
 
 
-read_src(In, [Clause|Clauses], Ctx_at_import_site, Ctx_Local, Ctx_Exported) :-
+read_src(/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_import_site, /*+*/Ctx_Local, /*-*/Ctx_Exported) :-
 	append(Ctx_at_import_site, Ctx_Local, Ctx_Current),
 	ctx_ops(Ctx_Current, Ops),
 
@@ -72,7 +81,7 @@ read_src(In, [Clause|Clauses], Ctx_at_import_site, Ctx_Local, Ctx_Exported) :-
               term:(Term),
 			  expanded:(Expanded),
 		      variables:(Vars),
-		      input:(In),
+		      %input:(In),
 		      start:(Start),
 		      layout:(Layout),
 		      comment:(Comment)
@@ -91,7 +100,7 @@ read_src(In, [Clause|Clauses], Ctx_at_import_site, Ctx_Local, Ctx_Exported) :-
 			->	throw(not_supported_yet(Expanded))
 			;	true),
 
-			(	Expanded = ':-'(module(_Name))
+			(	Expanded = ':-'(module(_))
 			->	throw(not_supported_yet(Expanded))
 			;	true),
 
@@ -100,9 +109,10 @@ read_src(In, [Clause|Clauses], Ctx_at_import_site, Ctx_Local, Ctx_Exported) :-
 			when it is a plain file, all ops declared within are passed back
 			*/
 			
-			(	Expanded = ':-'(module(_Name, PublicList))
+			(	Expanded = ':-'(module(_, PublicList))
 			->	(
-					Ctx_Exported = PublicList
+					Ctx_Exported = PublicList,
+					Ctx_Local2 = Ctx_Local
 				)
 			;	(
 					/* this line isnt a module declaration, just an ordinary statement or an import */
@@ -132,7 +142,7 @@ imports(Import)
 */
 	
 	
-maybe_do_imports(Ctx_Given, X, Ast, Ctx_Final) :-
+maybe_do_imports(Ctx_Given, X, Ast, Ctx_exported_final) :-
 	(
 		(
 			X = ':-'(use_module(Files)),
@@ -168,12 +178,12 @@ do_imports(Ctx_Given,
 		   Ctx_exported_final)
 :-
 	'append exported ops to context'(Ctx_Given, Ctx_Exported, Ctx_Local),
-	do_import(Ctx_Local, Specifier, Ast, ExportedOps),
+	do_import(Ctx_Local, File, Ast, ExportedOps),
 	op_matchers(ImportList, Matchers),
 	matching_exported_ops(Matchers, ExportedOps, ImportedOps),
 	debug(parse_prolog(ops), 'importing ops: ~q', [ImportedOps]),
 	'append exported ops to context'(Ctx_Exported, ImportedOps, Ctx_Middle),
-	do_imports(Ctx_Given, Specifiers, Asts, Ctx_Middle, Ctx_Final).
+	do_imports(Ctx_Given, Specifiers, Asts, Ctx_Middle, Ctx_exported_final).
 
 
 'append exported ops to context'(Ctx_Accum, Export_List, Ctx_Middle) :-
@@ -182,25 +192,26 @@ do_imports(Ctx_Given,
 
 
 exportlist_ops(Export_List, Ops) :-
-	setof(
+	findall(
 		Op,
 		(
-			membeer(Op, Export_List),
+			member(Op, Export_List),
 			(
 				Op = op(_,_,_)
 			;
 				Op = op(_,_)
 			)
 		),
-		Ops
-	).
+		Ops0
+	),
+	sort(Ops0, Ops).
 
 
 write_ast_line(Ast) :-
 	json_write(user_output, Ast, [serialize_unknown(true)]),
 	nl.
 
-ctx_ops(Ctx) :-
+ctx_ops(Ctx,Ops) :-
 	findall(Op, member(op(Op), Ctx), Ops).
 
 op_matchers(ImportList, ImportedOpMatchers) :-
@@ -209,14 +220,15 @@ op_matchers(ImportList, ImportedOpMatchers) :-
 	;	exportlist_ops(ImportList, ImportedOpMatchers)).
 
 matching_exported_ops(Matchers, ExportedOps, ImportedOps) :-
-	setof(
-		Op,
+	findall(
+		Matcher,
 		(
 			member(Matcher, Matchers),
 			member(Matcher, ExportedOps)
 		),
-		ImportedOps
-	).
+		ImportedOps0
+	),
+	sort(ImportedOps0,ImportedOps).
 
 
 	
