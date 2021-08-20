@@ -2,6 +2,10 @@
 	this is a proof-of-concept of obtaining prolog AST, inspired by https://github.com/SWI-Prolog/packages-indent/blob/master/indent.pl
 	maybe this is doing it better: ?
 		https://www.swi-prolog.org/pldoc/doc/_SWI_/library/prolog_colour.pl?show=src#prolog_colourise_stream/3
+		
+	limitation:
+		this approach won't handle conditionally declared ops.
+		
 */
 
 :- use_module(library(prolog_source)).
@@ -10,7 +14,7 @@
 :- use_module(library(apply)).
 :- use_module(library(http/json)).
 
-:- dynamic opened_file/1.
+:- dynamic seen/1.
 
 cmdline_main :-
 	ArgSpec = [
@@ -37,21 +41,22 @@ run(Source_File_Specifier) :-
 
 
 do_import(Ctx_Given, Source_File_Specifier, import{specifier: Source_File_Specifier, fn: Fn}, Ctx_Exported) :-
-	(	exists_source(Source_File_Specifier, Fn)
-	->	(	opened_file(Fn)
-		->	true
-		;	setup_call_cleanup(
+	T = opened_file(Source_File_Specifier, Fn, Ctx_Exported),
+	(	seen(T)
+	->	debug(parse_prolog(files), 'seen. skipping: ~q', [Fn])
+	;	(	exists_source(Source_File_Specifier, Fn)
+		->	setup_call_cleanup(
 				open(Fn, read, In),
 				(
-					assert(opened_file(Fn)),
+					assert(seen(T)),
 					debug(parse_prolog(files), 'now reading ~q', [Fn]),
-					read_src(In,_,Ctx_Given,[],Ctx_Exported)
+					read_src(Source_File_Specifier,In,_,Ctx_Given,[],Ctx_Exported)
 				),
 				close(In)
 			)
+		;	throw(err('doesnt look like something i can load', Source_File_Specifier))
 		)
-	;	throw(err('doesnt look like something i can load', Source_File_Specifier))).
-	
+	).
 
 
 /*
@@ -65,10 +70,10 @@ Ctx_Exported returns ops to be "added" at import site.
 */
 
 
-read_src(/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_import_site, /*+*/Ctx_Local, /*-*/Ctx_Exported) :-
+read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_import_site, /*+*/Ctx_Local, /*-*/Ctx_Exported) :-
 	append(Ctx_at_import_site, Ctx_Local, Ctx_Current),
 	ctx_ops(Ctx_Current, Ops),
-
+	debug(parse_prolog(ops), 'read with ops: ~q', [Ops]),
 	prolog_read_source_term(In, Term, Expanded,
 				[ variable_names(Vars),
 				  term_position(Start),
@@ -111,25 +116,27 @@ read_src(/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_import_site, /*+*/Ctx_Local
 			
 			(	Expanded = ':-'(module(_, PublicList))
 			->	(
-					Ctx_Exported = PublicList,
-					Ctx_Local2 = Ctx_Local
+
+					exportlist_ops(PublicList, Ops_exported_from_here),
+					Ctx_Exported = Ops_exported_from_here,
+					
+					(	false%Source_File_Specifier = library(_)
+					->	Clauses = []
+					;	read_src(Source_File_Specifier,In,Clauses,Ctx_at_import_site,Ctx_Local,_))
+							
 				)
 			;	(
 					/* this line isnt a module declaration, just an ordinary statement or an import */
-										%'append exported ops to context'(Ctx_Accum, PublicList, Ctx_Middle1),
 					(	maybe_do_imports(Ctx_Current, Expanded, Imports, Ctx_Local2)
 					->	Clause = Clause0.put(imports, Imports)
 					;	(
 							Clause = Clause0,
 							Ctx_Local2 = Ctx_Local
 						)
-					)
+					),
+					read_src(Source_File_Specifier,In,Clauses,Ctx_at_import_site,Ctx_Local2,Ctx_Exported)
 				)
-			),
-			
-			
-			
-			read_src(In,Clauses,Ctx_at_import_site,Ctx_Local2,Ctx_Exported)
+			)
 		)
 	).
 
@@ -177,6 +184,7 @@ do_imports(Ctx_Given,
 		   Ctx_Exported,
 		   Ctx_exported_final)
 :-
+	debug(parse_prolog(files), 'import: ~q', [File]),
 	'append exported ops to context'(Ctx_Given, Ctx_Exported, Ctx_Local),
 	do_import(Ctx_Local, File, Ast, ExportedOps),
 	op_matchers(ImportList, Matchers),
@@ -208,8 +216,9 @@ exportlist_ops(Export_List, Ops) :-
 
 
 write_ast_line(Ast) :-
-	json_write(user_output, Ast, [serialize_unknown(true)]),
-	nl.
+	(	debugging(parse_prolog(ast))
+	->	json_write(user_output, Ast, [serialize_unknown(true)]),nl
+	;	true).
 
 ctx_ops(Ctx,Ops) :-
 	findall(Op, member(op(Op), Ctx), Ops).
