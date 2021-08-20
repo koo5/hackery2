@@ -23,36 +23,43 @@ cmdline_main :-
 	run(Fn).
 
 run(Source_File_Specifier) :-
-	open_and_parse_file([], Source_File_Specifier, _).
+	do_import([], Source_File_Specifier, _, _).
 
-open_and_parse_file(Ctx_Accum, Source_File_Specifier, Ctx_Final) :-
+
+
+do_import(Ctx_Given, Source_File_Specifier, import{specifier: Source_File_Specifier, fn: Fn}, Ctx_Exported) :-
 	(	exists_source(Source_File_Specifier, Fn)
-	->	open_and_parse_file2(Ctx_Accum, Fn, Ctx_Final)
-	;	throw(err('doesnt look like something i can load', Source_File_Specifier))).
-	
-open_and_parse_file2(Ctx_Accum, Fn, Ctx_Final) :-	
-	(	opened_file(Fn)
-	->	true
-	;	(
-			setup_call_cleanup(
+	->	(	opened_file(Fn)
+		->	true
+		;	setup_call_cleanup(
 				open(Fn, read, In),
 				(
 					assert(opened_file(Fn)),
 					debug(parse_prolog(files), 'now reading ~q', [Fn]),
-					read_src(In,Ast,Ctx_Accum,Ctx_Final),
+					read_src(In,[],Ctx_Given,Ctx_Local,Ctx_Exported),
 				),
 				close(In)
 			)
 		)
-	).
+	;	throw(err('doesnt look like something i can load', Source_File_Specifier))).
+	
 
-ctx_ops(Ctx) :-
-	findall(Op, member(op(Op), Ctx), Ops).
 
-read_src(_,[end],Ctx,Ctx).
+/*
+read_src(+Stream,-Ast,-Ctx_Accum,+Ctx_Final).
 
-read_src(In,[Clause|Tail],Ctx_Accum,Ctx_Final) :-
-	ctx_ops(Ctx_Accum, Ops),
+recurse on a list of clauses read from a file. 
+
+Ctx_Accum carries op declarations currently in effect.
+Ctx_Exported returns ops to be "added" at import site.
+
+*/
+
+
+read_src(In, [Clause|Clauses], Ctx_at_import_site, Ctx_Local, Ctx_Exported) :-
+	append(Ctx_at_import_site, Ctx_Local, Ctx_Current),
+	ctx_ops(Ctx_Current, Ops),
+
 	prolog_read_source_term(In, Term, Expanded,
 				[ variable_names(Vars),
 				  term_position(Start),
@@ -60,6 +67,7 @@ read_src(In,[Clause|Tail],Ctx_Accum,Ctx_Final) :-
 				  comments(Comment),
 				  operators(Ops)
 				]),
+
 	Clause0 = clause{
               term:(Term),
 			  expanded:(Expanded),
@@ -70,77 +78,148 @@ read_src(In,[Clause|Tail],Ctx_Accum,Ctx_Final) :-
 		      comment:(Comment)
 	},
 	write_ast_line(Clause0),
-	dif(Expanded, end_of_file),
-	do_import0(Ctx_Accum, Expanded, Imports, Ctx2),
-	Clause = Clause0.put(imports, Imports),
-	!,
-	read_src(In,Tail,Ctx2,Ctx_Final).
+
+	(	Expanded = end_of_file
+	->	(
+			Clause = end,
+			Ctx_Local = Ctx_Exported
+		)
+	;	
+		(
+
+			(	Expanded = ':-'(module(_, _, _Dialect))
+			->	throw(not_supported_yet(Expanded))
+			;	true),
+
+			(	Expanded = ':-'(module(_Name))
+			->	throw(not_supported_yet(Expanded))
+			;	true),
+
+			/* 
+			when the file is a module, only the explicitly exported ops are passed back to the including location
+			when it is a plain file, all ops declared within are passed back
+			*/
+			
+			(	Expanded = ':-'(module(_Name, PublicList))
+			->	(
+					Ctx_Exported = PublicList
+				)
+			;	(
+					/* this line isnt a module declaration, just an ordinary statement or an import */
+										%'append exported ops to context'(Ctx_Accum, PublicList, Ctx_Middle1),
+					(	maybe_do_imports(Ctx_Current, Expanded, Imports, Ctx_Local2)
+					->	Clause = Clause0.put(imports, Imports)
+					;	(
+							Clause = Clause0,
+							Ctx_Local2 = Ctx_Local
+						)
+					)
+				)
+			),
+			
+			
+			
+			read_src(In,Clauses,Ctx_at_import_site,Ctx_Local2,Ctx_Exported)
+		)
+	).
+
+
+/*
+imports(Import)
+    Specify what to import from the loaded module. The default for use_module/1 is all. Import is passed from the second argument of use_module/2. Traditionally it is a list of predicate indicators to import. As part of the SWI-Prolog/YAP integration, we also support Pred as Name to import a predicate under another name. Finally, Import can be the term except(Exceptions), where Exceptions is a list of predicate indicators that specify predicates that are not imported or Pred as Name terms to denote renamed predicates. See also reexport/2 and use_module/2.bug
+
+    If Import equals all, all operators are imported as well. Otherwise, operators are not imported. Operators can be imported selectively by adding terms op(Pri,Assoc,Name) to the Import list. If such a term is encountered, all exported operators that unify with this term are imported. Typically, this construct will be used with all arguments unbound to import all operators or with only Name bound to import a particular operator.
+*/
 	
-do_import0(Ctx_Accum, X, Imports, Ctx_Final) :-
+	
+maybe_do_imports(Ctx_Given, X, Ast, Ctx_Final) :-
 	(
 		(
-			X = ':-'(Specifiers),
-			is_list(Specifiers),
-			Type = incl
+			X = ':-'(use_module(Files)),
+			is_list(Files),
+			findall(use_module(F, all), member(F,Files), Imports)
 		)
 	;	(
-			X = ':-'(use_module(Specifiers)),
-			is_list(Specifiers),
-			Type = imp
+			X = ':-'(Files),
+			is_list(Files),
+			/*
+			the action of including a module seems to have the same semantics as importing it. Ops declared as exported from the module are seen in the including file, while ops declared in the body are not.
+			*/
+			findall(use_module(F, all), member(F,Files), Imports)
 		)
 	;	(
-			X = ':-'(use_module(Specifier)),
-			\+is_list(Specifier),
-			Type = imp
+			X = ':-'(use_module(File)),
+			\+is_list(File),
+			Imports = [use_module(File, all)]
 		)
 	;	(
-			/* we dont care about explicit import lists. Resolving predicate names or somesuch is out of scope of this script. */
-			X = ':-'(use_module(Specifier,_Imports)),
-			Type = imp
+			X = ':-'(use_module(File, ImportList)),
+			Imports = [use_module(File, ImportList)]
 		)
 	),
-	do_imports(Type, Ctx_Accum, Specifiers, Imports, Ctx_Final),
-	!.
-	
-do_import0(Ctx, _, [], Ctx).	
+	do_imports(Ctx_Given, Imports, Ast, [], Ctx_exported_final).
 
+do_imports(_, [], [], Ctx_exported_final, Ctx_exported_final).
 
-do_imports(_, Ctx, [], [], Ctx).
-
-
-do_imports(Type,
-		   Ctx_Accum,
-		   [Specifier|Specifiers],
-		   [import{type: Type, specifier: Specifier, fn: Fn}|Imports],
-		   Ctx_Final)
+do_imports(Ctx_Given,
+		   [use_module(File, ImportList)|Specifiers],
+		   [Ast|Asts],
+		   Ctx_Exported,
+		   Ctx_exported_final)
 :-
-	Type = incl,
-	open_and_parse_file(Ctx_Accum, Specifier, _, Ctx2).
-	do_imports(Type, Ctx2, Specifiers, Imports, Ctx_Final).
-
-do_imports(Type,
-		   Ctx_Accum,
-		   [Specifier|Specifiers],
-		   [import{type: Type, specifier: Specifier, fn: Fn}|Imports],
-		   Ctx_Final)
-:-
-	Type = imp,
-	/* 
-	first directive has to be `module`. Ops declared in it will be returned.
-	does imported module see our ops?
-	*/
-	
-	open_and_parse_file(Ctx_Accum, Specifier, Exported_Ctx, _).
-	do_imports(Type, Exported_Ctx, Specifiers, Imports, Ctx_Final).
+	'append exported ops to context'(Ctx_Given, Ctx_Exported, Ctx_Local),
+	do_import(Ctx_Local, Specifier, Ast, ExportedOps),
+	op_matchers(ImportList, Matchers),
+	matching_exported_ops(Matchers, ExportedOps, ImportedOps),
+	debug(parse_prolog(ops), 'importing ops: ~q', [ImportedOps]),
+	'append exported ops to context'(Ctx_Exported, ImportedOps, Ctx_Middle),
+	do_imports(Ctx_Given, Specifiers, Asts, Ctx_Middle, Ctx_Final).
 
 
+'append exported ops to context'(Ctx_Accum, Export_List, Ctx_Middle) :-
+	exportlist_ops(Export_List, ImportedOps),
+	append(Ctx_Accum, ImportedOps, Ctx_Middle).
+
+
+exportlist_ops(Export_List, Ops) :-
+	setof(
+		Op,
+		(
+			membeer(Op, Export_List),
+			(
+				Op = op(_,_,_)
+			;
+				Op = op(_,_)
+			)
+		),
+		Ops
+	).
 
 
 write_ast_line(Ast) :-
 	json_write(user_output, Ast, [serialize_unknown(true)]),
 	nl.
 
+ctx_ops(Ctx) :-
+	findall(Op, member(op(Op), Ctx), Ops).
 
+op_matchers(ImportList, ImportedOpMatchers) :-
+	(	ImportList = all
+	->	ImportedOpMatchers = [_]
+	;	exportlist_ops(ImportList, ImportedOpMatchers)).
+
+matching_exported_ops(Matchers, ExportedOps, ImportedOps) :-
+	setof(
+		Op,
+		(
+			member(Matcher, Matchers),
+			member(Matcher, ExportedOps)
+		),
+		ImportedOps
+	).
+
+
+	
 /*
 it works like this right now:
 
