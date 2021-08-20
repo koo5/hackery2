@@ -89,7 +89,7 @@ read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_
 				  term_position(Start),
 				  subterm_positions(Layout),
 				  comments(Comment)
-				  %operators(Ops)
+				  %,operators(Ops)
 				]),
 	pop_operators,
 
