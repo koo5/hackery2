@@ -13,6 +13,7 @@
 :- use_module(library(listing)).
 :- use_module(library(apply)).
 :- use_module(library(http/json)).
+:- use_module(library(prolog_source), [expand/4]).
 
 :- dynamic seen/1.
 :- dynamic seeing/1.
@@ -82,6 +83,8 @@ read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_
 	ctx_ops(Ctx_Current, Ops),
 	debug(parse_prolog(ops), 'read with ops: ~q', [Ops]),
 	push_operators(Ops),
+
+/*
 	prolog_read_source_term(In, Term, Expanded,
 				[ 
 				  syntax_errors(error),
@@ -91,6 +94,19 @@ read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_
 				  comments(Comment)
 				  %,operators(Ops)
 				]),
+*/
+
+	read_clause(In, Term,
+				[ 
+				  syntax_errors(error),
+				  variable_names(Vars),
+				  term_position(Start),
+				  subterm_positions(Layout),
+				  comments(Comment)
+				]),
+
+	expand(Term, Layout, In, Expanded),
+
 	pop_operators,
 
 	Clause0 = clause{
