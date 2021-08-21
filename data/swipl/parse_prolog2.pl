@@ -1,11 +1,27 @@
 /*
 	this is a proof-of-concept of obtaining prolog AST, inspired by https://github.com/SWI-Prolog/packages-indent/blob/master/indent.pl
-	maybe this is doing it better: ?
-		https://www.swi-prolog.org/pldoc/doc/_SWI_/library/prolog_colour.pl?show=src#prolog_colourise_stream/3
+	
+	alternatives:
+		https://github.com/lodgeit-labs/FOL_solvers/blob/tracer1/wiki/SWIPL-and-prolog-notes.md#parsing-prolog-code
 		
-	limitation:
-		this approach won't handle conditionally declared ops.
+	limitations:
+		there isnt any logic to implement conditional compilation (`:- if ...`), so this won't handle conditionally declared ops .
 		
+	nomenclature:
+		import:
+			use_module(....
+		include:
+			:- [file1,...
+
+	wontfix?:
+		cyclic includes:
+			swipl itself chokes on cyclic includes
+		
+	todo:
+		representation of parsed code:
+		
+		
+
 */
 
 :- use_module(library(prolog_source)).
@@ -41,44 +57,48 @@ run(Source_File_Specifier) :-
 	do_import([], Source_File_Specifier, _, _).
 
 
-
 do_import(Ctx_Given, Source_File_Specifier, import{specifier: Source_File_Specifier, fn: Fn}, Ctx_Exported) :-
-	T = opened_file(Source_File_Specifier, Fn, Ctx_Exported),
+	T = seen(Source_File_Specifier, Fn, Ctx_Exported),
 	(	seen(T)
-	->	debug(parse_prolog(files), 'seen. skipping: ~q', [T])
+	->	debug(parse_prolog(seen), 'seen. skipping: ~q', [T])
 	;	(	exists_source(Source_File_Specifier, Fn)
 		->	(
-				(	seeing(Fn)
+				/*(	seeing(Fn)
 				->	throw(err('we be cyclin\'', Source_File_Specifier))
-				;	assert(seeing(Fn))),
+				;	true)*/
+				%assert(seeing(Fn)),
 				setup_call_cleanup(
 					open(Fn, read, In),
 					(
 						debug(parse_prolog(files), 'now reading ~q', [Fn]),
-						read_src(Source_File_Specifier,In,_,Ctx_Given,[],Ctx_Exported),
+						read_src(Source_File_Specifier,Fn,In,_,Ctx_Given,[],Ctx_Exported),
 						assert(seen(T))					
 					),
 					close(In)
 				),
 				retractall(seeing(Fn))
 			)
-		;	throw(err('doesnt look like something i can load', Source_File_Specifier))
+		;	(
+				/* https://github.com/SWI-Prolog/swipl-devel/issues/715 ?
+				or this looks more like i fail to give exists_source a path to start from? */
+				(	member(Source_File_Specifier, [clpq/bv_q,clpq/fourmotz_q,clpq/ineq_q,clpq/itf_q,clpq/nf_q,clpq/store_q,clpqr/class,clpqr/dump,clpqr/geler,clpqr/itf,clpqr/ordering,clpqr/project,clpqr/redund])
+				->	(
+						Ctx_Exported = [],
+						debug(parse_prolog(files), 'ignoring unimportable specifier: ~q', [Source_File_Specifier])
+					)
+				;	throw(err('doesnt look like something i can load', Source_File_Specifier))
+				)
+			)
 		)
 	).
 
 
+
 /*
-read_src(+Stream,-Ast,-Ctx_Accum,+Ctx_Final).
-
 recurse on a list of clauses read from a file. 
-
-Ctx_Accum carries op declarations currently in effect.
-Ctx_Exported returns ops to be "added" at import site.
-
 */
 
-
-read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_import_site, /*+*/Ctx_Local, /*-*/Ctx_Exported) :-
+read_src(/*+*/Source_File_Specifier,/*+*/Fn,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_import_site, /*+*/Ctx_Local, /*-*/Ctx_Exported) :-
 	append(Ctx_at_import_site, Ctx_Local, Ctx_Current),
 	ctx_ops(Ctx_Current, Ops),
 	debug(parse_prolog(ops), 'read with ops: ~q', [Ops]),
@@ -147,9 +167,24 @@ read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_
 					exportlist_ops(PublicList, Ops_exported_from_here),
 					Ctx_Exported = Ops_exported_from_here,
 					
-					(	Source_File_Specifier = library(_)
+					/* cut off right after module declaration, if this is a library, as opposed to user code? */
+					(	false%Source_File_Specifier = library(_)
 					->	Clauses = []
-					;	read_src(Source_File_Specifier,In,Clauses,Ctx_at_import_site,Ctx_Local,_))
+					;	(
+							(	seeing(Fn)
+							->	(
+									debug(parse_prolog(files), 'cycle detected, not reading body of module ~q now.', [Fn]),
+									Clauses = []
+								)
+							;	(
+									assert(seeing(Fn)),
+									append(Ctx_Local, Ops_exported_from_here, Ctx_Local2),
+									read_src(Source_File_Specifier,Fn,In,Clauses,Ctx_at_import_site,Ctx_Local2,_)
+								)
+							)
+						)
+					)
+						
 							
 				)
 			;	(
@@ -173,7 +208,7 @@ read_src(/*+*/Source_File_Specifier,/*+*/In, /*-*/[Clause|Clauses], /*+*/Ctx_at_
 						)
 					),
 					debug(parse_prolog(ops), 'read next statement with local ops: ~q', [Ctx_Local2]),
-					read_src(Source_File_Specifier,In,Clauses,Ctx_at_import_site,Ctx_Local2,Ctx_Exported)
+					read_src(Source_File_Specifier,Fn,In,Clauses,Ctx_at_import_site,Ctx_Local2,Ctx_Exported)
 				)
 			)
 		)
@@ -224,7 +259,7 @@ do_imports(Ctx_Given,
 		   Ctx_Exported,
 		   Ctx_exported_final)
 :-
-	debug(parse_prolog(files), 'import: ~q', [File]),
+	debug(parse_prolog(imports), 'import: ~q', [File]),
 	'append exported ops to context'(Ctx_Given, Ctx_Exported, Ctx_Local),
 	do_import(Ctx_Local, File, Ast, ExportedOps),
 	op_matchers(ImportList, Matchers),
