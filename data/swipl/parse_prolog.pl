@@ -1,3 +1,5 @@
+:- write('continued in: https://github.com/lodgeit-labs/FOL_solvers/tree/tracer1/prolog/parse_prolog'),halt.
+
 /*
 	this is a proof-of-concept of obtaining prolog AST, inspired by https://github.com/SWI-Prolog/packages-indent/blob/master/indent.pl
 	maybe this is doing it better: ?
