@@ -2,3 +2,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 bash -v "$DIR/update-yum2"
 
+
+#sudo cp ~/hackery2/src/data/sudoers.d/README /etc/sudoers.d/hackery
+#sudo chmod 0440 /etc/sudoers.d/hackery
+#sudo powertop --auto-tune
+# https://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
+# https://blog.mafr.de/2016/10/22/detecting-security-upgrades-on-ubuntu/
+#apt install debian-goodies needrestart reboot-notifier
+

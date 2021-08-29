@@ -87,11 +87,11 @@ Last-Update: 2021-02-21
              FLAG_UNSET (c->flags, CLIENT_FLAG_DEMANDS_ATTENTION);
          }
          clientSetNetState (c);
--        clientAdjustFullscreenLayer (c, TRUE);
-+//        clientAdjustFullscreenLayer (c, TRUE);
-         frameQueueDraw (c, FALSE);
-         clientUpdateOpacity (c);
-     }
+-        restacked = clientAdjustFullscreenLayer (c, TRUE);
++        restacked = true;//        clientAdjustFullscreenLayer (c, TRUE);
+
+         if (!restacked && screen_info->params->raise_on_focus)
+         {
 --- xfwm4-4.12.5.orig/src/misc.c
 +++ xfwm4-4.12.5/src/misc.c
 @@ -28,6 +28,7 @@

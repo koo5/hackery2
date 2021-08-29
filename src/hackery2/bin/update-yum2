@@ -1,24 +1,16 @@
 #!/usr/bin/env bash
 set -x
-#sudo cp ~/hackery2/src/data/sudoers.d/README /etc/sudoers.d/hackery
-#sudo chmod 0440 /etc/sudoers.d/hackery
-
-#sudo powertop --auto-tune
 
 sudo ntpdate  -v  ntp.ubuntu.com &&
 {
-{
-sudo aptdcon --refresh &&
-sudo unattended-upgrade #--debug
-} ||
-sudo yum update  -y --security
+	{
+		sudo aptdcon --refresh &&
+		sudo unattended-upgrade --debug
+	} ||
+	sudo yum update  -y --security
 } && {
-#apt install debian-goodies needrestart reboot-notifier
-/usr/lib/update-notifier/apt-check --human-readable ||
-#checkrestart -v ||
-needrestart
+	checkrestart -v && 
+	needrestart &&
+	/usr/lib/update-notifier/apt-check --human-readable 
 }
 
-
-# https://askubuntu.com/questions/441921/why-does-usr-lib-update-notifier-apt-check-not-agree-with-apt-get-upgrade
-# https://blog.mafr.de/2016/10/22/detecting-security-upgrades-on-ubuntu/
