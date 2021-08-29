@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 import os, time, sys
 while True:
 	os.system("scrot  -q 80 " +sys.argv[1]+"/$(date +%Y%m%d%H%M%S).png")

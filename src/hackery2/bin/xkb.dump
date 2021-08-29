@@ -1068,7 +1068,7 @@ xkb_compatibility "complete" {
     };
 };
 
-xkb_symbols "pc+us(colemak)+inet(evdev)+terminate(ctrl_alt_bksp)" {
+xkb_symbols "pc+us(colemak)+inet(evdev)+terminate(ctrl_alt_bksp)+keypad(pointerkeys)" {
 
     name[group1]="English (Colemak)";
 
