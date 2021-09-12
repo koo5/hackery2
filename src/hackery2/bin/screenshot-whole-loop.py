@@ -4,6 +4,7 @@ i = 0
 # folder, delay, scrot args
 while True:
 	os.system("scrot  -q 0  " +sys.argv[3]+ " " +  sys.argv[1]+"/$(date +%Y%m%d%H%M%S).png")
+#	os.system('geeqie -r --first')
 
 
 

@@ -9,8 +9,8 @@ sudo ntpdate  -v  ntp.ubuntu.com &&
 	} ||
 	sudo yum update  -y --security
 } && {
-	checkrestart -v && 
-	needrestart &&
-	/usr/lib/update-notifier/apt-check --human-readable 
+	sudo checkrestart -v && 
+	needrestart 
+	#&& /usr/lib/update-notifier/apt-check --human-readable 
 }
 
