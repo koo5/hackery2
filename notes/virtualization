@@ -77,3 +77,39 @@ https://medium.com/kata-containers
 guestmount -a path_to_image.qcow2 -i --ro /mount_point # safe, read only
 guestmount -a path_to_image.qcow2 -i /mount_point # use only on not running vm image
 guestmount utility can be found in libguestfs-tools package (on Debian and RHEL).
+
+
+
+
+
+
+
+
+
+
+
+# vm image formats
+is sparse raw worth the theoretic speed increase over qcow2?
+
+time ssh -p 44  -c  aes128-ctr    10.0.0.20   /home/koom/schily-2021-09-01/star/OBJ/x86_64-linux-gcc/star -c -v -sparse -force-hole /mx500data/lean/images/ubuntu20.10.raw | tar -x
+
+star -c -sparse without -force-hole is slow
+
+
+
+
+
+
+
+
+
+
+
+# networking
+iperf3 -c 192.168.8.8 -p 8080 -R -t 10000
+/ssh-cipher-benchmark.sh 10.0.0.20
+
+ssh -p 44  -c  aes128-ctr  -o Compression=no  10.0.0.20
+
+https://utcc.utoronto.ca/~cks/space/blog/sysadmin/SshSpeed?showcomments#comments
+
