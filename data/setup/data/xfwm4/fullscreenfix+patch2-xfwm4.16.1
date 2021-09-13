@@ -1,0 +1,154 @@
+diff --git a/./focus.c b/home/koom/2/xfwm4-333/src/focus.c
+index 18cbcf5..90c0b88 100644
+--- a/./focus.c
++++ b/home/koom/2/xfwm4-333/src/focus.c
+@@ -30,6 +30,7 @@
+ #include <X11/Xutil.h>
+ #include <X11/Xatom.h>
+ #include <X11/extensions/shape.h>
++#include <X11/extensions/Xrandr.h>
+ 
+ #include <glib.h>
+ #include <gdk/gdk.h>
+@@ -210,7 +211,7 @@ clientFocusNew(Client * c)
+     {
+         if (client_focus)
+         {
+-            clientAdjustFullscreenLayer (client_focus, FALSE);
++            //clientAdjustFullscreenLayer (client_focus, FALSE);
+         }
+         clientRaise (c, None);
+         clientShow (c, TRUE);
+@@ -285,6 +286,32 @@ clientSelectMask (Client * c, Client *other, guint mask, guint type)
+     {
+         return FALSE;
+     }
++
++    if (1)
++    {
++        int i;
++        int monitor_count;
++        XRRMonitorInfo *monitors;
++
++        monitors = XRRGetMonitors(clientGetXDisplay(c), c->window, True, &monitor_count);
++
++        for (i = 0; i < monitor_count; i++)
++        {
++            if (cursorInMonitor(monitors + i, c->screen_info) && clientInMonitor(monitors + i, c))
++            {
++                break;
++            }
++        }
++
++        if (i == monitor_count)
++        {
++            return FALSE;
++        }
++
++        XRRFreeMonitors(monitors);
++    } 
++    
++    
+     if (c->type & type)
+     {
+         return TRUE;
+@@ -505,7 +532,7 @@ clientUpdateFocus (ScreenInfo *screen_info, Client * c, unsigned short flags)
+     if (c2)
+     {
+         clientSetNetState (c2);
+-        clientAdjustFullscreenLayer (c2, FALSE);
++        //clientAdjustFullscreenLayer (c2, FALSE);
+         frameQueueDraw (c2, FALSE);
+         clientUpdateOpacity (c2);
+     }
+@@ -523,7 +550,7 @@ clientUpdateFocus (ScreenInfo *screen_info, Client * c, unsigned short flags)
+             FLAG_UNSET (c->flags, CLIENT_FLAG_DEMANDS_ATTENTION);
+         }
+         clientSetNetState (c);
+-        restacked = clientAdjustFullscreenLayer (c, TRUE);
++        restacked = true;//clientAdjustFullscreenLayer (c, TRUE);
+ 
+         if (!restacked && screen_info->params->raise_on_focus)
+         {
+diff --git a/./misc.c b/home/koom/2/xfwm4-333/src/misc.c
+index 020a3e7..cb21719 100644
+--- a/./misc.c
++++ b/home/koom/2/xfwm4-333/src/misc.c
+@@ -37,6 +37,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <libxfce4util/libxfce4util.h>
++#include <X11/extensions/Xrandr.h>
+ 
+ #include "display.h"
+ #include "screen.h"
+@@ -44,6 +45,44 @@
+ #include "client.h"
+ #include "misc.h"
+ 
++gboolean
++cursorInMonitor(XRRMonitorInfo *monitor, ScreenInfo *screen_info)
++{
++    int monitor_min_x = monitor->x;
++    int monitor_min_y = monitor->y;
++    int monitor_max_x = monitor->x + monitor->width;
++    int monitor_max_y = monitor->y + monitor->height;
++
++    int cursor_x;
++    int cursor_y;
++
++    /* Estos son datos basura que no voy a usar */
++    Window w1, w2;
++    int x2, y2;
++    unsigned int mask;
++
++    XQueryPointer (myScreenGetXDisplay(screen_info), screen_info->xroot, &w1, &w2, &cursor_x, &cursor_y, &x2, &y2, &mask);
++
++    return cursor_x >= monitor_min_x && cursor_x < monitor_max_x
++        && cursor_y >= monitor_min_y && cursor_y < monitor_max_y;
++}
++
++gboolean
++clientInMonitor(XRRMonitorInfo *m, Client *c)
++{
++    int m_x1 = m->x;
++    int m_x2 = m->x + m->width;
++    int m_y1 = m->y;
++    int m_y2 = m->x + m->height;
++    int c_x1 = c->x;
++    int c_x2 = c->x + c->width;
++    int c_y1 = c->y;
++    int c_y2 = c->x + c->height;
++    return m_x1 < c_x2 && m_x2 > c_x1
++        && m_y1 < c_y2 && m_y2 > c_y1;
++}
++
++
+ guint
+ getMouseXY (ScreenInfo *screen_info, gint *x2, gint *y2)
+ {
+diff --git a/./misc.h b/home/koom/2/xfwm4-333/src/misc.h
+index 73b864d..664cd18 100644
+--- a/./misc.h
++++ b/home/koom/2/xfwm4-333/src/misc.h
+@@ -31,6 +31,8 @@
+ #include <X11/X.h>
+ #include <X11/Xlib.h>
+ #include <glib.h>
++#include <X11/extensions/Xrandr.h>
++
+ #include "screen.h"
+ 
+ #if defined (__GNUC__) && __GNUC__ >= 7
+@@ -84,4 +86,11 @@ void                     placeSidewalks                         (ScreenInfo *,
+ gchar*                   get_atom_name                          (DisplayInfo *,
+                                                                  Atom);
+ 
++gboolean                 cursorInMonitor                        (XRRMonitorInfo *,
++                                                                 ScreenInfo *);
++
++gboolean                 clientInMonitor                        (XRRMonitorInfo *,
++                                                                 Client *c);
++
++
+ #endif /* INC_MISC_H */

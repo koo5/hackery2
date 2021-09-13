@@ -112,4 +112,7 @@ iperf3 -c 192.168.8.8 -p 8080 -R -t 10000
 ssh -p 44  -c  aes128-ctr  -o Compression=no  10.0.0.20
 
 https://utcc.utoronto.ca/~cks/space/blog/sysadmin/SshSpeed?showcomments#comments
+->
+https://sourceforge.net/projects/hpnssh/
 
+cat 2109.02902.pdf | tee >(sha1sum 1>&2) | ssh -p 44   -c  aes128-ctr    koom@localhost  "bash -c \"tee >(sha1sum 1>&2) | wc -c\""
