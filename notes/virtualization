@@ -116,3 +116,23 @@ https://utcc.utoronto.ca/~cks/space/blog/sysadmin/SshSpeed?showcomments#comments
 https://sourceforge.net/projects/hpnssh/
 
 cat 2109.02902.pdf | tee >(sha1sum 1>&2) | ssh -p 44   -c  aes128-ctr    koom@localhost  "bash -c \"tee >(sha1sum 1>&2) | wc -c\""
+
+
+
+
+
+
+
+
+# video
+
+<video>
+  <model type="virtio" heads="3" primary="yes"/>
+  <address type="pci" domain="0x0000" bus="0x00" slot="0x01" function="0x0"/>
+</video>
+
+
+<graphics type="spice" autoport="yes">
+  <listen type="address"/>
+  <image compression="off"/>
+</graphics>
