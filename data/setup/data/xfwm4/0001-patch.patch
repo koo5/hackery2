@@ -1,0 +1,207 @@
+From c942029c18fbd498160af7b55e477de9f3b0f054 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Mon, 20 Sep 2021 23:09:21 +0200
+Subject: [PATCH] patch!
+
+---
+ src/focus.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ src/misc.c  | 39 ++++++++++++++++++++++++++++++++
+ src/misc.h  |  9 ++++++++
+ 3 files changed, 109 insertions(+), 4 deletions(-)
+
+diff --git a/src/focus.c b/src/focus.c
+index 18cbcf5..067bd91 100644
+--- a/src/focus.c
++++ b/src/focus.c
+@@ -30,6 +30,7 @@
+ #include <X11/Xutil.h>
+ #include <X11/Xatom.h>
+ #include <X11/extensions/shape.h>
++#include <X11/extensions/Xrandr.h>
+ 
+ #include <glib.h>
+ #include <gdk/gdk.h>
+@@ -210,7 +211,7 @@ clientFocusNew(Client * c)
+     {
+         if (client_focus)
+         {
+-            clientAdjustFullscreenLayer (client_focus, FALSE);
++            //clientAdjustFullscreenLayer (client_focus, FALSE);
+         }
+         clientRaise (c, None);
+         clientShow (c, TRUE);
+@@ -285,6 +286,32 @@ clientSelectMask (Client * c, Client *other, guint mask, guint type)
+     {
+         return FALSE;
+     }
++
++    if (1)
++    {
++        int i;
++        int monitor_count;
++        XRRMonitorInfo *monitors;
++        if (!c) return FALSE;
++        monitors = XRRGetMonitors(clientGetXDisplay(c), c->window, True, &monitor_count);
++
++        for (i = 0; i < monitor_count; i++)
++        {
++            if (cursorInMonitor(monitors + i, c->screen_info) && clientInMonitor(monitors + i, c))
++            {
++                break;
++            }
++        }
++
++        if (i == monitor_count)
++        {
++            return FALSE;
++        }
++
++        XRRFreeMonitors(monitors);
++    } 
++    
++    
+     if (c->type & type)
+     {
+         return TRUE;
+@@ -373,7 +400,37 @@ clientPassFocus (ScreenInfo *screen_info, Client *c, GList *exclude_list)
+     if (!(screen_info->params->click_to_focus) &&
+         XQueryPointer (myScreenGetXDisplay (screen_info), screen_info->xroot, &dr, &window, &rx, &ry, &wx, &wy, &mask))
+     {
+-        new_focus = clientAtPosition (screen_info, rx, ry, exclude_list);
++        /*
++commenting this out due to a crash that happens when closing windows and goes like this:
++
++#0  0x00007ffff7240647 in g_log_writer_default () at /lib/x86_64-linux-gnu/libglib-2.0.so.0                                    
++#1  0x00007ffff723c407 in g_log_structured_array () at /lib/x86_64-linux-gnu/libglib-2.0.so.0                                  
++#2  0x00007ffff723c603 in g_log_structured_standard () at /lib/x86_64-linux-gnu/libglib-2.0.so.0                               
++#3  0x00007ffff75d1e04 in  () at /lib/x86_64-linux-gnu/libgdk-3.so.0                                                           
++#4  0x00007ffff70c7a24 in _XError () at /lib/x86_64-linux-gnu/libX11.so.6                                                      
++#5  0x00007ffff70c7b27 in  () at /lib/x86_64-linux-gnu/libX11.so.6                                                             
++#6  0x00007ffff70c9657 in _XReply () at /lib/x86_64-linux-gnu/libX11.so.6                                                      
++#7  0x00007ffff71d61f9 in XRRGetMonitors () at /lib/x86_64-linux-gnu/libXrandr.so.2
++#8  0x00005555555827d9 in clientSelectMask (c=0x5555558f43c0, other=<optimized out>, mask=<optimized out>, type=153) at focus.c:296
++#9  0x000055555559f07f in clientAtPosition.isra.0 (x=2023, y=1017, exclude_list=exclude_list@entry=0x55555574fe40 = {...}, screen_info=<optimized out>, screen_info=<optimized out>) at stacking.c:272
++#10 0x00005555555871e4 in clientPassFocus (screen_info=0x555555892000, c=<optimized out>, exclude_list=0x55555574fe40 = {...}) at focus.c:403
++#11 0x000055555557edda in handleUnmapNotify (ev=<optimized out>, display_info=<optimized out>) at events.c:1265
++#12 handleEvent (event=<optimized out>, display_info=0x55555578f850) at events.c:2238
++#13 xfwm4_event_filter (event=0x5555559964f0, data=0x55555578f850) at events.c:2322
++#14 0x00005555555797e8 in eventXfwmFilter (gdk_xevent=<optimized out>, gevent=<optimized out>, data=<optimized out>) at event_filter.c:175
++#15 0x00007ffff75c2d2f in  () at /lib/x86_64-linux-gnu/libgdk-3.so.0                                                           
++#16 0x00007ffff75cbbbf in  () at /lib/x86_64-linux-gnu/libgdk-3.so.0                                                           
++#17 0x00007ffff7591a69 in gdk_display_get_event () at /lib/x86_64-linux-gnu/libgdk-3.so.0
++#18 0x00007ffff75cbe26 in  () at /lib/x86_64-linux-gnu/libgdk-3.so.0                                                           
++#19 0x00007ffff72358eb in g_main_context_dispatch () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
++#20 0x00007ffff7288d28 in  () at /lib/x86_64-linux-gnu/libglib-2.0.so.0                                                        
++#21 0x00007ffff7234e53 in g_main_loop_run () at /lib/x86_64-linux-gnu/libglib-2.0.so.0
++#22 0x00007ffff78a97fd in gtk_main () at /lib/x86_64-linux-gnu/libgtk-3.so.0                                                   
++
++arguably, i may not even want to pass focus to next window *under cursor*, so...
++
++*/
++        //new_focus = clientAtPosition (screen_info, rx, ry, exclude_list);
+     }
+     if (!new_focus)
+     {
+@@ -505,7 +562,7 @@ clientUpdateFocus (ScreenInfo *screen_info, Client * c, unsigned short flags)
+     if (c2)
+     {
+         clientSetNetState (c2);
+-        clientAdjustFullscreenLayer (c2, FALSE);
++        //clientAdjustFullscreenLayer (c2, FALSE);
+         frameQueueDraw (c2, FALSE);
+         clientUpdateOpacity (c2);
+     }
+@@ -523,7 +580,7 @@ clientUpdateFocus (ScreenInfo *screen_info, Client * c, unsigned short flags)
+             FLAG_UNSET (c->flags, CLIENT_FLAG_DEMANDS_ATTENTION);
+         }
+         clientSetNetState (c);
+-        restacked = clientAdjustFullscreenLayer (c, TRUE);
++        restacked = true;//clientAdjustFullscreenLayer (c, TRUE);
+ 
+         if (!restacked && screen_info->params->raise_on_focus)
+         {
+diff --git a/src/misc.c b/src/misc.c
+index 020a3e7..cb21719 100644
+--- a/src/misc.c
++++ b/src/misc.c
+@@ -37,6 +37,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <libxfce4util/libxfce4util.h>
++#include <X11/extensions/Xrandr.h>
+ 
+ #include "display.h"
+ #include "screen.h"
+@@ -44,6 +45,44 @@
+ #include "client.h"
+ #include "misc.h"
+ 
++gboolean
++cursorInMonitor(XRRMonitorInfo *monitor, ScreenInfo *screen_info)
++{
++    int monitor_min_x = monitor->x;
++    int monitor_min_y = monitor->y;
++    int monitor_max_x = monitor->x + monitor->width;
++    int monitor_max_y = monitor->y + monitor->height;
++
++    int cursor_x;
++    int cursor_y;
++
++    /* Estos son datos basura que no voy a usar */
++    Window w1, w2;
++    int x2, y2;
++    unsigned int mask;
++
++    XQueryPointer (myScreenGetXDisplay(screen_info), screen_info->xroot, &w1, &w2, &cursor_x, &cursor_y, &x2, &y2, &mask);
++
++    return cursor_x >= monitor_min_x && cursor_x < monitor_max_x
++        && cursor_y >= monitor_min_y && cursor_y < monitor_max_y;
++}
++
++gboolean
++clientInMonitor(XRRMonitorInfo *m, Client *c)
++{
++    int m_x1 = m->x;
++    int m_x2 = m->x + m->width;
++    int m_y1 = m->y;
++    int m_y2 = m->x + m->height;
++    int c_x1 = c->x;
++    int c_x2 = c->x + c->width;
++    int c_y1 = c->y;
++    int c_y2 = c->x + c->height;
++    return m_x1 < c_x2 && m_x2 > c_x1
++        && m_y1 < c_y2 && m_y2 > c_y1;
++}
++
++
+ guint
+ getMouseXY (ScreenInfo *screen_info, gint *x2, gint *y2)
+ {
+diff --git a/src/misc.h b/src/misc.h
+index 73b864d..664cd18 100644
+--- a/src/misc.h
++++ b/src/misc.h
+@@ -31,6 +31,8 @@
+ #include <X11/X.h>
+ #include <X11/Xlib.h>
+ #include <glib.h>
++#include <X11/extensions/Xrandr.h>
++
+ #include "screen.h"
+ 
+ #if defined (__GNUC__) && __GNUC__ >= 7
+@@ -84,4 +86,11 @@ void                     placeSidewalks                         (ScreenInfo *,
+ gchar*                   get_atom_name                          (DisplayInfo *,
+                                                                  Atom);
+ 
++gboolean                 cursorInMonitor                        (XRRMonitorInfo *,
++                                                                 ScreenInfo *);
++
++gboolean                 clientInMonitor                        (XRRMonitorInfo *,
++                                                                 Client *c);
++
++
+ #endif /* INC_MISC_H */
+-- 
+2.30.2
+

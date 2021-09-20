@@ -49,3 +49,6 @@ crash fix:
 ```
 todo:
  use https://www.debian.org/doc/manuals/maint-guide/modify.en.html next time and generate a proper patch
+
+
+latest version is 0001-patch.patch
