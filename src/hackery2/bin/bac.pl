@@ -2,20 +2,10 @@
 
 :- ['disks'].
 
-
-/*do_backup_i(I) :-
-	start(I),
-	do_backup('/', I),
-	do_backup('/z/', I),
-	stop(I).
-*/
-
 do_backup(I) :-
-	%do_backup('/', I),
-	%do_backup('/home/', I),
 	%do_backup('/z/', I).
-	%do_backup('/intel500/', I),
 	do_backup('/', I),
+	do_backup('/home/', I),
 	do_backup('/d/', I),
 	do_backup('/mx500data/', I),
 	true.
