@@ -255,3 +255,7 @@ possible collaborations:
         https://addons.mozilla.org/en-US/firefox/addon/hacker-news-link-comments/?src=search
         https://addons.mozilla.org/en-US/firefox/addon/hn-comments/?src=search
 ```
+# promnesia / notes search / history search 
+
+https://news.ycombinator.com/item?id=27965979
+
