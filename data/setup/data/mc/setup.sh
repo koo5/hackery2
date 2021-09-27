@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cp -P mcedit /usr/bin/
-cp -P mceditt /usr/bin/
+cp --remove-destination -P mcedit /usr/bin/
+cp --remove-destination -P mceditt /usr/bin/
 
 
