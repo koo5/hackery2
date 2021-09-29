@@ -3,11 +3,11 @@
 :- ['disks'].
 
 do_backup(I) :-
-	%do_backup('/z/', I).
 	do_backup('/', I),
 	do_backup('/home/', I),
 	do_backup('/d/', I),
 	do_backup('/mx500data/', I),
+	do_backup('/mx500data/lean/', I),
 	true.
 
 do_backup(Src, I) :-
@@ -36,7 +36,7 @@ all(Disks, Pred) :-
 do_backup_with_disks(Disks) :-
 	df,	
 	/* everything could even be done in parallel if it wasnt for sxbackup symlink limitation */
-	foreach( (dif(I,1),member(I,Disks)), do_backup(I)),
+	foreach( (member(I,Disks)), do_backup(I)),
 	foreach( (dif(I,1),member(I,Disks)), backup_offline_data(I)),
 	df,
 	all(Disks,stop).
