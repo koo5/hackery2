@@ -1,3 +1,9 @@
+https://github.com/google/python-fire
+
+
+
+
+
 [a :note; :contents """
 TriOptima/tri.struct
 tri.struct supplies classes that can be used like dictionaries and as objects with attribute access at the same time
