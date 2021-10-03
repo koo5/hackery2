@@ -136,3 +136,17 @@ cat 2109.02902.pdf | tee >(sha1sum 1>&2) | ssh -p 44   -c  aes128-ctr    koom@lo
   <listen type="address"/>
   <image compression="off"/>
 </graphics>
+
+
+
+
+
+
+
+https://help.ubuntu.com/community/Autofs
+
+
+
+
+
+
