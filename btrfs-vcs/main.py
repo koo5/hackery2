@@ -13,50 +13,46 @@ from pathvalidate import sanitize_filename
 import sys,os
 import time
 import subprocess
-import click
+import fire
 
 
 
-@click.command()
-@click.option('--HOSTNAME', type=str, default=None)
-@click.option('--SNAPSHOTS_CONTAINER', type=str, default=None)
-@click.option('--TAG', type=str, default=None)
-@click.option('--SNAPSHOT', type=str, default=None)
+def run(VOL='/', HOSTNAME=None, SNAPSHOTS_CONTAINER=None, TAG=None, SNAPSHOT=None):
 
-def run(HOSTNAME, SNAPSHOTS_CONTAINER, TAG, SNAPSHOT):
+	VOL = Path(VOL).absolute()
 
-	if HOSTNAME is None:
-		HOSTNAME = subprocess.check_output(['hostname'])
+	if SNAPSHOT is not None:
 
-	VOL = Path(VOL)
+		SNAPSHOT = Path(SNAPSHOT).absolute()
+	else:
 
-
-	if SNAPSHOTS_CONTAINER is None:
-		if VOL == '/':
-			SNAPSHOTS_CONTAINER_PARENT = '/'
+		if HOSTNAME is None:
+			HOSTNAME = subprocess.check_output(['hostname'], text=True).strip()
+	
+		if SNAPSHOTS_CONTAINER is None:
+			SNAPSHOTS_CONTAINER = Path(str(VOL.parent) + '/.bcvs_snapshots.' + VOL.parts[-1]).absolute()
 		else:
-			
-			SNAPSHOTS_CONTAINER_PARENT = VOL + '../'
-		last_part_of_VOL_path = vol.parts[-1]
-		SNAPSHOTS_CONTAINER = SNAPSHOTS_CONTAINER_PARENT + '.bcvs_snapshots.' + last_part_of_VOL_path
-		os.system(f'mkdir -p {SNAPSHOTS_CONTAINER}')
+			SNAPSHOTS_CONTAINER = SNAPSHOTS_CONTAINER.absolute()
 
+		if TAG is None:
+			TAG = 'from_' + HOSTNAME
 
-	if TAG is None:
-		TAG = 'from_' + HOSTNAME
+		tss = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+		#tss = subprocess.check_output(['date', '-u', "+%Y-%m-%d_%H-%M-%S"], text=True).strip()
+		ts = sanitize_filename(tss.replace(' ', '_'))
 
+		SNAPSHOT = Path(str(SNAPSHOTS_CONTAINER) + '/' + TAG + '/' + ts)
 
-	ts = sanitize_filename(time.asctime())
+	SNAPSHOT_PARENT = os.path.split(str(SNAPSHOT))[0]
+	cmd(f'mkdir -p {SNAPSHOT_PARENT}')
 
+	cmd(f'btrfs subvolume snapshot -r {VOL} {SNAPSHOT}')
 
-	if SNAPSHOT is None:
-		SNAPSHOT = SNAPSHOTS_CONTAINER + '/' + TAG + '/' + ts
-
-
-	os.system('btrfs subvolume snapshot -r {VOL} {SNAPSHOT}')
-
+def cmd(s):
+	print(s)
+	os.system(s)
 
 
 if __name__ == '__main__':
-        run()
+        fire.Fire(run)
 
