@@ -26,15 +26,18 @@ def prerr(*a):
  
 
 
-def get_ro_subvolumes_with_received_uuid(command_runner, subvolume):
-	snapshots = {}
-	for line in command_runner(['sudo', 'btrfs', 'subvolume', 'list', '-t', '-r', '-R', subvolume]).splitlines()[2:]:
+def get_ro_subvolumes(command_runner, subvolume):
+	snapshots = {'by_received_uuid': {}, 'by_local_uuid': {}}
+	for line in command_runner(['sudo', 'btrfs', 'subvolume', 'list', '-t', '-r', '-R', '-u', subvolume]).splitlines()[2:]:
 		prerr(line)
 		items = line.split()
 		received_uuid = items[3]
-		relpath = items[4]
+		local_uuid = items[4]
+		relpath = items[5]
 		if received_uuid != '-':
-			snapshots[received_uuid] = relpath
+			snapshots['by_received_uuid'][received_uuid] = relpath
+		if local_uuid != '-':
+			snapshots['by_local_uuid'][local_uuid] = relpath
 	return snapshots
 
 
@@ -56,7 +59,7 @@ class Bfg:
 			if SNAPSHOTS_CONTAINER is None:
 				SNAPSHOTS_CONTAINER = Path(str(VOL.parent) + '/.bfg_snapshots.' + VOL.parts[-1]).absolute()
 			else:
-				SNAPSHOTS_CONTAINER = SNAPSHOTS_CONTAINER.absolute()
+				SNAPSHOTS_CONTAINER = Path(SNAPSHOTS_CONTAINER).absolute()
 
 			if TAG is None:
 				TAG = 'from_' + subprocess.check_output(['hostname'], text=True).strip()
@@ -71,18 +74,39 @@ class Bfg:
 		cmd(f'mkdir -p {SNAPSHOT_PARENT}')
 
 		cmd(f'btrfs subvolume snapshot -r {VOL} {SNAPSHOT}')
+		return str(SNAPSHOT)
 
 
 
 	def commit_and_push(s, subvolume='/', remote_subvolume='/'):
+		snapshot = s.commit(subvolume)
+		parents = []
+		for p in s.find_common_parents(subvolume, remote_subvolume):
+			parents.append('-c')
+			parents.append(p)
+		local_cmd_runner(['sudo', 'btrfs', 'send'] + parents + [snapshot])
 		
-		def cmd_runner(cmd):
-			ssh = shlex.split('/opt/hpnssh/usr/bin/ssh   -p 2222   -o TCPRcvBufPoll=yes -o NoneSwitch=yes  -o NoneEnabled=yes     koom@10.0.0.20')
-			return subprocess.check_output(ssh + cmd, text=True)
+		pass
 		
-		remote_subvols = get_ro_subvolumes_with_received_uuid(cmd_runner, remote_subvolume)
+
+	def find_common_parents(s, subvolume='/', remote_subvolume='/'):
 		
+		remote_subvols = get_ro_subvolumes(remote_cmd_runner, remote_subvolume)['by_received_uuid']
+		local_subvols = get_ro_subvolumes(local_cmd_runner, subvolume)['by_local_uuid']
+		
+		print('remote_subvols:')
 		print(remote_subvols)
+		print('local_subvols:')
+		print(local_subvols)
+		print("common_parents:")
+		
+		common_parents = []
+		for k,v in local_subvols.items():
+			if k in remote_subvols:
+				common_parents.append(v)
+		
+		print(common_parents)
+		return common_parents
 		
 		
 
@@ -93,7 +117,13 @@ class Bfg:
 	def commit_and_generate_patch(s):
 		pass
 		
+		
+def remote_cmd_runner(cmd):
+	ssh = shlex.split('/opt/hpnssh/usr/bin/ssh   -p 2222   -o TCPRcvBufPoll=yes -o NoneSwitch=yes  -o NoneEnabled=yes     koom@10.0.0.20')
+	return subprocess.check_output(ssh + cmd, text=True)
 
+def local_cmd_runner(cmd):
+	return subprocess.check_output(cmd, text=True)
 
 def cmd(s):
 	print(s)
