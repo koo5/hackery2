@@ -33,11 +33,11 @@ def get_ro_subvolumes(command_runner, subvolume):
 		items = line.split()
 		received_uuid = items[3]
 		local_uuid = items[4]
-		relpath = items[5]
+		subvol_id = items[0]
 		if received_uuid != '-':
-			snapshots['by_received_uuid'][received_uuid] = relpath
+			snapshots['by_received_uuid'][received_uuid] = subvol_id
 		if local_uuid != '-':
-			snapshots['by_local_uuid'][local_uuid] = relpath
+			snapshots['by_local_uuid'][local_uuid] = subvol_id
 	return snapshots
 
 
@@ -78,7 +78,7 @@ class Bfg:
 
 
 
-	def commit_and_push(s, subvolume='/', remote_subvolume='/'):
+	def commit_and_push(s, fs_root_mount_point='/', subvolume='/', remote_subvolume='/'):
 		snapshot = s.commit(subvolume)
 		parents = []
 		for p in s.find_common_parents(subvolume, remote_subvolume):
@@ -89,7 +89,7 @@ class Bfg:
 		pass
 		
 
-	def find_common_parents(s, subvolume='/', remote_subvolume='/'):
+	def find_common_parents(s, fs_root_mount_point='/', subvolume='/', remote_subvolume='/'):
 		
 		remote_subvols = get_ro_subvolumes(remote_cmd_runner, remote_subvolume)['by_received_uuid']
 		local_subvols = get_ro_subvolumes(local_cmd_runner, subvolume)['by_local_uuid']
@@ -103,7 +103,8 @@ class Bfg:
 		common_parents = []
 		for k,v in local_subvols.items():
 			if k in remote_subvols:
-				common_parents.append(v)
+				abspath = fs_root_mount_point + '/' + local_cmd_runner(['btrfs', 'ins', 'sub', v, subvolume]).strip()
+				common_parents.append(abspath)
 		
 		print(common_parents)
 		return common_parents
