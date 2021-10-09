@@ -50,14 +50,19 @@ class Bfg:
 		
 		
 	def push(s, fs_root_mount_point, subvolume, snapshot, remote_subvolume):
+		SNAPSHOT_PARENT = snapshot_parent_dir(Path(remote_subvolume))
+		remote_cmd_runner(['sudo', 'mkdir', '-p', str(SNAPSHOT_PARENT)])
+
 		parents = []
 		for p in s.find_common_parents(fs_root_mount_point, subvolume, remote_subvolume):
 			parents.append('-c')
 			parents.append(p)
-		local_cmd_runner(['sudo', 'btrfs', 'send'] + parents + [snapshot])
+			
+		cmd = shlex.join(['sudo', 'btrfs', 'send'] + parents + [snapshot]) + '|' + sshstr + " sudo btrfs receive " + str(SNAPSHOT_PARENT)
+		prerr((cmd))
+																														   
+		subprocess.check_call(cmd, shell=True)
 		
-		# SNAPSHOT_PARENT = snapshot_parent_dir(remote_subvolume)
-		# remote_cmd_runner(f'mkdir -p {SNAPSHOT_PARENT}')
 		# remote_cmd_runner('sudo', 'btrfs', 'receive'] + [where])
 		pass
 		
@@ -67,11 +72,11 @@ class Bfg:
 		remote_subvols = get_ro_subvolumes(remote_cmd_runner, remote_subvolume)['by_received_uuid']
 		local_subvols = get_ro_subvolumes(local_cmd_runner, subvolume)['by_local_uuid']
 		
-		print('remote_subvols:')
-		print(remote_subvols)
-		print('local_subvols:')
-		print(local_subvols)
-		print("common_parents:")
+		#print('remote_subvols:')
+		#print(remote_subvols)
+		#print('local_subvols:')
+		#print(local_subvols)
+		#print("common_parents:")
 		
 		common_parents = []
 		for k,v in local_subvols.items():
@@ -79,7 +84,7 @@ class Bfg:
 				abspath = fs_root_mount_point + '/' + local_cmd_runner(['btrfs', 'ins', 'sub', v, subvolume]).strip()
 				common_parents.append(abspath)
 		
-		print(common_parents)
+		#print(common_parents)
 		return common_parents
 		
 		
@@ -92,9 +97,13 @@ class Bfg:
 		pass
 		
 		
+sshstr = '/opt/hpnssh/usr/bin/ssh   -p 2222   -o TCPRcvBufPoll=yes -o NoneSwitch=yes  -o NoneEnabled=yes     koom@10.0.0.20'		
+		
 def remote_cmd_runner(cmd):
-	ssh = shlex.split('/opt/hpnssh/usr/bin/ssh   -p 2222   -o TCPRcvBufPoll=yes -o NoneSwitch=yes  -o NoneEnabled=yes     koom@10.0.0.20')
-	return subprocess.check_output(ssh + cmd, text=True)
+	ssh = shlex.split(sshstr)
+	cmd2 = ssh + cmd
+	prerr(cmd2)
+	return subprocess.check_output(cmd2, text=True)
 
 def local_cmd_runner(cmd):
 	return subprocess.check_output(cmd, text=True)
@@ -133,7 +142,7 @@ def prerr(*a):
 def get_ro_subvolumes(command_runner, subvolume):
 	snapshots = {'by_received_uuid': {}, 'by_local_uuid': {}}
 	for line in command_runner(['sudo', 'btrfs', 'subvolume', 'list', '-t', '-r', '-R', '-u', subvolume]).splitlines()[2:]:
-		prerr(line)
+		#prerr(line)
 		items = line.split()
 		received_uuid = items[3]
 		local_uuid = items[4]
