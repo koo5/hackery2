@@ -20,26 +20,6 @@ import shlex
 
 
 
- 
-def prerr(*a):
-	print(*a, file = sys.stderr)
- 
-
-
-def get_ro_subvolumes(command_runner, subvolume):
-	snapshots = {'by_received_uuid': {}, 'by_local_uuid': {}}
-	for line in command_runner(['sudo', 'btrfs', 'subvolume', 'list', '-t', '-r', '-R', '-u', subvolume]).splitlines()[2:]:
-		prerr(line)
-		items = line.split()
-		received_uuid = items[3]
-		local_uuid = items[4]
-		subvol_id = items[0]
-		if received_uuid != '-':
-			snapshots['by_received_uuid'][received_uuid] = subvol_id
-		if local_uuid != '-':
-			snapshots['by_local_uuid'][local_uuid] = subvol_id
-	return snapshots
-
 
 
 
@@ -51,41 +31,34 @@ class Bfg:
 		VOL = Path(VOL).absolute()
 
 		if SNAPSHOT is not None:
-
 			SNAPSHOT = Path(SNAPSHOT).absolute()
 		else:
+			SNAPSHOT = snapshot_path(VOL, TAG)
 
-		
-			if SNAPSHOTS_CONTAINER is None:
-				SNAPSHOTS_CONTAINER = Path(str(VOL.parent) + '/.bfg_snapshots.' + VOL.parts[-1]).absolute()
-			else:
-				SNAPSHOTS_CONTAINER = Path(SNAPSHOTS_CONTAINER).absolute()
-
-			if TAG is None:
-				TAG = 'from_' + subprocess.check_output(['hostname'], text=True).strip()
-
-			tss = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-			#tss = subprocess.check_output(['date', '-u', "+%Y-%m-%d_%H-%M-%S"], text=True).strip()
-			ts = sanitize_filename(tss.replace(' ', '_'))
-
-			SNAPSHOT = Path(str(SNAPSHOTS_CONTAINER) + '/' + TAG + '/' + ts)
-
-		SNAPSHOT_PARENT = os.path.split(str(SNAPSHOT))[0]
+		SNAPSHOT_PARENT = os.path.split((SNAPSHOT))[0]
 		cmd(f'mkdir -p {SNAPSHOT_PARENT}')
 
 		cmd(f'btrfs subvolume snapshot -r {VOL} {SNAPSHOT}')
-		return str(SNAPSHOT)
 
+		return (SNAPSHOT)
 
+		
 
 	def commit_and_push(s, fs_root_mount_point='/', subvolume='/', remote_subvolume='/'):
 		snapshot = s.commit(subvolume)
+		s.push(fs_root_mount_point, subvolume, snapshot, remote_subvolume)
+		
+		
+	def push(s, fs_root_mount_point, subvolume, snapshot, remote_subvolume):
 		parents = []
-		for p in s.find_common_parents(subvolume, remote_subvolume):
+		for p in s.find_common_parents(fs_root_mount_point, subvolume, remote_subvolume):
 			parents.append('-c')
 			parents.append(p)
 		local_cmd_runner(['sudo', 'btrfs', 'send'] + parents + [snapshot])
 		
+		# SNAPSHOT_PARENT = snapshot_parent_dir(remote_subvolume)
+		# remote_cmd_runner(f'mkdir -p {SNAPSHOT_PARENT}')
+		# remote_cmd_runner('sudo', 'btrfs', 'receive'] + [where])
 		pass
 		
 
@@ -128,7 +101,48 @@ def local_cmd_runner(cmd):
 
 def cmd(s):
 	print(s)
-	os.system(s)
+	try:
+		subprocess.check_call(shlex.split(s))
+	except Exception as e:
+		print(e)
+		exit(1)
+
+
+def snapshot_parent_dir(VOL):
+		return Path(str(VOL.parent) + '/.bfg_snapshots.' + VOL.parts[-1]).absolute()
+
+
+def snapshot_path(VOL, TAG):
+	parent = snapshot_parent_dir(VOL)
+	
+	tss = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+	#tss = subprocess.check_output(['date', '-u', "+%Y-%m-%d_%H-%M-%S"], text=True).strip()
+	ts = sanitize_filename(tss.replace(' ', '_'))
+
+	if TAG is None:
+		TAG = 'from_' + subprocess.check_output(['hostname'], text=True).strip()
+
+	return str(Path(str(parent) + '/' + ts + '_' + TAG))
+
+ 
+def prerr(*a):
+	print(*a, file = sys.stderr)
+ 
+
+
+def get_ro_subvolumes(command_runner, subvolume):
+	snapshots = {'by_received_uuid': {}, 'by_local_uuid': {}}
+	for line in command_runner(['sudo', 'btrfs', 'subvolume', 'list', '-t', '-r', '-R', '-u', subvolume]).splitlines()[2:]:
+		prerr(line)
+		items = line.split()
+		received_uuid = items[3]
+		local_uuid = items[4]
+		subvol_id = items[0]
+		if received_uuid != '-':
+			snapshots['by_received_uuid'][received_uuid] = subvol_id
+		if local_uuid != '-':
+			snapshots['by_local_uuid'][local_uuid] = subvol_id
+	return snapshots
 
 
 
