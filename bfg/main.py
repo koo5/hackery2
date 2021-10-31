@@ -26,6 +26,29 @@ import shlex
 
 class Bfg:
 
+
+	def commit_and_push(s, fs_root_mount_point='/', subvolume='/', remote_subvolume='/'):
+		snapshot = s.commit(subvolume)
+		s.push(fs_root_mount_point, subvolume, snapshot, remote_subvolume)
+		
+	"""
+	def local_checkout(s, what, where):
+
+
+	def local_stash(s, what):
+		
+	
+	
+	
+	"""
+
+	def local_make_ro_snapshot(VOLe, SNAPSHOT):
+		SNAPSHOT_PARENT = os.path.split((SNAPSHOT))[0]
+		cmd(f'mkdir -p {SNAPSHOT_PARENT}')
+		cmd(f'btrfs subvolume snapshot -r {VOL} {SNAPSHOT}')
+
+
+
 	def commit(s, VOL='/', SNAPSHOTS_CONTAINER=None, TAG=None, SNAPSHOT=None):
 
 		VOL = Path(VOL).absolute()
@@ -37,16 +60,10 @@ class Bfg:
 
 		SNAPSHOT_PARENT = os.path.split((SNAPSHOT))[0]
 		cmd(f'mkdir -p {SNAPSHOT_PARENT}')
-
 		cmd(f'btrfs subvolume snapshot -r {VOL} {SNAPSHOT}')
 
 		return (SNAPSHOT)
 
-		
-
-	def commit_and_push(s, fs_root_mount_point='/', subvolume='/', remote_subvolume='/'):
-		snapshot = s.commit(subvolume)
-		s.push(fs_root_mount_point, subvolume, snapshot, remote_subvolume)
 		
 		
 	def push(s, fs_root_mount_point, subvolume, snapshot, remote_subvolume):
