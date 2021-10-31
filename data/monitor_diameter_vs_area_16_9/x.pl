@@ -1,6 +1,6 @@
 :- [library(clpq)].
-:- ensure_loaded(library(aggregate)).
-:- ensure_loaded(library(between)).
+%:- ensure_loaded(library(aggregate)).
+%:- ensure_loaded(library(between)).
 
 tv(Diag,Area,W,H) :- {
 	/*H > 0, W > 0, Area > 0, W > H, Diag > W,*/

@@ -36,3 +36,5 @@ bash --init-file "venv/bin/activate"
 fish -C ". venv/bin/activate.fish"
 """].
 
+
+https://news.ycombinator.com/item?id=28880782

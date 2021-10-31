@@ -198,3 +198,25 @@ diag(inch):226.0     area(m): 14.08388   W(cm): 500.4        H(cm): 281.5
 diag(inch):227.2     area(m): 14.22723   W(cm): 502.9        H(cm): 282.9
 diag(inch):228.3     area(m): 14.37130   W(cm): 505.5        H(cm): 284.3
 diag(inch):229.5     area(m): 14.51610   W(cm): 508.0        H(cm): 285.8
+
+
+
+
+
+
+
+└─< (master)* >──» python3 final_version.py #redmi 7         0 < 21:47:32
+diag:6.3″ area:0.009743m² w:14.5cm h:6.7cm
+┌─<koom @ dev in ~/work/hackery2/data/monitor_diameter_vs_area_16_9>
+└─< (master)* >──» python3 final_version.py #max 2         0 < 21:48:16
+diag:6.44″ area:0.011433m² w:14.3cm h:8.0cm
+┌─<koom @ dev in ~/work/hackery2/data/monitor_diameter_vs_area_16_9>
+└─< (master)* >──» python3 final_version.py # poco         0 < 21:49:07
+diag:6.67″ area:0.010741m² w:15.4cm h:7.0cm
+┌─<koom @ dev in ~/work/hackery2/data/monitor_diameter_vs_area_16_9>
+└─< (master)* >──» python3 final_version.py # realme                                                    0 < 21:50:13
+diag:6.4″ area:0.009889m² w:14.8cm h:6.7cm
+
+
+
+
