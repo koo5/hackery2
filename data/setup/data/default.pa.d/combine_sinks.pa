@@ -1,0 +1,6 @@
+#!/usr/bin/pulseaudio -nF
+
+
+load-module module-combine-sink sink_name="combined" slaves=alsa_output.pci-0000_0a_00.1.hdmi-stereo-extra1,alsa_output.usb-PLEXTONE_Co._Ltd._GS3_000000000000-00.analog-stereo sink_properties="device.description='comb_vsink' device.icon_name='audio-card-symbolic'"
+
+
