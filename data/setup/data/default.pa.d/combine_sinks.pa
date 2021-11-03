@@ -1,13 +1,11 @@
 #!/usr/bin/pulseaudio -nF
 
-
-load-module module-combine-sink
-
+load-module module-combine-sink sink_properties="device.description='combined' device.icon_name='audio-card-symbolic'"
 
 # or:
 
+#load-module module-combine-sink
 
-#load-module module-combine-sink sink_name="combined"
 
 # or:
 
