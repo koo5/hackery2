@@ -3,7 +3,7 @@
 const fs = require('fs')
 var parse = require('dotparser');
 var ast = parse(fs.readFileSync('test.gv', 'utf8'));
-console.log(ast);
+//console.log(ast);
 let g = ast[0].children
 let nodepairs = {};
 g.forEach((stmt) =>
@@ -21,10 +21,14 @@ g.forEach((stmt) =>
 				let pair = JSON.stringify({'src': node0, 'tgt': e});
 				//console.log(pair)
 				if (nodepairs.hasOwnProperty(pair))
+				{
+					console.log('duplicate edge:');
 					console.log(pair);
+				}
 				nodepairs[pair] = true;
 			}
 			node0 = e;
 		})
 	}
 });
+console.log(`${Object.keys(nodepairs).length} edges found.`);
