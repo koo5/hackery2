@@ -150,3 +150,55 @@ https://help.ubuntu.com/community/Autofs
 
 
 
+
+
+# cache modes
+
+## qemu options
+
+### cache = writethrough
+	1) host page cache *is* used.
+	2) write calls do not return until the full action->confirmation chain returns from the physical disk(?)
+	3) iow, data is written in order and as fast as possible and there's no poweroff dataloss risk after that
+	
+
+
+### cache = writeback
+	1) host page cache *is* used.
+	2) writes are reported to the guest as completed when placed in the host page cache
+	3) guest is informed to send flush commands
+	3) iow, data is written in order, lazily but flushed per client, so there's no poweroff dataloss risk after that
+	
+
+### cache = none
+	1) host page cache is *not* used.
+	2) guest is informed to send flush commands
+
+
+### cache = unsafe
+	1) host page cache *is* used.
+	2) like writeback but flushes are ignored
+	
+
+### cache=directsync
+	1) host page cache is *not* used.
+	2) aggressive flushing
+	
+
+
+
+## resources
+	https://forum.proxmox.com/threads/implications-of-qemu-cache-unsafe.79336/
+		In practice, data is written to disk out of order and asynchronously with cache=unsafe
+
+	https://documentation.suse.com/sles/11-SP4/html/SLES-kvm4zseries/cha-qemu-cachemodes.html
+		Since that version, the various qemu-kvm guest storage interfaces have been fixed to handle writeback or writethrough semantics more correctly, allowing for the default caching mode to be switched to writeback. The guest driver for each of ide, scsi, and virtio have within their power to disable the write back cache, causing the caching mode used to revert to writethrough. The typical guest's storage drivers will maintain the default caching mode as writeback, however. 
+
+
+
+
+
+
+
+
+
