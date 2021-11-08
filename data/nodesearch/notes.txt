@@ -1,0 +1,11 @@
+edge [fontname=arial penwidth=0.5]
+no a fakt bych dal kazdy edgi trochu jinou barvu, a jestli tam mas tri ruzny typy, tak to by se dalo znazornit ruznejma line stylama
+edge [fontname=arial penwidth=0.5 style=dashed]
+"dashed"
+    "dotted"
+    "solid"
+    "invis"
+    "bold"
+    "tapered"
+
+    
