@@ -216,8 +216,8 @@ def output_details(ch):
 		print(f'weird guid: {guid}', file=sys.stderr)
 	
 	full_path = str(p) + '/' + fn +'.ini'
-	if pathlib.Path(full_path).is_file():
-		print(f'overwriting already existing file: {full_path}', file=sys.stderr)
+	#if pathlib.Path(full_path).is_file():
+	#	print(f'overwriting already existing file: {full_path}', file=sys.stderr)
 
 	with open(full_path, 'w') as configfile:
 		config.write(configfile, space_around_delimiters=False)
