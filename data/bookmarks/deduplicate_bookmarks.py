@@ -154,7 +154,8 @@ def walk(path, x):
 
 
 def output_link(path, ch):
-	p = pathlib.Path(options.output_link_tree_path + '/' + '/'.join(path))
+
+	p = pathlib.Path(options.output_link_tree_path + '/places/' + '/'.join(path))
 	p.mkdir(parents=True, exist_ok=True)
 	
 	config = configparser.ConfigParser(interpolation=None)
@@ -166,13 +167,12 @@ def output_link(path, ch):
 	config[s]['Version']='1.0'
 	config[s]['Type']='Link'
 	config[s]['Name']=ch['title']
-	config[s]['Index']=str(ch['index'])
+	#config[s]['Index']=str(ch['index'])
 	config[s]['Icon']='user-bookmarks'
 	config[s]['URL']=uri
 
 	fn = uri
-	#if len(fn) > 200:
-	fn = fn[:200] + '::' + ch['guid']
+	fn = fn[:100] + '::' + ch['guid']
 	fn = fn.replace('/','_')
 	fn = fn.replace('\n','_')
 	
@@ -183,6 +183,44 @@ def output_link(path, ch):
 	with open(full_path, 'w') as configfile:
 		config.write(configfile, space_around_delimiters=False)
 		os.fchmod(configfile.fileno(), os.fstat(configfile.fileno()).st_mode | stat.S_IXUSR)
+
+	output_details(ch)
+
+
+
+
+seen_guids = set()
+
+
+def output_details(ch):
+	p = pathlib.Path(options.output_link_tree_path + '/details/')
+	p.mkdir(parents=True, exist_ok=True)
+	
+	config = configparser.ConfigParser(interpolation=None)
+	config.optionxform = str
+	
+	s = 'Bookmark Details'
+	config.add_section(s)
+	config[s]['Index']=str(ch['index'])
+
+	guid = ch['guid']
+
+	if guid in seen_guids:
+		raise('hmm')
+	seen_guids.add(guid)
+	
+	fn = guid
+	fn = fn.replace('/','_')
+	fn = fn.replace('\n','_')
+	if fn != guid:
+		print(f'weird guid: {guid}', file=sys.stderr)
+	
+	full_path = str(p) + '/' + fn +'.ini'
+	if pathlib.Path(full_path).is_file():
+		print(f'overwriting already existing file: {full_path}', file=sys.stderr)
+
+	with open(full_path, 'w') as configfile:
+		config.write(configfile, space_around_delimiters=False)
 
 
 def un_great_suspender_ize(x):
