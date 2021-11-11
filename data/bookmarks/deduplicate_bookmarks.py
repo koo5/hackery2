@@ -2,6 +2,11 @@
 
 """
 handles and outputs firefox json bookmarks backup format: bookmarks->show all bookmarks->import and backup->backup
+
+deduplication and other cleanup but also can generate a directory tree with one file for each bookmark, on your filesystem
+example usage:
+rm -rf ~/Desktop/bookmarks/places/;  ./deduplicate_bookmarks.py -ol ~/Desktop/bookmarks/ ~/Desktop/bookmarks-2021-11-11.json
+
 """
 
 import sys, json, os, stat
