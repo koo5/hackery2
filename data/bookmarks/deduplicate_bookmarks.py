@@ -160,7 +160,7 @@ def walk(path, x):
 
 def output_link(path, ch):
 
-	p = pathlib.Path(options.output_link_tree_path + '/places/' + '/'.join(path))
+	p = pathlib.Path(options.output_link_tree_path + '/places/' + '/'.join([p.replace('/','_').replace('..','__') for p in path]))
 	p.mkdir(parents=True, exist_ok=True)
 	
 	config = configparser.ConfigParser(interpolation=None)
