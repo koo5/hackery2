@@ -143,7 +143,7 @@ def walk(path, x):
 						duplicate_entries.append(ch)
 				
 				if options.output_link_tree_path:
-					output_link(path, ch)
+					output_link(path, ch, x)
 				
 			else:
 				if ch['type'] == "text/x-moz-place-separator":
@@ -158,7 +158,7 @@ def walk(path, x):
 					raise(Exception(ch['type']))
 
 
-def output_link(path, ch):
+def output_link(path, ch, parent):
 
 	p = pathlib.Path(options.output_link_tree_path + '/places/' + '/'.join([p.replace('/','_').replace('..','__') for p in path]))
 	p.mkdir(parents=True, exist_ok=True)
@@ -174,6 +174,7 @@ def output_link(path, ch):
 	config[s]['Name']=ch['title']
 	#config[s]['Index']=str(ch['index'])
 	config[s]['Icon']='user-bookmarks'
+	config[s]['ParentGuid']=parent['guid']
 	config[s]['URL']=uri
 
 	fn = uri
