@@ -1,2 +1,0 @@
-apt-cache search --names-only 'php5$'
-sudo apt-get remove '^k3b.*'

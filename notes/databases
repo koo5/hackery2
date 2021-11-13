@@ -1,8 +1,0 @@
-https://people.cs.umass.edu/~yanlei/courses/CS691LL-f06/papers/SH05.pdf
-https://news.ycombinator.com/item?id=21060866
-```I've done this (commercially!) with PostgreSQL - just start with a single table, with one JSON field, and as you want performance, integrity, etc, add expression indexes, break out frequently used expressions into columns etc. On large tables, obviously there's a cost for this reorganization but you can partition the data first, and only reorg the most recent data (e.g. range partitioning by time).```
-
-
-
-OpenRefine and its RDF Extension
-https://medium.com/wallscope/creating-linked-data-31c7dd479a9e
