@@ -36,8 +36,9 @@ def ccss(cmd):
 
 
 
-t_txt = os.path.expanduser('~/ticker.txt')
-t_json = os.path.expanduser('~/ticker.json')
+t_txt = os.path.expanduser('~/ticker/output_buffer.txt')
+t_json = os.path.expanduser('~/ticker/status.json')
+t_banner = os.path.expanduser('~/ticker/banner.txt')
 
 def save_state():
 	json.dump({
@@ -58,7 +59,12 @@ with open(t_txt) as f:
 	txt = [l.strip() for l in f.readlines()]
 
 
-status = json.load(open(t_json))
+try:
+	status = json.load(open(t_json))
+except:
+	with open(t_json, 'w') as f:
+		f.write('{}')
+	status = {}
 on_this_line_since = status.get('on_this_line_since', now)
 source_num = status.get('source_num', -1)
 
@@ -73,14 +79,22 @@ def populate_ticker():
 	source_num += 1
 	save_state()
 
+	xx = 100
+
 	if source_num <= 5:
 
 		print(time.asctime())
 		exit()
 
-	elif source_num < 100 and source_num > 5:
-		source_num = 100
-	elif source_num == 100:
+	elif source_num == 6:
+		try:
+			out(open(t_banner).read())
+		except:
+			pass
+
+	elif source_num < xx:
+		source_num = xx
+	elif source_num == xx:
 
 		jupyter_kernel_probable_ports_lines = goe(['/bin/bash', '-c', "sudo netstat -nlpt | grep 8888 | grep python"]).splitlines()
 		if not jupyter_kernel_probable_ports_lines == []:
@@ -118,6 +132,6 @@ save_state()
 
 
 
-print(open(os.path.expanduser('~/ticker.txt')).read())
+print(open(t_txt).read())
 
 #%%
