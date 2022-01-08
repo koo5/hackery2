@@ -21,6 +21,8 @@ function CLEAN-THE-FUCKING-DOCKER
 	echo "Fucking shit, those silly fucking whales eating my fucking disk"
 	docker volume rm (docker volume ls -qf dangling=true)
 	echo "That wasn't even all the shit!"
+	docker system prune -af
+	echo "wait, there's more shit!"
 	docker builder prune -af
 	echo "done m8"
 end
