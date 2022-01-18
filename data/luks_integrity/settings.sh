@@ -11,13 +11,14 @@ export KEY=$WORKDIR/key
 export CRYPTDEV=luks_integrity_benchmark1
 # dd
 export DD="dd status=progress"
+export DD="dd"
 
 # block size that we will write/read
 export BS=4096
 
 # block count for image file
-export BC=$(python3 -c "import os;print(int(round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / 2 / int(os.environ['BS']))))")
-export BC=20000000
+export BC=$(python3 -c "import os;print(int(round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / 3 * 2 / int(os.environ['BS']))))")
+#export BC=20000000
 
 # how much data should we actually try to read and write, this is better to be lower than the image size
 export BCDATA=$(python3 -c "import os;print(int(round(int(os.environ['BC']) / 5 * 4)))")

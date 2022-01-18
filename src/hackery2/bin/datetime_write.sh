@@ -1,5 +1,5 @@
 #!/bin/env bash
-cd /run/user/1000
+cd /run/
 while :
 do
 	echo -n "UTC " > datetime.txt.tmp
