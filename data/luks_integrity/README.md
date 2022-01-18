@@ -132,3 +132,8 @@ Mem:           125Gi       5,0Gi        32Gi       124Mi        88Gi        35Gi
 
 ```
 
+# todo
+* allow to specify a real block device
+* try luks inside a crc32c integrity container
+
+
