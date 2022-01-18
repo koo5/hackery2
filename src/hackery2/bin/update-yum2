@@ -5,7 +5,8 @@ sudo ntpdate  -v  ntp.ubuntu.com &&
 {
 	{
 		sudo aptdcon --refresh &&
-		sudo unattended-upgrade --debug
+		#sudo unattended-upgrade --debug
+		sudo unattended-upgrade
 	} ||
 	sudo yum update  -y --security
 } && {

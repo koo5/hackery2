@@ -1,0 +1,39 @@
+try also: `cryptsetup benchmark`
+
+...### experimenting with a partition on an external hdd on usb3
+
+#### writing random data from my system's ssd to it
+```
+dd if=/dev/disk/by-id/nvme-Apacer_AS2280Q4_2000GB_03F107150D4419432361 | pv | dd of=/dev/disk/by-id/usb-Seagate_Expansion_NA8ZJLXY-0:0-part1
+[...]
+33633034240 bytes (34 GB, 31 GiB) copied, 70,0911 s, 480 MB/s
+```
+
+#### just default luks encryption
+```
+root@r6 ~# cryptsetup luksFormat /dev/disk/by-id/usb-Seagate_Expansion_NA8ZJLXY-0:0-part1  --type luks2                                
+root@r6 ~# cryptsetup open /dev/disk/by-id/usb-Seagate_Expansion_NA8ZJLXY-0:0-part1 bac8
+root@r6 ~ [32]# mkfs.ext4 -m1   /dev/mapper/bac8
+root@r6 ~# mount /dev/mapper/bac8 /bac8
+root@r6 ~# dd if=/dev/disk/by-id/nvme-Apacer_AS2280Q4_2000GB_03F107150D4419432361 | pv | dd of=/bac8/1
+32887218176 bytes (33 GB, 31 GiB) copied, 137,449 s, 239 MB/s
+```
+
+#### luks + --integrity
+##### --integrity hmac-sha1
+```
+cryptsetup luksFormat /dev/disk/by-id/usb-Seagate_Expansion_NA8ZJLXY-0:0-part1  --integrity hmac-sha1  --type luks2
+[...]
+Finished, time 01:47.157, 30791 MiB written, speed 287,4 MiB/s
+```
+```
+root@r6 ~# cryptsetup open /dev/disk/by-id/usb-Seagate_Expansion_NA8ZJLXY-0:0-part1 bac8
+root@r6 ~# mkfs.ext4 -m1   /dev/mapper/bac8
+root@r6 ~# mount /dev/mapper/bac8 /bac8
+root@r6 ~# dd if=/dev/disk/by-id/nvme-Apacer_AS2280Q4_2000GB_03F107150D4419432361 | pv | dd of=/bac8/1
+[...]
+31582789632 bytes (32 GB, 29 GiB) copied, 141,938 s, 223 MB/s
+```
+
+
+..
