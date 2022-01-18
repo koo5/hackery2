@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ticker2.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ticker2.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/bin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/bin.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ticker2.py" beforeDir="false" afterPath="$PROJECT_DIR$/ticker2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +84,9 @@
       <updated>1639441127833</updated>
       <workItem from="1639441129000" duration="1566000" />
       <workItem from="1639443250605" duration="485000" />
-      <workItem from="1639443747534" duration="10765000" />
+      <workItem from="1639443747534" duration="11235000" />
+      <workItem from="1639613770641" duration="2663000" />
+      <workItem from="1639725683645" duration="8000" />
     </task>
     <servers />
   </component>
