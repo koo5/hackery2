@@ -26,6 +26,8 @@ sh -c "$DD if=$DEV bs=$BS count=$BC of=/dev/null"
 
 
 
+
+
 echo
 free -h | grep -v Swap
 
@@ -36,7 +38,7 @@ free -h | grep -v Swap
 echo
 echo "dm-integrity ..."
 
-integritysetup format -qv $DEV 
+echo "YES" | integritysetup format $DEV 
 integritysetup open $DEV $CRYPTDEV
 sh -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV"
 integritysetup close $CRYPTDEV
@@ -55,8 +57,10 @@ free -h | grep -v Swap
 
 export CYP=""
 ./try_cyp.sh
-export CYP=" --cipher chacha20-random  --integrity poly1305"
-./try_cyp.sh
 export CYP="--integrity hmac-sha1"
 ./try_cyp.sh
 export CYP="--integrity hmac-sha256"
+./try_cyp.sh
+export CYP=" --cipher=chacha20-random  --integrity=poly1305"
+./try_cyp.sh
+
