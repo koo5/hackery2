@@ -18,6 +18,7 @@ cryptsetup --key-file  key   open   $DEV $CRYPTDEV
 echo "writing  ..."
 sh -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV"
 sync
+uptime
 cryptsetup close $CRYPTDEV
 
 echo "reading it back:"
@@ -26,6 +27,7 @@ cryptsetup --key-file  key  open   $DEV  $CRYPTDEV
 sync
 sh -c "$DD if=/dev/mapper/$CRYPTDEV bs=$BS count=$BCDATA of=/dev/null"
 sync
+uptime
 cryptsetup close $CRYPTDEV
 
 

@@ -20,8 +20,12 @@ free -h | grep -v Swap
 echo
 echo "raw write to ramfs:"
 sh -c "$DD if=/dev/zero bs=$BS count=$BC of=$DEV"
+sync
+uptime
 echo "reading it back:"
 sh -c "$DD if=$DEV bs=$BS count=$BC of=/dev/null"
+sync
+uptime
 
 
 
@@ -40,12 +44,17 @@ echo "dm-integrity ..."
 
 echo "YES" | integritysetup format $DEV 
 integritysetup open $DEV $CRYPTDEV
+echo "writing..."
 sh -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV"
+sync
+uptime
 integritysetup close $CRYPTDEV
 
 echo "reading it back:"
 integritysetup   open   $DEV $CRYPTDEV
 sh -c "$DD  if=/dev/mapper/$CRYPTDEV bs=$BS count=$BCDATA of=/dev/null"
+sync
+uptime
 integritysetup close $CRYPTDEV
 
 
