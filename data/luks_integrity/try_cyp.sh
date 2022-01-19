@@ -33,6 +33,6 @@ sync; sleep 10
 uptime
 cryptsetup close $CRYPTDEV
 
-
+sync; sleep 10
 echo
 free -h | grep -v Swap

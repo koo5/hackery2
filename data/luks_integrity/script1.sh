@@ -68,3 +68,41 @@ export CYP="--integrity hmac-sha256"
 export CYP=" --cipher=chacha20-random  --integrity=poly1305"
 ./try_cyp.sh
 
+
+
+
+
+
+echo
+echo "luks inside dm-integrity ..."
+export CYP=""
+
+echo "YES" | integritysetup format $DEV
+sh -x -c "integritysetup open $DEV $CRYPTDEV"
+sync; sleep 1
+
+echo
+echo "formatting with luks2  $CYP  ..."
+echo "YES" | sh -x -c "cryptsetup --key-file  key  luksFormat --type luks2   $CYP   /dev/mapper/$CRYPTDEV "
+sync; sleep 1
+cryptsetup --key-file  key   open   /dev/mapper/$CRYPTDEV $CRYPTDEV-2
+sync; sleep 10
+
+echo "writing..."
+sh -x -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV-2"
+sync; uptime; sleep 10
+cryptsetup close $CRYPTDEV-2
+integritysetup close $CRYPTDEV
+
+echo "reading it back:"
+integritysetup   open   $DEV $CRYPTDEV
+cryptsetup --key-file  key   open   /dev/mapper/$CRYPTDEV $CRYPTDEV-2
+sh -x -c "$DD  if=/dev/mapper/$CRYPTDEV-2 bs=$BS count=$BCDATA of=/dev/null"
+sync; uptime; sleep 10
+cryptsetup close $CRYPTDEV-2
+integritysetup close $CRYPTDEV
+
+
+echo
+free -h | grep -v Swap
+
