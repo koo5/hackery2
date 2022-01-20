@@ -1,0 +1,10 @@
+[global]
+bs=1M
+iodepth=64
+ioengine=libaio
+gtod_reduce=1
+numjobs=4
+group_reporting=1
+time_based
+runtime=10
+[job]
