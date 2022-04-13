@@ -1,6 +1,6 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 #cd /home/koom/snap/obs-studio/current
-cd /run
+cd /run/
 while :
 do
 	echo -n "UTC " > datetime.txt.tmp
