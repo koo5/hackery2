@@ -5,9 +5,8 @@ import os,sys,subprocess,time,shlex,logging, pathlib
 
 
 def get_username(url):
-	items = url.split('/')
 	try:
-		return items[-2]
+		return url.rstrip('/').split('/')[-2].split(':')[-1]
 	except:
 		return None
 
