@@ -1,1 +1,0 @@
-sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y

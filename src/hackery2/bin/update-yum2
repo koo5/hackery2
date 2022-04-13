@@ -11,7 +11,7 @@ sudo ntpdate  -v  ntp.ubuntu.com &&
 	sudo yum update  -y --security
 } && {
 	sudo checkrestart -v && 
-	needrestart 
+	sudo needrestart 
 	#&& /usr/lib/update-notifier/apt-check --human-readable 
 }
 
