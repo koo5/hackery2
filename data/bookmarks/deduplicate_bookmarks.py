@@ -17,7 +17,7 @@ from PyInquirer import prompt
 from collections import defaultdict
 import pathlib
 import configparser
-
+from click.exceptions import UsageError
 
 seen_uris = defaultdict(list)
 # dict from uri to set of "nodedupe" tags
@@ -27,7 +27,8 @@ seen_uris = defaultdict(list)
 options = Dotdict()
 
 @click.command()
-@click.argument('input_file')
+@click.option('-if', '--input_file', type=str, default='')
+@click.option('-id', '--input_directory', type=str, default='')
 @click.option('-of', '--output_file', type=str, default='')
 @click.option('-dd', '--dedupe', type=bool, default=False)
 @click.option('-re', '--remove_empty', type=bool, default=False)
@@ -37,6 +38,12 @@ options = Dotdict()
 def main(**kw):
 	for k,v in kw.items():
 		options[k] = v	
+
+	if options.input_file == '':
+		if options.input_directory != '':
+			options.input_file = find_most_recent_bookmark_backup_in_directory(options.input_directory)
+		else:
+			raise UsageError('one of --input_file or --input_directory must be given.')
 
 	print('loading %s'%options.input_file)
 	with open(options.input_file, 'r') as f:
@@ -52,6 +59,21 @@ def main(**kw):
 			else:
 				o = {}
 			json.dump(j, f, **o)
+
+
+
+
+import glob
+
+def find_most_recent_bookmark_backup_in_directory(dir):
+	hh = dir+'/bookmarks-*.json'
+	print('glob matching ' + hh)
+	files = sorted(glob.glob(hh))
+	print('found: ' + str(files))
+	r = files[-1]
+	print('reading ' + r + ' ...')
+	return r
+
 
 def print_counts(j):
 	c = place_count(j)
