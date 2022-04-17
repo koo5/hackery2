@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo "koom ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
+echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
 apt update
 sudo apt install ntpdate git fish
 chsh /usr/bin/fish

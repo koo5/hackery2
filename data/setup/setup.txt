@@ -1,6 +1,8 @@
 ## basics
 
 ```
+echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
+
 sudo apt install -y fish git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server
 
 sudo chsh -s /usr/bin/fish $USER
