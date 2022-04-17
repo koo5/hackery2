@@ -1,0 +1,16 @@
+output Virtual-1
+mode 1920x1080
+pos 0x0
+rate 60.00
+output Virtual-2
+mode 1920x1080
+pos 1920x1080
+rate 60.00
+output Virtual-3
+mode 1920x1080
+pos 3840x2160
+rate 60.00
+output Virtual-4
+mode 1920x1080
+pos 5760x3240
+rate 60.00
