@@ -4,11 +4,18 @@ set -x
 sudo ntpdate  -v  ntp.ubuntu.com &&
 {
 	{
-		sudo aptdcon --refresh &&
+		which yum &&
+		{
+			{
+				sudo yum update  -y --security
+			} || exit 1
+		}
+	} || {
+		aptdcon --fix-install &&
+		sudo apt-get update &&
 		#sudo unattended-upgrade --debug
 		sudo unattended-upgrade
-	} ||
-	sudo yum update  -y --security
+	}	
 } && {
 	sudo checkrestart -v && 
 	sudo needrestart 
