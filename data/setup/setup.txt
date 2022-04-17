@@ -1,9 +1,11 @@
 ## basics
 
 ```
+echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
+
 sudo apt install -y fish git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server
 
-sudo chsh -s /usr/bin/fish admin
+sudo chsh -s /usr/bin/fish $USER
 
 sudo ufw default deny incoming
 sudo ufw allow OpenSSH
@@ -22,7 +24,11 @@ sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-d
 
 git clone https://github.com/koo5/hackery2.git
 set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
+
+rm -rf ~/.config/fish/functions/
 ln -s ~/hackery2/data/setup/data/fish/functions/ ~/.config/fish/
+
+ln -s ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
 
 ```
 
@@ -45,7 +51,7 @@ sudo apt install xfce4-session xubuntu-desktop
 
 ## dev stuff
 ```
-sudo apt install -y gitsome aha kdiff
+sudo apt install -y gitsome aha kdiff 
 
 
 ```
