@@ -1,3 +1,8 @@
+# note
+Scripts are in bash so that set -e (die on error) can be used. Fish does not have a reasonable equivalent..
+
+
+
 # luks / dm-crypt / dm-integrity ciphers benchmark. Reading from/writing to a ramfs mount.
 
 ## test machine: Ryzen 9 5900X 12-Core
@@ -158,6 +163,18 @@ reading it back:
 # todo
 * allow to specify a real block device
 * output CSV or similar
+* --sector-size 4096
+* i changed settings.sh into fish format, the rest may still need changing
+
+
+
+
+
+## use for preparing or testing a real device:
+. settings.sh
+sudo DEV=/dev/disk/by-id/usb-Seagate_Expansion_NA8ZJLXY-0:0-part2  KEY=/keyfile1   DD="dd status=progress"  CYP="--cipher=chacha20-random  --integrity=poly1305  --sector-size 4096 "   ./try_cyp.sh
+
+
 
 
 

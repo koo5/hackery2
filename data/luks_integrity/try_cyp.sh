@@ -1,38 +1,38 @@
 #!/usr/bin/env bash
 set -e
 
-
-. ./settings.sh
-
+echo
+echo
+echo
+echo "luks2  $CYP  ..."
 
 # clean the header
 dd status=none if=/dev/zero bs=4096 count=10 of=$DEV  conv=notrunc
 
 
 echo
-echo "formatting with luks2  $CYP  ..."
-echo "YES" | sh -x -c "cryptsetup --key-file  key  luksFormat --type luks2    $CYP   $DEV "
-sync; sleep 10
+echo "YES" | sh -x -c "cryptsetup --key-file  $KEY  luksFormat --type luks2    $CYP   $DEV "
+sync; $UPTIME_DELAY
 
-cryptsetup --key-file  key   open   $DEV $CRYPTDEV
-sync; sleep 10
+cryptsetup --key-file  $KEY   open   $DEV $CRYPTDEV
+sync; $UPTIME_DELAY
 
 echo "writing  ..."
 sh -x -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV"
-sync; sleep 10; uptime
+sync; $UPTIME_DELAY; uptime
 cryptsetup close $CRYPTDEV
 
 echo "reading it back:"
-sync; sleep 10
-cryptsetup --key-file  key  open   $DEV  $CRYPTDEV
-sync; sleep 10
+sync; $UPTIME_DELAY
+cryptsetup --key-file  $KEY  open   $DEV  $CRYPTDEV
+sync; $UPTIME_DELAY
 
-sh -x -c "$DD if=/dev/mapper/$CRYPTDEV bs=$BS count=$BCDATA of=/dev/null"
-sync; sleep 10
+sh -x -c "$DD_NOSYNC if=/dev/mapper/$CRYPTDEV bs=$BS count=$BCDATA of=/dev/null"
+sync; $UPTIME_DELAY
 
 uptime
 cryptsetup close $CRYPTDEV
 
-sync; sleep 10
+sync; $UPTIME_DELAY
 echo
 free -h | grep -v Swap
