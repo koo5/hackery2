@@ -19,8 +19,11 @@ sync; $UPTIME_DELAY
 
 echo "writing  ..."
 sh -x -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV"
-sync; $UPTIME_DELAY; uptime
+sync
+$UPTIME
 cryptsetup close $CRYPTDEV
+
+$DROP_CACHES
 
 echo "reading it back:"
 sync; $UPTIME_DELAY
@@ -28,9 +31,10 @@ cryptsetup --key-file  $KEY  open   $DEV  $CRYPTDEV
 sync; $UPTIME_DELAY
 
 sh -x -c "$DD_NOSYNC if=/dev/mapper/$CRYPTDEV bs=$BS count=$BCDATA of=/dev/null"
-sync; $UPTIME_DELAY
+sync
+$UPTIME
 
-uptime
+
 cryptsetup close $CRYPTDEV
 
 sync; $UPTIME_DELAY

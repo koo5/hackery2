@@ -13,13 +13,16 @@ echo
 echo
 echo "raw write:"
 sh -x -c "$DD if=/dev/zero bs=$BS count=$BC of=$DEV"
-sync; uptime; $UPTIME_DELAY
+sync
+$UPTIME
 echo
 echo
+$DROP_CACHES
 echo
-echo "reading it back:"
+echo "raw read:"
 sh -x -c "$DD_NOSYNC if=$DEV bs=$BS count=$BC of=/dev/null"
-sync; uptime; $UPTIME_DELAY
+sync
+$UPTIME
 
 
 echo

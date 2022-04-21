@@ -17,21 +17,25 @@ echo
 echo "formatting with luks2  $CYP  ..."
 echo "YES" | sh -x -c "cryptsetup --key-file  $KEY  luksFormat --type luks2   $CYP   /dev/mapper/$CRYPTDEV "
 sync; $SLEEP 1
-cryptsetup --key-file  $KEY   open   /dev/mapper/$CRYPTDEV $CRYPTDEV-2
+cryptsetup --key-file  $KEY   open   /dev/mapper/$CRYPTDEV $CRYPTDEV2
 sync; $UPTIME_DELAY
 
 echo "writing..."
-sh -x -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV-2"
-sync; uptime; $UPTIME_DELAY
-cryptsetup close $CRYPTDEV-2
+sh -x -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV2"
+sync
+$UPTIME
+cryptsetup close $CRYPTDEV2
 integritysetup close $CRYPTDEV
+
+$DROP_CACHES
 
 echo "reading it back:"
 integritysetup   open   $DEV $CRYPTDEV
-cryptsetup --key-file  $KEY   open   /dev/mapper/$CRYPTDEV $CRYPTDEV-2
-sh -x -c "$DD_NOSYNC  if=/dev/mapper/$CRYPTDEV-2 bs=$BS count=$BCDATA of=/dev/null"
-sync; uptime; $UPTIME_DELAY
-cryptsetup close $CRYPTDEV-2
+cryptsetup --key-file  $KEY   open   /dev/mapper/$CRYPTDEV $CRYPTDEV2
+sh -x -c "$DD_NOSYNC  if=/dev/mapper/$CRYPTDEV2 bs=$BS count=$BCDATA of=/dev/null"
+sync
+$UPTIME
+cryptsetup close $CRYPTDEV2
 integritysetup close $CRYPTDEV
 
 

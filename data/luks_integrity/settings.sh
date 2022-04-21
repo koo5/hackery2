@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
+export DROP_CACHES=./drop_caches.sh
+export UPTIME=./uptime.sh
+
 export WORKDIR=/run/luks_integrity_benchmark
 # crypto key
 export KEY=key
 # dev-mapper device name
 export CRYPTDEV=luks_integrity_benchmark1
+export CRYPTDEV2=luks_integrity_benchmark2
 
 # dd
 export DD_NOSYNC="dd "
