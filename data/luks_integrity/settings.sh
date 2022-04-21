@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
 export WORKDIR=/run/luks_integrity_benchmark
-# where to mount ramfs
-export MNT=$WORKDIR/ramfs
-# image file path
-export DEV=$MNT/image.raw
 # crypto key
 export KEY=key
 # dev-mapper device name

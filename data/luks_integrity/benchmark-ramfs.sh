@@ -7,7 +7,10 @@ set -e
 
 
 . ./settings.sh
-./cleanup.sh
-./init.sh
+# where to mount ramfs
+export MNT=$WORKDIR/ramfs
+export DEV=$MNT/image.raw
+./ramfs-cleanup.sh
+./ramfs-init.sh
 ./benchmark.sh
-./cleanup.sh
+./ramfs-cleanup.sh
