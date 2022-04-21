@@ -11,7 +11,7 @@ sudo ntpdate  -v  ntp.ubuntu.com &&
 			} || exit 1
 		}
 	} || {
-		aptdcon --fix-install &&
+		sudo aptdcon --fix-install &&
 		sudo apt-get update --error-on=any &&
 		#sudo unattended-upgrade --debug
 		sudo unattended-upgrade
