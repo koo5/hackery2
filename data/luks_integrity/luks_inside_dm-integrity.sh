@@ -3,13 +3,13 @@ echo
 echo
 echo
 echo "luks inside dm-integrity ..."
-export CYP=""
+
 
 # clean the header
 dd status=none if=/dev/zero bs=4096 count=10 of=$DEV  conv=notrunc
 
 
-echo "YES" | integritysetup format $CYP $DEV
+echo "YES" | integritysetup format $INTEGRITY_CYP $DEV
 sh -x -c "integritysetup open $DEV $CRYPTDEV"
 sync; $SLEEP 1
 

@@ -16,9 +16,8 @@ export DD="$DD_NOSYNC conv=fsync "
 export DD="$DD status=progress "
 
 # sleep
-export SLEEP=true
-# sleep
-export UPTIME_DELAY=true
+export SLEEP=sleep
+export UPTIME_DELAY=sleep 1
 # sleep 10
 
 # block size that we will write/read

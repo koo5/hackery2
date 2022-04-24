@@ -2,4 +2,4 @@
 echo ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 uptime
 echo
-sleep $UPTIME_DELAY
+$UPTIME_DELAY

@@ -58,13 +58,16 @@ export CYP="--integrity hmac-sha256"
 export CYP=" --cipher=chacha20-random  --integrity=poly1305"
 ./try_cyp.sh
 
-export CYP="--integrity crc32c"
+
+export CYP=""
+
+export INTEGRITY_CYP="--integrity crc32c"
 ./luks_inside_dm-integrity.sh
 
-export CYP="--integrity sha1"
+export INTEGRITY_CYP="--integrity sha1"
 ./luks_inside_dm-integrity.sh
 
-export CYP="--integrity sha256"
+export INTEGRITY_CYP="--integrity sha256"
 ./luks_inside_dm-integrity.sh
 
 

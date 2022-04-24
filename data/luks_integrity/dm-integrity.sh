@@ -18,9 +18,11 @@ sh -x -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV"
 echo
 sync
 $UPTIME
-integritysetup close $CRYPTDEV
-
 $DROP_CACHES
+sleep 5
+integritysetup close $CRYPTDEV
+$DROP_CACHES
+
 
 echo
 echo "reading it back:"
@@ -29,6 +31,7 @@ sh -x -c "$DD_NOSYNC  if=/dev/mapper/$CRYPTDEV bs=$BS count=$BCDATA of=/dev/null
 echo
 sync
 $UPTIME
+sleep 5
 integritysetup close $CRYPTDEV
 
 
