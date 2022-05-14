@@ -1,23 +1,9 @@
-## basics
+## basics 0
 
-### locale
-```
-sudo dpkg-reconfigure locale
-sudo dpkg-reconfigure locales
-#sudo locale-gen en_US.utf8
-#sudo update-locale
-#localectl status
-#env LANG=en_US.UTF-8 sudo update-locale
-sudo update-locale en_US.UTF-8
-sudo mcedit /etc/default/locale
-sudo locale-gen en_AU.utf8
-localectl  list-locales
-```
-### essentials
 ```
 echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
 
-sudo apt install -y fish git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server
+sudo apt install -y fish git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof
 
 sudo chsh -s /usr/bin/fish $USER
 
@@ -31,11 +17,67 @@ echo """PasswordAuthentication no
 Port 44""" | sudo tee /etc/ssh/sshd_config.d/1.conf
 sudo systemctl restart sshd.service
 
-sudo apt install -y build-essential libxrandr-dev ssh arandr xcalib virt-manager gparted wget traceroute terminator tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof geany hdparm fdupes duperemove zram-config swi-prolog  mailcheck autorandr xfce4-terminal kwrite 
-# sudo apt install -y hddtemp 
+```
 
-sudo apt install -y btrfs-progs
+## basics 1 - locale (attempt 1)
+```
+sudo dpkg-reconfigure locale
+sudo dpkg-reconfigure locales
+#sudo locale-gen en_US.utf8
+#sudo update-locale
+#localectl status
+#env LANG=en_US.UTF-8 sudo update-locale
+sudo update-locale en_US.UTF-8
+sudo mcedit /etc/default/locale
+sudo locale-gen en_AU.utf8
+localectl  list-locales
+```
 
+## basics 1 - locale (docker) (todo, turn this into a script?)
+[locale config/setup and possibly also essential utilities](https://github.com/lodgeit-labs/accounts-assessor/blob/b6a07923a0dc9232e90359bbbf8ac04cf73b2176/docker_scripts/ubuntu/Dockerfile#L10)
+```
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Prague
+ARG TERM=linux
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+
+RUN apt-get update
+RUN apt-get install -qqy ca-certificates apt-utils tzdata time locales language-pack-en unattended-upgrades tzdata time apt-utils dialog 2>&1 | \
+    grep -v "^debconf: delaying package configuration.*"
+    
+
+env LOC en_US.UTF-8
+ENV LANG $LOC
+ENV LANGUAGE $LANG
+ENV LC_ALL $LOC
+
+
+RUN sed -i -e 's/# $LOC UTF-8/$LOC UTF-8/' /etc/locale.gen
+RUN dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$LOC
+```
+
+
+
+
+
+## basics 2
+```
+sudo apt install -y build-essential hddtemp hdparm fdupes duperemove zram-config swi-prolog
+
+# graphical stuff
+sudo apt install -y arandr terminator geany  fdupes duperemove zram-config swi-prolog  mailcheck autorandr xfce4-terminal kwrite
+
+# hypervisor stuff
+sudo apt install -y virt-manager
+
+# physical stuff
+hddtemp hdparm gparted xcalib libxrandr-dev btrfs-progs
+```
+
+## basics 3
+```
 sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
 
 git clone https://github.com/koo5/hackery2.git
@@ -219,3 +261,5 @@ sudo journalctl --follow
 
 
 ```
+## hpnssh...
+
