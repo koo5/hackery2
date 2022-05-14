@@ -1,0 +1,6 @@
+#SUBSYSTEM=="usb", ACTION=="add", ATTR{removable}=="removable", ATTR{idVendor}=="04e8", ATTR{idProduct}=="6860", ATTR{authorized}="0"
+# $ udevadm info -a -p /sys/bus/usb/devices/2-2
+# tree /sys/bus/usb/devices/2-2
+# lsusb
+
+

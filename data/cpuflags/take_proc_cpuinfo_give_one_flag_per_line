@@ -1,0 +1,1 @@
+grep flags $1 | uniq | tr ' ' '\n'| tail -n +2
