@@ -141,7 +141,9 @@ sudo systemctl status mptcp
 ```
 ### setup
 ```
-ip mptcp limits set subflow 2 add_addr_accepted 2
+dmesg | grep MPTCP
+
+ip mptcp limits set subflow 4 add_addr_accepted 4
 
 set MY_IP (dig +short myip.opendns.com @resolver1.opendns.com)
 sudo ip mptcp endpoint add et $MY_IP dev eth0 subflow
@@ -171,10 +173,6 @@ sudo ip mptcp endpoint add 154.12.236.185 dev eth0 subflow
 ```
 
 ### monitor
-
-```
-dmesg | grep MPTCP
-```
 ```
 journalctl -f -u mptcp.service
 ```
@@ -198,23 +196,6 @@ client:
 ```
 mptcpize run -d nc 154.12.236.185 8080 | wc -c
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
