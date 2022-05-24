@@ -64,16 +64,22 @@ RUN dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$L
 
 ## basics 2
 ```
-sudo apt install -y build-essential hddtemp hdparm fdupes duperemove zram-config swi-prolog
+sudo apt install needrestart debian-goodies mailcheck build-essential zram-config swi-prolog
 
 # graphical stuff
-sudo apt install -y arandr terminator geany  fdupes duperemove zram-config swi-prolog  mailcheck autorandr xfce4-terminal kwrite
+sudo apt install -y arandr terminator geany xfce4-terminal kwrite
 
 # hypervisor stuff
 sudo apt install -y virt-manager
 
 # physical stuff
-hddtemp hdparm gparted xcalib libxrandr-dev btrfs-progs
+sudo apt install -y fdupes hddtemp hdparm gparted
+
+# X11 stuff
+sudo apt install -y xcalib libxrandr-dev autorandr
+
+# btrfs
+sudo apt install -y duperemove btrfs-progs
 ```
 
 ## basics 3
