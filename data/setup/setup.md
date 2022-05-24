@@ -89,6 +89,8 @@ sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-d
 git clone https://github.com/koo5/hackery2.git
 set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
 
+sudo ~/hackery2/data/setup/data/mc/setup.sh
+
 rm -rf ~/.config/fish/functions/
 ln -s ~/hackery2/data/setup/data/fish/functions/ ~/.config/fish/
 
