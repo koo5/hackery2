@@ -1,0 +1,10 @@
+no luck with xfce:
+```
+  ! Your are using the xrdp-installer script via ssh connection  !
+  ! You might need to create your ~/.xsessionrc file manually    !
+ 
+#? sudo apt install xfce4-session xubuntu-desktop
+#? echo "exec plasma_session" >> ~/.xsession
+# sudo apt remove xfce4-power-manager xfce4-screensaver 
+```
+

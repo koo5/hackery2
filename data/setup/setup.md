@@ -1,25 +1,84 @@
+## log in
+```
+ssh ... MY_PUBKEY_VALUE=(cat ~/.ssh/id_ed25519.pub) bash -l
+```
+
+## create user
+```
+export NEW_USER=user
+adduser $NEW_USER
+usermod -a -G sudo $NEW_USER
+# fedoora:
+# usermod -a -G wheel $NEW_USER
+```
+
 ## basics 0
 
 ```
+mkdir ~/.ssh; echo $MY_PUBKEY_VALUE >> ~/.ssh/authorized_keys
 echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
-
-sudo apt install -y fish git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof
-
+sudo apt install -y fish
+fish
+```
+## basics 1
+```
 sudo chsh -s /usr/bin/fish $USER
+sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
+sudo apt install -y git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3
+
+git clone https://github.com/koo5/hackery2.git
+set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
+sudo ~/hackery2/data/setup/data/mc/setup.sh
+rm -rf ~/.config/fish/functions/
+ln -s ~/hackery2/data/setup/data/fish/functions/ ~/.config/fish/
+ln -s ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
+```
+
+## tighten up
+
+1) upload pubkey:
+```
+mcedit ~/.ssh/authorized_keys
+```
+2)
+```
+export NEW_SSH_PORT=44
 
 sudo ufw default deny incoming
 sudo ufw allow OpenSSH
-sudo ufw allow 44
+sudo ufw allow $NEW_SSH_PORT
 sudo ufw enable
 sudo ufw status
 
 echo """PasswordAuthentication no
-Port 44""" | sudo tee /etc/ssh/sshd_config.d/1.conf
+Port $NEW_SSH_PORT """ | sudo tee /etc/ssh/sshd_config.d/1.conf
 sudo systemctl restart sshd.service
 
 ```
 
-## basics 1 - locale (attempt 1)
+
+## bandwidth test
+transmitting server:
+```
+PORT=8888 sudo ufw allow $PORT; iperf3  -s -p $PORT; sudo ufw delete allow $PORT
+```
+downloading client:
+```
+PORT=8888 iperf3 -c $HOST -p $PORT -t 10000 -R
+```
+
+### useful shell history
+```
+df -H -h   -l -x loop -x tmpfs -x devtmpfs -x squashfs | grep -v rpool
+sudo ufw status
+NO_COLOR=1 sudo journalctl --follow
+sudo netstat -nlpt
+sudo jnettop -i any
+
+```
+
+
+## locale (confused attempt 1)
 ```
 sudo dpkg-reconfigure locale
 sudo dpkg-reconfigure locales
@@ -33,7 +92,7 @@ sudo locale-gen en_AU.utf8
 localectl  list-locales
 ```
 
-## basics 1 - locale (docker) (todo, turn this into a script?)
+## locale (this works inside docker) (todo, turn this into a script?)
 [locale config/setup and possibly also essential utilities](https://github.com/lodgeit-labs/accounts-assessor/blob/b6a07923a0dc9232e90359bbbf8ac04cf73b2176/docker_scripts/ubuntu/Dockerfile#L10)
 ```
 ARG DEBIAN_FRONTEND=noninteractive
@@ -64,7 +123,8 @@ RUN dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$L
 
 ## basics 2
 ```
-sudo apt install needrestart debian-goodies mailcheck build-essential zram-config swi-prolog
+# maybe
+sudo apt install build-essential zram-config swi-prolog
 
 # graphical stuff
 sudo apt install -y arandr terminator geany xfce4-terminal kwrite
@@ -73,28 +133,10 @@ sudo apt install -y arandr terminator geany xfce4-terminal kwrite
 sudo apt install -y virt-manager
 
 # physical stuff
-sudo apt install -y fdupes hddtemp hdparm gparted
+sudo apt install -y fdupes duperemove btrfs-progs hddtemp hdparm gparted 
 
 # X11 stuff
 sudo apt install -y xcalib libxrandr-dev autorandr
-
-# btrfs
-sudo apt install -y duperemove btrfs-progs
-```
-
-## basics 3
-```
-sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
-
-git clone https://github.com/koo5/hackery2.git
-set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
-
-sudo ~/hackery2/data/setup/data/mc/setup.sh
-
-rm -rf ~/.config/fish/functions/
-ln -s ~/hackery2/data/setup/data/fish/functions/ ~/.config/fish/
-
-ln -s ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
 
 ```
 
@@ -193,7 +235,7 @@ while True:
 	os.system('nstat "MPTcp*"')
 ```
 
-### try
+### does it work?
 
 server:
 ```
@@ -210,23 +252,32 @@ mptcpize run -d nc 154.12.236.185 8080 | wc -c
 
 ## RDP server
 
-follow https://c-nergy.be/blog/?p=17175 :
+0) pick a desktop .. i dont have luck with xfce, it is plasma_session that works
+```
+sudo apt install kubuntu-desktop
+```
+
+1) on server, follow https://c-nergy.be/blog/?p=17175 , run as normal user:
 ```
 sudo apt install -y xserver-xorg-core unzip
-wget https://www.c-nergy.be/downloads/xRDP/xrdp-installer-1.3.zip
-unzip xrdp-installer-1.3.zip
-chmod +x  xrdp-installer-1.3.sh
-./xrdp-installer-1.3.sh -l # -s
-echo "exec plasma_session" >> ~/.xsession
-#sudo apt install kubuntu-desktop
-sudo apt install xfce4-session xubuntu-desktop
-# sudo apt remove xfce4-power-manager xfce4-screensaver 
-
-
+wget https://c-nergy.be/downloads/xRDP/xrdp-installer-1.4.1.zip
+unzip xrdp-installer-*
+chmod +x  xrdp-installer-*.sh
+./xrdp-installer-*.sh -l # -s
 ```
+2) on client :)
+```
+cp -r ~/.ssh/ ~/snap/remmina/common/
+```
+* probably use remmina from snap (latest version)
+* when logging in, remember that the remote machine has it's own keyboard layout
+
 
 ## dev stuff
 ```
+ssh-keygen -t ed25519 -a 100
+cat ~/.ssh/id_ed25519.pub 
+
 sudo apt install -y gitsome aha kdiff 
 
 ```
@@ -241,14 +292,5 @@ sudo apt install gh
 
 ```
 
-## useful shell history
-```
-df -H -h   -l -x loop -x tmpfs -x devtmpfs -x squashfs | grep -v rpool
-sudo ufw status
-sudo journalctl --follow
-
-
-
-```
 ## hpnssh...
 
