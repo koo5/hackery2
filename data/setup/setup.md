@@ -78,7 +78,20 @@ sudo jnettop -i any
 ```
 
 
-## locale (confused attempt 1)
+
+## locale 
+
+### this would be:
+```
+export LOC=en_US.UTF-8
+export LANG=$LOC
+export LANGUAGE=$LANG
+export LC_ALL=$LOC
+apt-get install -qqy ca-certificates apt-utils tzdata time locales language-pack-en unattended-upgrades tzdata time apt-utils dialog
+sudo sed -i -e 's/# $LOC UTF-8/$LOC UTF-8/' /etc/locale.gen
+sudo dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$LOC
+```
+### (confused attempt 1)
 ```
 sudo dpkg-reconfigure locale
 sudo dpkg-reconfigure locales
@@ -92,7 +105,7 @@ sudo locale-gen en_AU.utf8
 localectl  list-locales
 ```
 
-## locale (this works inside docker) (todo, turn this into a script?)
+### (this works inside docker) (todo, turn this into a script?)
 [locale config/setup and possibly also essential utilities](https://github.com/lodgeit-labs/accounts-assessor/blob/b6a07923a0dc9232e90359bbbf8ac04cf73b2176/docker_scripts/ubuntu/Dockerfile#L10)
 ```
 ARG DEBIAN_FRONTEND=noninteractive
@@ -116,8 +129,6 @@ ENV LC_ALL $LOC
 RUN sed -i -e 's/# $LOC UTF-8/$LOC UTF-8/' /etc/locale.gen
 RUN dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$LOC
 ```
-
-
 
 
 
@@ -293,4 +304,34 @@ sudo apt install gh
 ```
 
 ## hpnssh...
+### check distro repos
+### try package download
+https://sourceforge.net/projects/hpnssh/files/Debian%20Packages/
+wget https://sourceforge.net/projects/hpnssh/files/Debian%20Packages/HPN-SSH%2015v5%208.8p1%20%28hirsute%29/hpnssh-8.8p1-hpn15v5.tar.gz/download
+mkdir hpnssh; tar -xf download -C hpnssh
+sudo dpkg -i hpnssh/hpnssh*
+### build from source
+```
+sudo apt install zlib1g-dev
+```
+https://github.com/rapier1/openssh-portable#building-from-git
 
+see INSTALL for libcrypto instructions
+
+
+```
+git clone https://github.com/rapier1/openssh-portable
+cd openssh-portable
+autoreconf
+./configure
+make && make tests
+```
+```
+sudo make install
+```
+
+...
+```
+sudo ssh-keygen -t ed25519 -a 100  -f /etc/ssh/ssh_host_key -N ""
+?...
+```

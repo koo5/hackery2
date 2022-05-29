@@ -1,4 +1,4 @@
 #!/usr/bin/env fish
-VM=$argv[1] begin; virsh start $VM; virt-viewer  -f  -a  -c  qemu:///system  $VM; end
+VM=$argv[1] begin; sudo virsh start $VM; virt-viewer  -f  -a  -c  qemu:///system  $VM; end
 
 
