@@ -1,29 +1,42 @@
 ## log in
 ```
-ssh ... MY_PUBKEY_VALUE=(cat ~/.ssh/id_ed25519.pub) bash -l
+set --universal MY_VPS_IP ....
+
+ssh -t root@$MY_VPS_IP  CLIENT_PUBKEY_VALUE=\"(cat ~/.ssh/id_ed25519.pub)\" bash -c "mkdir ~/.ssh; echo $CLIENT_PUBKEY_VALUE >> ~/.ssh/authorized_keys"
+```
+
+## basics0
+```
+sudo apt install -y fish
+fish
 ```
 
 ## create user
 ```
 export NEW_USER=user
 adduser $NEW_USER
+
+# ubuntu:
 usermod -a -G sudo $NEW_USER
 # fedoora:
-# usermod -a -G wheel $NEW_USER
-```
+usermod -a -G wheel $NEW_USER
 
-## basics 0
 
 ```
-mkdir ~/.ssh; echo $MY_PUBKEY_VALUE >> ~/.ssh/authorized_keys
+
+## basics 0.5
+```
+su $NEW_USER
+cd
+#mkdir ~/.ssh; echo $CLIENT_PUBKEY_VALUE >> ~/.ssh/authorized_keys
 echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
-sudo apt install -y fish
-fish
 ```
 ## basics 1
 ```
 sudo chsh -s /usr/bin/fish $USER
+
 sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
+
 sudo apt install -y git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3
 
 git clone https://github.com/koo5/hackery2.git
@@ -60,20 +73,33 @@ sudo systemctl restart sshd.service
 ## bandwidth test
 transmitting server:
 ```
-PORT=8888 sudo ufw allow $PORT; iperf3  -s -p $PORT; sudo ufw delete allow $PORT
+PORT=8888 begin; 
+    sudo ufw allow $PORT; 
+    iperf3  -s -p $PORT; 
+    sudo ufw delete allow $PORT;
+end
+
 ```
 downloading client:
 ```
-PORT=8888 iperf3 -c $HOST -p $PORT -t 10000 -R
+PORT=8888 begin;
+	iperf3 -c $MY_VPS_IP -p $PORT -t 10000 -R
+end
 ```
 
 ### useful shell history
-```
-df -H -h   -l -x loop -x tmpfs -x devtmpfs -x squashfs | grep -v rpool
+```df -H -h   -l -x loop -x tmpfs -x devtmpfs -x squashfs | grep -v rpool
+
 sudo ufw status
+
 NO_COLOR=1 sudo journalctl --follow
+
 sudo netstat -nlpt
+
 sudo jnettop -i any
+
+cat /etc/issue
+
 
 ```
 
@@ -87,9 +113,9 @@ export LOC=en_US.UTF-8
 export LANG=$LOC
 export LANGUAGE=$LANG
 export LC_ALL=$LOC
-apt-get install -qqy ca-certificates apt-utils tzdata time locales language-pack-en unattended-upgrades tzdata time apt-utils dialog
+sudo apt-get install -qqy ca-certificates apt-utils tzdata time locales language-pack-en unattended-upgrades tzdata time apt-utils dialog
 sudo sed -i -e 's/# $LOC UTF-8/$LOC UTF-8/' /etc/locale.gen
-sudo dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$LOC
+sudo dpkg-reconfigure --frontend=noninteractive locales  && sudo update-locale LANG=$LOC
 ```
 ### (confused attempt 1)
 ```
@@ -263,9 +289,16 @@ mptcpize run -d nc 154.12.236.185 8080 | wc -c
 
 ## RDP server
 
-0) pick a desktop .. i dont have luck with xfce, it is plasma_session that works
+0) pick a desktop .. i dont have luck with xfce, it is plasma_session that works (remember to disable compositing and animations..)
 ```
 sudo apt install kubuntu-desktop
+sudo apt remove sddm "cups*" "bluez*" cryptsetup "network-manager*" 
+sudo apt autoremove
+
+
+echo xeyes > ~/.xsession
+echo plasma_session > ~/.xsession
+
 ```
 
 1) on server, follow https://c-nergy.be/blog/?p=17175 , run as normal user:
@@ -282,7 +315,14 @@ cp -r ~/.ssh/ ~/snap/remmina/common/
 ```
 * probably use remmina from snap (latest version)
 * when logging in, remember that the remote machine has it's own keyboard layout
+```
 
+sudo systemctl restart xrdp.service
+
+killall Xorg
+
+
+```
 
 ## dev stuff
 ```
@@ -306,32 +346,71 @@ sudo apt install gh
 ## hpnssh...
 ### check distro repos
 ### try package download
+```
 https://sourceforge.net/projects/hpnssh/files/Debian%20Packages/
+
 wget https://sourceforge.net/projects/hpnssh/files/Debian%20Packages/HPN-SSH%2015v5%208.8p1%20%28hirsute%29/hpnssh-8.8p1-hpn15v5.tar.gz/download
+
 mkdir hpnssh; tar -xf download -C hpnssh
-sudo dpkg -i hpnssh/hpnssh*
+
+sudo dpkg -i hpnssh/hpnssh-client_*
+sudo dpkg -i hpnssh/hpnssh-server_*
+```
 ### build from source
 ```
-sudo apt install zlib1g-dev
+sudo apt install zlib1g-dev libssl-dev  autoconf build-essential
 ```
-https://github.com/rapier1/openssh-portable#building-from-git
 
-see INSTALL for libcrypto instructions
-
+dw zip at https://github.com/rapier1/openssh-portable/tags
 
 ```
-git clone https://github.com/rapier1/openssh-portable
 cd openssh-portable
 autoreconf
 ./configure
-make && make tests
-```
-```
-sudo make install
+make -j24 && make tests
 ```
 
-...
 ```
-sudo ssh-keygen -t ed25519 -a 100  -f /etc/ssh/ssh_host_key -N ""
+sudo useradd hpnsshd
+sudo make install
+```
+```
+sudo chmod -R go-rw /home/user/.ssh/
+sudo chown -R user:user /home/user/.ssh/
+```
+```
+sudo ufw allow 2222
+```
+```
+sudo /usr/local/sbin/hpnsshd -Dd
+```
+
+nope:
+###sudo ssh-keygen -t ed25519 -a 100  -f /etc/ssh/ssh_host_key -N ""
+/// https://github.com/rapier1/openssh-portable#building-from-git
+/// # see INSTALL for libcrypto instructions
 ?...
+
+
+
+## iperf3
+```
+set --universal MY_PORT 7777
+ssh -L $MY_PORT:localhost:$MY_PORT -p2222 -t user@$MY_VPS
+```
+```
+PORT=7777 begin; 
+	sudo ufw allow $PORT; 
+	iperf3  -s -p $PORT; 
+	sudo ufw delete allow $PORT;
+end
+```
+```
+iperf3 -c localhost -p MY_PORT -t 10000 -R
+```
+```
+iperf3 -c $MY_VPS_IP -p 8888 -t 10000 -R
+```
+```
+hpnssh -o NoneEnabled=yes -o NoneSwitch=yes -C -L 8888:localhost:8888 -p2222  user@$MY_VPS   stdbuf -i0 -o0 -e0    iperf3  -s -p  8888
 ```
