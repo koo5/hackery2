@@ -9,6 +9,10 @@ ssh -t root@$MY_VPS_IP  CLIENT_PUBKEY_VALUE=\"(cat ~/.ssh/id_ed25519.pub)\" bash
 ```
 sudo apt install -y fish
 fish
+```	
+## basics0 (VM)
+```
+sudo apt install -y spice-vdagent
 ```
 
 ## create user
@@ -330,6 +334,13 @@ ssh-keygen -t ed25519 -a 100
 cat ~/.ssh/id_ed25519.pub 
 
 sudo apt install -y gitsome aha kdiff 
+
+npm i -g diff-so-fancy
+
+https://github.com/nvm-sh/nvm#install--update-script
+
+
+
 
 ```
 
