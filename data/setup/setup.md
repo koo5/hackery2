@@ -44,10 +44,11 @@ sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-d
 sudo apt install -y git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3 auditd
 
 git clone https://github.com/koo5/hackery2.git
-set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
 sudo ~/hackery2/data/setup/data/mc/setup.sh
-rm -rf ~/.config/fish/functions/
-ln -s ~/hackery2/data/setup/data/fish/functions/ ~/.config/fish/
+
+set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
+set -g fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path
+
 ln -s ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
 ```
 
