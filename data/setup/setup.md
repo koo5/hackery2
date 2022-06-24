@@ -452,3 +452,22 @@ iperf3 -c $MY_VPS_IP -p 8888 -t 10000 -R
 ```
 hpnssh -o NoneEnabled=yes -o NoneSwitch=yes -C -L 8888:localhost:8888 -p2222  user@$MY_VPS   stdbuf -i0 -o0 -e0    iperf3  -s -p  8888
 ```
+
+## xfwm
+```
+sudo apt-get build-dep xfwm4
+apt source xfwm4
+cd xfwm4-4.16.1/src
+patch < ~/hackery2/data/setup/data/xfwm4/fullscreenfix+patch2-xfwm4.16.1
+dpkg-buildpackage  -rfakeroot -b
+sudo dpkg -i ../xfwm4_4.16.1-1_amd64.deb
+nohup xfwm4 --replace
+```
+^ note that this is without bumping the package's version ...
+
+
+
+
+
+
+```
