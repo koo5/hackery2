@@ -10,7 +10,33 @@ ssh -t root@$MY_VPS_IP  CLIENT_PUBKEY_VALUE=\"(cat ~/.ssh/id_ed25519.pub)\" bash
 sudo apt install -y fish
 fish
 ```	
-## basics0 (VM)
+
+## basics0.1
+
+```
+sudo apt install apt-config-auto-update unattended-upgrades apt-listchanges mailutils powermgmt-base
+```
+
+```
+bash
+```
+```
+cat << EEE | sudo tee /etc/apt/apt.conf.d/999
+Unattended-Upgrade::Automatic-Reboot "true";
+//Unattended-Upgrade::Automatic-Reboot-WithUsers "true"; // it's false by default
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::Unattended-Upgrade "1";
+Unattended-Upgrade::MinimalSteps "true";
+Unattended-Upgrade::Mail "$USER";
+EEE
+```
+```
+exit
+```
+
+
+
+## basics0.2 (VM)
 ```
 sudo apt install -y spice-vdagent
 ```
@@ -22,7 +48,7 @@ adduser $NEW_USER
 
 # ubuntu:
 usermod -a -G sudo $NEW_USER
-# fedoora:
+# fedora:
 usermod -a -G wheel $NEW_USER
 
 
