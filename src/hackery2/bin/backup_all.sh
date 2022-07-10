@@ -1,9 +1,23 @@
 #!/usr/bin/env fish
+
+sudo swipl -s /home/koom/h/disks.pl  -g "start"
+
+
 export DST=bac1
 
-mount | grep /bac4;  \
-and  mount | grep $DST ; \
-and bfg  --YES=true   --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/bac4  commit_and_push_and_checkout   --SUBVOLUME=/bac4/cold --REMOTE_SUBVOLUME=/$DST/cold/
+mount | grep $DST ; and backup_cold.sh
+mount | grep $DST ; and backup_lean.sh
+mount | grep $DST ; and backup_root.sh
 
-mount | grep $DST ; \
-and bfg  --YES=true  --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/nvme0n1p6_crypt_root  commit_and_push_and_checkout    --SUBVOLUME=/d    --REMOTE_SUBVOLUME=/$DST/lean
+export DST=bac3
+
+mount | grep $DST ; and backup_lean.sh
+mount | grep $DST ; and backup_root.sh
+
+export DST=bac9
+
+mount | grep $DST ; and backup_cold.sh
+
+
+
+sudo swipl -s /home/koom/h/disks.pl  -g "stop"
