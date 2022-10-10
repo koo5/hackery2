@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
 """
-handles and outputs firefox json bookmarks backup format: bookmarks->show all bookmarks->import and backup->backup
+reads and outputs firefox json and jsonlz4 bookmarks backup format: bookmarks->show all bookmarks->import and backup->backup
 
-deduplication and other cleanup but also can generate a directory tree with one file for each bookmark, on your filesystem
-example usage:
-rm -rf ~/Desktop/bookmarks/places/;  ./deduplicate_bookmarks.py -ol ~/Desktop/bookmarks/ ~/Desktop/bookmarks-2021-11-11.json
+does deduplication and other cleanup (not sure how well this still works) but also can generate a directory tree with one file for each bookmark, on your filesystem
+
+actual usage:
+rm -rf ~/bookmarks/places/;  /d/hackery2/data/bookmarks/deduplicate_bookmarks.py -ol ~/bookmarks/ -id ~/"/Desktop/bookmarks-*.json" -id ~/"snap/firefox/common/.mozilla/firefox/scjibdo1.default/bookmarkbackups/*"
+
 
 """
 
-import sys, json, os, stat
+import sys, json, os, stat, lz4.block
 import click
 from dotdict import Dotdict
 from urllib import parse
@@ -28,7 +30,7 @@ options = Dotdict()
 
 @click.command()
 @click.option('-if', '--input_file', type=str, default='')
-@click.option('-id', '--input_directory', type=str, default='')
+@click.option('-id', '--input_directory', type=str, multiple=True)
 @click.option('-of', '--output_file', type=str, default='')
 @click.option('-dd', '--dedupe', type=bool, default=False)
 @click.option('-re', '--remove_empty', type=bool, default=False)
@@ -40,14 +42,13 @@ def main(**kw):
 		options[k] = v	
 
 	if options.input_file == '':
-		if options.input_directory != '':
+		if options.input_directory != []:
 			options.input_file = find_most_recent_bookmark_backup_in_directory(options.input_directory)
 		else:
 			raise UsageError('one of --input_file or --input_directory must be given.')
 
 	print('loading %s'%options.input_file)
-	with open(options.input_file, 'r') as f:
-		j = json.load(f)
+	j = load_bookmarks_backup_file(options.input_file)
 	print_counts(j)
 	print('walking...')
 	walk([], j)
@@ -61,18 +62,37 @@ def main(**kw):
 			json.dump(j, f, **o)
 
 
+def load_bookmarks_backup_file(fn):
+	if fn.endswith('.jsonlz4'):
+		with open(fn, "rb") as f:
+			magic = f.read(8)
+			return json.loads(lz4.block.decompress(f.read()).decode("utf-8"))
+	else:
+		with open(options.input_file, 'r') as f:
+			return json.load(f)
 
+"""
+		for win in jdata.get("windows"):
+			for tab in win.get("tabs"):
+				i = int(tab.get("index")) - 1
+				urls = tab.get("entries")[i].get("url")
+				print(urls)
+"""
 
 import glob
 
-def find_most_recent_bookmark_backup_in_directory(dir):
-	hh = dir+'/bookmarks-*.json'
-	print('glob matching ' + hh)
-	files = sorted(glob.glob(hh))
-	print('found: ' + str(files))
-	r = files[-1]
-	print('reading ' + r + ' ...')
-	return r
+def find_most_recent_bookmark_backup_in_directory(globs):
+	#hh = dir+'/bookmarks-*.json'
+	all_files = []
+	for g in globs:
+		print('glob matching ' + g)
+		files = glob.glob(g)
+		print('found: ' + str(files))
+		all_files += files
+	all_files = sorted(all_files, key=os.path.getmtime)
+	result = all_files[-1]
+	print('reading ' + result  + ' ...')
+	return result 
 
 
 def print_counts(j):
