@@ -18,12 +18,14 @@ export DST=bac4
 
 mount | grep $DST ; and backup_lean.sh
 mount | grep $DST ; and backup_root.sh
+mount | grep $DST ; and backup_ffff.sh
 
 export DST=bac8
 
 mount | grep $DST ; and backup_cold.sh
 mount | grep $DST ; and backup_lean.sh
 mount | grep $DST ; and backup_root.sh
+mount | grep $DST ; and backup_ffff.sh
 
 export DST=bac9
 

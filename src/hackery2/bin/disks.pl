@@ -35,13 +35,17 @@ stop(I) :-
 	shell2(['umount /bac', I]),
 	shell2(['cryptdisks_stop bac', I]).
 
+my_disks_are([0,1,2,3,4,5,6,7,8,9,10]).
+
 start :-
-	maplist(start, [0,1,2,3,4,5,6,7,8,9]),
+	my_disks_are(Disks),
+	maplist(start, Disks),
 	shell2(['df -h']),
 	halt.
 
 stop :-
-	maplist(stop, [0,1,2,3,4,5,6,7,8,9]),
+	my_disks_are(Disks),
+	maplist(stop, Disks),
 	shell2(['df -h']),
 	halt.
 

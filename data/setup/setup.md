@@ -7,8 +7,13 @@ ssh -t root@$MY_VPS_IP  CLIENT_PUBKEY_VALUE=\"(cat ~/.ssh/id_ed25519.pub)\" bash
 
 ## basics0
 ```
-sudo apt install -y fish
+sudo apt install -y fish net-tools
 fish
+```	
+
+## basics0 (non-metal machines)
+```
+xset s off; xset -dpms
 ```	
 
 ## basics0.1
@@ -327,7 +332,8 @@ sudo apt remove sddm "cups*" "bluez*" cryptsetup "network-manager*"
 sudo apt autoremove
 
 
-echo xeyes > ~/.xsession
+echo xeyes > ~/.xs
+ssion
 echo plasma_session > ~/.xsession
 
 ```
