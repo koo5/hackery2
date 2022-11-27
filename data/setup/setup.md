@@ -332,8 +332,7 @@ sudo apt remove sddm "cups*" "bluez*" cryptsetup "network-manager*"
 sudo apt autoremove
 
 
-echo xeyes > ~/.xs
-ssion
+echo xeyes > ~/.xsssion
 echo plasma_session > ~/.xsession
 
 ```
