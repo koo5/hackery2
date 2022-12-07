@@ -1,3 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env fish
 
-python3.9 /home/koom/work/hackery2/src/hackery2/bin/ticker2.py
+cd (dirname (readlink -m (status --current-filename)))
+
+python3.9 ./ticker2.py

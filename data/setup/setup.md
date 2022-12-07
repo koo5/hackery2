@@ -79,6 +79,7 @@ sudo ~/hackery2/data/setup/data/mc/setup.sh
 
 set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
 set -g fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path #-U?
+#? set -e fish_function_path; set -U fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path
 
 ln -snf ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
 ```
