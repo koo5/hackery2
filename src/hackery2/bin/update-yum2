@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -x
 
-sudo ntpdate  -v  ntp.ubuntu.com &&
+sudo ntpdate  -v  ntp.ubuntu.com;
 {
 	{
 		which yum &&
