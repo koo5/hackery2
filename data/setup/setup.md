@@ -106,36 +106,49 @@ sudo systemctl restart sshd.service
 ```
 
 
-## bandwidth test
-transmitting server:
+## basics 2
 ```
-PORT=8888 begin; 
-    sudo ufw allow $PORT; 
-    iperf3  -s -p $PORT; 
-    sudo ufw delete allow $PORT;
-end
+# maybe
+sudo apt install build-essential zram-config swi-prolog
+```
 
+### graphical stuff
 ```
-downloading client:
+sudo apt install -y arandr terminator geany xfce4-terminal kwrite
 ```
-PORT=8888 begin;
-	iperf3 -c $MY_VPS_IP -p $PORT -t 10000 -R
-end
+
+### vm stuff
 ```
+sudo apt purge xfce4-screensaver "xfce4-power-manager*"
+```
+
+### metal X11 stuff
+```
+sudo apt install -y xcalib libxrandr-dev autorandr
+```
+
+### hypervisor stuff
+```
+sudo apt install -y virt-manager
+```
+
+### physical stuff
+```
+sudo apt install -y fdupes duperemove btrfs-progs hddtemp hdparm gparted 
+```
+
 
 ### useful shell history
-```df -H -h   -l -x loop -x tmpfs -x devtmpfs -x squashfs | grep -v rpool
-
+```
+df -H -h   -l -x loop -x tmpfs -x devtmpfs -x squashfs | grep -v rpool
 sudo ufw status
-
-NO_COLOR=1 sudo journalctl --follow
-
 sudo netstat -nlpt
-
 sudo jnettop -i any
-
 cat /etc/issue
-
+NO_COLOR=1 sudo journalctl --follow
+ping 8.8.8.8
+sudo traceroute -n 8.8.8.8
+python3 -m http.server 8080 --directory /var/log
 
 ```
 
@@ -194,24 +207,6 @@ RUN dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$L
 
 
 
-## basics 2
-```
-# maybe
-sudo apt install build-essential zram-config swi-prolog
-
-# graphical stuff
-sudo apt install -y arandr terminator geany xfce4-terminal kwrite
-
-# hypervisor stuff
-sudo apt install -y virt-manager
-
-# physical stuff
-sudo apt install -y fdupes duperemove btrfs-progs hddtemp hdparm gparted 
-
-# X11 stuff
-sudo apt install -y xcalib libxrandr-dev autorandr
-
-```
 
 ## mptcp
 ### ubuntu 20.04 / mptcpd compilation ..
@@ -436,6 +431,24 @@ nope:
 
 
 
+
+## bandwidth test
+transmitting server:
+```
+PORT=8888 begin; 
+    sudo ufw allow $PORT; 
+    iperf3  -s -p $PORT; 
+    sudo ufw delete allow $PORT;
+end
+
+```
+downloading client:
+```
+PORT=8888 begin;
+	iperf3 -c $MY_VPS_IP -p $PORT -t 10000 -R
+end
+```
+^v^v^v^v^v^v^v^v^v^v^v^v^v
 ## iperf3
 ```
 set --universal MY_PORT 7777

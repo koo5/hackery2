@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="" />
+    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../data/setup/data/fish/functions/fish_prompt.fish" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/setup/data/fish/functions/fish_prompt.fish" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../data/setup/setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/setup/setup.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datetime_write.sh" beforeDir="false" afterPath="$PROJECT_DIR$/datetime_write.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/disks.pl" beforeDir="false" afterPath="$PROJECT_DIR$/disks.pl" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

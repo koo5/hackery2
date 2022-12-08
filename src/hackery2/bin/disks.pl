@@ -19,6 +19,7 @@ start(I) :-
 
 start(I, Exit_status1, Exit_status2) :-
 	shell2(['cryptdisks_start bac', I], Exit_status1),
+	shell2(['cryptdisks_start bac', I, '_2'], Exit_status1_2),
 	shell2(['mount /bac', I], Exit_status2).
 
 start_or_fail(I) :-
@@ -33,7 +34,8 @@ try_ensure_mounted(I) :-
 
 stop(I) :-
 	shell2(['umount /bac', I]),
-	shell2(['cryptdisks_stop bac', I]).
+	shell2(['cryptdisks_stop bac', I]),
+	shell2(['cryptdisks_stop bac', I, '_2']).
 
 my_disks_are([0,1,2,3,4,5,6,7,8,9,10]).
 

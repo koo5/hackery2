@@ -3,8 +3,8 @@
 cd /run/
 while :
 do
-	echo -n "UTC " > datetime.txt.tmp
-	date --utc "+%Y-%m-%d_%H-%M-%S" >> datetime.txt.tmp
+	#echo -n "UTC " > datetime.txt.tmp
+	date --utc "+%Y-%m-%dT%H-%M-%SZ" > datetime.txt.tmp
 	cat datetime.txt.tmp > datetime.txt
 	sleep 1
 	#logger -p user.error xxxx
