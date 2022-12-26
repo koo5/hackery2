@@ -37,7 +37,7 @@ stop(I) :-
 	shell2(['cryptdisks_stop bac', I]),
 	shell2(['cryptdisks_stop bac', I, '_2']).
 
-my_disks_are([0,1,2,3,4,5,6,7,8,9,10]).
+my_disks_are([0,1,2,3,4,5,6,7,8,9,10,11]).
 
 start :-
 	my_disks_are(Disks),
