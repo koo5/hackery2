@@ -70,9 +70,11 @@ echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
 ```
 sudo chsh -s /usr/bin/fish $USER
 
+sudo apt install -y git ntpdate 
+
 sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
 
-sudo apt install -y git ntpdate mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3 auditd
+sudo apt install -y mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3 auditd
 
 git clone https://github.com/koo5/hackery2.git
 sudo ~/hackery2/data/setup/data/mc/setup.sh
@@ -145,8 +147,10 @@ df -H -h   -l -x loop -x tmpfs -x devtmpfs -x squashfs | grep -v rpool
 sudo ufw status
 sudo netstat -nlpt
 sudo jnettop -i any
+
 cat /etc/issue
 NO_COLOR=1 sudo journalctl --follow
+
 ping 8.8.8.8
 sudo traceroute -n 8.8.8.8
 python3 -m http.server 8080 --directory /var/log
@@ -479,7 +483,7 @@ apt source xfwm4
 cd xfwm4-4.16.1/src
 patch < ~/hackery2/data/setup/data/xfwm4/fullscreenfix+patch2-xfwm4.16.1
 dpkg-buildpackage  -rfakeroot -b
-sudo dpkg -i ../xfwm4_4.16.1-1_amd64.deb
+sudo dpkg -i ../xfwm4
 nohup xfwm4 --replace
 ```
 ^ note that this is without bumping the package's version ...
