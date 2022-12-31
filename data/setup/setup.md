@@ -84,6 +84,10 @@ set -g fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_functi
 #? set -e fish_function_path; set -U fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path
 
 ln -snf ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
+
+abbr --add kw kwrite
+
+
 ```
 
 ## tighten up
