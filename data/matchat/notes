@@ -1,0 +1,52 @@
+"""
+to get the jsons:
+export P=(pwd)/(date --utc +%Y-%m-%d_%H-%M-%S); mkdir -p $P; docker run --user 1000 -v $P:/out  -it tyrrrz/discordchatexporter:latest   exportguild  --guild 748871194572226661  -t $MY_DISCORD_TOKEN --format Json
+
+at least for running the script manually once in a while. Eventually we can mix and match with one of these to build something better:
+
+https://github.com/qwertyboy/logbot/blob/master/logbot.py
+https://github.com/Rapptz/discord.py/commits/master
+https://www.youtube.com/watch?v=dR9n1zmw-Go
+https://github.com/milutinke/Discord-Archive-Bot
+...
+"""
+
+
+import click, json
+
+@click.cmd
+def rescan():
+	for file in glob.glob("*json"):
+		j = json.load(file)
+		guild_id = j['guild']['id']
+		channel_id = j['channel']['id']
+		for m in j['messages']:
+			message_id = m['id']
+			message_uri = 'https://discord.com/channels/' + guild_id + '/' + channel_id + '/' + message_id
+			message_content = m['content']
+			
+			#on_message_scanned..
+			on_message_added(message_uri, message_content)
+
+
+
+
+
+
+"""
+this would be the "API" of the matchat bot / action item extractor, etc
+"""
+
+import re
+
+def on_message_added(uri, text):
+	action_item_regex = r'(?:should|must|need to|have to).*?\.'
+	action_items = re.findall(action_item_regex, text, re.IGNORECASE)
+	if len(action_items) > 0:
+		print(action_items)
+
+
+
+
+
+	
