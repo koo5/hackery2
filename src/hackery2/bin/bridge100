@@ -1,0 +1,6 @@
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.168.8.1 metric 0 dev bridge100
+ifconfig bridge100 up 192.168.8.52
+
+resolvectl status
+# ->
+resolvectl dns 23 192.168.8.1
