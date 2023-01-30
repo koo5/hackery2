@@ -75,6 +75,8 @@ sudo apt install -y git ntpdate
 sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
 
 sudo apt install -y mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3 auditd
+sudo apt install -y iotop-c 
+# https://gitlab.com/volian/nala
 
 git clone https://github.com/koo5/hackery2.git
 sudo ~/hackery2/data/setup/data/mc/setup.sh
