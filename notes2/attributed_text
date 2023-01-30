@@ -1,0 +1,14 @@
+two keyboard shortcuts for:
+	do you want the newly typed character to inherit the left or the right side's attributes?
+
+
+
+
+
+
+notes for possible implementations:
+	emacs:	
+		https://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html
+		https://emacs.stackexchange.com/questions/70016/add-invisible-text-property-in-org-mode
+
+

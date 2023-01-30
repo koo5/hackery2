@@ -1,0 +1,25 @@
+# notes
+
+## general
+
+"XML is almost always misused"
+ https://www.devever.net/~hl/xml
+
+## XLink
+https://melonfire.com/archives/trog/article/xlink-basics
+
+"Although xlink: role describes the resource, xlink: arcrole defines how they relate", 
+"The attribute role describes the meaning of the resource. "
+ http://zvon.org/xxl/xlink/xlink_extend/OutputExamples/xml6_out.xml.html
+
+The semantic attributes describe the meaning of the arc's ending resource relative to its starting resource. The arcrole attribute corresponds to the [RDF] notion of a property, where the role can be interpreted as stating that "starting-resource HAS arc-role ending-resource." This contextual role can differ from the meaning of an ending resource when taken outside the context of this particular arc. For example, a resource might generically represent a "person," but in the context of a particular arc it might have the role of "mother" and in the context of a different arc it might have the role of "daughter."
+
+so, in this way, xlink supplants the basic functionality of rdf (in a very unfortunate verbose error-prone way), and at the same time
+goes beyond plain rdf, supplying a particular ontology for interlinking and annotating resources. (roughly speaking).
+or, the other way around, rdf made some of this built-in, and some of it ommited due to no widespread use (xbrl being probably the only 
+serious user of xlink)
+
+## syntax
+
+see koo5/SML
+

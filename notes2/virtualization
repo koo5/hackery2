@@ -1,0 +1,230 @@
+virsh domxml-to-native qemu-argv xxxx
+kvm-spice -machine help
+
+
+
+
+https://www.reddit.com/r/VFIO/comments/80p1q7/high_kvmqemu_cpu_utilization_when_windows_10/
+
+
+
+
+https://mathiashueber.com/virtual-machine-audio-setup-get-pulse-audio-working/
+
+https://serverfault.com/questions/627238/kvm-libvirt-how-to-configure-static-guest-ip-addresses-on-the-virtualisation-ho
+https://www.spice-space.org/multiple-monitors.html
+
+
+
+# p9 shared filesystem
+
+
+pretty slow and you have to fix permissions all the time, but i use it
+
+
+modules to load:
+9p
+9pnet
+9pnet_virtio
+
+
+fstab:
+shared /shared 9p trans=virtio 0 0
+
+
+
+
+
+
+modprobe nbd
+qemu-nbd -c /dev/nbd0 /mnt/data/images/untrusted_progs.qcow2
+sudo mount /dev/nbd0p1 /mnt6/
+
+
+
+qemu-img convert -O qcow2 untrusted_progs.qcow2   /mnt/data/images/untrusted_progs.qcow2
+
+
+
+
+
+
+git clone https://github.com/virt-manager/virt-bootstrap.git
+cd virt-bootstrap/
+sudo apt install python-pip
+sudo apt install python-passlib
+sudo apt install python-guestfs
+sudo apt install libguestfs-dev
+pip install -r ./requirements.txt
+sudo python setup.py  install
+
+virt-builder -l
+
+virt-builder://ubuntu-18.04
+
+
+
+
+
+
+https://medium.com/kata-containers
+
+
+
+
+
+
+guestmount -a path_to_image.qcow2 -i --ro /mount_point # safe, read only
+guestmount -a path_to_image.qcow2 -i /mount_point # use only on not running vm image
+guestmount utility can be found in libguestfs-tools package (on Debian and RHEL).
+
+
+
+
+
+
+
+
+
+
+
+# vm image formats
+is sparse raw worth the theoretic speed increase over qcow2?
+
+time ssh -p 44  -c  aes128-ctr    10.0.0.20   /home/koom/schily-2021-09-01/star/OBJ/x86_64-linux-gcc/star -c -v -sparse -force-hole /mx500data/lean/images/ubuntu20.10.raw | tar -x
+
+star -c -sparse without -force-hole is slow
+
+
+
+
+
+
+
+
+
+
+
+# networking
+iperf3 -c 192.168.8.8 -p 8080 -R -t 10000
+/ssh-cipher-benchmark.sh 10.0.0.20
+
+ssh -p 44  -c  aes128-ctr  -o Compression=no  10.0.0.20
+
+https://utcc.utoronto.ca/~cks/space/blog/sysadmin/SshSpeed?showcomments#comments
+->
+https://sourceforge.net/projects/hpnssh/
+
+cat 2109.02902.pdf | tee >(sha1sum 1>&2) | ssh -p 44   -c  aes128-ctr    koom@localhost  "bash -c \"tee >(sha1sum 1>&2) | wc -c\""
+
+
+
+
+
+
+
+
+# video
+
+<video>
+  <model type="virtio" heads="3" primary="yes"/>
+  <address type="pci" domain="0x0000" bus="0x00" slot="0x01" function="0x0"/>
+</video>
+
+
+<graphics type="spice" autoport="yes">
+  <listen type="address"/>
+  <image compression="off"/>
+</graphics>
+
+
+
+
+
+
+
+https://help.ubuntu.com/community/Autofs
+
+
+
+
+
+
+
+
+# cache modes
+
+## qemu options
+
+### cache = writethrough
+	1) host page cache *is* used.
+	2) write calls do not return until the full action->confirmation chain returns from the physical disk(?)
+	3) iow, data is written in order and as fast as possible and there's no poweroff dataloss risk after that
+	
+
+
+### cache = writeback
+	1) host page cache *is* used.
+	2) writes are reported to the guest as completed when placed in the host page cache
+	3) guest is informed to send flush commands
+	3) iow, data is written in order, lazily but flushed per client, so there's no poweroff dataloss risk after that
+	
+
+### cache = none
+	1) host page cache is *not* used.
+	2) guest is informed to send flush commands
+
+
+### cache = unsafe
+	1) host page cache *is* used.
+	2) like writeback but flushes are ignored
+	
+
+### cache=directsync
+	1) host page cache is *not* used.
+	2) aggressive flushing
+	
+
+
+
+## resources
+	https://forum.proxmox.com/threads/implications-of-qemu-cache-unsafe.79336/
+		In practice, data is written to disk out of order and asynchronously with cache=unsafe
+
+	https://documentation.suse.com/sles/11-SP4/html/SLES-kvm4zseries/cha-qemu-cachemodes.html
+		Since that version, the various qemu-kvm guest storage interfaces have been fixed to handle writeback or writethrough semantics more correctly, allowing for the default caching mode to be switched to writeback. The guest driver for each of ide, scsi, and virtio have within their power to disable the write back cache, causing the caching mode used to revert to writethrough. The typical guest's storage drivers will maintain the default caching mode as writeback, however. 
+
+
+
+
+
+
+
+
+
+
+tar --create  --sparse /d0/data/ | ssh -p 2222 root@192.168.8.8 "tar xf - --sparse --directory /mx500data/leanpriv/"
+tar: Removing leading `/' from member names
+tar: Removing leading `/' from hard link targets
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# bridge networking
+	https://wiki.libvirt.org/page/Net.bridge.bridge-nf-call_and_sysctl.conf
+	http://patchwork.ozlabs.org/project/netdev/patch/1246379267.3749.42.camel@blaa/
+	https://levelup.gitconnected.com/how-to-setup-bridge-networking-with-kvm-on-ubuntu-20-04-9c560b3e3991
+
+

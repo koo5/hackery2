@@ -1,0 +1,220 @@
+
+# collaborative / distributed IDEs
+
+## https://www.codetogether.com/
+	?
+		
+
+## GitHub Codespaces vs Gitpod
+	
+		
+	
+
+### https://github.blog/2021-08-11-githubs-engineering-team-moved-codespaces/
+	
+	| Happily, we could support our shell-based colleagues through a simple update to our prebuilt image which initializes sshd with our GitHub public keys, opens port 22, and forwards the port out of the codespace.
+
+
+	
+### gitpod
+		
+	```git fetch --unshallow origin```
+			
+			
+### https://community.gitpod.io/t/how-to-ssh-into-gitpod-workspace/341/25
+	| Here is a sample configuration of a workspace that allows to connect to via SSH through a Chisel tunnel: https://github.com/corneliusludmann/gitpod-playground/tree/sshd-over-chisel 
+				
+	| Gitpod Local Companion: Gitpod Local Companion - localhost is going remote 106 It automatically forwards services from Gitpod workspace to your localhost as well as allow SSH access.
+				
+				
+			
+		
+	| You can use teams to group and manage one or more projects and invite team members. Users with access to a team can view branches, prebuilds, and configuration for all projects within a team as well as open new workspaces directly from a branch or a prebuild from the dashboard.
+			
+	| With “Gitpod for Startups”, we offer eligible companies free services for up to 2 years
+			
+	| you can provide a public Docker image or your own Dockerfile. This provides you with the flexibility to install the tools & libraries required for your project.
+			
+			
+			
+	
+### https://www.freecodecamp.org/news/github-codespaces-vs-gitpod-cloud-based-dev-environments/
+		
+	| Developer environments turn just into some resource I can spin up on demand and close and forget about if I am done with my task. Gitpod is excelling at that workflow and built their product around it. 
+			
+	| Gitpod offers functionality to share a snapshot of the workspace with a co-worker but GitHub Codespaces does not.
+			
+	https://visualstudio.microsoft.com/services/live-share/
+		
+	| For GitHub Codespaces I could not find any information for other IDEs than VS Code. And given that Microsoft is behind both projects, I’d expect that they'll probably focus on VS Code.
+
+	In contrast, Gitpod tries to stress that what they have built is, on an architectural level, IDE independent and allows you to run any IDE image you can run remotely in their container. 
+			
+	| Both Codespaces and Gitpod support docker-in-docker for Docker Compose scenarios and nested virtualization which enables running operating systems or appliances in your browser.
+			
+	| Gitpod supports prebuilds for that (think about them as a CI/CD server where Gitpod prebuilds the full workspace / runs the automation on every commit to Git).
+			
+		
+
+	
+		
+## inotify over SSHFS
+	tldr: DIY
+	https://itectec.com/unixlinux/ssh-how-to-use-inotify-or-named-pipes-over-sshfs/
+	
+
+
+
+	
+	
+# collaborative graph editing
+	https://github.com/collabserver/collabserver-grapheditor
+	
+
+	
+# real-time collaborative editors - services
+	https://peerpad.net
+		gunDb?
+		
+
+		
+		
+
+
+# js, real-time collaborative (embeddable) (rich-) text editors / toolkits -
+
+
+## meta
+	https://pierrehedkvist.com/posts/4-open-source-collaborative-editors	
+	https://juretriglav.si/open-source-collaborative-text-editors/
+
+	https://namiwang.github.io/2020/11/12/building-a-roam-like-networked-heavily-customized-realtime-editor-part-1.html
+	https://dev.to/kannndev/let-s-build-a-collaborative-rich-text-editor-32n3	
+	https://news.ycombinator.com/item?id=19720279
+	
+
+## the options
+
+
+### ShareDB + quill
+	https://github.com/share/sharedb/tree/master/examples/rich-text
+		https://quilljs.com/	
+	
+
+
+### firepad
+	firebase platform paid / non-commercial licensing? / alternatives?
+		https://sapphire-db.com/start/main
+	
+	https://demo.firepad.io/#Ab5oKwY1Di
+	https://github.com/FirebaseExtended/firepad/blob/master/examples/richtext-simple.html
+	
+	fast setup
+
+
+### prosemirror
+	server code missing / paid / non-commercial licensing?
+		- nextcloud?
+		
+		- https://juretriglav.si/open-source-collaborative-text-editors/
+			https://github.com/jure/pubsweet-blogger/issues
+			not a huge community..
+
+	https://gitlab.coko.foundation/wax/wax-prosemirror
+
+#### atlaskit
+	https://github.com/jure/pubsweet-blogger/blob/master/app/components/component-atlaskit-editor/src/Editor.tsx#L5
+	
+#### https://prosemirror.net/examples/collab/#edit-Example
+	looks more or less perfect, since there is a server too
+	we'd posseibly just tweak the ui a bit.
+	
+	git@github.com:ProseMirror/website.git
+		currently throwing: https://gist.github.com/koo5/e8035311da5149e7985fd4f34aa65e6c	
+
+	git@github.com:ProseMirror/prosemirror-example-setup.git
+		incomplete
+
+	https://marijnhaverbeke.nl/blog/collaborative-editing.html
+	https://discuss.prosemirror.net/
+
+	
+#### nextcloud has one
+	https://nextcloud.com/blog/nextcloud-introduces-collaborative-rich-text-editor/
+	- could it be re-embedded?
+	- based on prosemirror
+
+#### https://github.com/yjs/yjs/
+	?
+
+
+### CKEditor
+	server code missing / paid / non-commercial licensing?
+		https://ckeditor.com/wysiwyg-editor-open-source/
+		
+	https://ckeditor.com/collaboration/real-time-collaborative-editing/
+	https://onlinehtmleditor.dev/collaboration/#doce15aa0c730%20
+	probably cool
+	https://ckeditor.com/docs/ckeditor5/latest/features/collaboration/real-time-collaboration/real-time-collaboration.html?docId=edef3b3c3cda4a0d2e5d85433e8815cea
+	https://ckeditor.com/blog/Lessons-learned-from-creating-a-rich-text-editor-with-real-time-collaboration/
+	https://juretriglav.si/open-source-collaborative-text-editors/
+
+
+### bytemd
+	you have to `npm i` both in the example directory and in the root dir and possibly in the other example dir.
+	still, the svelte component crashes the sapper server somehow (basically the server exits instead of starting up, no error given)
+	probably can be followeed up with
+	not too active but seems maintained + maybe big backer
+	
+	so...probably not a bad choice 
+	
+
+
+### etherpad
+	git@github.com:ether/etherpad-lite-jquery-plugin.git
+	simple iframe embeedding, if it can be made to be flexible wrt width/height, could work
+	https://github.com/ether/etherpad-lite/wiki/Alternative-clients
+
+
+
+# non-collaborative rich text editors
+	### quill by itself
+		https://github.com/typewriter-editor/typewriter
+			active
+			
+
+	
+
+# about editors
+	https://medium.com/content-uneditable/contenteditable-the-good-the-bad-and-the-ugly-261a38555e9c
+
+	
+	
+# safe rich text  /  html sanitization
+	https://stackoverflow.com/questions/39784400/securely-render-arbitrary-user-uploaded-content-from-a-wsywig-editor
+	->	
+		https://github.com/cure53/DOMPurify
+		https://github.com/google/closure-library/tree/master/closure/goog/html/sanitizer
+		
+	https://www.html5rocks.com/en/tutorials/security/sandboxed-iframes/
+	https://www.tiny.cloud/docs/configure/content-filtering/
+	https://github.com/owasp/java-html-sanitizer
+	http://www.gwtproject.org/doc/latest/DevGuideSecuritySafeHtml.html
+	https://draftjs.org/docs/api-reference-data-conversion/
+	
+
+	
+https://glitch.com/
+
+
+
+
+
+
+
+
+
+
+
+
+

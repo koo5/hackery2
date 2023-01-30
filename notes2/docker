@@ -1,0 +1,120 @@
+# published ports
+	https://github.com/moby/moby/issues/22054#issuecomment-867547076
+		```
+		For those of you looking for a solution to ensure your docker containers are protected by your firewall rules: run your images with the --network host option and set { "iptables": false } in /etc/docker/daemon.json (Note, you will need to both run systemctl restart docker and reset iptables, firewalld-cmd --reload on CentOS, for these changes to take affect, restarting will also work)
+
+	This will have two very important affects:
+
+		If you forget to run your docker image with --network host then they won't be accessible to the outside world, but will themselves not be able to make external network requests. (That is the effect of { "iptables": false })
+		Your docker containers will be constrained by your normal firewall rules set by firewalld, ufw or your tool of choice, since your docker containers are using your host's network.
+		```
+	
+	https://github.com/shinebayar-g/ufw-docker-automated
+	
+	
+
+
+"docker stack" is not a reliable orchestrator. You're gonna end up into situations when no error is indicated, your container is running, but the port is not being forwarded. Or your logs stop printing. Or your container is not brought up. And other jokes like that.
+
+
+
+so grab:
+https://ubuntu.com/kubernetes/install#single-node
+
+
+
+a gui will help you manage all that. On windows, Docker desktop. On linux, Portainer.
+
+
+
+https://www.docker.com/blog/simplifying-kubernetes-with-docker-compose-and-friends/
+	aaaand it's dead
+	
+	
+
+https://www.reddit.com/r/docker/comments/es7n2u/containers_fail_to_start_on_reboot_until_i_do_a/
+
+
+
+docker stack ps robust73 --no-trunc
+
+
+
+All our images are based on minideb a minimalist Debian based container image which gives you a small base container image and the familiarity of a leading Linux distribution.
+
+
+
+
+
+
+security updates
+	https://blog.goroot.de/post/unattended-container-updates/
+	https://forum.storj.io/t/watchtower-and-docker-compose/6321/14
+	https://github.com/containrrr/watchtower
+		this is a piece of the puzzle but a small one and also can be seen as a compromise. What we need to aim for is immutability coupled with automated review feed coupled to automated updates...
+	https://github.com/SUSE/zypper-docker
+	https://docs.docker.com/config/containers/multi-service_container/
+	https://github.com/GrahamDumpleton/mod_wsgi-docker/issues/34
+	https://hub.docker.com/r/itech/docker-unattended-upgrade
+	https://iximiuz.com/en/posts/not-every-container-has-an-operating-system-inside/
+	https://pythonspeed.com/articles/security-updates-in-docker/
+	https://pythonspeed.com/articles/docker-cache-insecure-images/
+	https://pythonspeed.com/articles/base-image-python-docker-images/
+
+
+	
+fail2ban
+	https://www.crowdsec.net/blog/secure-docker-compose-stacks-with-crowdsec
+
+	
+
+mount vs volume
+	https://forum.storj.io/t/watchtower-and-docker-compose/6321/12
+
+
+
+
+
+
+
+
+
+https://iximiuz.com/en/posts/journey-from-containerization-to-orchestration-and-beyond/
+```UPDATE Feb 2021: In December, 2020 Kubernetes finally deprecated its Docker support. Despite the CRI invention in 2016, the conditional code in kubelet still remains. Essentially, Kubernetes supports Docker as a container runtime through a so-called Dockershim module and all other container runtimes through CRI module. It seems like after Docker's Mirantis acquisition in late 2019, the chances of Docker implementing CRI became way to low (well, Docker folks just decided to focus more on developer experience than on integration with production systems). And as a result Kubernetes community decided to get rid of Docker support completely. Well, makes sense, Docker is too bloated for a CRI runtime, IMO. So, we are one cleanup away from freeing kubelet of Dockershim code (the plan is to remove it in Kubernetes v1.23). Another nice part about it is that for regular developers there is nothing to worry about. Thanks to the OCI standardisation, images build locally using Docker (or Podman, or any other compatible tool), will keep working on Kubernetes.```
+
+
+
+
+
+
+
+
+
+
+
+
+ 	
+File Permissions: A painful side of Docker (2019)
+	https://news.ycombinator.com/item?id=27311619
+	
+	
+	
+
+
+
+https://github.com/swarmstack/swarmstack
+
+
+
+
+https://github.com/phusion/passenger-docker/
+
+
+
+
+If configuration is required, it is recommended to supply an appropriate /etc/rabbitmq/rabbitmq.conf file (see the "Configuration File(s)" section of the RabbitMQ documentation for more details), for example via bind-mount, Docker Configs, or a short Dockerfile with a COPY instruction.
+
+https://news.ycombinator.com/item?id=29400741
+
+https://github.com/docker-library/rabbitmq/pull/174#issuecomment-452002696
+

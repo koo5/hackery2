@@ -1,0 +1,20 @@
+Start with basic k8s.
+
+Just getting a couple of apps deployed on a cluster with logging, scaling, pipelines takes ~ 2 weeks.
+
+Trying to rebuild that basic functionality using ad hoc solutions takes way more time and rapidly becomes more cumbersome as the wheel gets reinvented when k8s as a platform has well documented solutions/tools.
+
+Putting it into production leads to a handful of footguns that take a while to sort out related to pull-policies, caching, scaling, security, etc. But it's fairly manageable. And probably easier to premempt than customized solutions since these pitfalls are somewhat well documented.
+
+Past a certain point though, especially as the work veers into things like operators, sketchy helm packages, service meshes, k8s falls apart fast if you don't have people on it full time, and it's much better to write some customized code.
+
+reply
+	
+	
+mountainriver 21 minutes ago | parent | next [–]
+
+100% I’ve seen this happen in my current organization as they chose ECS, and then reinvented half of kubernetes in house in a fragile way.
+
+Basic kubernetes where you are just deploying a web app is incredibly simple. There is no more complexity than any other container deployment tool, but Kube can grow with you like few other tools can. 
+
+

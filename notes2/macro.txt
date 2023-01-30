@@ -1,0 +1,48 @@
+i'm only focusing on systems that work universally with any target language and are probably mainly written in python or are similarly non-hacky solutions
+
+
+https://sourceforge.net/p/nuweb/
+
+https://github.com/zyedidia/Literate
+
+noweb:
+	archaic, but see:
+		(simplistic) https://github.com/JonathanAquino/noweb.py/blob/master/noweb.py.txt
+	version 3?
+		https://github.com/nrnrnr/noweb
+		
+	resources?
+		https://www.cs.tufts.edu/~nr/noweb/
+
+https://slott56.github.io/py-web-tool/pyweb.html
+
+	"""
+	The immediate predecessors to this pyWeb tool are FunnelWeb, noweb and nuweb. The ideas lifted from these other tools created the foundation for pyWeb.
+
+	There are several Python-oriented literate programming tools. These include LEO, interscript, lpy, py2html, PyLit.
+	"""
+
+	pyWeb also specifically rejects some features of nuweb and FunnelWeb. These include the macro capability with parameter substitution, and multiple references to a chunk. These two capabilities can be used to grow object-like applications from non-object programming languages (e.g. C or Pascal). Since most modern languages (Python, Java, C++) are object-oriented, this macro capability is more of a problem than a help.
+
+
+
+
+http://enso-lang.org/
+
+
+
+
+
+
+<bookmarks/macro>
+
+
+
+
+
+
+https://www.spoofax.dev/
+	https://strategoxt.org/Spoofax/Tour.html#Getting_Started
+	
+
+

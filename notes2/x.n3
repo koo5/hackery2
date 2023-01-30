@@ -1,0 +1,4 @@
+@prefix c: <http://example.org/cartoons#>.
+
+<banana> <:banana> <http://xxxx.xxx/banana>.
+<banana> <:banana> <yyy/yyyyy/banana>.
