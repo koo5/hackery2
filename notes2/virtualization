@@ -203,9 +203,10 @@ https://help.ubuntu.com/community/Autofs
 
 
 
-tar --create  --sparse /d0/data/ | ssh -p 2222 root@192.168.8.8 "tar xf - --sparse --directory /mx500data/leanpriv/"
+tar --create  --sparse /d0/data/ | ssh -p 2222 root@192.168.8.8 "tar xf - --sparse --one-top-level=/mx500data/leanpriv/d/images/"
 tar: Removing leading `/' from member names
 tar: Removing leading `/' from hard link targets
+ssh root@192.168.8.8 "tar --create  --sparse /mx500data/leanpriv/d/images/dev1.raw" | tar xf - --sparse --one-top-level=/d/images/
 
 
 
