@@ -19,10 +19,3 @@ https://www.google.cz/search?safe=off&client=ubuntu&hs=ejK&channel=fs&biw=1280&b
 
 
 
-kb
-{} => {?x superstructure (?x)}
-{?x superstructure ?y. ?y recurse ?z} => {?x recurse ?z}.
-fin.
-query
-a recurse ?z.
-fin.

@@ -157,6 +157,16 @@ interesting libs related to luigi, rougly ordered from most interesting to least
 	https://pypi.org/project/pydags/
 		
 		
+## function graph search / typing libs / inputs / outputs 
+### non-python
+* https://www.commonwl.org/user_guide/
+* https://sourceforge.net/projects/conversio/
+* https://web.archive.org/web/20040930065210/http://libs.sourceforge.net/user/welcome.php
+* https://fno.io/
+* https://github.com/aindilis/cfo
+* https://frdcsa.org/~andrewdo/software/domains.lisp
+* https://github.com/w3c/N3/blob/51f370ffb880effb089190076b956d16035f4ea3/files/builtin%20definitions/builtins.n3
+
 
 
 
@@ -256,7 +266,7 @@ interesting libs related to luigi, rougly ordered from most interesting to least
 
 ## note also
 	https://www.rabbitmq.com/networking.html
-
+	https://github.com/antirez/disque
 
 
 

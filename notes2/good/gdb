@@ -1,0 +1,5 @@
+make gdb run a program with arguments:
+	gdb -ex r --args ./program --simulation --debug ...
+
+
+

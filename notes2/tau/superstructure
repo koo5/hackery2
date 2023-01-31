@@ -1,0 +1,7 @@
+kb
+{} => {?x superstructure (?x)}
+{?x superstructure ?y. ?y recurse ?z} => {?x recurse ?z}.
+fin.
+query
+a recurse ?z.
+fin.
