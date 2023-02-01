@@ -7,13 +7,26 @@ Task Orchestration Tools
 	
 		https://assets-global.website-files.com/5e46eb90c58e17cafba804e9/5f8f885195ca2b64eb6d462c_200027%20ON%20UV%20Workflow%20Orchestration%20White%20Paper.pdf
 	
-	https://docs.prefect.io/
+	https://prefect.io/
 		https://www.datarevenue.com/en-blog/what-we-are-loving-about-prefect
-	
-	https://temporal.io
-		* Asynchronous Activity Completion
+        scheduling
+        retries
+        logging
+        caching
+        notifications
+        observability
+        All tasks must be called from within a flow. Tasks may not call other tasks directly.
+
 	
 	https://nifi.apache.org/	
+        seems like a nice rich dataflow-based plumbing engine, would be exciting to play with
+        Data Provenance
+        
+            NiFi automatically records, indexes, and makes available provenance data as objects flow through the system even across fan-in, fan-out, transformations, and more. This information becomes extremely critical in supporting compliance, troubleshooting, optimization, and other scenarios.
+        Recovery / Recording a rolling buffer of fine-grained history
+        
+            NiFi’s content repository is designed to act as a rolling buffer of history. Data is removed only as it ages off the content repository or as space is needed. This combined with the data provenance capability makes for an incredibly useful basis to enable click-to-content, download of content, and replay, all at a specific point in an object’s lifecycle which can even span generations.
+
 	
 	https://aiida.readthedocs.io/projects/aiida-core/en/latest/topics/provenance/index.html
 	
@@ -28,8 +41,7 @@ Task Orchestration Tools
 	https://nipype.github.io/pydra/
 		* Auditing and provenance tracking: Pydra provides a simple JSON-LD-based message passing mechanism to capture the dataflow execution activities as a provenance graph. These messages track inputs and outputs of each task in a dataflow, and the resources consumed by the task.
 	
-	https://www.digdag.io/
-	
+
 	https://substantic.github.io/rain/docs/quickstart.html
 	
 	https://github.com/insitro/redun
@@ -41,12 +53,40 @@ Task Orchestration Tools
 
 	https://github.com/ovh/celery-director
 
+    cadence
+        memory that is not linked to a specific process, and preserves the full application state, including function stacks
 
+	
+	https://temporal.io
+		* Asynchronous Activity Completion
+        * seems more of a dataflow framework, no backtracking  (but backpressure :) )
+        * rest api based
+
+    https://dolphinscheduler.apache.org/
+        Dingtalk
+        task dependency in the form of conditional execution
+        nice web ui
+
+    https://www.digdag.io/
+        kinda an application server, expects that you submit archives with code
+
+    https://docs.ray.io/en/latest/ray-core/walkthrough.html
+        smells like celery
 
 interesting libs related to luigi, rougly ordered from most interesting to least:
 	
+
+    https://github.com/riga/law
+        - now those are some nice additions
+        * Environment sandboxing, configurable on task level 
+        * Remote targets with automatic retries and local caching
+        - this means we can fetch result files automatically...
+
+
 	https://github.com/boschglobal/luisy
 		- active, ci, tests 
+        - opinionated about where data goes
+
 		* luisy has a smart way of passing parameters between tasks
 		* luisy can just download results of pipelines that were already executed by others
 		* Decorating your tasks is enough to define your read/write of your tasks
@@ -286,6 +326,122 @@ interesting libs related to luigi, rougly ordered from most interesting to least
 
 
 
+# RPC / remote object access between python processess
+pizco.  
+Qt-like (and Qt compatible!) signal and slot mechanism.
+https://github.com/hgrecco/pizco/tree/_multiobject
+The multiobject branch seems unfinished, repeating functionality and was made against an old version. The file isnt long,
+keeping intact some of the pizco functionality like 'instantiate' could require more investigation
+and not sure if worth it. (at least for a start i could drop "instantiate"). The things touching the io loop
+are a bit arcane, maybe the gevent fork can help. 
+Other option is to not rpc so seamlessly, give up on seamless object/attribute access and make the interface from method calls.
+At any case, the priority of splitting lemon into rpcing components has decreased, as ive optimized it to run quite nicely as a single process (with marpa in a thread). Disorganized notes follow.
+
+zerorpc 
+doesnt have any remote attributes. Other libraries seem to be even worse, requiring
+various declarations and stuff. One thing zerorpc has is streaming generators.
+
+
+misc
+http://morepypy.blogspot.cz/2014/11/tornado-without-gil-on-pypy-stm.html
+http://nanomsg.org/
+
+http://zeromq.github.io/pyzmq/eventloop.html
+http://www.tornadoweb.org/en/stable/ioloop.html
+https://github.com/zeromq/pyzmq/blob/master/zmq/eventloop/minitornado/ioloop.py
+https://github.com/hgrecco/pizco/pull/22
+http://twistedmatrix.com/documents/13.0.0/core/howto/threading.html
+
+debugging the rpc server code under tornado io loop: give up trying to make it propagate exceptions,
+get a scriptable debugger (unlike pycharms..)
+
+http://nbviewer.ipython.org/gist/ChrisBeaumont/5758381/descriptor_writeup.ipynb
+http://stackoverflow.com/a/26096355
+http://www.tornadoweb.org/en/stable/guide/coroutines.html
+
+"""can a client be a server at the same time? question of event loops integration i think
+a not so neat but okay alternative for the distributed event handling:
+make the nonlocal client frames in keybindings.py stubs that raise an error
+catch and proceed to emit a signal with that event on the server (implemented in pizco in one of the forks/branches?)
+then all clients try it again? or more organized, at the moment its just root and menu,
+ so 'all' would work, if there will be multiple editor clients, we can have 'last active editor'
+...?.?.?"""
+
+
+
+"""
+general ways that rpcing complicates things;
+
+have to do more effort at proper mvc-y eventing, This would in some form be
+necessary for best performance anyway (keeping track of dirtiness at various levels.
+But the split between the server and client part of frames isnt nice..
+
+proxying elements: wont be a performance hit, if it will, it can be easily stubbed
+proxy_this() and deproxy() have to be in places tho
+
+"""
+
+
+
+
+       # lets try setting a reasonable rpc timeout on the proxy
+       #and wrapping everything in a try except catching the timeout?
+       #also, i will be adressing the server objects explicitly
+       #instead of instantiating the client frames with references to the server counterparts
+       #this way it will be easier to have it survive a reconnect/server restart..
+
+
+
+required features of the pizco fork:
+no separate remoteattribute: Proxy has a path - a list of attribute names,
+and handles all accesssess. 
+boxing: 
+
+
+
+or..actually..zerorpc?
+no attribute access -> what must be wrapped in functions?
+signals?
+"boxing":quick dumb values for when the client only needs to pass them back later
+ in the serializer
+
+
+
+""" this will be the responsibility of pizco/serialization
+proxied = WeakValueDictionary()
+key_counter = 0
+# distributed computing is fun.
+# lets work with the theoretical possibiliy that the counter
+# will overflow (makes me feel a bit easier than a runaway bignum)
+# the point is that we want to be sure what object the client is talking about.
+# ids can repeat. This doesnt save the clients from sending events while their data is
+# outdated, but at least it cant seem they reference a different object than they mean.
+#
+def proxy_this(v):
+       global key_counter
+       while key_counter in proxied:
+               key_counter += 1
+       proxied[key_counter] = v
+       return key_counter
+"""
+
+
+
+#total split or threading? 
+https://wiki.python.org/moin/GlobalInterpreterLock
+http://pypy.readthedocs.org/en/latest/stm.html
+
+add --server to main_sdl and main_curses
+
+accepts tcp connection, creates some 
+client object
+  .proxy is a weakref dict from some int
+
+for tag in tags:
+  if type(tag) == ElementTag:
+    proxy[len(proxy)] = weakref(node)
+
+incrementing render(transmission) id
 
 
 
@@ -293,7 +449,37 @@ interesting libs related to luigi, rougly ordered from most interesting to least
 
 
 
+protocols:
+
+http://www.jsonrpc.org/specification
+https://github.com/grpc/grpc
+https://thrift.apache.org/tutorial/
 
 
+
+serialization:
+http://www.oilshell.org/blog/2017/01/09.html
+http://cbor2.readthedocs.io/en/latest/usage.html
+https://github.com/slisznia/pcos
+https://en.wikipedia.org/wiki/Apache_Avro
+https://github.com/google/flatbuffers
+https://developers.google.com/protocol-buffers/docs/techniques
+
+unsuitable:swagger
+
+
+misc:
+https://code.visualstudio.com/blogs/2016/06/27/common-language-protocol
+https://cloud.google.com/speech/reference/rpc/
+
+
+
+
+jena,redis,rethink
+
+
+
+
+https://pypi.python.org/pypi/ladon
 
 
