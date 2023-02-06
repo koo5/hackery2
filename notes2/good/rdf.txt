@@ -684,6 +684,16 @@ rdf_triplestores.txt
 						export from virtuoso, edit in protege?
 						could be used to build a bookrmarking solution, but isn't one by itself, so far
 
+
+
+
+			agraph
+				transactions:
+					* one possible way to implement? but i cannot find further info, so this seems as a too uncertain to bet on:
+						"""This subclass is used for DELETE and INSERT queries. The result returned when the query is evaluated is a boolean that can be used to tell if the store has been modified by te operation."""
+					* the bnode generator function is guaranteed to generate unique names
+
+
         ?
             https://github.com/terminusdb/terminus-server/tree/dev
             https://github.com/RecallGraph/RecallGraph
@@ -714,6 +724,13 @@ rdf_triplestores.txt
             http://hypergraphdb.org/
             https://www.tigergraph.com/graphstudio/
 
+
+	rdfox
+	   transactions:
+	       https://docs.oxfordsemantic.tech/transactions.html
+        	   At each point in time the following transactions can be active in a data store:
+	           a single read/write transaction; or
+        	   multiple read-only transactions.
 
 
 

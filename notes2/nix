@@ -1,0 +1,24 @@
+https://zero-to-nix.com/
+https://www.reddit.com/r/NixOS/comments/ypkbk3/comment/ix0c0dh/?utm_source=share&utm_medium=web2x&context=3
+
+https://www.reddit.com/r/Gentoo/comments/wjn2xq/gentoo_users_what_are_your_thoughts_on_nixos_have/
+https://github.com/thiagokokada/nix-alien
+https://guix.gnu.org/manual/en/html_node/Defining-Package-Variants.html
+https://github.com/NixOS/nixpkgs/issues/12877
+https://github.com/NixOS/nixpkgs/issues/143860
+
+
+
+
+
+| In some cases Home Manager cannot detect whether it will overwrite a previous manual configuration. For example, the Gnome Terminal module will write to your dconf store and cannot tell whether a configuration that it is about to be overwritten was from a previous Home Manager generation or from manual configuration.
+
+
+
+
+
+
+
+
+https://www.linkedin.com/pulse/automating-my-personal-ubuntu-ansible-bruno-noriller
+

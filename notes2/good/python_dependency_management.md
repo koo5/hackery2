@@ -12,7 +12,8 @@ https://www.activestate.com/resources/quick-reads/python-dependencies-everything
 #### pipreqs
 ```pip install pipreqs```
 | Create a requirements.in file and list just the direct dependencies of your app. 
-```pipreqs --savepath requirements.in```
+```pipreqs --debug --savepath requirements.in .```
+
 
 
 #### https://pypa.github.io/pipx/
@@ -50,4 +51,12 @@ pip-tools seems to require a virtualenv and to be installed in that virtualenv .
 ```
 pip-compile --resolver=backtracking
 ```
+
+
+### https://virtualfish.readthedocs.io/
+nope, for some magical unexplained reason, this wants to manage only virtualenvs 
+ stored away in some special directory, rather than where they're used.
+
+? hackery2/data/setup/data/fish/functions/auto_venv.fish
+
 
