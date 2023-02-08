@@ -1,7 +1,16 @@
+fish is a great interactive shell, but it refuses to be a scripting language: https://github.com/fish-shell/fish-shell/issues/510
+ridiculous indeed.
+
+
 reload prompt:
 ```
 . ~/.config/fish/functions/fish_prompt.fish
 ```
+or:
+```
+exec fish
+```
+
 
 set path:
 ```
