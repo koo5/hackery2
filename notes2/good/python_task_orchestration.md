@@ -36,6 +36,8 @@ Task Orchestration Tools
 	https://github.com/d6t/d6t-python
 		bring airflow-style DAGs to the data science research and development process.
 		https://github.com/d6t/d6t-python/blob/master/blogs/datasci-dags-airflow-meetup.md
+        * Instead of having to manually load and save data, this is outsourced to the library
+        * intelligently rerun workflow after changing a parameter. Parameters are passed from the target task to the relevant downstream task. 
 		
 	
 	https://nipype.github.io/pydra/
