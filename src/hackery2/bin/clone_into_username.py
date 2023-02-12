@@ -37,7 +37,6 @@ def clone(url, optional_clone_args):
 
 	git_cmd = ['git', 'clone', '--recurse-submodules'] + list(optional_clone_args) + [url]
 	logger.info('git_cmd: ' + shlex.join(git_cmd))
-
 	sys.exit(subprocess.call(git_cmd))
 
 
