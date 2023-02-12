@@ -1,5 +1,6 @@
 fish is a great interactive shell, but it refuses to be a scripting language: https://github.com/fish-shell/fish-shell/issues/510
-ridiculous indeed.
+ridiculous indeed. Maybe if you wrap your whole script in a single function? Functions do follow the logical semantics.
+
 
 
 reload prompt:

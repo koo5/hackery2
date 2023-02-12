@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../data/setup/data/fish/functions/fish_prompt.fish" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/setup/data/fish/functions/fish_prompt.fish" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../data/setup/setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/setup/setup.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datetime_write.sh" beforeDir="false" afterPath="$PROJECT_DIR$/datetime_write.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/disks.pl" beforeDir="false" afterPath="$PROJECT_DIR$/disks.pl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/bin.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/bin.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clone_into_username.py" beforeDir="false" afterPath="$PROJECT_DIR$/clone_into_username.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,13 +52,18 @@
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
-    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.notebooks.jupyter.connections.configuration.JupyterServerConfigurable" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
   <component name="RunManager">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="bin" />
@@ -93,6 +101,7 @@
       <workItem from="1639443747534" duration="11235000" />
       <workItem from="1639613770641" duration="2663000" />
       <workItem from="1639725683645" duration="8000" />
+      <workItem from="1676211581609" duration="4112000" />
     </task>
     <servers />
   </component>
@@ -109,6 +118,5 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>
