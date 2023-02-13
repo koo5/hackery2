@@ -1,31 +1,35 @@
 # CLI
-	## fire	
-		https://github.com/google/python-fire
-	## click
-		https://click.palletsprojects.com/
+	fire and click both have their uses, fire is more quick and dirty.
+### fire	
+https://github.com/google/python-fire
+### click
+https://click.palletsprojects.com/
 
 
 
 # UI
-	https://github.com/willmcgugan/textual
-		reactivity on the desktop!
+https://github.com/willmcgugan/textual
+
+	reactivity on the desktop! Never tried but looks fun.
 	
 	
 	
 # web gui frameworks
+never tried.	
+### https://github.com/dddomodossola/remi
 	
-	https://github.com/dddomodossola/remi
+### https://www.nagare.org/
+	"back and fork", cute
 	
-	https://www.nagare.org/
-		"back and fork", cute
-	
-	https://holoviz.org/
+### https://holoviz.org/
 	
 	
 
 # configuration management
-	https://www.dynaconf.com/
-	https://hydra.cc/docs/intro/
+
+https://www.dynaconf.com/
+
+https://hydra.cc/docs/intro/
 	
 
 
@@ -43,13 +47,11 @@
 # 		logging.getLogger().info(e)
 
 
-
-[a :note; :contents """
-https://github.com/jlubcke/pytest-pycharm
-Plugin for py.test to enter PyCharm debugger on uncaught exceptions
-"""].
-
 ```
+https://github.com/jlubcke/pytest-pycharm
+
+	Plugin for py.test to enter PyCharm debugger on uncaught exceptions
+
 
 
 
@@ -57,37 +59,26 @@ Plugin for py.test to enter PyCharm debugger on uncaught exceptions
 
 	time python3 -m cProfile -o ooo <file>; pyprof2calltree -o oooo -i ooo; kcachegrind oooo
 
-	===
 
-	https://github.com/benfred/py-spy
+### https://github.com/benfred/py-spy
 
-	==
+### https://functiontrace.com/
 
+### https://profiler.firefox.com/
 
-	https://functiontrace.com/ https://profiler.firefox.com/
-
-
-	===
-
-	https://github.com/jlfwong/speedscope
-
-
-	===
-
-	stay away from:
-	?
+### https://github.com/jlfwong/speedscope
 
 
 	
 
 # misc
-```
-[a :note; :contents """
-TriOptima/tri.struct
+### TriOptima/tri.struct
 tri.struct supplies classes that can be used like dictionaries and as objects with attribute access at the same time
+
 https://github.com/TriOptima/tri.struct
-see also my dotdict
-"""].
+
+see also (my) dotdict.
+
 
 
 [:keyphrase "for each line of input:";
@@ -104,6 +95,7 @@ for line in sys.stdin.readlines():
 :note """"coding" no longer necessary, with python 3"]
 
 [:contents """
+how to activate a virtualenv in a child shell:
 bash --init-file "venv/bin/activate"
 fish -C ". venv/bin/activate.fish"
 """].
