@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../data/setup/data/fish/functions/gclur.fish" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/setup/data/fish/functions/gclur.fish" afterDir="false" />
-    </list>
+    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -98,7 +96,7 @@
       <workItem from="1639443747534" duration="11235000" />
       <workItem from="1639613770641" duration="2663000" />
       <workItem from="1639725683645" duration="8000" />
-      <workItem from="1676211581609" duration="4747000" />
+      <workItem from="1676211581609" duration="5601000" />
     </task>
     <servers />
   </component>
