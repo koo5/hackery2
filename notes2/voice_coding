@@ -1,10 +1,10 @@
 conclusion
-    i am looking for a hands-free+eyes-free work/coding experience. None of the available voice-coding/voice-control stacks (Unimacro, vocola, dragonfly, caster) and ecosystems cater to a high-level, eyes-free experience, and neither do any of the alternatives. But the SR/grammar/command systems are there, and TTS is easy. It would be interesting to start with something simpler - to try to set up a good SR/TTS web-browsing experience, using any of the above stacks and other resources, or explore what other common tasks can be efficiently turned hands-free+eyes-free.
+    i am looking for a hands-free+eyes-free work/coding experience. None of the available voice-coding/voice-control stacks (Unimacro, vocola, dragonfly, caster) and ecosystems cater to a high-level, eyes-free experience, and neither do any of the alternatives. But the SR/grammar/command systems are there, and TTS is easy. It would be interesting to start with something simpler - to try to set up a good SR/TTS web-browsing experience, using any of the above stacks and other resources, or to explore what other common tasks can be efficiently turned hands-free+eyes-free - how about a json editor? - that would prove a basic capability to explore, navigate and edit a tree structure... and that's already a lot.
 
 
 
 resume:
-    DNF is a safe bet SR engine, although kaldi and WSR seem to be doing a good job and are integrated into some projects
+    DNF is a safe bet SR engine, although kaldi and WSR seem to be doing a good job and are integrated into some projects.
     caster seems to be the ideal base for experimentation with custom grammars/command sets
 
     the stack could be:

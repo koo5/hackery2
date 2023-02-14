@@ -485,3 +485,8 @@ jena,redis,rethink
 https://pypi.python.org/pypi/ladon
 
 
+
+kafka
+	https://hackernoon.com/a-super-quick-comparison-between-kafka-and-message-queues-e69742d855a8?gi=e965191e72d0
+
+
