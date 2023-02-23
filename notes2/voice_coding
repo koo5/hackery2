@@ -28,6 +28,7 @@ resume:
 
 
 
+
 meta
     http://www.knowbrainer.com/forums/forum/messageview.cfm?catid=25&threadid=34641&enterthread=y
 
@@ -135,7 +136,9 @@ deprecated
 alternatives
 
     https://serenade.ai
-        claims to be a higher-level approach to editing code, but it's still text-fiddling
+        claims to be a higher-level approach to editing code, but it's still text-fiddling - actually, there's a decent ast layer now, very interesting.
+
+
 
     talon
         text-fiddling
@@ -144,12 +147,14 @@ alternatives
         ships with kaldi
 
 
-
-
-
-
-
 chatbot sw
 	https://www.capterra.com/p/180853/Dialogflow/reviews/
 	https://ebi.ai/platform/
+
+new finds:
+	numen
+		https://news.ycombinator.com/item?id=34816000
+	whisper
+		https://news.ycombinator.com/item?id=34770898
+		https://news.ycombinator.com/item?id=34877020
 
