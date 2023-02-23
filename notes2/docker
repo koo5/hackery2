@@ -18,12 +18,15 @@
 
 
 
-so grab:
-https://ubuntu.com/kubernetes/install#single-node
+alternatives:
+	https://news.ycombinator.com/item?id=28391777
+	https://ubuntu.com/kubernetes/install#single-node
 
 
 
-a gui will help you manage all that. On windows, Docker desktop. On linux, Portainer.
+
+gui:
+	On windows, Docker desktop. On linux, Portainer.
 
 
 
@@ -41,8 +44,6 @@ docker stack ps robust73 --no-trunc
 
 
 All our images are based on minideb a minimalist Debian based container image which gives you a small base container image and the familiarity of a leading Linux distribution.
-
-
 
 
 
@@ -74,18 +75,8 @@ mount vs volume
 
 
 
-
-
-
-
-
 https://iximiuz.com/en/posts/journey-from-containerization-to-orchestration-and-beyond/
 ```UPDATE Feb 2021: In December, 2020 Kubernetes finally deprecated its Docker support. Despite the CRI invention in 2016, the conditional code in kubelet still remains. Essentially, Kubernetes supports Docker as a container runtime through a so-called Dockershim module and all other container runtimes through CRI module. It seems like after Docker's Mirantis acquisition in late 2019, the chances of Docker implementing CRI became way to low (well, Docker folks just decided to focus more on developer experience than on integration with production systems). And as a result Kubernetes community decided to get rid of Docker support completely. Well, makes sense, Docker is too bloated for a CRI runtime, IMO. So, we are one cleanup away from freeing kubelet of Dockershim code (the plan is to remove it in Kubernetes v1.23). Another nice part about it is that for regular developers there is nothing to worry about. Thanks to the OCI standardisation, images build locally using Docker (or Podman, or any other compatible tool), will keep working on Kubernetes.```
-
-
-
-
-
 
 
 
@@ -117,4 +108,9 @@ If configuration is required, it is recommended to supply an appropriate /etc/ra
 https://news.ycombinator.com/item?id=29400741
 
 https://github.com/docker-library/rabbitmq/pull/174#issuecomment-452002696
+
+
+
+
+
 
