@@ -4,6 +4,7 @@
 https://github.com/google/python-fire
 ### click
 https://click.palletsprojects.com/
+	https://news.ycombinator.com/item?id=34865421
 
 
 
@@ -142,3 +143,8 @@ https://news.ycombinator.com/item?id=28880782
 ```
 
 
+
+
+# packaging
+
+https://github.com/aequitas-aod/python-project-template

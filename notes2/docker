@@ -19,6 +19,7 @@
 
 
 alternatives:
+	https://mkdev.me/posts/dockerless-part-3-moving-development-environment-to-containers-with-podman
 	https://news.ycombinator.com/item?id=28391777
 	https://ubuntu.com/kubernetes/install#single-node
 
@@ -111,6 +112,11 @@ https://github.com/docker-library/rabbitmq/pull/174#issuecomment-452002696
 
 
 
+
+
+
+
+https://news.ycombinator.com/item?id=34873687
 
 
 

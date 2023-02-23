@@ -60,3 +60,6 @@ nope, for some magical unexplained reason, this wants to manage only virtualenvs
 ? hackery2/data/setup/data/fish/functions/auto_venv.fish
 
 
+
+
+
