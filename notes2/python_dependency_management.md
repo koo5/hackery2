@@ -63,3 +63,5 @@ nope, for some magical unexplained reason, this wants to manage only virtualenvs
 
 
 
+# updates
+	https://docs.renovatebot.com/#who-uses-renovate
