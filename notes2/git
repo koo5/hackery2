@@ -6,6 +6,13 @@
 
 
 # submodules:
+
+
+git submodule foreach --recursive "git commit -m test || :"
+
+git config --global submodule.recurse true
+
+
 	
 	```
  mathstuf 3 days ago | parent | prev | next [–]
