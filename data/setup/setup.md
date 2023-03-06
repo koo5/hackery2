@@ -88,7 +88,8 @@ set -g fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_functi
 ln -snf ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
 
 abbr --add kw kwrite
-
+abbr --add untar tar -xvf
+abbr --add root sudo terminator
 
 ```
 
