@@ -1,0 +1,129 @@
+# Only pins that support both input & output have integrated pull-up and pull-down resistors. Input-only GPIOs 34-39 do not.
+
+
+esphome:
+  name: zima
+
+esp8266:
+  board: nodemcu
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  reboot_timeout: 0s
+  password: ""
+  services:
+    - service: vyvetrat
+      then:
+        - switch.turn_on: vetrak
+        - delay: 3s
+        - switch.turn_off: vetrak
+
+    - service: zablikat
+      variables:
+        my_brightness: int
+        my_effect: string
+      then:
+#        - light.turn_on:
+#            id: my_light
+#            brightness: !lambda 'return my_brightness;'
+#            effect: !lambda 'return my_effect;'
+
+ota:
+  password: ""
+
+wifi:
+  ssid: !secret ssid
+  password: !secret password
+
+  # Optional manual IP
+  manual_ip:
+    static_ip: 192.168.8.30
+    gateway: 192.168.8.1
+    subnet: 255.255.255.0
+    dns1: 192.168.8.1
+  
+  ap:
+    ssid: !secret fallback_ssid
+    password: !secret fallback_password
+
+    
+    
+captive_portal:
+
+
+switch:
+  - platform: gpio
+    name: "topeni"
+    id: topeni
+    pin: 
+        number: D1
+        inverted: true
+    
+  - platform: gpio
+    name: "vetrak"
+    id: vetrak
+    pin: D2
+    
+sensor:
+  - platform: dht
+    pin: D5
+    temperature:
+      name: "Temperature"
+      id: dht1
+    humidity:
+      name: "Humidity"
+    update_interval: 10s
+    
+climate:
+  - platform: thermostat
+    name: "Thermostat Climate Controller"
+    sensor: dht1
+    min_cooling_off_time: 3s
+    min_cooling_run_time: 3s
+    min_heating_off_time: 3s
+    min_heating_run_time: 3s
+    min_idle_time: 3s
+    cool_action:
+      - switch.turn_on: vetrak
+    heat_action:
+      - switch.turn_on: topeni
+    idle_action:
+      - switch.turn_off: topeni
+      - switch.turn_off: vetrak
+    default_preset: sleep
+    on_boot_restore_from: memory
+    preset:
+      - name: sleep
+        mode: heat_cool
+        default_target_temperature_low: 15 °C
+        default_target_temperature_high: 21 °C
+      - name: work
+        mode: heat_cool
+        default_target_temperature_low: 19 °C
+        default_target_temperature_high: 21 °C
+
+
+light:
+  - platform: neopixelbus
+    id: my_light
+    type: GRB
+    variant: WS2811
+    pin: D4
+    num_leds: 60
+    name: "NeoPixel Light"
+
+#binary_sensor:
+#  - platform: gpio
+#    pin: D5
+#    name: "Living Room Dehumidifier Toggle Button"
+#    on_press:
+#      then:
+#        - switch.toggle: topeni
+
+web_server:
+  port: 80
+  ota: false
+
