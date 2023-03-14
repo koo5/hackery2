@@ -84,24 +84,24 @@ climate:
   - platform: thermostat
     name: "kyticky"
     sensor: dryness
-    min_cooling_off_time: 1s
+    min_cooling_off_time: 5s
     min_cooling_run_time: 1s
     max_cooling_run_time: 2s
-    min_idle_time: 1s
+    min_idle_time: 10s
     supplemental_cooling_action:
       - lambda: |- 
           auto time = id(sntp_time).now();
+      - switch.turn_on: s2
+      - delay: 1s
+      - switch.turn_off: s2
       - if:
             condition:
                 - sun.is_above_horizon:
             then:
                 - logger.log: Sun is above horizon!
-                - switch.turn_on: s2
                 - switch.turn_on: s3
                 - delay: 1s
-                - switch.turn_off: s2
                 - switch.turn_off: s3
-
             else:
                 - logger.log: Sun is below horizon!
                 
