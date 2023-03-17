@@ -490,3 +490,6 @@ kafka
 	https://hackernoon.com/a-super-quick-comparison-between-kafka-and-message-queues-e69742d855a8?gi=e965191e72d0
 
 
+
+https://pydoit.org/
+
