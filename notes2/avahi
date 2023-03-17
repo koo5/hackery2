@@ -1,0 +1,11 @@
+
+
+https://askubuntu.com/questions/1438763/why-ipv6-looks-disabled-by-default-in-multicast-dns-resolution
+
+
+hackery2/data/python/avahi_publish.py
+
+
+avahi-publish-address -v robust16.local "200:...
+
+
