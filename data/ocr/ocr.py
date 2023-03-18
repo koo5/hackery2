@@ -76,7 +76,7 @@ def rects_list(results):
 
 
 
-grab_res = (1920,1080)
+grab_res = (3840,2160)
 output_window_res = (3840,2160)
 
 def mss_loop_with_tesseract_api(sct):
@@ -100,10 +100,8 @@ def mss_loop_with_tesseract_api(sct):
 			# at least color/grayscale / blurred/nonblurred / thresholded/nonthresholded
 			# and just scan for PII in all of them
 
-			# nevermind, seems that we always have to convert into grayscale(?)
-			img = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
-
 			# the optional preprocessing steps
+			img = img0#cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
 			img = cv2.GaussianBlur(img,(5,5),0)
 			#_, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 			#img = 255-img
@@ -118,12 +116,16 @@ def mss_loop_with_tesseract_api(sct):
 
 
 			# take what we fed into tesseract and prepare it for drawing over it and displaying it on screen
-			img0 = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+			img0 = img#cv2.cvtColor(img, cv2.COLOR_GRAY2RGBA)
 
 			t('rectangle')
 			rects0 = rects_list(results)
 			# sort rects by area...helps (somewhat) with big rects drawing over small rects
 			rects = sorted(rects0, key=lambda r:r['w']*r['h'], reverse=True)
+
+
+			shapes = np.zeros_like(img0, np.uint8)
+			#shapes = np.zeros((grab_res[1],grab_res[0],3), np.uint8)
 
 
 			for rect in rects:
@@ -132,27 +134,33 @@ def mss_loop_with_tesseract_api(sct):
 				#if len(text) > 4:
 				#	print((x,y,w,h,text,conf))
 				if len(text) > 0:
-
-					# underline detected text(?)
-					#cv2.line(img0, (x,y),(x+w,y),  (0, 200, 200), 1)
-
 					# draw orange rectangle over detected text
-					cv2.rectangle(img0, (x,y), (x+w,y+h),  (0, 200, 200), -1)
-
+					cv2.rectangle(img0, (x,y), (x+w,y+h),  (0, 0, 0), cv2.FILLED)
 					# draw a rectangle around detected text
 					#cv2.line(img0, (x,y-2), (x+w,y-2),  (0, 200, 200), 1)
 					#cv2.line(img0, (x-2,y), (x-2,y+h),  (200, 200, 0), 1)
 
-					# draw the detected text
-					text_size = 0.5
-					cv2.putText(img0, text, (x,y+int(0.9*h)), cv2.FONT_HERSHEY_SIMPLEX, text_size, (0,155,0), 1, cv2.LINE_AA, False)
 
+			mask = shapes.astype(bool)
+			cv2.addWeighted(shapes, 0.3, img0, 0.5, 0, img0)
+			#img0[mask] = cv2.addWeighted(img0, 0.8, shapes, 0.2, 0)[mask]
+			#cv2.bitwise_and(img0, 0, shapes, 1)
+
+
+			for rect in rects:
+				x,y,w,h,text,conf = rect['x'],rect['y'],rect['w'],rect['h'],rect['text'],rect['conf']
+				if len(text) > 0:
 					# draw line above detected text
 					#cv2.rectangle(img0, (x-1,y-1), (x+w+2,y+h+2),  (0, 255, 255), 1)
 					#cv2.rectangle(img0, (x-2,y-2), (x+w+4,y+h+4),  (255, 0, 0), 1)
+					# underline detected text(?)
+					cv2.line(img0, (x,y),(x+w,y),  (0, 200, 200), 1)
+					# draw the detected text
+					text_size = 0.8
+					cv2.putText(img0, text, (x,y+int(0.9*h)), cv2.FONT_HERSHEY_SIMPLEX, text_size, (0,155,0), 2, cv2.LINE_AA, False)
 
 
-					#cv2.putText(img0, text, (x+800,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA, False)
+
 
 
 			t('img_to_pygame')
