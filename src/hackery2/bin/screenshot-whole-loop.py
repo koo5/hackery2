@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, time, sys, shutil, errno, subprocess, shlex
+import os, time, sys, shutil, errno, subprocess, shlex, uuid
 from datetime import datetime
 
 
@@ -78,6 +78,7 @@ while True:
 	#print(cmd)
 	subprocess.check_call(cmd)
 	safe_move(tmp_fn, dest_fn)
+	os.symlink(dest_fn, dest_dir + '/' + 'last.png')
 	print(dest_fn)
 	#os.system('geeqie -r --first')
 	time.sleep(int(sys.argv[2]))
