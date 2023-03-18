@@ -62,17 +62,20 @@ def t(upcoming_op):
 
 
 
-#res = (3840,2160)
-res = (1920,1080)
+
+grab_res = (1920,1080)
+output_window_res = (3840,2160)
 
 def mss_loop_with_tesseract_api(sct):
 	try:
-		os.environ['SDL_VIDEO_WINDOW_POS'] = f"{res[0]},{res[1]}"
+
+		#os.environ['SDL_VIDEO_WINDOW_POS'] = f"{res[0]},{res[1]}"
+
 		pygame.init()
-		screen = pygame.display.set_mode(res, flags=pygame.NOFRAME)
+		screen = pygame.display.set_mode(output_window_res)#, flags=pygame.NOFRAME)
 		while True:
 			t('grab')
-			mon = {'left': 0, 'top': 0, 'width': res[0], 'height': res[1]}
+			mon = {'left': 0, 'top': 0, 'width': grab_res[0], 'height': grab_res[1]}
 
 			screenShot = sct.grab(mon)
 			img0 = np.array(screenShot)
@@ -84,13 +87,18 @@ def mss_loop_with_tesseract_api(sct):
 			# at least color/grayscale / blurred/nonblurred / thresholded/nonthresholded
 			# and just scan for PII in all of them
 
-		
+			# nevermind, seems that we always have to convert into grayscale(?)
 			img = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
+
+			# the optional preprocessing steps
 			img = cv2.GaussianBlur(img,(5,5),0)
-			_, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-			#img = 255-img		
-	
+			#_, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+			#img = 255-img
+
+
 			t('image_to_data')
+
+			# the recognition itself. psm is important.
 			results = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT, config='--psm 11')
 			
 			img0 = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
@@ -114,17 +122,32 @@ def mss_loop_with_tesseract_api(sct):
 				#if len(text) > 4:
 				#	print((x,y,w,h,text,conf))
 				if len(text) > 0:
+
+					# underline detected text(?)
 					#cv2.line(img0, (x,y),(x+w,y),  (0, 200, 200), 1)
+
+					# draw orange rectangle over detected text
 					cv2.rectangle(img0, (x,y), (x+w,y+h),  (0, 200, 200), -1)
-#					cv2.line(img0, (x,y-2), (x+w,y-2),  (0, 200, 200), 1)
-#					cv2.line(img0, (x-2,y), (x-2,y+h),  (200, 200, 0), 1)
-					cv2.putText(img0, text, (x,y+int(0.9*h)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,155,0), 1, cv2.LINE_AA, False)
+
+					# draw a rectangle around detected text
+					#cv2.line(img0, (x,y-2), (x+w,y-2),  (0, 200, 200), 1)
+					#cv2.line(img0, (x-2,y), (x-2,y+h),  (200, 200, 0), 1)
+
+					# draw the detected text
+					text_size = 0.5
+					cv2.putText(img0, text, (x,y+int(0.9*h)), cv2.FONT_HERSHEY_SIMPLEX, text_size, (0,155,0), 1, cv2.LINE_AA, False)
+
+					# draw line above detected text
 					#cv2.rectangle(img0, (x-1,y-1), (x+w+2,y+h+2),  (0, 255, 255), 1)
 					#cv2.rectangle(img0, (x-2,y-2), (x+w+4,y+h+4),  (255, 0, 0), 1)
+
+
 					#cv2.putText(img0, text, (x+800,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA, False)
+
 
 			t('img_to_pygame')
 			pygame_image = convert_opencv_img_to_pygame(img0)
+			pygame_image = pygame.transform.scale(pygame_image, (3840,2160))
 			t('blit')
 			screen.blit(pygame_image, (0, 0))
 			t('display.update')
