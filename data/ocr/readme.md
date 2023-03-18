@@ -1,5 +1,5 @@
 ```
-./init.sh
-PYTHONUNBUFFERED=1 ./ocr.py
+. ./init.sh
+./run.sh
 ```
 

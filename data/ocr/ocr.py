@@ -23,8 +23,6 @@ import pytesseract
 
 
 
-dest_dir = os.path.abspath(sys.argv[1])
-pathlib.Path('data').mkdir(exist_ok=True)
 
 
 
@@ -47,189 +45,58 @@ def convert_opencv_img_to_pygame(opencv_image):
 
 
 
-def safe_move(src, dst):
-	"""Rename a file from ``src`` to ``dst``.
-
-	*   Moves must be atomic.  ``shutil.move()`` is not atomic.
-		Note that multiple threads may try to write to the cache at once,
-		so atomicity is required to ensure the serving on one thread doesn't
-		pick up a partially saved image from another thread.
-
-	*   Moves must work across filesystems.  Often temp directories and the
-		cache directories live on different filesystems.  ``os.rename()`` can
-		throw errors if run across filesystems.
-
-	So we try ``os.rename()``, but if we detect a cross-filesystem copy, we
-	switch to ``shutil.move()`` with some wrappers to make it atomic.
-
-	https://alexwlchan.net/2019/03/atomic-cross-filesystem-moves-in-python/
-
-	"""
-	try:
-		os.rename(src, dst)
-	except OSError as err:
-
-		if err.errno == errno.EXDEV:
-			# Generate a unique ID, and copy `<src>` to the target directory
-			# with a temporary name `<dst>.<ID>.tmp`.  Because we're copying
-			# across a filesystem boundary, this initial copy may not be
-			# atomic.  We intersperse a random UUID so if different processes
-			# are copying into `<dst>`, they don't overlap in their tmp copies.
-			copy_id = uuid.uuid4()
-			tmp_dst = "%s.%s.tmp" % (dst, copy_id)
-			shutil.copyfile(src, tmp_dst)
-
-			# Then do an atomic rename onto the new name, and clean up the
-			# source image.
-			os.rename(tmp_dst, dst)
-			os.unlink(src)
-		else:
-			raise
-
-
-
-
-tmp_fn = '/tmp/screenshot-whole-loop.png'
-try:
-	os.makedirs(dest_dir)
-except FileExistsError:
-	pass
-
-
-i = 0
-def print_free_space_very_smartly():
-	global i
-	if i == 0:
-		os.system("df -h " + dest_dir)
-	i += 1
-	if i == 100:
-		i = 0
-
-
-def init_cam():
-	print("Accessing device's camera...")
-	cap = cv2.VideoCapture(2)
-	cap.set(3, 1920)
-	cap.set(4, 1080)
-	print("Camera ready!")
-	return cap
-
-
-
-def camloop():
-	try:
-		while (True):
-			cap = init_cam()
-			_, frame = cap.read()
-
-			# this would make the detection fail if text and background didn't have different luminosity i guess
-			gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-			#blur = cv2.GaussianBlur(gray,(10,10),0)
-			#_, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-			cv2.imshow('Frame', gray)
-			cv2.imwrite('file.png', gray)
-
-			tessfunc()
-	except:
-		pass
-	finally:
-		cap.release()
-	exit()
-
-
-def scrotloop_with_standalone_tesseract():
-	while True:
-		print_free_space_very_smartly()
-		dest_fn = dest_dir + "/" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
-		tmp_fn = dest_dir + '/tmp'
-		cmd = ["scrot", "-o", '-q', '0', '-u'] + [tmp_fn]
-		print(cmd)
-		subprocess.check_call(cmd)
-		safe_move(tmp_fn, dest_fn)
-		link = dest_dir + '/' + 'last.png'
-		os.unlink(link)
-		os.symlink(dest_fn, link)
-		print(dest_fn)
-
-		img = cv2.cvtColor(cv2.imread(dest_fn), cv2.COLOR_BGR2GRAY)
-		_, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-		cv2.imwrite('data/file.png', thresh)
-
-		#os.system('geeqie -r --first')
-		#os.system("tesseract --psm 11 --dpi 300 " + link + ' data')
-		os.system("tesseract --psm 11 --dpi 300 " + 'data/file.png' + ' data/data')
-		
-		with open('data/output.txt', 'w') as output_file:
-			with open('data/data.txt', 'r') as mf:
-				out = "\n********************************************"
-				for line in mf.readlines():
-					l = line.strip().strip('\n')
-					if len(l) > 4 and not l.isspace():
-						out += l + '\n'
-				out += "********************************************"
-				print(out, file=output_file)
-				print(file=output_file)
-		time.sleep(int(sys.argv[2]))
-
-
-
-def screenshot():
-	print_free_space_very_smartly()
-	dest_fn = dest_dir + "/" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
-	tmp_fn = dest_dir + '/tmp'
-	cmd = ["scrot", "-o", '-q', '100', '-u'] + [tmp_fn]
-	sys.stdout.write(shlex.join(cmd))
-	subprocess.check_call(cmd)
-	safe_move(tmp_fn, dest_fn)
-	link = dest_dir + '/' + 'last.png'
-	os.unlink(link)
-	os.symlink(dest_fn, link)
-	#print(dest_fn)
-	return dest_fn
-
-
-
-
-
 _t = None
-def t():
+def t(upcoming_op):
 	global _t
 	t2 = time.perf_counter()
 	if _t is not None:
-		print(' ' + str(round(t2 - _t, 3)))
-	_t = t2
+		sys.stdout.write(' ' + str(round(t2 - _t, 3)) + 's')
+		sys.stdout.write('\n')
+	if upcoming_op is not None:
+		sys.stdout.write(' | ' + upcoming_op + '..')
+		_t = t2
+	else:
+		_t = None
+
+
+
 
 
 #res = (3840,2160)
-res = (1920,1000)
+res = (1920,1080)
 
-def scrotloop_with_tesseract_api(sct):
+def mss_loop_with_tesseract_api(sct):
 	try:
-
+		os.environ['SDL_VIDEO_WINDOW_POS'] = f"{res[0]},{res[1]}"
 		pygame.init()
-		screen = pygame.display.set_mode(res)
-
-
-
-		# print(f'Conversion time: {time_end - time_start}Seconds/ {1/(time_end - time_start)}fps')
-
+		screen = pygame.display.set_mode(res, flags=pygame.NOFRAME)
 		while True:
-			t()
+			t('grab')
 			mon = {'left': 0, 'top': 0, 'width': res[0], 'height': res[1]}
 
-			sys.stdout.write(' | grab..')
 			screenShot = sct.grab(mon)
-			img = np.array(screenShot)
+			img0 = np.array(screenShot)
 			#img = np.array(Image.frombytes('RGB', (screenShot.width, screenShot.height), screenShot.rgb,))
-			t()
+			
 
-			sys.stdout.write(' | image_to_data..')
-			results = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
-			t()
+			# seems that different versions of tesseract support or dont support non-grayscale images, 
+			# and different preprocessing steps help or hinder different testcases. So, it seems that we should do a couple permutations,
+			# at least color/grayscale / blurred/nonblurred / thresholded/nonthresholded
+			# and just scan for PII in all of them
 
-			sys.stdout.write(' | rectangle..')
+		
+			img = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
+			img = cv2.GaussianBlur(img,(5,5),0)
+			_, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+			#img = 255-img		
+	
+			t('image_to_data')
+			results = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT, config='--psm 11')
+			
+			img0 = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+
+			t('rectangle')
+			rects0 = []
 			for i in range(0, len(results["text"])):
 				x = results["left"][i]
 				y = results["top"][i]
@@ -237,26 +104,34 @@ def scrotloop_with_tesseract_api(sct):
 				h = results["height"][i]
 				text = results["text"][i]
 				conf = int(results["conf"][i])
-				text = text.strip()
+				text = text.strip()			
+				rects0.append({'x':x,'y':y,'w':w,'h':h,'text':text,'conf':conf})
+			
+			rects = sorted(rects0, key=lambda r:r['w']*r['h'], reverse=True)
+			for rect in rects:
+				x,y,w,h,text,conf = rect['x'],rect['y'],rect['w'],rect['h'],rect['text'],rect['conf']				
+
 				#if len(text) > 4:
 				#	print((x,y,w,h,text,conf))
-				if len(text) > 3:
-					cv2.rectangle(img, (x,y), (x+w,y+h),  (255, 255, 0), 2)
-			t()
-			#cv2.imwrite('data/'+datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png", img)
-			#gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-			#cv2.imshow('boxes', img)
-			#cv2.waitKey(0)
+				if len(text) > 0:
+					#cv2.line(img0, (x,y),(x+w,y),  (0, 200, 200), 1)
+					cv2.rectangle(img0, (x,y), (x+w,y+h),  (0, 200, 200), -1)
+#					cv2.line(img0, (x,y-2), (x+w,y-2),  (0, 200, 200), 1)
+#					cv2.line(img0, (x-2,y), (x-2,y+h),  (200, 200, 0), 1)
+					cv2.putText(img0, text, (x,y+int(0.9*h)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,155,0), 1, cv2.LINE_AA, False)
+					#cv2.rectangle(img0, (x-1,y-1), (x+w+2,y+h+2),  (0, 255, 255), 1)
+					#cv2.rectangle(img0, (x-2,y-2), (x+w+4,y+h+4),  (255, 0, 0), 1)
+					#cv2.putText(img0, text, (x+800,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA, False)
 
-			sys.stdout.write(' | img_to_pygame..')
-			pygame_image = convert_opencv_img_to_pygame(img)
-			sys.stdout.write(' | blit...')
+			t('img_to_pygame')
+			pygame_image = convert_opencv_img_to_pygame(img0)
+			t('blit')
 			screen.blit(pygame_image, (0, 0))
-			sys.stdout.write(' | display.update..')
+			t('display.update')
 			pygame.display.update()
-			t()
-
-			print(' :) ')
+			
+			t(None)
+			print('and loop.')
 
 	finally:
 		pygame.quit()
@@ -264,7 +139,7 @@ def scrotloop_with_tesseract_api(sct):
 
 if __name__ == '__main__':
 	with mss() as sct:
-		scrotloop_with_tesseract_api(sct)
+		mss_loop_with_tesseract_api(sct)
 
 
 # levenshtein
