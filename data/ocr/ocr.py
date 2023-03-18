@@ -60,6 +60,19 @@ def t(upcoming_op):
 
 
 
+def rects_list(results):
+	rects0 = []
+	for i in range(0, len(results["text"])):
+		x = results["left"][i]
+		y = results["top"][i]
+		w = results["width"][i]
+		h = results["height"][i]
+		text = results["text"][i]
+		conf = int(results["conf"][i])
+		text = text.strip()
+		rects0.append({'x':x,'y':y,'w':w,'h':h,'text':text,'conf':conf})
+	return rects0
+
 
 
 
@@ -98,24 +111,21 @@ def mss_loop_with_tesseract_api(sct):
 
 			t('image_to_data')
 
-			# the recognition itself. psm is important.
-			results = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT, config='--psm 11')
-			
+			# the recognition itself. psm is important. also --oem
+			# also: You can extend the standard dictionary for a language model with your own words or retrain the model replacing completely the standard dictionary words with your own words.
+			# also, there are 5 versions of tesseract
+			results = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT, config='--psm 11 --oem 3')
+
+
+			# take what we fed into tesseract and prepare it for drawing over it and displaying it on screen
 			img0 = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
 
 			t('rectangle')
-			rects0 = []
-			for i in range(0, len(results["text"])):
-				x = results["left"][i]
-				y = results["top"][i]
-				w = results["width"][i]
-				h = results["height"][i]
-				text = results["text"][i]
-				conf = int(results["conf"][i])
-				text = text.strip()			
-				rects0.append({'x':x,'y':y,'w':w,'h':h,'text':text,'conf':conf})
-			
+			rects0 = rects_list(results)
+			# sort rects by area...helps (somewhat) with big rects drawing over small rects
 			rects = sorted(rects0, key=lambda r:r['w']*r['h'], reverse=True)
+
+
 			for rect in rects:
 				x,y,w,h,text,conf = rect['x'],rect['y'],rect['w'],rect['h'],rect['text'],rect['conf']				
 
@@ -147,7 +157,7 @@ def mss_loop_with_tesseract_api(sct):
 
 			t('img_to_pygame')
 			pygame_image = convert_opencv_img_to_pygame(img0)
-			pygame_image = pygame.transform.scale(pygame_image, (3840,2160))
+			pygame_image = pygame.transform.scale(pygame_image, output_window_res)
 			t('blit')
 			screen.blit(pygame_image, (0, 0))
 			t('display.update')
