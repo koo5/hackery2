@@ -16,6 +16,10 @@ from pathlib import Path
 import re
 import pathlib
 import pygame
+import numpy as np
+from mss import mss
+from PIL import Image
+import pytesseract
 
 
 
@@ -175,7 +179,7 @@ def screenshot():
 	print_free_space_very_smartly()
 	dest_fn = dest_dir + "/" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
 	tmp_fn = dest_dir + '/tmp'
-	cmd = ["scrot", "-o", '-q', '0', '-u'] + [tmp_fn]
+	cmd = ["scrot", "-o", '-q', '100', '-u'] + [tmp_fn]
 	sys.stdout.write(shlex.join(cmd))
 	subprocess.check_call(cmd)
 	safe_move(tmp_fn, dest_fn)
@@ -187,30 +191,43 @@ def screenshot():
 
 
 
-import pytesseract
 
-def scrotloop_with_tesseract_api():
 
+_t = None
+def t():
+	global _t
+	t2 = time.perf_counter()
+	if _t is not None:
+		print(' ' + str(round(t2 - _t, 3)))
+	_t = t2
+
+
+#res = (3840,2160)
+res = (1920,1000)
+
+def scrotloop_with_tesseract_api(sct):
 	try:
 
 		pygame.init()
-		screen = pygame.display.set_mode((3840,2160))
+		screen = pygame.display.set_mode(res)
 
-		# time_start = time.perf_counter()
-		# time_end = time.perf_counter()
+
+
 		# print(f'Conversion time: {time_end - time_start}Seconds/ {1/(time_end - time_start)}fps')
 
 		while True:
+			t()
+			mon = {'left': 0, 'top': 0, 'width': res[0], 'height': res[1]}
 
-			dest_fn = screenshot()
-			sys.stdout.write(' | imread..')
-			img = cv2.imread(dest_fn)
-			#sys.stdout.write(' | cvtColor..')
-			#img = cv2.cvtColor(iii, cv2.COLOR_BGR2RGB)
-			#_, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-			#cv2.imwrite('data/file.png', thresh)
+			sys.stdout.write(' | grab..')
+			screenShot = sct.grab(mon)
+			img = np.array(screenShot)
+			#img = np.array(Image.frombytes('RGB', (screenShot.width, screenShot.height), screenShot.rgb,))
+			t()
+
 			sys.stdout.write(' | image_to_data..')
 			results = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+			t()
 
 			sys.stdout.write(' | rectangle..')
 			for i in range(0, len(results["text"])):
@@ -221,10 +238,11 @@ def scrotloop_with_tesseract_api():
 				text = results["text"][i]
 				conf = int(results["conf"][i])
 				text = text.strip()
-				if len(text) > 4:
-					print((x,y,w,h,text,conf))
-				cv2.rectangle(img, (x,y), (x+w,y+h),  (255, 255, 0), 2)
-
+				#if len(text) > 4:
+				#	print((x,y,w,h,text,conf))
+				if len(text) > 3:
+					cv2.rectangle(img, (x,y), (x+w,y+h),  (255, 255, 0), 2)
+			t()
 			#cv2.imwrite('data/'+datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png", img)
 			#gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 			#cv2.imshow('boxes', img)
@@ -234,15 +252,19 @@ def scrotloop_with_tesseract_api():
 			pygame_image = convert_opencv_img_to_pygame(img)
 			sys.stdout.write(' | blit...')
 			screen.blit(pygame_image, (0, 0))
-			sys.stdout.write(' | display.update. | ')
+			sys.stdout.write(' | display.update..')
 			pygame.display.update()
+			t()
+
+			print(' :) ')
 
 	finally:
 		pygame.quit()
 
 
 if __name__ == '__main__':
-	scrotloop_with_tesseract_api()
+	with mss() as sct:
+		scrotloop_with_tesseract_api(sct)
 
 
 # levenshtein
