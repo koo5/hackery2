@@ -15,13 +15,31 @@ import json
 from pathlib import Path
 import re
 import pathlib
-
-
+import pygame
 
 
 
 dest_dir = os.path.abspath(sys.argv[1])
 pathlib.Path('data').mkdir(exist_ok=True)
+
+
+
+def get_opencv_img_res(opencv_image):
+	height, width = opencv_image.shape[:2]
+	return width, height
+
+
+
+def convert_opencv_img_to_pygame(opencv_image):
+	"""
+	Convert OpenCV images for Pygame.
+	see https://gist.github.com/radames/1e7c794842755683162b
+	"""
+	rgb_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB).swapaxes(0, 1)
+	#Generate a Surface for drawing images with Pygame based on OpenCV images
+	pygame_image = pygame.surfarray.make_surface(rgb_image)
+
+	return pygame_image
 
 
 
@@ -106,10 +124,8 @@ def camloop():
 			#blur = cv2.GaussianBlur(gray,(10,10),0)
 			#_, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-
 			cv2.imshow('Frame', gray)
 			cv2.imwrite('file.png', gray)
-
 
 			tessfunc()
 	except:
@@ -119,9 +135,7 @@ def camloop():
 	exit()
 
 
-
-
-def scrotloop():
+def scrotloop_with_standalone_tesseract():
 	while True:
 		print_free_space_very_smartly()
 		dest_fn = dest_dir + "/" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
@@ -156,8 +170,79 @@ def scrotloop():
 		time.sleep(int(sys.argv[2]))
 
 
-scrotloop()
 
+def screenshot():
+	print_free_space_very_smartly()
+	dest_fn = dest_dir + "/" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
+	tmp_fn = dest_dir + '/tmp'
+	cmd = ["scrot", "-o", '-q', '0', '-u'] + [tmp_fn]
+	sys.stdout.write(shlex.join(cmd))
+	subprocess.check_call(cmd)
+	safe_move(tmp_fn, dest_fn)
+	link = dest_dir + '/' + 'last.png'
+	os.unlink(link)
+	os.symlink(dest_fn, link)
+	#print(dest_fn)
+	return dest_fn
+
+
+
+import pytesseract
+
+def scrotloop_with_tesseract_api():
+
+	try:
+
+		pygame.init()
+		screen = pygame.display.set_mode((3840,2160))
+
+		# time_start = time.perf_counter()
+		# time_end = time.perf_counter()
+		# print(f'Conversion time: {time_end - time_start}Seconds/ {1/(time_end - time_start)}fps')
+
+		while True:
+
+			dest_fn = screenshot()
+			sys.stdout.write(' | imread..')
+			img = cv2.imread(dest_fn)
+			#sys.stdout.write(' | cvtColor..')
+			#img = cv2.cvtColor(iii, cv2.COLOR_BGR2RGB)
+			#_, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+			#cv2.imwrite('data/file.png', thresh)
+			sys.stdout.write(' | image_to_data..')
+			results = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+
+			sys.stdout.write(' | rectangle..')
+			for i in range(0, len(results["text"])):
+				x = results["left"][i]
+				y = results["top"][i]
+				w = results["width"][i]
+				h = results["height"][i]
+				text = results["text"][i]
+				conf = int(results["conf"][i])
+				text = text.strip()
+				if len(text) > 4:
+					print((x,y,w,h,text,conf))
+				cv2.rectangle(img, (x,y), (x+w,y+h),  (255, 255, 0), 2)
+
+			#cv2.imwrite('data/'+datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png", img)
+			#gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+			#cv2.imshow('boxes', img)
+			#cv2.waitKey(0)
+
+			sys.stdout.write(' | img_to_pygame..')
+			pygame_image = convert_opencv_img_to_pygame(img)
+			sys.stdout.write(' | blit...')
+			screen.blit(pygame_image, (0, 0))
+			sys.stdout.write(' | display.update. | ')
+			pygame.display.update()
+
+	finally:
+		pygame.quit()
+
+
+if __name__ == '__main__':
+	scrotloop_with_tesseract_api()
 
 
 # levenshtein
