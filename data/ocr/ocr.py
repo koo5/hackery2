@@ -93,18 +93,37 @@ def mss_loop_with_tesseract_api(sct):
 			screenShot = sct.grab(mon)
 			img0 = np.array(screenShot)
 			#img = np.array(Image.frombytes('RGB', (screenShot.width, screenShot.height), screenShot.rgb,))
-			
+
+
+
+
+			# text *detection* might go here.
+			# https://github.com/LaggyHammer/real-time-OCR/blob/master/real_time_ocr_multiprocessing.py
+			# https://pyimagesearch.com/2018/08/20/opencv-text-detection-east-text-detector/
+			# whats this? https://github.com/opencv/opencv/blob/master/samples/dnn/text_detection.cpp
+			# Note that we don't need to rely on EAST only, we can also do something like the table cell detection linked here https://tesseract-ocr.github.io/tessdoc/ImproveQuality.html
+
+			# roi_list = east_stuff(...
+
+
+
 
 			# seems that different versions of tesseract support or dont support non-grayscale images, 
 			# and different preprocessing steps help or hinder different testcases. So, it seems that we should do a couple permutations,
 			# at least color/grayscale / blurred/nonblurred / thresholded/nonthresholded
 			# and just scan for PII in all of them
+			# | While tesseract version 3.05 (and older) handle inverted image (dark background and light text) without problem, for 4.x version use dark text on light background.
+			# https://towardsdatascience.com/getting-started-with-tesseract-part-ii-f7f9a0899b3f
+			# https://tesseract-ocr.github.io/tessdoc/ImproveQuality.html
+			# https://vovaprivalov.medium.com/tesseract-ocr-tips-custom-dictionary-to-improve-ocr-d2b9cd17850b
+
 
 			# the optional preprocessing steps
 			img = img0#cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
 			img = cv2.GaussianBlur(img,(5,5),0)
 			#_, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 			#img = 255-img
+
 
 
 			t('image_to_data')
@@ -183,4 +202,21 @@ if __name__ == '__main__':
 		mss_loop_with_tesseract_api(sct)
 
 
+#
 # levenshtein
+
+
+
+
+
+# for video input/output:
+# https://github.com/Abhishek325/OCR-live-stream
+
+# for v4l loopback:
+# https://github.com/Abhishek325/OCR-live-stream
+
+
+
+# https://github.com/mftnakrsu/Comparison-of-OCR/blob/main/ocr.py
+# ^ we should start here
+# - https://towardsdatascience.com/remove-text-from-images-using-cv2-and-keras-ocr-24e7612ae4f4

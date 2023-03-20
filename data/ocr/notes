@@ -1,0 +1,3 @@
+fdupes --delete --noprompt .
+sudo apt install gimagereader-qt5
+
