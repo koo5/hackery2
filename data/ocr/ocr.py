@@ -220,3 +220,6 @@ if __name__ == '__main__':
 # https://github.com/mftnakrsu/Comparison-of-OCR/blob/main/ocr.py
 # ^ we should start here
 # - https://towardsdatascience.com/remove-text-from-images-using-cv2-and-keras-ocr-24e7612ae4f4
+
+
+# not sure if/where this fits: https://news.ycombinator.com/item?id=29554433
