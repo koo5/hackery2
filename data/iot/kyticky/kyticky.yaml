@@ -16,30 +16,59 @@ esp32:
 logger:
 
 api:
-  reboot_timeout: 0s
   password: ""
+  reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently seems to have issues with WiFi where a full reboot is required to get the interface back working. Defaults to 15min.
+  #power_save_mode: # (Optional, string): The power save mode for the WiFi interface. See Power Save Mode
+  #output_power: 15dB # (Optional, string): The amount of TX power for the WiFi interface from 8.5dB to 20.5dB. Default for ESP8266 is 20dB, 20.5dB might cause unexpected restarts.
+  #fast_connect: true # (Optional, boolean): If enabled, directly connects to WiFi network without doing a full scan first. This is required for hidden networks and can significantly improve connection times. Defaults to off. The downside is that this option connects to the first network the ESP sees, even if that network is very far away and better ones are available.    
+  services:
+    - service: ota_mode_on
+      then: 
+        - logger.log: "deep_sleep.prevent..."
+        - deep_sleep.prevent: deep_sleep
+    - service: ota_mode_off
+      then:
+        - logger.log: "deep_sleep.allow..."
+        - deep_sleep.allow: deep_sleep
+
+
+
+mqtt:
+
+  broker: 192.168.8.8
+  username: livingroom
+  password: !secret mqtt_password
+
+  on_message:
+    - topic: kyticky/ota_mode
+      payload: 'ON'
+      then:
+        - logger.log: "deep_sleep.prevent..."
+        - deep_sleep.prevent: deep_sleep
+    - topic: kyticky/ota_mode
+      payload: 'OFF'
+      then:
+        - logger.log: "deep_sleep.allow..."
+        - deep_sleep.allow: deep_sleep
 
 ota:
   password: ""
 
 wifi:
-  ssid: !secret ssid
-  password: !secret password
-
-  # Optional manual IP
-  manual_ip:
-    static_ip: 192.168.8.31
-    gateway: 192.168.8.1
-    subnet: 255.255.255.0
-    dns1: 192.168.8.1
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: 192.168.8.31
+      gateway: 192.168.8.1
+      subnet: 255.255.255.0
+      dns1: 192.168.8.1
     
   ap:
     ssid: !secret fallback_ssid
     password: !secret fallback_password
 
     
-    
-captive_portal:
 
 
 sensor:
@@ -74,10 +103,11 @@ switch:
     pin: 3
     id: s3
     name: "s3"
-
-
-    
-    
+  - platform: gpio
+    pin: 4
+    id: periodic_pump1
+    name: "periodic_pump1"
+  
     
     
 climate:
@@ -119,13 +149,9 @@ climate:
     
     
 
-    
-#time:
-#  - platform: sntp
-#    on_time:
-#      - seconds: /5
-#        then:
-#          - switch.turn_off: s2
+
+
+captive_portal:
     
 web_server:
   port: 80
@@ -135,7 +161,6 @@ web_server:
 
 
 sun:
-
   latitude: 50.0755°
   longitude: 14.4378°
 
@@ -145,7 +170,11 @@ sun:
   on_sunset:
     - then:
         - logger.log: Good evening!
-        
+
+
+
+
+# display sun values in gui        
 text_sensor:
   - platform: sun
     name: Next Sunrise
@@ -154,11 +183,52 @@ text_sensor:
     name: Next Sunset
     type: sunset
     
+
+
+
+
         
 time:
+
+  - platform: ds1307
+    id: rtc
+
+
   - platform: sntp
     id: sntp_time
     timezone: Europe/Prague
+
     on_time_sync:
       then:
-        - logger.log: "Synchronized clock"
+        - logger.log: "rtc.write_time..."
+        - rtc.write_time
+        - logger.log: "Synchronized clock."
+
+
+    on_time:
+      - cron: '* /5 * * * *'
+        then:
+          - logger.log: "periodic action..."
+          - homeassistant.event:
+             event: esphome.pump
+             data:
+               message: "pump!"
+
+          - switch.turn_on: periodic_pump1
+          - delay: 30s
+          - switch.turn_off: periodic_pump1
+
+          #- deep_sleep.enter:
+          #    id: deep_sleep
+          #    until: "16:00:00"
+          #    time_id: sntp_time
+
+          - deep_sleep.enter:
+              id: deep_sleep
+              sleep_duration: 30s
+
+deep_sleep:
+  run_duration: 1min
+  sleep_duration: 1min
+
+
