@@ -9,11 +9,29 @@
 
 esphome:
   name: kyticky
+  on_boot:
+    then:
+      ds1307.read_time:
 
 esp32:
   board: denky32
 
-logger:
+wifi:
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: 192.168.8.31
+      gateway: 192.168.8.1
+      subnet: 255.255.255.0
+      dns1: 192.168.8.1
+      dns2: 8.8.8.8
+    
+  ap:
+    ssid: !secret fallback_ssid
+    password: !secret fallback_password
+
+
 
 api:
   password: ""
@@ -54,21 +72,24 @@ mqtt:
 ota:
   password: ""
 
-wifi:
-  networks:
-  - ssid: !secret ssid
-    password: !secret password
-    manual_ip:
-      static_ip: 192.168.8.31
-      gateway: 192.168.8.1
-      subnet: 255.255.255.0
-      dns1: 192.168.8.1
     
-  ap:
-    ssid: !secret fallback_ssid
-    password: !secret fallback_password
+logger:
+  on_message:
+    level: ERROR
+    then:
+      - mqtt.publish:
+          topic: some/topic
+          payload: !lambda |-
+            return "Triggered on_message with level " + to_string(level) + ", tag " + tag + " and message " + message;
 
+
+
+captive_portal:
     
+web_server:
+  port: 80
+  ota: false
+
 
 
 sensor:
@@ -104,7 +125,7 @@ switch:
     id: s3
     name: "s3"
   - platform: gpio
-    pin: 4
+    pin: 5
     id: periodic_pump1
     name: "periodic_pump1"
   
@@ -119,8 +140,6 @@ climate:
     max_cooling_run_time: 2s
     min_idle_time: 10s
     supplemental_cooling_action:
-      - lambda: |- 
-          auto time = id(sntp_time).now();
       - switch.turn_on: s2
       - delay: 1s
       - switch.turn_off: s2
@@ -151,13 +170,6 @@ climate:
 
 
 
-captive_portal:
-    
-web_server:
-  port: 80
-  ota: false
-
-
 
 
 sun:
@@ -182,22 +194,45 @@ text_sensor:
   - platform: sun
     name: Next Sunset
     type: sunset
-    
+  - platform: template
+    name: "NTP Time"
+    lambda: |-
+      char str[30];
+      time_t currTime = id(ntp).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
+  - platform: template
+    name: "RTC Time"
+    lambda: |-
+      char str[30];
+      time_t currTime = id(rtc).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
 
 
 
 
         
-time:
+time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
 
   - platform: ds1307
     id: rtc
+    update_interval: never
 
+  - platform: homeassistant
+    on_time_sync:
+      then:
+        - logger.log: "rtc.write_time..."
+        - ds1307.write_time
+        - logger.log: "Synchronized clock."
 
   - platform: sntp
-    id: sntp_time
+    id: ntp
     timezone: Europe/Prague
-
     on_time_sync:
       then:
         - logger.log: "rtc.write_time..."
@@ -206,7 +241,10 @@ time:
 
 
     on_time:
-      - cron: '* 30 20 * * *'
+#      - cron: '* 57 21 * * *'
+
+      - minutes: 20
+        #hours: 22
         then:
           - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
           - homeassistant.event:
@@ -215,22 +253,35 @@ time:
                message: "pump!"
 
           - switch.turn_on: periodic_pump1
-          - delay: 15min
+
+      - minutes: 25
+        #hours: 22
+        then:
+          - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+          - homeassistant.event:
+             event: esphome.pump
+             data:
+               message: "pumpoff!"
           - switch.turn_off: periodic_pump1
+
+
+
+
+
 
           #- deep_sleep.enter:
           #    id: deep_sleep_1
           #    until: "16:00:00"
-          #    time_id: sntp_time
+          #    time_id: ntp
 
-          - deep_sleep.enter:
-              id: deep_sleep_1
-              sleep_duration: 30s
+#          - deep_sleep.enter:
+#              id: deep_sleep_1
+#              sleep_duration: 30s
 
 deep_sleep:
   run_duration: 1min
   sleep_duration: 1min
-  wakeup_pin: 12
+  wakeup_pin: 13
   id: deep_sleep_1
 
 i2c:
@@ -238,7 +289,5 @@ i2c:
 #  scl: 22
   scan: true
   id: bus_a
-
-
 
 
