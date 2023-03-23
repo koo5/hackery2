@@ -25,11 +25,11 @@ api:
     - service: ota_mode_on
       then: 
         - logger.log: "deep_sleep.prevent..."
-        - deep_sleep.prevent: deep_sleep
+        - deep_sleep.prevent: deep_sleep_1
     - service: ota_mode_off
       then:
         - logger.log: "deep_sleep.allow..."
-        - deep_sleep.allow: deep_sleep
+        - deep_sleep.allow: deep_sleep_1
 
 
 
@@ -44,12 +44,12 @@ mqtt:
       payload: 'ON'
       then:
         - logger.log: "deep_sleep.prevent..."
-        - deep_sleep.prevent: deep_sleep
+        - deep_sleep.prevent: deep_sleep_1
     - topic: kyticky/ota_mode
       payload: 'OFF'
       then:
         - logger.log: "deep_sleep.allow..."
-        - deep_sleep.allow: deep_sleep
+        - deep_sleep.allow: deep_sleep_1
 
 ota:
   password: ""
@@ -201,34 +201,44 @@ time:
     on_time_sync:
       then:
         - logger.log: "rtc.write_time..."
-        - rtc.write_time
+        - ds1307.write_time
         - logger.log: "Synchronized clock."
 
 
     on_time:
-      - cron: '* /5 * * * *'
+      - cron: '* 30 20 * * *'
         then:
-          - logger.log: "periodic action..."
+          - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
           - homeassistant.event:
              event: esphome.pump
              data:
                message: "pump!"
 
           - switch.turn_on: periodic_pump1
-          - delay: 30s
+          - delay: 15min
           - switch.turn_off: periodic_pump1
 
           #- deep_sleep.enter:
-          #    id: deep_sleep
+          #    id: deep_sleep_1
           #    until: "16:00:00"
           #    time_id: sntp_time
 
           - deep_sleep.enter:
-              id: deep_sleep
+              id: deep_sleep_1
               sleep_duration: 30s
 
 deep_sleep:
   run_duration: 1min
   sleep_duration: 1min
+  wakeup_pin: 12
+  id: deep_sleep_1
+
+i2c:
+#  sda: 21
+#  scl: 22
+  scan: true
+  id: bus_a
+
+
 
 
