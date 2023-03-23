@@ -112,14 +112,15 @@ sensor:
       
 light:
   - platform: status_led
-    name: "status"
+    name: "status LED(pin2)"
+    id: status
     pin: 2
 
 switch:
-  - platform: gpio
-    pin: 2
-    id: s2
-    name: "s2"
+#  - platform: gpio
+#    pin: 2
+#    id: status_led_pin2
+#    name: "s2"
   - platform: gpio
     pin: 3
     id: s3
@@ -140,9 +141,9 @@ climate:
     max_cooling_run_time: 2s
     min_idle_time: 10s
     supplemental_cooling_action:
-      - switch.turn_on: s2
+      - light.turn_on: status
       - delay: 1s
-      - switch.turn_off: s2
+      - light.turn_off: status
       - if:
             condition:
                 - sun.is_above_horizon:
@@ -158,7 +159,7 @@ climate:
     cool_action:
       - logger.log: cool!
     idle_action:
-      - switch.turn_off: s2
+      - light.turn_off: status
       - switch.turn_off: s3
     default_preset: Home
     preset:
@@ -195,16 +196,17 @@ text_sensor:
     name: Next Sunset
     type: sunset
   - platform: template
-    name: "NTP Time"
+    name: "Time NTP"
     lambda: |-
       char str[30];
+      if (!id(ntp).now().is_valid()) { return { "----" }; }
       time_t currTime = id(ntp).now().timestamp;
       strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
       //strftime(str, sizeof(str), "%c", localtime(&currTime));
       return  { str };
     update_interval: 1s
   - platform: template
-    name: "RTC Time"
+    name: "Time RTC"
     lambda: |-
       char str[30];
       time_t currTime = id(rtc).now().timestamp;
@@ -232,7 +234,7 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
 
   - platform: sntp
     id: ntp
-    timezone: Europe/Prague
+    #timezone: Europe/Prague
     on_time_sync:
       then:
         - logger.log: "rtc.write_time..."
