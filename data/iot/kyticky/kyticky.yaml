@@ -142,6 +142,20 @@ climate:
     min_idle_time: 10s
     supplemental_cooling_action:
       - light.turn_on: status
+
+
+      - http_request.get:
+          url: !secret ping_url
+          verify_ssl: false
+          on_response:
+            then:
+              - logger.log:
+                  format: "Response status: %d, Duration: %u ms"
+                  args:
+                    - status_code
+                    - duration_ms      
+      
+
       - delay: 1s
       - light.turn_off: status
       - if:
@@ -294,4 +308,8 @@ i2c:
   scan: true
   id: bus_a
 
+
+
+http_request:
+  timeout: 100s
 
