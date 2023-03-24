@@ -254,9 +254,10 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
              data:
                message: "pump!"
 
+          - deep_sleep.prevent: deep_sleep_1
           - switch.turn_on: periodic_pump1
 
-      - minutes: 25
+      - minutes: 30
         #hours: 22
         then:
           - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
@@ -265,6 +266,7 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
              data:
                message: "pumpoff!"
           - switch.turn_off: periodic_pump1
+          - deep_sleep.allow: deep_sleep_1
 
 
 
@@ -282,7 +284,7 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
 
 deep_sleep:
   run_duration: 1min
-  sleep_duration: 1min
+  sleep_duration: 60min
   wakeup_pin: 13
   id: deep_sleep_1
 
