@@ -150,10 +150,9 @@ climate:
           on_response:
             then:
               - logger.log:
-                  format: "Response status: %d, Duration: %u ms"
+                  format: "Response status: %d"
                   args:
                     - status_code
-                    - duration_ms      
       
 
       - delay: 1s
@@ -311,5 +310,5 @@ i2c:
 
 
 http_request:
-  timeout: 100s
+  timeout: 34s
 
