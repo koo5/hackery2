@@ -91,7 +91,12 @@ web_server:
 
 
 
+
 sensor:
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 60s
+    
   - platform: adc
     pin: 35
     id: dryness
@@ -229,6 +234,19 @@ text_sensor:
       //strftime(str, sizeof(str), "%c", localtime(&currTime));
       return  { str };
     update_interval: 1s
+
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address
+    ssid:
+      name: ESP Connected SSID
+    bssid:
+      name: ESP Connected BSSID
+    mac_address:
+      name: ESP Mac Wifi Address
+    scan_results:
+      name: ESP Latest Scan Results
+
 
 
 

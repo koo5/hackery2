@@ -34,7 +34,8 @@ https://www.instructables.com/id/DIY-SOIL-MOISTURE-SENSOR-CHEAP-YET-ACCURATE-/
 
 
 
-
+https://www.instructables.com/APIS-Automated-Plant-Irrigation-System/
+It did not stop there. I noticed that humidity probe tend to erode rather quickly, quite possibly due to the fact that it was (by design) under constant voltage, and therefore there was constant electrical current between the probes (eroding anode). The cheap soil probe from China survived about a week. Even a galvanized nail was "eaten up" in a month. A stainless steel probe was holding better, but I noticed that even that was giving up. Version 6 turns the probe on for only 1 minute every hour (and on all the time during watering), thus dramatically reducing erosion (~16 minutes a day vs. 24 hours a day).
 
 
 
