@@ -1,0 +1,100 @@
+substitutions:
+  hostname: "ocamera"
+
+
+esphome:
+  name: $hostname
+  platform: ESP32
+  board: esp-wrover-kit
+
+
+wifi:
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: 10.0.0.46
+      gateway: 10.0.0.138
+      subnet: 255.255.255.0
+      dns1: 10.0.0.138
+      dns2: 8.8.8.8
+    
+  ap:
+    ssid: !secret fallback_ssid
+    password: !secret fallback_password
+
+
+api:
+  password: ""
+
+
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+
+
+ota:
+  password: ""
+
+    
+logger:
+
+
+captive_portal:
+    
+
+web_server:
+  port: 80
+  ota: false
+
+
+
+
+
+sun:
+  latitude: 50.0755°
+  longitude: 14.4378°
+
+  on_sunrise:
+    - then:
+        - logger.log: Good morning!
+  on_sunset:
+    - then:
+        - logger.log: Good evening!
+
+
+time:
+  - platform: homeassistant
+  - platform: sntp
+
+
+#esp32_camera:
+#  external_clock:
+#    pin: GPIO0
+#    frequency: 20MHz
+#  i2c_pins:
+#    sda: GPIO26
+#    scl: GPIO27
+#  data_pins: [GPIO5, GPIO18, GPIO19, GPIO21, GPIO36, GPIO39, GPIO34, GPIO35]
+#  vsync_pin: GPIO25
+#  href_pin: GPIO23
+#  pixel_clock_pin: GPIO22
+#  power_down_pin: GPIO32
+#  name: mycamera
+
+
+
+# Flashlight
+#output:
+#  - platform: gpio
+#    pin: GPIO4
+#    id: gpio_4
+
+## GPIO_4 is the flash light pin
+#light:
+#  - platform: binary
+#    output: gpio_4
+#    name: $hostname light
+

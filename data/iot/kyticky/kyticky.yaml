@@ -50,11 +50,10 @@ api:
         - deep_sleep.allow: deep_sleep_1
 
 
-
 mqtt:
-
-  broker: 192.168.8.8
-  username: livingroom
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
   password: !secret mqtt_password
 
   on_message:
@@ -122,11 +121,11 @@ switch:
 #    id: status_led_pin2
 #    name: "s2"
   - platform: gpio
-    pin: 3
+    pin: 19
     id: s3
     name: "s3"
   - platform: gpio
-    pin: 5
+    pin: 20
     id: periodic_pump1
     name: "periodic_pump1"
   
@@ -141,33 +140,36 @@ climate:
     max_cooling_run_time: 2s
     min_idle_time: 10s
     supplemental_cooling_action:
-      - light.turn_on: status
 
-
-      - http_request.get:
-          url: !secret ping_url
-          verify_ssl: false
-          on_response:
-            then:
-              - logger.log:
-                  format: "Response status: %d"
-                  args:
-                    - status_code
-      
-
-      - delay: 1s
-      - light.turn_off: status
       - if:
             condition:
                 - sun.is_above_horizon:
             then:
-                - logger.log: Sun is above horizon!
+                - logger.log: Land is dry and Sun is above horizon!
+
+                - light.turn_on: status
+
+                - http_request.get:
+                    url: !secret ping_url
+                    verify_ssl: false
+                    on_response:
+                        then:
+                        - logger.log:
+                            format: "Response status: %d"
+                            args:
+                                - status_code
+
+                - delay: 1s
+                - light.turn_off: status
+
+
                 - switch.turn_on: s3
                 - delay: 1s
                 - switch.turn_off: s3
             else:
-                - logger.log: Sun is below horizon!
+                - logger.log: Land is dry and Sun is below horizon!
                 
+
     supplemental_cooling_delta: 1
     cool_action:
       - logger.log: cool!
@@ -178,7 +180,7 @@ climate:
     preset:
       - name: Home
         mode: COOL
-        default_target_temperature_high: 25 °C
+        default_target_temperature_high: 20 °C
     
     
 
@@ -296,8 +298,8 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
 #              sleep_duration: 30s
 
 deep_sleep:
-  run_duration: 1min
-  sleep_duration: 60min
+#  run_duration: 10min
+#  sleep_duration: 10min
   wakeup_pin: 13
   id: deep_sleep_1
 
