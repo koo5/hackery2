@@ -17,8 +17,9 @@ every interval:
 				new_wetness = 0
 				last_wetness = wetness
 				last_pump_start = 0
-				while next_scheduled_pump < now:
-					next_scheduled_pump = last_scheduled_pump + 24h
+				while next_scheduled_pump.day <= now.day:
+					while next_scheduled_pump.hour < 7:
+					next_scheduled_pump+= 1h
 
 
 wetness_now():
