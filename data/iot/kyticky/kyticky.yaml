@@ -8,11 +8,53 @@ substitutions:
   ip: 192.168.8.31
   name: banana
 
+
+preferences:
+  flash_write_interval: 30s
+
 esphome:
   name: $name
   on_boot:
     then:
-      ds1307.read_time:
+      - ds1307.read_time:
+      - delay: 120s
+      - if:
+          condition:
+            lambda: |-
+                return (id(ntp).utcnow().hour == 24);
+          then:
+            - if:
+            condition:
+                lambda: |-
+                    return (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
+            then:
+                - number.set:
+                    id: last_pump_ts 
+                    value: !lambda |-
+                    return id(ntp).utcnow().timestamp;
+                - delay: 40s
+                - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
+                - switch.turn_on: periodic_pump1
+                - delay: 140s
+                - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+                - switch.turn_off: periodic_pump1
+                - deep_sleep.enter:
+                        id: deep_sleep_1
+                        #sleep_duration: !lambda |-
+                        #  return 20*60*60
+                        sleep_duration: 20h
+                        time_id: ntp
+            else:
+                - deep_sleep.enter:
+                    id: deep_sleep_1
+                    sleep_duration: 1h
+                    time_id: ntp
+
+
+
+
+
+
 
 esp32:
   board: denky32
@@ -36,21 +78,10 @@ wifi:
 
 api:
   password: ""
-  reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently seems to have issues with WiFi where a full reboot is required to get the interface back working. Defaults to 15min.
-  #power_save_mode: # (Optional, string): The power save mode for the WiFi interface. See Power Save Mode
-  #output_power: 15dB # (Optional, string): The amount of TX power for the WiFi interface from 8.5dB to 20.5dB. Default for ESP8266 is 20dB, 20.5dB might cause unexpected restarts.
-  #fast_connect: true # (Optional, boolean): If enabled, directly connects to WiFi network without doing a full scan first. This is required for hidden networks and can significantly improve connection times. Defaults to off. The downside is that this option connects to the first network the ESP sees, even if that network is very far away and better ones are available.    
-  services:
-    - service: ota_mode_on
-      then: 
-        - logger.log: "deep_sleep.prevent..."
-        - deep_sleep.prevent: deep_sleep_1
-    - service: ota_mode_off
-      then:
-        - logger.log: "deep_sleep.allow..."
-        - deep_sleep.allow: deep_sleep_1
-
-
+  reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently 
+  
+  
+  
 mqtt:
   broker: !secret mqtt_host
   port: !secret mqtt_port
@@ -76,15 +107,6 @@ mqtt:
     - topic: $name/now
       then:
         - logger.log: "now..."
-        - http_request.get:
-            url: !secret ping_url
-            verify_ssl: false
-            on_response:
-                then:
-                - logger.log:
-                    format: "Response status: %d"
-                    args:
-                        - status_code
         - lambda: |-
             id(my_global_int) = id(ntp).utcnow().timestamp;
         - number.set:
@@ -189,17 +211,6 @@ climate:
                 - logger.log: Land is dry and Sun is above horizon!
 
                 - light.turn_on: status
-
-                - http_request.get:
-                    url: !secret ping_url
-                    verify_ssl: false
-                    on_response:
-                        then:
-                        - logger.log:
-                            format: "Response status: %d"
-                            args:
-                                - status_code
-
                 - delay: 1s
                 - light.turn_off: status
 
@@ -271,18 +282,6 @@ text_sensor:
       return  { str };
     update_interval: 5s
 
-  - platform: wifi_info
-    ip_address:
-      name: ESP IP Address
-    ssid:
-      name: ESP Connected SSID
-    bssid:
-      name: ESP Connected BSSID
-    mac_address:
-      name: ESP Mac Wifi Address
-    scan_results:
-      name: ESP Latest Scan Results
-
 
 
 
@@ -311,51 +310,12 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
         - logger.log: "Synchronized clock."
 
 
-    on_time:
-#      - cron: '* 57 21 * * *'
-
-      - minutes: 20
-        #hours: 22
-        then:
-          - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
-          - homeassistant.event:
-             event: esphome.pump
-             data:
-               message: "pump!"
-
-          - deep_sleep.prevent: deep_sleep_1
-          - switch.turn_on: periodic_pump1
-
-      - minutes: 30
-        #hours: 22
-        then:
-          - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
-          - homeassistant.event:
-             event: esphome.pump
-             data:
-               message: "pumpoff!"
-          - switch.turn_off: periodic_pump1
-          - deep_sleep.allow: deep_sleep_1
-
-
-
-
-
-
-          #- deep_sleep.enter:
-          #    id: deep_sleep_1
-          #    until: "16:00:00"
-          #    time_id: ntp
-
-#          - deep_sleep.enter:
-#              id: deep_sleep_1
-#              sleep_duration: 30s
-
 deep_sleep:
 #  run_duration: 10min
 #  sleep_duration: 10min
   wakeup_pin: 13
   id: deep_sleep_1
+
 
 i2c:
 #  sda: 21
@@ -365,19 +325,36 @@ i2c:
 
 
 
-http_request:
-  timeout: 34s
 
 
 
 
-interval:
-  - interval: 240min
-    then:
-      - delay: 240min
-      - switch.toggle: manual_restart
-
-
+number:
+  - platform: template
+    id: num1
+    name: "blbost"
+    optimistic: true
+    min_value: 0
+    max_value: 3360287004
+    step: 1
+  - platform: template
+    id: hour
+    name: "pump hour"
+    min_value: 0
+    max_value: 24
+    step: 1
+    restore_value: true
+    initial_value: 24
+    
+  - platform: template
+    id: last_pump_ts
+    name: "last_pump_ts"
+    min_value: 0
+    max_value: 3360287004
+    step: 1
+    restore_value: true
+    initial_value: 0
+    
 
 globals:
   - id: my_global_int
@@ -385,11 +362,4 @@ globals:
     restore_value: yes
     initial_value: '5'
 
-number:
-  - platform: template
-    id: num1
-    name: "Template number"
-    optimistic: true
-    min_value: 0
-    max_value: 3360287004
-    step: 1
+
