@@ -5,7 +5,7 @@
 
 
 substitutions:
-  ip: 192.168.8.31
+  ip: 192.168.8.32
   name: banana
 
 
@@ -24,31 +24,39 @@ esphome:
                 return (id(ntp).utcnow().hour == 24);
           then:
             - if:
-                condition:
-                    lambda: |-
-                        return (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
-                then:
-                    - number.set:
-                        id: last_pump_ts
-                        value: !lambda |-
-                            return id(ntp).utcnow().timestamp;
-                    - delay: 40s
-                    - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
-                    - switch.turn_on: periodic_pump1
-                    - delay: 140s
-                    - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
-                    - switch.turn_off: periodic_pump1
-                    - deep_sleep.enter:
+            condition:
+                lambda: |-
+                    return (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
+            then:
+                - number.set:
+                    id: last_pump_ts 
+                    value: !lambda |-
+                    return id(ntp).utcnow().timestamp;
+                - delay: 40s # flush
+                - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
+                - switch.turn_on: periodic_pump1
+                - delay: 140s
+                - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+                - switch.turn_off: periodic_pump1
+                - logger.log: "sleep for 20h..."
+                - deep_sleep.enter:
                         id: deep_sleep_1
                         #sleep_duration: !lambda |-
                         #  return 20*60*60
                         sleep_duration: 20h
-                        #time_id: ntp
-                else:
-                    - deep_sleep.enter:
-                        id: deep_sleep_1
-                        sleep_duration: 1h
-                        #time_id: ntp
+                        time_id: ntp
+            else:
+                - logger.log: "sleep for 1h..."
+                - deep_sleep.enter:
+                    id: deep_sleep_1
+                    sleep_duration: 1h
+                    time_id: ntp
+          else:
+              - logger.log: "periodic pump disabled, sleep for 1h..."
+              - deep_sleep.enter:
+                  id: deep_sleep_1
+                  sleep_duration: 1h
+                  time_id: ntp
 
 
 
@@ -88,32 +96,6 @@ mqtt:
   username: !secret mqtt_user
   password: !secret mqtt_password
 
-  on_message:
-    - topic: $name/ota_mode
-      payload: 'ON'
-      then:
-        - logger.log: "deep_sleep.prevent..."
-        - deep_sleep.prevent: deep_sleep_1
-    - topic: $name/ota_mode
-      payload: 'OFF'
-      then:
-        - logger.log: "deep_sleep.allow..."
-        - deep_sleep.allow: deep_sleep_1
-    - topic: $name/inc
-      then:
-        - logger.log: "inc..."
-        - lambda: |-
-            id(my_global_int) += 1;
-    - topic: $name/now
-      then:
-        - logger.log: "now..."
-        - lambda: |-
-            id(my_global_int) = id(ntp).utcnow().timestamp;
-        - number.set:
-            id: num1
-            value: !lambda |-
-              return id(ntp).utcnow().timestamp;
-
 
 
 ota:
@@ -121,15 +103,6 @@ ota:
 
     
 logger:
-  on_message:
-    level: ERROR
-    then:
-      - mqtt.publish:
-          topic: some/topic
-          payload: !lambda |-
-            return "Triggered on_message with level " + to_string(level) + ", tag " + tag + " and message " + message;
-
-
 
 captive_portal:
     
@@ -145,14 +118,6 @@ sensor:
     name: "Irrigation Wifi"
     update_interval: 60s
     
-  - platform: adc
-    pin: 35
-    id: dryness
-    name: "dryness"
-    update_interval: 1s
-    attenuation: 11db
-    filters:
-      - multiply: 10
   - platform: sun
     name: Sun Elevation
     type: elevation
@@ -161,11 +126,6 @@ sensor:
     type: azimuth
 
 
-  - platform: template
-    name: "Template Sensor"
-    lambda: |-
-        return id(kyticky).action ;
-    update_interval: 1s
       
 light:
   - platform: status_led
@@ -173,15 +133,8 @@ light:
     id: status
     pin: 2
 
+
 switch:
-#  - platform: gpio
-#    pin: 2
-#    id: status_led_pin2
-#    name: "s2"
-  - platform: gpio
-    pin: 19
-    id: s3
-    name: "s3"
   - platform: gpio
     pin: 20
     id: periodic_pump1
@@ -189,54 +142,6 @@ switch:
   - platform: restart
     id: manual_restart
     name: "Living Room Restart"
-    #restore_mode: ALWAYS_OFF
-
-    
-    
-climate:
-  - platform: thermostat
-    id: kyticky
-    name: "kyticky"
-    sensor: dryness
-    min_cooling_off_time: 5s
-    min_cooling_run_time: 2s
-    max_cooling_run_time: 2s
-    min_idle_time: 10s
-    supplemental_cooling_action:
-
-      - if:
-            condition:
-                - sun.is_above_horizon:
-            then:
-                - logger.log: Land is dry and Sun is above horizon!
-
-                - light.turn_on: status
-                - delay: 1s
-                - light.turn_off: status
-
-
-                - switch.turn_on: s3
-                - delay: 1s
-                - switch.turn_off: s3
-            else:
-                - logger.log: Land is dry and Sun is below horizon!
-                
-
-    supplemental_cooling_delta: 1
-    cool_action:
-      - logger.log: cool!
-    idle_action:
-      - light.turn_off: status
-      - switch.turn_off: s3
-    default_preset: Home
-    preset:
-      - name: Home
-        mode: COOL
-        default_target_temperature_high: 20 °C
-    
-    
-
-
 
 
 
@@ -310,6 +215,7 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
         - logger.log: "Synchronized clock."
 
 
+
 deep_sleep:
 #  run_duration: 10min
 #  sleep_duration: 10min
@@ -330,39 +236,22 @@ i2c:
 
 
 number:
-  - platform: template
-    id: num1
-    name: "blbost"
-    optimistic: true
-    min_value: 0
-    max_value: 3360287004
-    step: 1
-
+  
   - platform: template
     id: hour
     name: "pump hour"
-    optimistic: true
     min_value: 0
     max_value: 24
     step: 1
     restore_value: true
     initial_value: 24
-    
+    optimistic: true
+  
   - platform: template
     id: last_pump_ts
     name: "last_pump_ts"
-    optimistic: true
     min_value: 0
     max_value: 3360287004
     step: 1
     restore_value: true
     initial_value: 0
-    
-
-globals:
-  - id: my_global_int
-    type: int
-    restore_value: yes
-    initial_value: '5'
-
-

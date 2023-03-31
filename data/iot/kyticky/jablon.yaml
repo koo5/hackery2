@@ -1,0 +1,187 @@
+
+# https://protosupplies.com/product/capacitive-soil-moisture-sensor-module/
+# - use nail varnish or similar to seal the edges of the pcb
+# - VCC = 3.3V – 5.5V
+
+
+substitutions:
+  ip: 192.168.8.31
+  name: banana
+
+esphome:
+  name: $name
+
+esp32:
+  board: denky32
+
+wifi:
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: $ip
+      gateway: 192.168.8.1
+      subnet: 255.255.255.0
+      dns1: 192.168.8.1
+      dns2: 8.8.8.8
+    
+  ap:
+    ssid: !secret fallback_ssid
+    password: !secret fallback_password
+
+api:
+  password: ""
+  reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently 
+  
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+
+
+ota:
+  password: ""
+
+    
+logger:
+
+
+captive_portal:
+    
+web_server:
+  port: 80
+  ota: true
+
+
+sensor:
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 60s
+    
+  - platform: adc
+    pin: 35
+    id: dryness
+    name: "dryness"
+    update_interval: 1s
+    attenuation: 11db
+    filters:
+      - multiply: 10
+
+  - platform: sun
+    name: Sun Elevation
+    type: elevation
+  - platform: sun
+    name: Sun Azimuth
+    type: azimuth
+
+  - platform: template
+    name: "action"
+    lambda: |-
+        return id(mokrostat).action ;
+    update_interval: 1s
+      
+      
+light:
+  - platform: status_led
+    name: "status LED(pin2)"
+    id: status
+    pin: 2
+
+
+switch:
+  - platform: gpio
+    pin: 19
+    id: s3
+    name: "s3"
+  - platform: restart
+    id: manual_restart
+    name: "Living Room Restart"
+    
+    
+climate:
+  - platform: thermostat
+    id: mokrostat
+    name: "mokrostat"
+    sensor: dryness
+    min_cooling_run_time: 2s
+    max_cooling_run_time: 3s
+    min_cooling_off_time: 4s
+    min_idle_time: 60s
+    supplemental_cooling_action:
+
+      - if:
+            condition:
+                - sun.is_above_horizon:
+            then:
+                - logger.log: Land is dry and Sun is above horizon!
+
+                - light.turn_on: status
+                - delay: 1s
+                - light.turn_off: status
+
+                - switch.turn_on: s3
+                - delay: 1s
+                - switch.turn_off: s3
+
+            else:
+                - logger.log: Land is dry and Sun is below horizon!
+                
+
+    supplemental_cooling_delta: 0
+    cool_action:
+      - logger.log: cool!
+    idle_action:
+      - light.turn_off: status
+      - switch.turn_off: s3
+    default_preset: Home
+    preset:
+      - name: Home
+        mode: COOL
+        default_target_temperature_high: 16 °C
+
+
+
+
+sun:
+  latitude: 50.0755°
+  longitude: 14.4378°
+
+  on_sunrise:
+    - then:
+        - logger.log: Good morning!
+  on_sunset:
+    - then:
+        - logger.log: Good evening!
+
+
+
+
+text_sensor:
+  - platform: sun
+    name: Next Sunrise
+    type: sunrise
+  - platform: sun
+    name: Next Sunset
+    type: sunset
+  - platform: template
+    name: "Time NTP"
+    lambda: |-
+      char str[30];
+      if (!id(ntp).now().is_valid()) { return { "----" }; }
+      time_t currTime = id(ntp).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 5s
+
+
+
+
+
+time:
+
+  - platform: homeassistant
+
+  - platform: sntp
+    id: ntp

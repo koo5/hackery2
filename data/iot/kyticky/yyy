@@ -57,6 +57,154 @@ http_request:
 
 
 
+  on_message:
+    - topic: $name/ota_mode
+      payload: 'ON'
+      then:
+        - logger.log: "deep_sleep.prevent..."
+        - deep_sleep.prevent: deep_sleep_1
+    - topic: $name/ota_mode
+      payload: 'OFF'
+      then:
+        - logger.log: "deep_sleep.allow..."
+        - deep_sleep.allow: deep_sleep_1
+    - topic: $name/inc
+      then:
+        - logger.log: "inc..."
+        - lambda: |-
+            id(my_global_int) += 1;
+    - topic: $name/now
+      then:
+        - logger.log: "now..."
+        - lambda: |-
+            id(my_global_int) = id(ntp).utcnow().timestamp;
+        - number.set:
+            id: num1
+            value: !lambda |-
+              return id(ntp).utcnow().timestamp;
+
+
+
+
+
+
+
+
+
+  on_message:
+    level: ERROR
+    then:
+      - mqtt.publish:
+          topic: some/topic
+          payload: !lambda |-
+            return "Triggered on_message with level " + to_string(level) + ", tag " + tag + " and message " + message;
+
+
+
+
+
+#  - platform: gpio
+#    pin: 2
+#    id: status_led_pin2
+#    name: "s2"
+
+
+  - platform: template
+    name: "Time RTC"
+    lambda: |-
+      char str[30];
+      time_t currTime = id(rtc).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 5s
+
+
+  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
+  
+  
+  
+  
+  
+  
+deep_sleep:
+#  run_duration: 10min
+#  sleep_duration: 10min
+  wakeup_pin: 13
+  id: deep_sleep_1
+
+
+i2c:
+#  sda: 21
+#  scl: 22
+  scan: true
+  id: bus_a
+
+
+
+
+
+
+
+
+
+number:
+  - platform: template
+    id: num1
+    name: "blbost"
+    optimistic: true
+    min_value: 0
+    max_value: 3360287004
+    step: 1
+  - platform: template
+    id: hour
+    name: "pump hour"
+    min_value: 0
+    max_value: 24
+    step: 1
+    restore_value: true
+    initial_value: 24
+    
+  - platform: template
+    id: last_pump_ts
+    name: "last_pump_ts"
+    min_value: 0
+    max_value: 3360287004
+    step: 1
+    restore_value: true
+    initial_value: 0
+    
+
+globals:
+  - id: my_global_int
+    type: int
+    restore_value: yes
+    initial_value: '5'
+
+
+
+
+time:
+
+  - platform: homeassistant
+    on_time_sync:
+      then:
+        - logger.log: "rtc.write_time..."
+        - ds1307.write_time
+        - logger.log: "Synchronized clock."
+
+  - platform: sntp
+    id: ntp
+    on_time_sync:
+      then:
+        - logger.log: "rtc.write_time..."
+        - ds1307.write_time
+        - logger.log: "Synchronized clock."
+
+
+
+
+
 
 seems to have issues with WiFi where a full reboot is required to get the interface back working. Defaults to 15min.
   #power_save_mode: # (Optional, string): The power save mode for the WiFi interface. See Power Save Mode
@@ -130,10 +278,9 @@ interval:
 
 
 
-globals:
-  - id: my_global_int
-    type: int
-    restore_value: yes
-    initial_value: '5'
-
-
+< 
+< globals:
+<   - id: my_global_int
+<     type: int
+<     restore_value: yes
+<     initial_value: '5'
