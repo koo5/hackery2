@@ -77,12 +77,6 @@ wifi:
       dns1: !secret dns1
       dns2: 8.8.8.8
     
-
-
-api:
-  password: ""
-  reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently 
-  
   
   
 mqtt:
