@@ -32,12 +32,12 @@ esphome:
             - if:
                 condition:
                     lambda: |-
-                        return (id(ntp).is_valid() && id(ntp).utcnow().timestamp > 1680000000) && (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
+                        return (id(rtc).is_valid() && id(rtc).utcnow().timestamp > 1680000000) && (id(rtc).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(rtc).utcnow().hour > id(hour).state);
                 then:
                     - number.set:
                         id: last_pump_ts 
                         value: !lambda |-
-                                  return id(ntp).utcnow().timestamp;
+                                  return id(rtc).utcnow().timestamp;
                     - delay: 40s # flush
                     - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
                     - switch.turn_on: periodic_pump1
