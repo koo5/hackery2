@@ -1,12 +1,7 @@
 
-# https://protosupplies.com/product/capacitive-soil-moisture-sensor-module/
-# - use nail varnish or similar to seal the edges of the pcb
-# - VCC = 3.3V – 5.5V
-
-
 substitutions:
-  ip: 192.168.8.32
-  name: banana
+  ip: 192.168.1.23
+  name: jahody
 
 
 preferences:
@@ -35,7 +30,7 @@ esphome:
             - if:
                 condition:
                     lambda: |-
-                        return (id(ntp).utcnow().timestamp > 1680000000) && (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
+                        return (id(ntp).is_valid() && id(ntp).utcnow().timestamp > 1680000000) && (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
                 then:
                     - number.set:
                         id: last_pump_ts 
@@ -44,7 +39,10 @@ esphome:
                     - delay: 40s # flush
                     - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
                     - switch.turn_on: periodic_pump1
+                    
+                    # delka zalevani s/min/h
                     - delay: 140s
+                    
                     - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
                     - switch.turn_off: periodic_pump1
                     - logger.log: "sleep for 20h..."
@@ -63,7 +61,8 @@ esphome:
 
 
 esp32:
-  board: denky32
+  board: nodemcu-32s
+
 
 wifi:
   networks:
@@ -71,15 +70,11 @@ wifi:
     password: !secret password
     manual_ip:
       static_ip: $ip
-      gateway: 192.168.8.1
+      gateway: !secret gateway
       subnet: 255.255.255.0
-      dns1: 192.168.8.1
+      dns1: !secret dns1
       dns2: 8.8.8.8
     
-  #ap:
-  #  ssid: !secret fallback_ssid
-  #  password: !secret fallback_password
-
 
 
 api:
@@ -135,10 +130,12 @@ light:
 
 
 switch:
+
   - platform: gpio
     pin: 20
     id: periodic_pump1
     name: "periodic_pump1"
+
   - platform: restart
     id: manual_restart
     name: "Living Room Restart"
@@ -239,7 +236,10 @@ number:
     max_value: 23
     step: 1
     restore_value: true
-    initial_value: 18
+    
+    # defaultni hodnota
+    initial_value: 18 # military time (8 vecer letni cas praha/evropa)
+
     optimistic: true
   
   - platform: template
