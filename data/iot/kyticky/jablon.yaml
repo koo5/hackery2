@@ -55,6 +55,9 @@ web_server:
 
 
 sensor:
+  - platform: uptime
+    name: Uptime Sensor
+
   - platform: wifi_signal
     name: "Irrigation Wifi"
     update_interval: 60s
