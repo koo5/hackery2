@@ -24,31 +24,31 @@ esphome:
                 return (id(ntp).utcnow().hour == 24);
           then:
             - if:
-            condition:
-                lambda: |-
-                    return (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
-            then:
-                - number.set:
-                    id: last_pump_ts 
-                    value: !lambda |-
-                    return id(ntp).utcnow().timestamp;
-                - delay: 40s
-                - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
-                - switch.turn_on: periodic_pump1
-                - delay: 140s
-                - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
-                - switch.turn_off: periodic_pump1
-                - deep_sleep.enter:
+                condition:
+                    lambda: |-
+                        return (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
+                then:
+                    - number.set:
+                        id: last_pump_ts
+                        value: !lambda |-
+                            return id(ntp).utcnow().timestamp;
+                    - delay: 40s
+                    - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
+                    - switch.turn_on: periodic_pump1
+                    - delay: 140s
+                    - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+                    - switch.turn_off: periodic_pump1
+                    - deep_sleep.enter:
                         id: deep_sleep_1
                         #sleep_duration: !lambda |-
                         #  return 20*60*60
                         sleep_duration: 20h
-                        time_id: ntp
-            else:
-                - deep_sleep.enter:
-                    id: deep_sleep_1
-                    sleep_duration: 1h
-                    time_id: ntp
+                        #time_id: ntp
+                else:
+                    - deep_sleep.enter:
+                        id: deep_sleep_1
+                        sleep_duration: 1h
+                        #time_id: ntp
 
 
 
@@ -337,9 +337,11 @@ number:
     min_value: 0
     max_value: 3360287004
     step: 1
+
   - platform: template
     id: hour
     name: "pump hour"
+    optimistic: true
     min_value: 0
     max_value: 24
     step: 1
@@ -349,6 +351,7 @@ number:
   - platform: template
     id: last_pump_ts
     name: "last_pump_ts"
+    optimistic: true
     min_value: 0
     max_value: 3360287004
     step: 1
