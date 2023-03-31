@@ -30,11 +30,12 @@ esphome:
           else:
 
             # tady je potreba ntp vymenit za rtc
+            # a po prvnim synchronizacnim bootu znova rebootnout
 
             - if:
                 condition:
                     lambda: |-
-                        return id(ntp).is_valid() && (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
+                        return (id(ntp).utcnow().timestamp > 1680000000) && (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
                 then:
                     - number.set:
                         id: last_pump_ts 
