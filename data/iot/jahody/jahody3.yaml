@@ -27,12 +27,14 @@ esphome:
               - deep_sleep.enter:
                   id: deep_sleep_1
                   sleep_duration: 1h
-                  #time_id: ntp
           else:
+
+            # tady je potreba ntp vymenit za rtc
+
             - if:
                 condition:
                     lambda: |-
-                        return (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
+                        return id(ntp).is_valid() && (id(ntp).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(ntp).utcnow().hour > id(hour).state);
                 then:
                     - number.set:
                         id: last_pump_ts 
@@ -50,13 +52,11 @@ esphome:
                             #sleep_duration: !lambda |-
                             #  return 20*60*60
                             sleep_duration: 20h
-                            #time_id: ntp
                 else:
                     - logger.log: "nothing to do yet, sleep..."
                     - deep_sleep.enter:
                         id: deep_sleep_1
                         sleep_duration: 2h
-                        #time_id: ntp
 
 
 
