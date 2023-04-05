@@ -7,12 +7,17 @@
 substitutions:
   ip: 192.168.8.31
   name: banana
+  clock: ntp
 
 esphome:
   name: $name
+  on_boot:
+    then:
+      - logger.log: 'booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot'
 
 esp32:
   board: denky32
+
 
 wifi:
   networks:
@@ -24,20 +29,23 @@ wifi:
       subnet: 255.255.255.0
       dns1: 192.168.8.1
       dns2: 8.8.8.8
-    
-  ap:
-    ssid: !secret fallback_ssid
-    password: !secret fallback_password
+#  ap:
+#    ssid: !secret fallback_ssid
+#    password: !secret fallback_password
+
 
 api:
   password: ""
   reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently 
-  
+
+
 mqtt:
   broker: !secret mqtt_host
   port: !secret mqtt_port
   username: !secret mqtt_user
   password: !secret mqtt_password
+  keepalive: 8s
+  reboot_timeout: 5min
 
 
 ota:
@@ -48,7 +56,8 @@ logger:
 
 
 captive_portal:
-    
+
+
 web_server:
   port: 80
   ota: true
@@ -66,7 +75,7 @@ sensor:
     pin: 35
     id: dryness
     name: "dryness"
-    update_interval: 1s
+    update_interval: 10s
     attenuation: 11db
     filters:
       - multiply: 10
@@ -78,11 +87,11 @@ sensor:
     name: Sun Azimuth
     type: azimuth
 
-  - platform: template
-    name: "action"
-    lambda: |-
-        return id(mokrostat).action ;
-    update_interval: 1s
+#  - platform: template
+#    name: "action"
+#    lambda: |-
+#        return id(suchostat).action ;
+#    update_interval: 2s
       
       
 light:
@@ -97,6 +106,8 @@ switch:
     pin: 19
     id: s3
     name: "s3"
+    restore_mode: ALWAYS_OFF
+
   - platform: restart
     id: manual_restart
     name: "Living Room Restart"
@@ -104,33 +115,15 @@ switch:
     
 climate:
   - platform: thermostat
-    id: mokrostat
-    name: "mokrostat"
+    id: suchostat
+    name: "suchostat"
     sensor: dryness
     min_cooling_run_time: 2s
     max_cooling_run_time: 3s
     min_cooling_off_time: 4s
     min_idle_time: 60s
     supplemental_cooling_action:
-
-      - if:
-            condition:
-                - sun.is_above_horizon:
-            then:
-                - logger.log: Land is dry and Sun is above horizon!
-
-                - light.turn_on: status
-                - delay: 1s
-                - light.turn_off: status
-
-                - switch.turn_on: s3
-                - delay: 1s
-                - switch.turn_off: s3
-
-            else:
-                - logger.log: Land is dry and Sun is below horizon!
-                
-
+      - script.execute: maybe_pump
     supplemental_cooling_delta: 0
     cool_action:
       - logger.log: cool!
@@ -141,7 +134,7 @@ climate:
     preset:
       - name: Home
         mode: COOL
-        default_target_temperature_high: 16 °C
+        default_target_temperature_high: 14 °C
 
 
 
@@ -176,15 +169,106 @@ text_sensor:
       strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
       //strftime(str, sizeof(str), "%c", localtime(&currTime));
       return  { str };
-    update_interval: 5s
-
+    update_interval: 15s
+  - platform: template
+    name: "Time RTC"
+    lambda: |-
+      char str[30];
+      time_t currTime = id(rtc).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 15s
 
 
 
 
 time:
-
-  - platform: homeassistant
-
   - platform: sntp
     id: ntp
+    #timezone: Europe/Prague
+    on_time_sync:
+      then:
+      - if:
+            condition:
+                lambda: |-
+                        return id(ntp).now().is_valid() && id(ntp).now().year > 2022;
+            then:
+                - logger.log: "rtc.write_time..."
+                - ds1307.write_time
+                - logger.log: "Synchronized clock."
+            else:
+                - logger.log: 'not trying to save invalid time'
+
+  - platform: ds1307
+    id: rtc
+    update_interval: never
+
+
+
+i2c:
+#  sda: 21
+#  scl: 22
+  scan: true
+  id: bus_a
+
+
+
+number:
+  - platform: template
+    id: last_pump_ts
+    name: "last_pump_ts"
+    min_value: 0
+    max_value: 3360287004
+    step: 1
+    restore_value: true
+    initial_value: 0
+    optimistic: true
+
+
+script:
+  - id: maybe_pump
+    mode: parallel
+    max_runs: 1
+    then:
+        - if:
+            condition:
+                lambda: |-
+                   return id($clock).now().is_valid() && id($clock).now().year > 2022;
+            then:
+                - logger.log:
+                    format: "%d is valid time"
+                    args: [ 'id($clock).now()' ]
+                - if:
+                      condition:
+                          lambda: |-
+                              return id($clock).now().hour > 8 && id($clock).now().hour < 21;
+                      then:
+                        - logger.log:
+                            format: "%d Land is dry and Sun is above horizon!"
+                            args: [ 'id($clock).utcnow()' ]
+                        - script.execute: pump
+                      else:
+                          - logger.log: Land is dry and Sun is below horizon!
+            else:
+                - logger.log:
+                    format: "%d There's no time! Get in the choppa!"
+                    args: [ 'id($clock).utcnow()' ]
+                - script.execute: pump
+
+  - id: pump
+    mode: parallel
+    max_runs: 1
+    then:
+      - number.set:
+          id: last_pump_ts
+          value: !lambda |-
+            return id($clock).utcnow().timestamp;
+
+      - light.turn_on: status
+      - delay: 2s
+      - light.turn_off: status
+
+      - switch.turn_on: s3
+      - delay: 0.1s
+      - switch.turn_off: s3
