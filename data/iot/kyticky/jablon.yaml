@@ -134,7 +134,7 @@ climate:
     preset:
       - name: Home
         mode: COOL
-        default_target_temperature_high: 14 °C
+        default_target_temperature_high: 14.5 °C
 
 
 
@@ -186,7 +186,7 @@ text_sensor:
 time:
   - platform: sntp
     id: ntp
-    #timezone: Europe/Prague
+    timezone: Europe/Prague
     on_time_sync:
       then:
       - if:
@@ -242,18 +242,18 @@ script:
                 - if:
                       condition:
                           lambda: |-
-                              return id($clock).now().hour > 8 && id($clock).now().hour < 21;
+                              return id($clock).now().hour >= 8 && id($clock).now().hour < 22;
                       then:
                         - logger.log:
                             format: "%d Land is dry and Sun is above horizon!"
-                            args: [ 'id($clock).utcnow()' ]
+                            args: [ 'id($clock).now()' ]
                         - script.execute: pump
                       else:
                           - logger.log: Land is dry and Sun is below horizon!
             else:
                 - logger.log:
                     format: "%d There's no time! Get in the choppa!"
-                    args: [ 'id($clock).utcnow()' ]
+                    args: [ 'id($clock).now()' ]
                 - script.execute: pump
 
   - id: pump
@@ -270,5 +270,5 @@ script:
       - light.turn_off: status
 
       - switch.turn_on: s3
-      - delay: 0.1s
+      - delay: 0.3s
       - switch.turn_off: s3
