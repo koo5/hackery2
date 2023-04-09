@@ -78,7 +78,12 @@ while True:
 	#print(cmd)
 	subprocess.check_call(cmd)
 	safe_move(tmp_fn, dest_fn)
-	os.symlink(dest_fn, dest_dir + '/' + 'last.png')
+	symlink = dest_dir + '/' + 'last.png'
+	try:
+		os.remove(symlink)
+	except OSError:
+		pass
+	os.symlink(dest_fn, symlink)
 	print(dest_fn)
 	#os.system('geeqie -r --first')
 	time.sleep(int(sys.argv[2]))

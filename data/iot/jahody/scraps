@@ -1,0 +1,37 @@
+    - delay: 30min
+    - deep_sleep.enter:
+        id: deep_sleep_1
+        until: "7:00:00"
+        time_id: ntp
+
+
+
+
+
+    on_time:
+        hours: 22
+        then:
+          - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
+          - deep_sleep.prevent: deep_sleep_1
+          - switch.turn_on: periodic_pump1
+          - delay: 10min
+          - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+          - switch.turn_off: periodic_pump1
+          - deep_sleep.allow: deep_sleep_1
+          
+          - deep_sleep.enter:
+              id: deep_sleep_1
+              until: "7:00:00"
+              time_id: ntp
+
+
+
+
+
+deep_sleep:
+  #run_duration: 3min
+  #sleep_duration: 50min
+
+
+
+

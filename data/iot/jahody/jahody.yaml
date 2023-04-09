@@ -1,0 +1,285 @@
+esphome:
+  name: jahody
+  on_boot:
+    then:
+    - ds1307.read_time:
+    - delay: 30min
+    - deep_sleep.enter:
+        id: deep_sleep_1
+        until: "7:00:00"
+        time_id: ntp
+
+
+esp32:
+  board: nodemcu-32s
+
+
+wifi:
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: 10.0.0.55
+      gateway: 10.0.0.138
+      subnet: 255.255.255.0
+      dns1: 192.168.8.1
+      dns2: 10.0.0.138
+    
+  ap:
+    ssid: !secret fallback_ssid
+    password: !secret fallback_password
+
+
+
+
+api:
+  password: ""
+  reboot_timeout: 0h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently seems to have issues with WiFi where a full reboot is required to get the interface back working. Defaults to 15min.
+  #power_save_mode: # (Optional, string): The power save mode for the WiFi interface. See Power Save Mode
+  #output_power: 15dB # (Optional, string): The amount of TX power for the WiFi interface from 8.5dB to 20.5dB. Default for ESP8266 is 20dB, 20.5dB might cause unexpected restarts.
+  #fast_connect: true # (Optional, boolean): If enabled, directly connects to WiFi network without doing a full scan first. This is required for hidden networks and can significantly improve connection times. Defaults to off. The downside is that this option connects to the first network the ESP sees, even if that network is very far away and better ones are available.    
+  services:
+    - service: ota_mode_on
+      then: 
+        - logger.log: "deep_sleep.prevent..."
+        - deep_sleep.prevent: deep_sleep_1
+    - service: ota_mode_off
+      then:
+        - logger.log: "deep_sleep.allow..."
+        - deep_sleep.allow: deep_sleep_1
+
+
+
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+
+  on_message:
+    - topic: kyticky/ota_mode
+      payload: 'ON'
+      then:
+        - logger.log: "deep_sleep.prevent..."
+        - deep_sleep.prevent: deep_sleep_1
+    - topic: kyticky/ota_mode
+      payload: 'OFF'
+      then:
+        - logger.log: "deep_sleep.allow..."
+        - deep_sleep.allow: deep_sleep_1
+
+
+
+
+ota:
+  password: ""
+
+    
+logger:
+  on_message:
+    level: ERROR
+    then:
+      - mqtt.publish:
+          topic: some/topic
+          payload: !lambda |-
+            return "Triggered on_message with level " + to_string(level) + ", tag " + tag + " and message " + message;
+
+
+
+captive_portal:
+    
+    
+web_server:
+  port: 80
+  ota: true
+
+
+sensor:
+  - platform: sun
+    name: Sun Elevation
+    type: elevation
+  - platform: sun
+    name: Sun Azimuth
+    type: azimuth
+
+
+      
+switch:
+  - platform: gpio
+    pin: 18
+    id: periodic_pump1
+    name: "periodic_pump1"
+    inverted: true
+
+  - platform: gpio
+    pin: 19
+    id: periodic_pump2
+    name: "periodic_pump2"
+    inverted: true
+
+
+output:
+  - platform: gpio
+    pin: 25
+    id: tlacitek
+
+
+
+binary_sensor:
+  - platform: gpio
+    id: button32
+    pin: 
+      inverted: true
+      number: 32
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_off: periodic_pump1
+        - logger.log: "..."
+
+  - platform: gpio
+    id: button33
+    pin: 
+      inverted: true
+      number: 33
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_on: periodic_pump1
+        - logger.log: "..."
+
+  - platform: gpio
+    id: button35
+    pin: 
+      inverted: true
+      number: 26
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_on: periodic_pump2
+        - logger.log: "..."
+
+  - platform: gpio
+    id: button34
+    pin: 
+      inverted: true
+      number: 27
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_off: periodic_pump2
+        - logger.log: "..."
+
+
+
+
+sun:
+  latitude: 50.0755°
+  longitude: 14.4378°
+
+  on_sunrise:
+    - then:
+        - logger.log: Good morning!
+  on_sunset:
+    - then:
+        - logger.log: Good evening!
+
+
+
+
+text_sensor:
+  - platform: sun
+    name: Next Sunrise
+    type: sunrise
+  - platform: sun
+    name: Next Sunset
+    type: sunset
+  - platform: template
+    name: "Time NTP"
+    lambda: |-
+      char str[30];
+      if (!id(ntp).now().is_valid()) { return { "----" }; }
+      time_t currTime = id(ntp).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
+  - platform: template
+    name: "Time RTC"
+    lambda: |-
+      char str[30];
+      time_t currTime = id(rtc).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
+
+
+
+
+        
+time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
+
+  - platform: ds1307
+    id: rtc
+    update_interval: never
+
+  - platform: sntp
+    id: ntp
+    on_time_sync:
+      then:
+        - logger.log: "rtc.write_time..."
+        - ds1307.write_time
+        - logger.log: "Synchronized clock."
+
+
+
+    on_time:
+        hours: 22
+        then:
+          - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
+          - deep_sleep.prevent: deep_sleep_1
+          - switch.turn_on: periodic_pump1
+          - delay: 10min
+          - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+          - switch.turn_off: periodic_pump1
+          - deep_sleep.allow: deep_sleep_1
+          
+          - deep_sleep.enter:
+              id: deep_sleep_1
+              until: "7:00:00"
+              time_id: ntp
+
+
+
+deep_sleep:
+  #run_duration: 3min
+  #sleep_duration: 50min
+  wakeup_pin:
+    number: 27 
+    inverted: true  
+  id: deep_sleep_1
+
+i2c:
+#  sda: 21
+#  scl: 22
+  scan: true
+  id: bus_a
+
+
