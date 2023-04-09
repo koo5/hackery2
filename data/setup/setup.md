@@ -498,6 +498,10 @@ nohup xfwm4 --replace
 
 
 
-
-
+## yggdrasil
 ```
+for tun in tun0 tun1
+	sudo ufw insert 1 deny in on $tun from any to any
+```
+
+
