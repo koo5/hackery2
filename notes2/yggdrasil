@@ -1,0 +1,16 @@
+yggdrasil as a private vpn:
+
+there is no fingerprint verification when nodes connect, therefore peer outernet ip's are not trustworthy.
+
+there is no pubkey whitelisting when connecting to peers, therefore peer outernet ip's are not trustworthy.
+
+there is no pubkey whitelisting with multicast discovery, therefore multicast must be disabled.
+
+
+
+
+
+
+
+
+
