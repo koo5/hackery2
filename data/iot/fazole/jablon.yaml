@@ -1,12 +1,7 @@
 
-# https://protosupplies.com/product/capacitive-soil-moisture-sensor-module/
-# - use nail varnish or similar to seal the edges of the pcb
-# - VCC = 3.3V – 5.5V
-
-
 substitutions:
-  ip: 192.168.8.31
-  name: banana
+  ip: 10.0.0.45
+  name: fazole
   clock: ntp
 
 esphome:
@@ -16,7 +11,7 @@ esphome:
       - logger.log: 'booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot'
 
 esp32:
-  board: denky32
+  board: 
 
 
 wifi:
