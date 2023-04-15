@@ -4,7 +4,6 @@ esphome:
 esp8266:
   board: nodemcu
 
-# Enable logging
 logger:
 
 api:
@@ -42,7 +41,6 @@ wifi:
     dns1: 192.168.8.1
   
   ap:
-    ssid: !secret fallback_ssid
     password: !secret fallback_password
 
     
