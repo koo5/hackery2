@@ -20,7 +20,7 @@ def clone(url, optional_clone_args):
 
 	# taking the right side of a possible comma makes it handle both a https schema and a ssh schema
 	path_cleaned = url_parsed.path.strip('/').split(':')[-1]
-	removesuffix(path_cleaned ,'.git')
+	path_cleaned = removesuffix(path_cleaned ,'.git')
 	logger.info('path_cleaned: ' + path_cleaned.__repr__())
 	#path_cleaned = pathlib.Path(path_cleaned).resolve(strict=False)
 	#path_cleaned.normalize()
