@@ -1,14 +1,15 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3.10
 
 
 import logging,os,sys,subprocess,time,shlex,logging, pathlib, urllib, json, click
 logger = logging.getLogger('ciu')
 
 
-def removesuffix(s,suffix):
-	if s.endswith(suffix):
-		s = s[:-len(suffix)]
-	return s
+def removesuffix(self: str, suffix: str, /) -> str:
+    if self.endswith(suffix):
+        return self[:-len(suffix)]
+    else:
+        return self[:]
 
 
 @click.command()
