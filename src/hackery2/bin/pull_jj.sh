@@ -1,0 +1,2 @@
+#!/usr/bin/env fish
+bfg   --YES=true    --REMOTE_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/d2    --sshstr='/opt/hpnssh/usr/bin/ssh -o TCPRcvBufPoll=yes  -p 2222  koom@192.168.8.24'   remote_commit_and_pull   --SUBVOLUME=/mx500data/jj_d2  --REMOTE_SUBVOLUME=/d2/images
