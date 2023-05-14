@@ -17,6 +17,27 @@ esphome:
 
 esp32:
   board: denky32
+  #framework:
+    #type: esp-idf
+    #version: latest
+    # Custom sdkconfig options
+    #sdkconfig_options:
+    #  CONFIG_COMPILER_OPTIMIZATION_SIZE: y
+    # Advanced tweaking options
+    #advanced:
+    #  ignore_efuse_mac_crc: false
+
+
+#network:
+#  enable_ipv6: true
+
+
+captive_portal:
+
+
+web_server:
+  port: 80
+  ota: true
 
 
 wifi:
@@ -53,14 +74,6 @@ ota:
 
     
 logger:
-
-
-captive_portal:
-
-
-web_server:
-  port: 80
-  ota: true
 
 
 sensor:

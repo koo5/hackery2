@@ -1,0 +1,4 @@
+For ultra-high reliability, the designer can use the MAX6323/MAX6324 windowed watchdogs. With these parts, the pulse clearing the watchdog must occur within a well-specified time window. A valid pulse may come as early as 1.5ms after the last pulse or could arrive as late as 10ms after the last pulse (see Table 1 for additional ranges). With the MAX6323/MAX6324 the system recovers from parasitic loops, which can generate a fast-pulse train if the clear-watchdog command is within the loop. These pulses would clear a normal watchdog and no reset would be generated. This can be avoided with windowed watchdogs, as they require a minimum delay between watchdog pulses. Typical applications for these devices are anti-lock brake systems or other automotive circuits, industrial and medical applications where high safety requirements apply, or applications where system availability is critical.
+Conclusion
+
+
