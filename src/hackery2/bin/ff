@@ -1,4 +1,9 @@
-#!/usr/bin/env bash
-echo $@;
-firefox $@
+#!/usr/bin/env python
+
+import os, sys
+
+return subprocess.call(['firefox' + sys.argv[1:])
+
+# xdg-settings set default-web-browser ff.desktop
+
 

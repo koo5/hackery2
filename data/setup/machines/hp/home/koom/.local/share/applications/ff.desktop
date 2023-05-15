@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=FF
+Comment=Better Firefox
+Exec=/home/koom/hackery2/src/hackery2/bin/ff
+
+Icon=/home/koom/.local/share/LightBurn/LightBurn.png
+Categories=Graphics;
+MimeType=text/html;
