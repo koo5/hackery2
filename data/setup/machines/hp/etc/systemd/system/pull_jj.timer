@@ -1,0 +1,11 @@
+[Unit]
+Description="Run helloworld.service 5min after boot and every 24 hours relative to activation time"
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+#OnCalendar=Mon..Fri *-*-* 10:00:*
+Unit=pull_jj.service
+
+[Install]
+WantedBy=multi-user.target

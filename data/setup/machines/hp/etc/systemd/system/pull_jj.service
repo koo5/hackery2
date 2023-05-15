@@ -1,0 +1,6 @@
+[Unit]
+Description="pull_jj"
+
+[Service]
+ExecStart=/home/koom/hackery2/src/hackery2/bin/pull_jj.sh
+
