@@ -11,8 +11,8 @@ esphome:
       - logger.log: 'boOoOoOoOooOoOoOoOt'
 
 esp32:
-  board: heltec_wifi_kit_32
-
+  #board: heltec_wifi_kit_32
+  board: esp32dev
 
 wifi:
   networks:
@@ -130,9 +130,29 @@ sensor:
 
 
   - platform: adc
-    pin: d14
-    #,27,26,25
+    pin: 37
     id: wetness1
+    update_interval: 5s
+    attenuation: 11db
+    filters:
+      - multiply: 10
+  - platform: adc
+    pin: 37
+    id: wetness2
+    update_interval: 5s
+    attenuation: 11db
+    filters:
+      - multiply: 10
+  - platform: adc
+    pin: 38
+    id: wetness3
+    update_interval: 5s
+    attenuation: 11db
+    filters:
+      - multiply: 10
+  - platform: adc
+    pin: 39
+    id: wetness4
     update_interval: 5s
     attenuation: 11db
     filters:
@@ -143,9 +163,20 @@ sensor:
 
 switch:
   - platform: gpio
-    pin: 18
-    #,23,19,22
+    pin: 22
     id: pump1
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    pin: 19
+    id: pump2
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    pin: 23
+    id: pump3
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    pin: 18
+    id: pump4
     restore_mode: ALWAYS_OFF
 
 
@@ -159,39 +190,38 @@ switch:
 
     
 climate:
-  - platform: thermostat
-    id: pump1
-    sensor: wetness1
-    min_idle_time: 60s
-    supplemental_heating_action:
-      - script.execute:
-        id: run_pump
-        p: pump1
-    supplemental_heating_delta: 0
-    default_preset: Home
-    preset:
-      - name: Home
-        mode: HEAT
-        default_target_temperature_low: 15 °C
-
-
+  - !include
+    file: thermostat.yaml
+    vars:
+      n: 1
+  - !include
+    file: thermostat.yaml
+    vars:
+      n: 2
+  - !include
+    file: thermostat.yaml
+    vars:
+      n: 3
+  - !include
+    file: thermostat.yaml
+    vars:
+      n: 4
 
 script:
+  - !include
+    file: run_pump.yaml
+    vars:
+      n: 1
+  - !include
+    file: run_pump.yaml
+    vars:
+      n: 2
+  - !include
+    file: run_pump.yaml
+    vars:
+      n: 3
+  - !include
+    file: run_pump.yaml
+    vars:
+      n: 4
 
-  - id: run_pump
-    mode: parallel
-    max_runs: 1
-    parameters:
-      p: int
-    then:
-#      - number.set:
-#          id: last_pump_ts
-#          value: !lambda |-
-#            return id($clock).utcnow().timestamp;
-      - light.turn_on: status
-      - delay: 2s
-      - light.turn_off: status
-
-      - switch.turn_on: p
-      - delay: 1s
-      - switch.turn_off: p

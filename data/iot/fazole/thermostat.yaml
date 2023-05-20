@@ -1,0 +1,20 @@
+    platform: thermostat
+    id: t_pump${n}
+    sensor: wetness${n}
+    min_idle_time: 60s
+    idle_action:
+      - logger.log: 'idle'
+    heat_action:
+      - logger.log: 'heat'
+    min_heating_off_time: 100min
+    min_heating_run_time: 10s
+    max_heating_run_time: 1s
+    default_preset: Home
+    preset:
+      - name: Home
+        mode: HEAT
+        default_target_temperature_low: 15 °C
+    supplemental_heating_delta: 0
+    supplemental_heating_action:
+       - script.execute:
+           id: run_pump${n}

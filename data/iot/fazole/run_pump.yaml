@@ -1,0 +1,12 @@
+    id: run_pump${n}
+    mode: parallel
+    max_runs: 1
+    then:
+#      - number.set:
+#          id: last_pump_ts
+#          value: !lambda |-
+#            return id($clock).utcnow().timestamp;
+      - switch.turn_on: pump${n}
+      - delay: 10s
+      - switch.turn_off: pump${n}
+      - delay: 1000s
