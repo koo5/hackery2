@@ -1,0 +1,14 @@
+arduino 1.8.19
+board "Wifi Kit 8"
+libraries -> heltec
+SSD1306DrawingDemo
+https://github.com/HelTecAutomation/Heltec_ESP8266
+128 * 32 
+JST 1.25mm 
+https://homeding.github.io/boards/wifikit8.htm
+- The Wifi Kit 8 Module is not designed to be used for deep sleep mode: 
+| The GPIO16(D0) pin is required to be connected to RESET to support Deep Sleep but it is also required to be pulled to low to reset the display - causing a reset.
+
+D0	GPIO16		HIGH at boot, used to wake up from deep sleep
+
+

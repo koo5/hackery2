@@ -1,0 +1,17 @@
+https://resource.heltec.cn/download/WiFi_Kit_32/WIFI_Kit_32_pinoutDiagram_V2.pdf
+
+
+esp32:
+  board: heltec_wifi_kit_32
+
+....
+
+INFO Reading configuration main.yaml...
+Failed config
+
+sensor.adc: [source main.yaml:132]
+  platform: adc
+  
+  Cannot resolve pin name 'd14' for board heltec_wifi_kit_32.
+  pin: d14
+  id: wetness1
