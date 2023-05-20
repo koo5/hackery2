@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import os, sys, glob
+
+profile = '/home/koom/snap/firefox/common/.mozilla/firefox/hpp'
+lock = profile + '/lock'
+
+if glob.glob(lock) != []:
+	print(lock + ' exists.')
+	sys.exit(1)
+
+sys.exit(subprocess.call(['firefox', '--new-instance', '--profile', profile]  + sys.argv[1:]))
+
+# xdg-settings set default-web-browser ff.desktop
+
+
