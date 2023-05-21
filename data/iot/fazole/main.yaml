@@ -14,87 +14,88 @@ esp32:
   #board: heltec_wifi_kit_32
   board: esp32dev
 
-wifi:
-  networks:
-  - ssid: !secret ssid
-    password: !secret password
-    manual_ip:
-      static_ip: $ip
-      gateway: 10.0.0.138
-      subnet: 255.255.255.0
-      dns1: 10.0.0.138
-      dns2: 8.8.8.8
+#wifi:
+#  networks:
+#  - ssid: !secret ssid
+#    password: !secret password
+#    manual_ip:
+#      static_ip: $ip
+#      gateway: 10.0.0.138
+#      subnet: 255.255.255.0
+#      dns1: 10.0.0.138
+#      dns2: 8.8.8.8
 
 
-mqtt:
-  broker: !secret mqtt_host
-  port: !secret mqtt_port
-  username: !secret mqtt_user
-  password: !secret mqtt_password
-  keepalive: 8s
-  reboot_timeout: 45min
+#mqtt:
+#  broker: !secret mqtt_host
+#  port: !secret mqtt_port
+#  username: !secret mqtt_user
+#  password: !secret mqtt_password
+#  keepalive: 8s
+#  reboot_timeout: 45min
+#
 
-
-ota:
-  password: ""
-
+#ota:
+#  password: ""
+#
     
 logger:
+#  level: INFO
 
 
-captive_portal:
-
-
-web_server:
-  port: 80
-
-
-
-
-
-sun:
-  latitude: 50.0755°
-  longitude: 14.4378°
-
-  on_sunrise:
-    - then:
-        - logger.log: Good morning!
-  on_sunset:
-    - then:
-        - logger.log: Good evening!
-
-
-
-
-text_sensor:
-  - platform: sun
-    name: Next Sunrise
-    type: sunrise
-  - platform: sun
-    name: Next Sunset
-    type: sunset
-  - platform: template
-    name: "Time NTP"
-    lambda: |-
-      char str[30];
-      if (!id(ntp).now().is_valid()) { return { "----" }; }
-      time_t currTime = id(ntp).now().timestamp;
-      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
-      //strftime(str, sizeof(str), "%c", localtime(&currTime));
-      return  { str };
-    update_interval: 15s
-
-
-
-
-time:
-  - platform: sntp
-    id: ntp
-    timezone: Europe/Prague
-
-
-
-
+#captive_portal:
+#
+#
+#web_server:
+#  port: 80
+#
+#
+#
+#
+#
+#sun:
+#  latitude: 50.0755°
+#  longitude: 14.4378°
+#
+#  on_sunrise:
+#    - then:
+#        - logger.log: Good morning!
+#  on_sunset:
+#    - then:
+#        - logger.log: Good evening!
+#
+#
+#
+#
+#text_sensor:
+#  - platform: sun
+#    name: Next Sunrise
+#    type: sunrise
+#  - platform: sun
+#    name: Next Sunset
+#    type: sunset
+#  - platform: template
+#    name: "Time NTP"
+#    lambda: |-
+#      char str[30];
+#      if (!id(ntp).now().is_valid()) { return { "----" }; }
+#      time_t currTime = id(ntp).now().timestamp;
+#      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+#      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+#      return  { str };
+#    update_interval: 1s
+#
+#
+#
+#
+#time:
+#  - platform: sntp
+#    id: ntp
+#    timezone: Europe/Prague
+#
+#
+#
+#
 #
 #number:
 #  - platform: template
@@ -111,75 +112,64 @@ time:
 
 
 sensor:
-  - platform: uptime
-    name: Uptime Sensor
+#  - platform: uptime
+#    name: Uptime Sensor
+#
+#  - platform: sun
+#    name: Sun Elevation
+#    type: elevation
+#  - platform: sun
+#    name: Sun Azimuth
+#    type: azimuth
+#
+#  - platform: wifi_signal
+#    name: "Irrigation Wifi"
+#    update_interval: 1s
+#
 
-  - platform: sun
-    name: Sun Elevation
-    type: elevation
-  - platform: sun
-    name: Sun Azimuth
-    type: azimuth
-
-  - platform: wifi_signal
-    name: "Irrigation Wifi"
-    update_interval: 60s
-
-
-
-
-
-  - platform: adc
-    pin: 37
-    id: wetness1
-    update_interval: 5s
-    attenuation: 11db
-    filters:
-      - multiply: 10
-  - platform: adc
-    pin: 37
-    id: wetness2
-    update_interval: 5s
-    attenuation: 11db
-    filters:
-      - multiply: 10
-  - platform: adc
-    pin: 38
-    id: wetness3
-    update_interval: 5s
-    attenuation: 11db
-    filters:
-      - multiply: 10
-  - platform: adc
-    pin: 39
-    id: wetness4
-    update_interval: 5s
-    attenuation: 11db
-    filters:
-      - multiply: 10
-
-
+  - !include
+    file: sensor.yaml
+    vars:
+      n: 1
+      pin: 33
+  - !include
+    file: sensor.yaml
+    vars:
+      n: 2
+      pin: 32
+  - !include
+    file: sensor.yaml
+    vars:
+      n: 3
+      pin: 35
+  - !include
+    file: sensor.yaml
+    vars:
+      n: 4
+      pin: 34
 
 
 switch:
-  - platform: gpio
-    pin: 22
-    id: pump1
-    restore_mode: ALWAYS_OFF
-  - platform: gpio
-    pin: 19
-    id: pump2
-    restore_mode: ALWAYS_OFF
-  - platform: gpio
-    pin: 23
-    id: pump3
-    restore_mode: ALWAYS_OFF
-  - platform: gpio
-    pin: 18
-    id: pump4
-    restore_mode: ALWAYS_OFF
-
-
+  - !include
+    file: switch.yaml
+    vars:
+      n: 1
+      pin: 18
+  - !include
+    file: switch.yaml
+    vars:
+      n: 2
+      pin: 23
+  - !include
+    file: switch.yaml
+    vars:
+      n: 3
+      pin: 19
+  - !include
+    file: switch.yaml
+    vars:
+      n: 4
+      pin: 22
 
 
   - platform: restart
@@ -187,8 +177,6 @@ switch:
     name: "Living Room Restart"
     
 
-
-    
 climate:
   - !include
     file: thermostat.yaml

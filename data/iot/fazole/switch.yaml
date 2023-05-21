@@ -1,0 +1,5 @@
+    platform: gpio
+    pin: ${pin}
+    id: pump${n}
+    name: "pump${n}"
+    restore_mode: ALWAYS_OFF

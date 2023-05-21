@@ -3,12 +3,12 @@
     sensor: wetness${n}
     min_idle_time: 60s
     idle_action:
-      - logger.log: 'idle'
+      - delay: 1s
     heat_action:
-      - logger.log: 'heat'
+      - delay: 1s
     min_heating_off_time: 100min
-    min_heating_run_time: 10s
-    max_heating_run_time: 1s
+    min_heating_run_time: 30s
+    max_heating_run_time: 15s
     default_preset: Home
     preset:
       - name: Home
