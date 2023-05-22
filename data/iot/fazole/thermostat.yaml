@@ -1,6 +1,6 @@
     platform: thermostat
-    id: t_pump${n}
-    name: t${n}
+    id: thermostat${n}
+    name: pump${n}_t
     sensor: wetness${n}
     min_idle_time: 60s
     idle_action:
