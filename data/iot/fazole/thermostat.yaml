@@ -1,5 +1,6 @@
     platform: thermostat
     id: t_pump${n}
+    name: t${n}
     sensor: wetness${n}
     min_idle_time: 60s
     idle_action:
@@ -13,7 +14,7 @@
     preset:
       - name: Home
         mode: HEAT
-        default_target_temperature_low: 15 °C
+        default_target_temperature_low: 14 °C
     supplemental_heating_delta: 0
     supplemental_heating_action:
        - script.execute:
