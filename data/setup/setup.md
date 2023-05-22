@@ -11,11 +11,6 @@ sudo apt install -y fish net-tools
 fish
 ```	
 
-## basics0 (non-metal machines)
-```
-xset s off; xset -dpms
-```	
-
 ## basics0.1
 
 ```
@@ -92,6 +87,12 @@ abbr --add untar tar -xvf
 abbr --add root sudo terminator
 
 ```
+
+## keep screen on (virtual machines)
+```
+~/hackery2/src/hackery2/bin/noblank.sh
+```	
+
 
 ## tighten up
 
