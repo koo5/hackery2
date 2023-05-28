@@ -87,12 +87,15 @@ abbr --add untar tar -xvf
 abbr --add root sudo terminator
 
 ```
-
 ## keep screen on (virtual machines)
 ```
 ~/hackery2/src/hackery2/bin/noblank.sh
 ```	
 
+## generate key
+```
+~/hackery2/src/hackery2/bin/ssh-keygen.sh
+```
 
 ## tighten up
 
