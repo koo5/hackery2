@@ -19,17 +19,20 @@ esp32:
 
 
 logger:
-#  level: INFO
+  level: INFO
 
 
-#mqtt:
-#  broker: !secret mqtt_host
-#  port: !secret mqtt_port
-#  username: !secret mqtt_user
-#  password: !secret mqtt_password
-#  keepalive: 8s
-#  reboot_timeout: 45min
-#
+api:
+
+
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  keepalive: 8s
+  reboot_timeout: 45min
+
 
 wifi:
   networks:
@@ -110,25 +113,41 @@ sensor:
 
 
   - !include
-    file: sensor.yaml
+    file: wetness_raw.yaml
     vars:
       n: 1
       pin: 33
   - !include
-    file: sensor.yaml
+    file: wetness.yaml
+    vars:
+      n: 1
+  - !include
+    file: wetness_raw.yaml
     vars:
       n: 2
       pin: 32
   - !include
-    file: sensor.yaml
+    file: wetness.yaml
+    vars:
+      n: 2
+  - !include
+    file: wetness_raw.yaml
     vars:
       n: 3
       pin: 35
   - !include
-    file: sensor.yaml
+    file: wetness.yaml
+    vars:
+      n: 3
+  - !include
+    file: wetness_raw.yaml
     vars:
       n: 4
       pin: 34
+  - !include
+    file: wetness.yaml
+    vars:
+      n: 4
 
 
 switch:

@@ -14,4 +14,4 @@
       - switch.turn_on: pump${n}
       - delay: 10s
       - switch.turn_off: pump${n}
-      - delay: 1000s
+      - delay: 5h

@@ -1,9 +1,8 @@
     platform: adc
     pin: ${pin}
-    id: wetness${n}
-    name: "wetness${n}"
+    id: wetness_raw${n}
+    name: "wetness_raw${n}"
     update_interval: 1s
     attenuation: 11db
-
     filters:
       - lambda: return 30 - (x * 10);
