@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, sys, glob
+import os, sys, glob, subprocess
 
 profile = '/home/koom/snap/firefox/common/.mozilla/firefox/hpp'
 lock = profile + '/lock'

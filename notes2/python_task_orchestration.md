@@ -493,3 +493,25 @@ kafka
 
 https://pydoit.org/
 
+
+
+
+
+
+
+I disqualified dramatiq on the basis of missing a monitoring solution. See its sucessor, remoulade + superbowl, i'm happy with them so far, and it seems to be the only option here that offers monitoring.
+I disqualified RQ on the basis of being unreliable by design, ARQ is apparently a sucessor of RQ that "fixes" that problem.
+
+Now the issue of calling the "worker code" by name VS having to import the worker codebase into the "calling" code is something to think about, with pros and cons. Calling by name seems cleaner wrt code organization, but importing potentially offers the benefits of type-checking, IDE navigation, etc. Just saying.
+
+As on interoperability with different languages, remoulade docs already say:
+```All you have to do is push a JSON-encoded dictionary containing the following fields to your queue:
+{
+  "queue_name": "default",     // The name of the queue the message is being pushed on
+....
+```
+
+But repid definitely looks nice, being "inspired by dramatiq and arq", and with some modern and possibly cleaner practices.
+
+Some of these options are more "down to the metal", some with "middlewares" that offer AOP-style extensions/abstraction. You need to make you own choice in that regard. And maybe one day we can have a cross-task-queue monitoring solution.....
+
