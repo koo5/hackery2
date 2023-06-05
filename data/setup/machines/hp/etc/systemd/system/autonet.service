@@ -1,0 +1,6 @@
+[Unit]
+Description="autonet"
+
+[Service]
+ExecStart=/home/koom/hackery2/src/hackery2/bin/autonet.sh
+

@@ -1,0 +1,10 @@
+[Unit]
+Description="autonet"
+
+[Timer]
+OnBootSec=10
+OnUnitActiveSec=10
+Unit=autonet.service
+
+[Install]
+WantedBy=multi-user.target
