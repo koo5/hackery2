@@ -49,6 +49,15 @@ Without these requirements, it is really a wild west of insanity IME. Much bette
 	
 	
 	i'm testing no-ff merges now. 
+
+		1) you have dev branches
+		2) you commit whatever, anything and everything, and you don't really even worry about commit messages
+		3) you no-ff merge dev branches into bigger streams (master), and that's where you hopefully take some care with a thought out merge message, and with the scope of your changes
+		4) and then you have some tricks to look at the history along the "first parent" line, or to look into the details
+
+		iow, instead of manipulating your history to create a nice squash commit that others are supposed to look at, you keep your messy history, create a nice merge commit, and teach others how to filter out the messy side of the tree
+
+
 		https://nvie.com/img/merge-without-ff@2x.png
 		`"git log --first-parent origin/master" as the sequence of the important things`
 		
