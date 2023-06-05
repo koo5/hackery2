@@ -493,12 +493,13 @@ kafka
 
 https://pydoit.org/
 
+https://github.com/Lancetnik/Propan
 
 
 
 
 
-
+---
 I disqualified dramatiq on the basis of missing a monitoring solution. See its sucessor, remoulade + superbowl, i'm happy with them so far, and it seems to be the only option here that offers monitoring.
 I disqualified RQ on the basis of being unreliable by design, ARQ is apparently a sucessor of RQ that "fixes" that problem.
 
@@ -514,4 +515,4 @@ As on interoperability with different languages, remoulade docs already say:
 But repid definitely looks nice, being "inspired by dramatiq and arq", and with some modern and possibly cleaner practices.
 
 Some of these options are more "down to the metal", some with "middlewares" that offer AOP-style extensions/abstraction. You need to make you own choice in that regard. And maybe one day we can have a cross-task-queue monitoring solution.....
-
+---

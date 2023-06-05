@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3
 
 
 import logging,os,sys,subprocess,time,shlex,logging, pathlib, urllib, json, click

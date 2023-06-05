@@ -1,0 +1,14 @@
+    platform: copy
+    source_id: wetness_raw${n}
+    id: wetness${n}
+    name: "wetness${n}"
+
+    filters:
+
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 5
+          send_first_at: 5
+
+
+      - delta: 0.3

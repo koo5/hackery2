@@ -1,0 +1,21 @@
+    platform: thermostat
+    id: thermostat${n}
+    name: pump${n}_t
+    sensor: wetness${n}
+    min_idle_time: 60s
+    idle_action:
+      - delay: 1s
+    heat_action:
+      - delay: 1s
+    min_heating_off_time: 100min
+    min_heating_run_time: 30s
+    max_heating_run_time: 15s
+    default_preset: Home
+    preset:
+      - name: Home
+        mode: HEAT
+        default_target_temperature_low: 14 °C
+    supplemental_heating_delta: 0
+    supplemental_heating_action:
+       - script.execute:
+           id: run_pump${n}
