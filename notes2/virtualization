@@ -229,3 +229,20 @@ ssh root@192.168.8.8 "tar --create  --sparse /mx500data/leanpriv/d/images/dev1.r
 	https://levelup.gitconnected.com/how-to-setup-bridge-networking-with-kvm-on-ubuntu-20-04-9c560b3e3991
 
 
+
+
+
+
+
+
+
+
+
+
+virt-viewer over ssh with patched or git up-to-date virt-viewer, fixing shell invocation on host. This solves repeated key password prompts. Ssh port probably matters (needs 22).:
+	```
+	ssh-add ~/.ssh/id_ed25519
+	~/h/virt-viewer-7.0/debian/virt-viewer/usr/bin/virt-viewer -c 'qemu+ssh://root@192.168.8.8/system'
+
+	```
+
