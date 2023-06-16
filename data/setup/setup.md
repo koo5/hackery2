@@ -76,7 +76,7 @@ sudo apt install -y iotop-c
 git clone https://github.com/koo5/hackery2.git
 sudo ~/hackery2/data/setup/data/mc/setup.sh
 
-set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/
+set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/ ~/.local/bin/
 set -g fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path #-U?
 #? set -e fish_function_path; set -U fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path
 
