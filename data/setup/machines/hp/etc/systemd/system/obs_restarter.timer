@@ -1,0 +1,9 @@
+[Unit]
+Description="obs_restarter"
+
+[Timer]
+OnCalendar=*-*-* *:00:00
+Unit=obs_restarter.service
+
+[Install]
+WantedBy=multi-user.target

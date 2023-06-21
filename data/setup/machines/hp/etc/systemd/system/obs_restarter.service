@@ -1,0 +1,5 @@
+[Unit]
+Description="obs_restarter"
+
+[Service]
+ExecStart=/home/koom/hackery2/src/hackery2/bin/obs_recording_restart.py
