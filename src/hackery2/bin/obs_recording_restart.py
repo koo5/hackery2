@@ -18,14 +18,14 @@ if co('obs-cli --password ccfa0506 recording status') != 'Recording: true':
 co('obs-cli --password ccfa0506 recording stop')
 
 #co('xcalib -a -i')
-co('/home/koom/xrandr-invert-colors/xrandr-invert-colors.bin -s 0')
+co('/home/koom/xrandr-invert-colors/xrandr-invert-colors -s 0')
 
 while True:
 	if co('obs-cli --password ccfa0506 recording status') == 'Recording: false':
 		break
 
 #co('xcalib -a -i')
-co('/home/koom/xrandr-invert-colors/xrandr-invert-colors.bin -s 0')
+co('/home/koom/xrandr-invert-colors/xrandr-invert-colors -s 0')
 
 co('obs-cli --password ccfa0506 recording start')
 
