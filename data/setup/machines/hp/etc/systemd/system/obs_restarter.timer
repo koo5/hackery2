@@ -2,6 +2,7 @@
 Description="obs_restarter"
 
 [Timer]
+AccuracySec=0s
 OnCalendar=*-*-* *:00:00
 Unit=obs_restarter.service
 
