@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-import subprocess,shlex,time,datetime
+import subprocess,shlex,time,datetime,sys
 
 def co(x):
 	print('cmd:'+x)
@@ -19,27 +19,32 @@ def co(x):
 
 co('sudo -u koom obs-cli --password ccfa0506 label text zzz "' + datetime.datetime.now().isoformat() + '"')
 co('sudo -u koom obs-cli --password ccfa0506 sceneitem hide ding ding_ogg')
+co('sudo -u koom obs-cli --password ccfa0506 sceneitem show ding zzz')
 
-if co('sudo -u koom obs-cli --password ccfa0506 recording status') != 'Recording: true':
-	exit()
-co('sudo -u koom obs-cli --password ccfa0506 recording stop')
+if len(sys.argv) > 1 and sys.argv[1] == 'start':
+	pass
+else:
+	if co('sudo -u koom obs-cli --password ccfa0506 recording status') != 'Recording: true':
+		exit()
+	co('sudo -u koom obs-cli --password ccfa0506 recording stop')
 
-#co('xcalib -a -i')
-#co('/home/koom/xrandr-invert-colors/xrandr-invert-colors -s 0')
+	#co('xcalib -a -i')
+	#co('/home/koom/xrandr-invert-colors/xrandr-invert-colors -s 0')
 
-while True:
-	try:
-		if co('obs-cli --password ccfa0506 recording status') == 'Recording: false':
-			break
-	except:
-		pass
+	while True:
+		try:
+			if co('obs-cli --password ccfa0506 recording status') == 'Recording: false':
+				break
+		except:
+			pass
 
-#co('xcalib -a -i')
-#co('/home/koom/xrandr-invert-colors/xrandr-invert-colors -s 0')
+	#co('xcalib -a -i')
+	#co('/home/koom/xrandr-invert-colors/xrandr-invert-colors -s 0')
 
 co('obs-cli --password ccfa0506 recording start')
 co('sudo -u koom obs-cli --password ccfa0506 sceneitem show ding ding_ogg')
 co('sudo -u koom obs-cli --password ccfa0506 label text zzz " "')
+co('sudo -u koom obs-cli --password ccfa0506 sceneitem hide ding zzz')
 
 #while True:
 #	if co('obs-cli --password ccfa0506 recording status') == 'Recording: true':
