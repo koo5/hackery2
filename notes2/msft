@@ -1,0 +1,41 @@
+two possible scenarios:
+	a) user gets/copies a share link and pastes that into robust website somewhere
+		here there should be no need to authenticate to msft
+		while this would in theory be more flexible, as you can run a job on a file on anyones onedrive, ...
+	
+	b) user saves a doc on their onedrive, goes to robust website, 
+		a) (authenticates to msft, to get a cookie that allows their browser to inquire their onedrive)
+		b) (authenticates to msft + allows robust app to inquire their onedrive)
+			
+		and selects the doc to process
+		this shows that it would be useful to have both browser-side auth and server-side
+		user must allow: "robust_a will be able to open OneDrive files, including files shared with you. "
+
+
+ms-graph-python-client
+	https://github.com/areed1192/ms-graph-python-client
+	https://www.youtube.com/watch?v=bBslvqBCjAA
+
+	user browses to robust fastapi
+	user clicks "allow robust to access my onedrive"
+	post to fastapi -> lib gets auth url, client redirects to it
+	user click ok on msft website, is redirected back to robust fastapi,
+	access token is parsed out (and saved?)
+	get user info, get drive id, items, render a list of items (server template)
+
+	once robust has the token, it can probably access the user's onedrive any time
+
+	but this does not integrate an authentication workflow - or does it, can we always redirect user to the "allow app" url, and get back a cookie/token, and save it in the otherwise anonymous session data.
+	
+
+
+
+	
+	
+	
+in an extreme case, we don't need more than an api that lets us download a onedrive file from the share link, and onedrive lets browsers do that without any authentication. And something to parse it. And then using msft as an identity provider is a separate issue.
+
+
+
+
+

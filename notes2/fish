@@ -60,3 +60,11 @@ set path:
 ```
 set -U fish_user_paths $fish_user_paths /home/koom/sw/node-v10.15.1-linux-x64/bin/ 
 ```
+
+
+https://stackoverflow.com/questions/70035234/how-to-properly-setup-fish-and-version-the-configuration
+
+
+
+get current script's directory:
+set DIR (dirname (readlink -m (status --current-filename))); cd "$DIR"
