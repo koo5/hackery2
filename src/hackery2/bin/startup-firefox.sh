@@ -3,7 +3,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 {
 #bash -v "$DIR/startup2.sh" && 
 sudo snap refresh &&
-sudo bash "$DIR/update-yum" &&
+#sudo bash "$DIR/update-yum" &&
+security_updates.sh &&
 firefox
 }
 
