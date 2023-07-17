@@ -1,3 +1,3 @@
 #!/usr/bin/env fish
-xcalib -gc 5 -a
+xcalib -gc 2 -a
 
