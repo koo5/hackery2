@@ -37,7 +37,10 @@ def run(local=False, target_path='/bac4/'):
 	elif hostname == 'jj':
 		subvols = ['backup','images','images2','u']
 		toplevel = '/d2'
-	
+	elif hostname == 'r64':
+		subvols = ['/']
+		toplevel = '/'
+
 
 
 	# rsync ext4 filesystems into btrfs backup/ folder
@@ -51,8 +54,10 @@ def run(local=False, target_path='/bac4/'):
 	
 	# transfer btrfs subvolumes
 
+	target_subvol_name = subvol if subvol != '/' else '_root'
+
 	for subvol in subvols:
-		ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target_path}/backup_{hostname}/{subvol}""")
+		ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target_path}/backup_{hostname}/{target_subvol_name}""")
 
 
 def rsync(what,where):
