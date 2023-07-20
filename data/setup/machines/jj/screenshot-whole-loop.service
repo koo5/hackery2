@@ -1,0 +1,21 @@
+[Unit]
+StartLimitIntervalSec=60
+StartLimitBurst=4
+
+[Service]
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/koom/hackery2/src/hackery2/bin//screenshot-whole-loop.py  /d2/screenshots 10 -q 75 -p
+Restart=on-failure
+RestartSec=10
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
+# Elevated permissions to sync ownership (disabled by default),
+# see https://docs.syncthing.net/advanced/folder-sync-ownership
+#AmbientCapabilities=CAP_CHOWN CAP_FOWNER
+
+[Install]
+WantedBy=default.target

@@ -53,10 +53,14 @@ def safe_move(src, dst):
 
 
 
-
-tmp_fn = '/tmp/screenshot-whole-loop.png'
+tmp_dir = dest_dir + '/tmp'
+tmp_fn = tmp_dir + '/screenshot-whole-loop.png'
 try:
 	os.makedirs(dest_dir)
+except FileExistsError:
+	pass
+try:
+	os.makedirs(tmp_dir)
 except FileExistsError:
 	pass
 
@@ -73,7 +77,7 @@ def print_free_space_very_smartly():
 
 while True:
 	print_free_space_very_smartly()
-	dest_fn = dest_dir + "/" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
+	dest_fn = dest_dir + "/utc" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
 	cmd = ["scrot", "-o"] + sys.argv[3:] + [tmp_fn]
 	#print(cmd)
 	subprocess.check_call(cmd)

@@ -1,0 +1,13 @@
+[Unit]
+Description=synergy
+StartLimitIntervalSec=300
+StartLimitBurst=50
+
+[Service]
+ExecStart=/usr/bin/synergys -c /home/koom/ssssssssss -n jj -f
+Restart=on-failure
+RestartSec=2s
+
+[Install]
+WantedBy=default.target
+
