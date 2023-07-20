@@ -6,6 +6,5 @@ mount | grep bac16; and  bfg  --YES=true   --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POI
 mount | grep bac16; and  bfg  --YES=true   --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/mx500data/  commit_and_push_and_checkout   --SUBVOLUME=/mx500data/home --REMOTE_SUBVOLUME=/bac16/backup_hp_home
 mount | grep bac16; and  bfg  --YES=true   --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/mx500data/  commit_and_push_and_checkout   --SUBVOLUME=/mx500data/lean --REMOTE_SUBVOLUME=/bac16/backup_hp_lean
 mount | grep bac16; and  bfg  --YES=true   --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/mx500data/  commit_and_push_and_checkout   --SUBVOLUME=/mx500data/leanpriv --REMOTE_SUBVOLUME=/bac16/backup_hp_leanpriv
-mount | grep bac16; and  bfg  --YES=true   --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/mx500data/  commit_and_push_and_checkout   --SUBVOLUME=/mx500data/leanstream --REMOTE_SUBVOLUME=/bac16/backup_hp_leanstream
 
 

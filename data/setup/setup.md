@@ -403,6 +403,8 @@ sudo apt install gh
 
 ## hpnssh...
 ### check distro repos
+### ppa
+https://launchpad.net/~rapier1/+archive/ubuntu/hpnssh
 ### try package download
 ```
 https://sourceforge.net/projects/hpnssh/files/Debian%20Packages/

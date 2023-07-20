@@ -1,8 +1,17 @@
-import pty
-
 from shell import *
+
+
+
+
+import socket
+hostname = socket.gethostname()
+
+
+
+
 import tempfile
 from ptyprocess import PtyProcess
+import pty
 
 
 # def r64_ip():
@@ -75,7 +84,7 @@ from ptyprocess import PtyProcess
 #
 
 
-def r64_ip():
+def get_r64_ip():
 	for ip in ['10.0.7.64', '192.168.8.64']:
 		if ptyrun(ss(f'ping -c 1 -w 1 {ip}')):
 			print('yay its ' + ip)
@@ -83,3 +92,11 @@ def r64_ip():
 	raise Exception('r64 where?')
 
 
+
+
+
+def get_hpnssh_executable():
+#	if hostname == 'hp':
+#		return '/opt/hpnssh/usr/bin/ssh'
+#	elif hostname == 'jj':
+	return 'hpnssh'
