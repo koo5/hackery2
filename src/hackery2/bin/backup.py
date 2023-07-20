@@ -3,7 +3,7 @@
 from infra import *
 
 
-def run(local=False, target_path='/bac4/'):
+def run(local=False, target='/bac4/'):
 
 	# grab whatever info would not be transferred from ext4 partitions
 	srun('snap list | sudo tee /root/snap_list')
@@ -57,7 +57,7 @@ def run(local=False, target_path='/bac4/'):
 	target_subvol_name = subvol if subvol != '/' else '_root'
 
 	for subvol in subvols:
-		ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target_path}/backup_{hostname}/{target_subvol_name}""")
+		ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target}/backup_{hostname}/{target_subvol_name}""")
 
 
 def rsync(what,where):
