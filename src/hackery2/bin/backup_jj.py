@@ -19,7 +19,7 @@ def run(local=False, target_path='/bac4/'):
 		sshstr = f'--sshstr="hpnssh  -p 44  -o TCPRcvBufPoll=yes -o NoneSwitch=yes  -o NoneEnabled=yes  koom@{ip}"'
 		sshstr = f'--sshstr="ssh  -p 44  koom@{ip}"'
 
-	for subvol in ['backup','images','images2','u']:
+	for subvol in ['u','backup','images','images2']:
 		ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT=/d2 commit_and_push_and_checkout  --SUBVOLUME=/d2/{subvol}/ --REMOTE_SUBVOLUME=/{target_path}/jj_backup/{subvol}""")
 
 

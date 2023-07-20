@@ -5,16 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../data/fyb/decls.trig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backup_jj.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infra.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/shell.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_infra.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backup_vmi.sh" beforeDir="false" afterPath="$PROJECT_DIR$/backup_vmi.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/screenshot-whole-loop.py" beforeDir="false" afterPath="$PROJECT_DIR$/screenshot-whole-loop.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backup_jj.py" beforeDir="false" afterPath="$PROJECT_DIR$/backup_jj.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
