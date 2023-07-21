@@ -54,9 +54,8 @@ def run(local=False, target='/bac4/'):
 	
 	# transfer btrfs subvolumes
 
-	target_subvol_name = subvol if subvol != '/' else '_root'
-
 	for subvol in subvols:
+		target_subvol_name = subvol if subvol != '/' else '_root'
 		ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target}/backup_{hostname}/{target_subvol_name}""")
 
 
