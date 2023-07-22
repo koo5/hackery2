@@ -19,7 +19,7 @@ def run(target_machine='r64', target_fs='/bac4/'):
 	rsync_ext4_filesystems_into_backup_folder(fss)
 	add_backup_subvols(fss[0])
 	sshstr = set_up_target(target_machine)
-	transfer_btrfs_subvolumes(sshstr, fss)
+	transfer_btrfs_subvolumes(sshstr, fss, target_fs)
 
 
 
@@ -84,13 +84,18 @@ def rsync_ext4_filesystems_into_backup_folder(fss):
 
 
 
-def transfer_btrfs_subvolumes(sshstr, fss):
+def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 	for fs in fss:
 		toplevel = fs['toplevel']
-		for target_dir, subvols in fs['subvols'].items():
-			for subvol in subvols:
-				target_subvol_name = subvol if subvol != '/' else '_root'
-				ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_subdir}/{target_subvol_name}""")
+		for subvol in fs['subvols']:
+
+			name = subvol['name']
+			source_path = subvol['source_path']
+			target_dir = subvol['target_dir']
+
+			target_subvol_name = name if name != '/' else '_root'
+
+			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
 
 
 def rsync(what,where):
@@ -100,8 +105,11 @@ def rsync(what,where):
 
 def add_backup_subvols(fs):
 	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is on inherent need to only support a flat structure.
-	for f in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
-		fs['subvols'] = [glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + f)]
+	for host in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
+		fs['subvols'] = [{'target_dir': host,
+						  'name': name,
+						  'source_path': '/backups/' + host + '/'} for name in
+						  glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + host)]
 
 
 
