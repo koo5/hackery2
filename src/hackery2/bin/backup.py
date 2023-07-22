@@ -1,24 +1,35 @@
 #!/usr/bin/env python3
+import glob
+from pathlib import Path
 
 from infra import *
 
 
-def run(local=False, target='/bac4/'):
+def run(target_machine='r64', target_fs='/bac4/'):
+	"""back up the machine that this script runs on"""
+
+
 
 	# grab whatever info would not be transferred from ext4 partitions
 	srun('snap list | sudo tee /root/snap_list')
 	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
 	#anything else? 
 	#pause firefox? pause some vms?
+	fss = get_filesystems()
+	rsync_ext4_filesystems_into_backup_folder(fss)
+	add_backup_subvols(fss[0])
+	sshstr = set_up_target(target_machine)
+	transfer_btrfs_subvolumes(sshstr, fss)
 
 
 
-	# set up target
 
-	if local:
+def set_up_target(target_machine):
+
+	if target_machine is None:
 		ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
 		sshstr = ''
-	else:
+	elif target_machine == 'r64':
 		r64_ip = get_r64_ip()
 		ssh = get_hpnssh_executable()
 		if r64_ip.startswith('10.'):
@@ -26,53 +37,81 @@ def run(local=False, target='/bac4/'):
 		else:
 			insecure_speedups = ''
 		sshstr = f'--sshstr="{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups}  koom@{r64_ip}"'
+	else:
+		raise Exception('unsupported')
+	return sshstr
 
 
 
-	# toplevel is where the bulk of the data lives, divided into subvolumes
+def get_filesystems():
+	# each of my machines has a big btrfs disk where the bulk of my data lives, divided into subvolumes
+	# each machine also has a small ext4 or btrfs disk where the OS lives
+	# we rsync ext4 disks into a subvolume on the btrfs disk, and then use bfg to transfer the btrfs subvolumes
+	# but maybe in future we should just rsync them to the target btrfs filesystem directly
 
 	if hostname == 'hp':
 		fss = [{
 			'toplevel': '/mx500data',
-			'subvols': ['backup', 'home', 'lean','leanpriv'],
+			'subvols': m(['home', 'lean','leanpriv']),
 		}]
 	elif hostname == 'jj':
 		fss = [{
 			'toplevel': '/d2',
-			'subvols': ['backup','images','images2','u'],
+			'subvols': m(['images','images2','u']),
 		}]
 	elif hostname == 'r64':
 		fss = [{
-			'toplevel': '/',
-			'subvols': ['/'],
-		},{
 			'toplevel': '/bac4',
-			'subvols': ['lean', 'images_win'],
+			'subvols': m(['lean', 'images_win'])
+		},
+		{
+			'toplevel': '/',
+			'subvols': m(['/']),
 		}]
+	return fss
 
 
 
-	# rsync ext4 filesystems into btrfs backup/ folder
-
-	where = f"{fss[0]['toplevel']}/backup/root_ext4"
+def rsync_ext4_filesystems_into_backup_folder(fss):
+	# this path corresponds to the structure expected by add_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
+	where = f"{fss[0]['toplevel']}/backups/{hostname}/root_ext4"
+	if not Path(where).exists():
+		ccs(f'sudo btrfs sub create {where}')
 	if hostname == 'hp':
 		rsync('/boot /root /etc /var/www /var/lib/docker/volumes', where)
 	elif hostname == 'jj':
 		rsync('/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd', where)
 
-	
-	# transfer btrfs subvolumes
 
+
+def transfer_btrfs_subvolumes(sshstr, fss):
 	for fs in fss:
 		toplevel = fs['toplevel']
-		for subvol in fs['subvols']:
-			target_subvol_name = subvol if subvol != '/' else '_root'
-			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target}/backup_{hostname}/{target_subvol_name}""")
+		for target_dir, subvols in fs['subvols'].items():
+			for subvol in subvols:
+				target_subvol_name = subvol if subvol != '/' else '_root'
+				ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{subvol}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_subdir}/{target_subvol_name}""")
 
 
 def rsync(what,where):
 	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its result
 	srun(f'sudo rsync -v -a -S -v --progress -r --delete {what} {where}')
+
+
+def add_backup_subvols(fs):
+	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is on inherent need to only support a flat structure.
+	for f in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
+		fs['subvols'] = [glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + f)]
+
+
+
+def m(subvols):
+	"""return subvol specifications for a machine's filesystem"""
+	return [{'target_dir': hostname,
+			'name':subvol,
+			'source_path':''} for subvol in subvols]
+
+
 
 if __name__ == "__main__":
 	fire.Fire(run)
