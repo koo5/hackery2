@@ -5,6 +5,12 @@ from pathlib import Path
 from infra import *
 
 
+if hostname == 'r64':
+	default_target_machine = None
+else:
+	default_target_machine = 'r64'
+
+
 def run(target_machine='r64', target_fs='/bac4/'):
 	"""back up the machine that this script runs on"""
 
