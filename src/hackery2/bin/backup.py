@@ -88,6 +88,7 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
+			print(subvol)
 
 			name = subvol['name']
 			source_path = subvol['source_path']
@@ -106,10 +107,10 @@ def rsync(what,where):
 def add_backup_subvols(fs):
 	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is on inherent need to only support a flat structure.
 	for host in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
-		fs['subvols'].append([{'target_dir': host,
+		fs['subvols'] += [{'target_dir': host,
 						  'name': name,
 						  'source_path': '/backups/' + host + '/'} for name in
-						  glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + host)])
+						  glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + host)]
 
 
 
