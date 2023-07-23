@@ -40,6 +40,8 @@ def ccs(cmd):
 
 def ptyrun(cmd):
 	print('|v')
-	code = os.waitstatus_to_exitcode(pty.spawn(['stdbuf', '-oL', '-eL'] + cmd))
+	
+	code = os.WEXITSTATUS(pty.spawn(['stdbuf', '-oL', '-eL'] + cmd))
+	#code = os.waitstatus_to_exitcode(pty.spawn(['stdbuf', '-oL', '-eL'] + cmd))
 	print('|^')
 	return code == 0
