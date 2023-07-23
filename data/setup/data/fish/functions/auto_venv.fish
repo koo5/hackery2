@@ -5,11 +5,13 @@ function __auto_source_venv --on-variable PWD --description "Activate/Deactivate
   #echo $maybe_env
 
 
-  if test "$VIRTUAL_ENV" != $maybe_env -a -e "$maybe_env/bin/activate.fish"
+  if test "$VIRTUAL_ENV" != $maybe_env
     if functions --query deactivate
       deactivate
     end
-    source $maybe_env/bin/activate.fish
+    if test -e "$maybe_env/bin/activate.fish"
+      source $maybe_env/bin/activate.fish
+    end
   end
 
 end
