@@ -5,7 +5,15 @@ from pathlib import Path
 from infra import *
 
 
-def run(target_machine='r64', target_fs='/bac4/'):
+if hostname == 'r64':
+	default_target_machine = None
+	default_target_fs='/bac17/'
+else:
+	default_target_machine = 'r64'
+	default_target_fs='/bac4/'
+
+
+def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	"""back up the machine that this script runs on"""
 
 
@@ -62,7 +70,7 @@ def get_filesystems():
 	elif hostname == 'r64':
 		fss = [{
 			'toplevel': '/bac4',
-			'subvols': m(['lean', 'images_win'])
+			'subvols': m(['lean', 'images_win', 'cold'])
 		},
 		{
 			'toplevel': '/',
@@ -106,11 +114,16 @@ def rsync(what,where):
 
 def add_backup_subvols(fs):
 	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is on inherent need to only support a flat structure.
-	for host in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
+	
+	#for host in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
+	os.chdir(fs['toplevel'] + '/backups/')
+	for host in glob.glob('*'):
+		os.chdir(fs['toplevel'] + '/backups/' + host)
 		fs['subvols'] += [{'target_dir': host,
 						  'name': name,
 						  'source_path': '/backups/' + host + '/'} for name in
-						  glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + host)]
+						  #glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + host)]
+						  glob.glob('*')]
 
 
 
