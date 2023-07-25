@@ -1,4 +1,6 @@
 #!/usr/bin/env fish
 
-set out ~/"Z_"(date -u '+%Y-%m-%d_%H-%M-%S')
+set out ~/"backup_log_utc_"(date -u '+%Y-%m-%d_%H-%M-%S')
 PYTHONUNBUFFERED=1 backup.py $argv | tee $out
+cat out | grep \{\"result
+

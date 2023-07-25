@@ -1,0 +1,10 @@
+[Unit]
+Description="monitors"
+
+[Timer]
+AccuracySec=0s
+OnCalendar=*-*-* *:*:/15
+Unit=monitors.service
+
+[Install]
+WantedBy=multi-user.target
