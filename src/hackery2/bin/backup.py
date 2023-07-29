@@ -81,14 +81,10 @@ def get_filesystems():
 
 
 def rsync_ext4_filesystems_into_backup_folder(fss):
-	# this path corresponds to the structure expected by add_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
-	where = f"{fss[0]['toplevel']}/backups/{hostname}/root_ext4"
-	if not Path(where).exists():
-		ccs(f'sudo btrfs sub create {where}')
 	if hostname == 'hp':
-		rsync('/boot /root /etc /var/www /var/lib/docker/volumes', where)
+		rsync('/boot /root /etc /var/www /var/lib/docker/volumes')
 	elif hostname == 'jj':
-		rsync('/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd', where)
+		rsync('/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd')
 
 
 
@@ -107,7 +103,11 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
 
 
-def rsync(what,where):
+def rsync(what):
+	# this path corresponds to the structure expected by add_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
+	where = f"{fss[0]['toplevel']}/backups/{hostname}/root_ext4"
+	if not Path(where).exists():
+		ccs(f'sudo btrfs sub create {where}')
 	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its result
 	srun(f'sudo rsync -v -a -S -v --progress -r --delete {what} {where}')
 
