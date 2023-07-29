@@ -79,15 +79,6 @@ def get_filesystems():
 	return fss
 
 
-
-def rsync_ext4_filesystems_into_backup_folder(fss):
-	if hostname == 'hp':
-		rsync('/boot /root /etc /var/www /var/lib/docker/volumes')
-	elif hostname == 'jj':
-		rsync('/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd')
-
-
-
 def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 	for fs in fss:
 		toplevel = fs['toplevel']
@@ -101,6 +92,15 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 			target_subvol_name = name if name != '/' else '_root'
 
 			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
+
+
+def rsync_ext4_filesystems_into_backup_folder(fss):
+	# it probably makes sense to eventually rsync straight to the backup media
+	if hostname == 'hp':
+		rsync('/boot /root /etc /var/www /var/lib/docker/volumes')
+	elif hostname == 'jj':
+		rsync('/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd')
+
 
 
 def rsync(what):
