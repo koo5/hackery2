@@ -35,6 +35,7 @@ else:
 		try:
 			if co('obs-cli --password ccfa0506 recording status') == 'Recording: false':
 				break
+		time.sleep(0.5)
 		except:
 			pass
 

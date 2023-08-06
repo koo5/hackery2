@@ -97,13 +97,13 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 def rsync_ext4_filesystems_into_backup_folder(fss):
 	# it probably makes sense to eventually rsync straight to the backup media
 	if hostname == 'hp':
-		rsync('/boot /root /etc /var/www /var/lib/docker/volumes')
+		rsync(fss, '/boot /root /etc /var/www /var/lib/docker/volumes')
 	elif hostname == 'jj':
-		rsync('/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd')
+		rsync(fss, '/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd')
 
 
 
-def rsync(what):
+def rsync(fss, what):
 	# this path corresponds to the structure expected by add_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
 	where = f"{fss[0]['toplevel']}/backups/{hostname}/root_ext4"
 	if not Path(where).exists():
