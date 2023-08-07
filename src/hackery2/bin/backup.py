@@ -16,7 +16,7 @@ else:
 def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	"""back up the machine that this script runs on"""
 
-
+	sshstr = set_up_target(target_machine)
 
 	# grab whatever info would not be transferred from ext4 partitions
 	srun('snap list | sudo tee /root/snap_list')
@@ -26,7 +26,6 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	fss = get_filesystems()
 	rsync_ext4_filesystems_into_backup_folder(fss)
 	add_backup_subvols(fss[0])
-	sshstr = set_up_target(target_machine)
 	transfer_btrfs_subvolumes(sshstr, fss, target_fs)
 
 
@@ -60,7 +59,7 @@ def get_filesystems():
 	if hostname == 'hp':
 		fss = [{
 			'toplevel': '/mx500data',
-			'subvols': m(['home', 'lean','leanpriv']),
+			'subvols': m(['home', 'lean','leanpriv', 'live/dev3']),
 		}]
 	elif hostname == 'jj':
 		fss = [{
