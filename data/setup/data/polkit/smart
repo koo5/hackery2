@@ -1,0 +1,18 @@
+/usr/share/polkit-1/actions/org.freedesktop.UDisks2.policy   [----] 20 L:[2686+10 2696/3448] *(255210/323358b) 0060 0x03C      
+    <message xml:lang="fi">Tunnistautuminen vaaditaan SMART-tietojen päivittämistä varten</message>
+    <message xml:lang="es">Se requiere autenticación para actualizar los datos SMART</message>
+    <message xml:lang="en_GB">Authentication is required to update SMART data</message>
+    <message xml:lang="el">Απαιτείται πιστοποίηση για ενημέρωση δεδομένων SMART</message>
+    <message xml:lang="de">Legitimierung ist zum Aktualisieren von SMART-Werten erforderlich</message>
+    <message xml:lang="da">Der kræves godkendelse for at opdatere SMART-data</message>
+    <message xml:lang="cs">Pro aktualizaci dat SMART je vyžadována autentizace</message>
+    <message xml:lang="ca">Es requereix autenticació per actualitzar les dades del SMART</message>
+    <message xml:lang="af">Verifiëring is nodig om SMART-data by te werk</message>
+    <defaults>
+      <allow_any>yes</allow_any>
+      <allow_inactive>yes</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+  <!-- Set SMART data from blob -->
+  <action id="org.freedesktop.udisks2.ata-smart-simulate">
