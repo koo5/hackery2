@@ -16,6 +16,11 @@ else:
 def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	"""back up the machine that this script runs on"""
 
+	if target_machine == '':
+		print('target_machine = None')
+		target_machine = None
+	print(f'target_machine = {target_machine}')	  
+	  
 	sshstr = set_up_target(target_machine)
 
 	# grab whatever info would not be transferred from ext4 partitions
