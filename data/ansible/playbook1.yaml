@@ -1,0 +1,25 @@
+- name: My first play
+  hosts: mms
+  ignore_unreachable: yes
+
+
+
+
+
+  gather_subset: "!mounts"
+  # https://github.com/ansible/ansible/issues/30411
+  # https://github.com/ansible/ansible/issues/48312
+  #gather_facts: no
+  #gather_timeout: 2
+
+
+
+
+
+  tasks:
+   - name: Ping my hosts
+     ansible.builtin.ping:
+
+   - name: Print message
+     ansible.builtin.debug:
+       msg: Hello world
