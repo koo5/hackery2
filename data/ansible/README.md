@@ -10,3 +10,5 @@ ansible all -m shell -a 'uname -a'
 
 
 
+-vvvvvv
+-m trace?
