@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+echo "start" >> /tmp/screenshot-whole-loop.log
+exo-open --launch TerminalEmulator &
+remap_numrow_fastest &
+PYTHONUNBUFFERED=1 screenshot-whole-loop.py /shared/screenshots/ 10 -u  | tee /tmp/screenshot-whole-loop.log
+

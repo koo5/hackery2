@@ -153,4 +153,12 @@ Otherwise, it'd be prompted/required, or it could be assumed from other mtab lin
 	
 	
 	
+	if hostname == 'dev3':
+		cr(cwd='/home/koom/.config', cmd='git add .; git commit -m "auto commit"')
+
+def cr(cwd, cmd):
+	try:
+		cc(cwd=cwd, cmd=cmd)
+	except Exception as e:
+		report(e)
 """
