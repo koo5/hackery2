@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="" />
+    <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notes2/sw" beforeDir="false" afterPath="$PROJECT_DIR$/notes2/sw" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,11 +24,13 @@
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Shell Script" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="" />
@@ -32,15 +40,5 @@
       <updated>1586793159463</updated>
     </task>
     <servers />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="320" y="40" width="639" height="642" key="find.popup" timestamp="1601758856109">
-      <screen x="0" y="0" width="1280" height="720" />
-    </state>
-    <state x="320" y="40" width="639" height="642" key="find.popup/0.0.1280.720/0.0.1024.744/0.0.1024.744@0.0.1280.720" timestamp="1601758856109" />
-    <state x="303" y="40" width="672" height="679" key="search.everywhere.popup" timestamp="1594565452983">
-      <screen x="0" y="0" width="1280" height="720" />
-    </state>
-    <state x="303" y="40" width="672" height="679" key="search.everywhere.popup/0.0.1280.720@0.0.1280.720" timestamp="1594565452983" />
   </component>
 </project>
