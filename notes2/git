@@ -283,4 +283,40 @@ git clone --recurse-submodules --branch dev5 xxx
 
 git config --global pull.ff only
 
+git fetch origin master:master
+
+git push --recurse-submodules on-demand
+
+git submodule update --remote --merge
+^ but this somehow merged master branches instead. 
+"""git submodule update --remote : to pull from the registered branch (or master by default)"""
+- makes sense if the submodule is not on a branch?
+so, this dosen't work
+need to disable automatic submodule update on pull, and merge manually
+
+
+
+           git submodule sync synchronizes all submodules while git submodule sync -- A synchronizes submodule "A" only.
+
+           If --recursive is specified, this command will recurse into the registered submodules, and sync any nested submodules within.
+
+       absorbgitdirs
+           If a git directory of a submodule is inside the submodule, move the git directory of the submodule into its superproject’s
+           $GIT_DIR/modules path and then connect the git directory and its working directory by setting the core.worktree and adding a
+           .git file pointing to the git directory embedded in the superprojects git directory.
+
+
+
+
+
+
+
+
+
+or configured (for an existing submodule) to follow a branch:
+  cd /path/to/parent/repo
+  git config -f .gitmodules submodule.asubmodule.branch abranch
+
+
+
 
