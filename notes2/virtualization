@@ -246,3 +246,14 @@ virt-viewer over ssh with patched or git up-to-date virt-viewer, fixing shell in
 
 	```
 
+
+
+
+
+
+
+
+
+
+https://www.fullstaq.com/knowledge-hub/blogs/docker-and-the-host-filesystem-owner-matching-problem
+	bindfs!!!
