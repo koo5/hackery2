@@ -162,17 +162,56 @@ new finds:
 
 
 
+https://news.ycombinator.com/item?id=37809946
+https://voiceinput.futo.org/
+https://gitlab.futo.org/alex/voiceinput
+https://play.google.com/store/apps/details?id=org.futo.voiceinput
+
+
 
 
 
 voice_coding_talon_cursorless
+from:
+	https://www.cursorless.org/docs/user/installation/
+
+install:
+	steps:
+
+	install https://talonvoice.com/
 
 
-
+	install community
 
 ```
+
+
     cd ~/.talon/user
     git clone https://github.com/talonhub/community community
 
 ```
+
+
+```
+		# now on to cursorless
+		cd ~/.talon/user
+		git clone https://github.com/cursorless-dev/cursorless-talon.git cursorless-talon
+		```
+>
+		The folder structure should look something like the below:
+
+		~/.talon/user/community
+		~/.talon/user/community/apps
+		~/.talon/user/community/code
+		...
+		~/.talon/user/cursorless-talon
+		~/.talon/user/cursorless-talon/src
+		...
+
+		Now, restart Talon.
+<
+
+```
+
+	install vscode extensions
 
