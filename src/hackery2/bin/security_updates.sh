@@ -2,7 +2,10 @@
 
 
 sudo aptdcon --fix-install
-and grep -h security -R /etc/apt/sources.list /etc/apt/sources.list.d/ | sudo tee /etc/apt/sec
+and \
+grep -h -e "security\|mozilla" -R /etc/apt/sources.list /etc/apt/sources.list.d/*.list \
+| sudo tee /etc/apt/sec
+
 and sudo apt-get update  -o Dir::Etc::SourceParts='' -o Dir::Etc::SourceList=/etc/apt/sec  --error-on=any 
 and sudo apt-get upgrade -o Dir::Etc::SourceParts='' -o Dir::Etc::SourceList=/etc/apt/sec  -y --allow-downgrades
 

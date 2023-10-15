@@ -320,3 +320,10 @@ or configured (for an existing submodule) to follow a branch:
 
 
 
+
+
+
+
+git submodule foreach --recursive fish -c "fix_github_https_repo.sh; set h (git rev-parse HEAD); echo \$h; and begin git checkout -b dev || git checkout dev; end; and git pull origin dev; git merge \$h; and git push  --set-upstream origin dev; echo -e '\n'"
+
+

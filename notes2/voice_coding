@@ -158,3 +158,21 @@ new finds:
 		https://news.ycombinator.com/item?id=34770898
 		https://news.ycombinator.com/item?id=34877020
 
+
+
+
+
+
+
+
+voice_coding_talon_cursorless
+
+
+
+
+```
+    cd ~/.talon/user
+    git clone https://github.com/talonhub/community community
+
+```
+
