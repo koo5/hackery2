@@ -1,0 +1,11 @@
+
+Debug default application for MIME type:
+
+$ env XDG_UTILS_DEBUG_LEVEL=10  xdg-mime query default text/html
+Checking /home/user/.config/mimeapps.list
+Checking /home/user/.local/share/applications/defaults.list and /home/user/.local/share/applications/mimeinfo.cache
+Checking /usr/local/share/applications/defaults.list and /usr/local/share/applications/mimeinfo.cache
+Checking /usr/share/applications/defaults.list and /usr/share/applications/mimeinfo.cache
+qutebrowser.desktop
+
+

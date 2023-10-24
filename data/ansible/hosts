@@ -1,7 +1,12 @@
-[mms]
-hp
-jj
-r64
-dev3-hp
-dev3-jj
-
+mms:
+  vars:
+    hovno:
+      hovno
+  hosts:
+    hp:
+    jj:
+    r64:
+    dev3-hp:
+    dev3-jj:
+    vmi579006.contaboserver.net:
+      hovno: {{vmi_sudo_password}}

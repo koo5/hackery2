@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=FF
+Name=ff
 Comment=Better Firefox
-Exec=/home/koom/hackery2/src/hackery2/bin/ff
+Exec=/home/koom/hackery2/src/hackery2/bin/ff.py
 
 Icon=/home/koom/.local/share/LightBurn/LightBurn.png
 Categories=Graphics;

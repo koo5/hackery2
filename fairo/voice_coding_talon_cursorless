@@ -1,0 +1,41 @@
+from:
+	https://www.cursorless.org/docs/user/installation/
+
+install:
+	steps:
+
+	install https://talonvoice.com/
+
+
+
+
+
+
+
+
+
+
+
+	```
+		# now on to cursorless
+		cd ~/.talon/user
+		git clone https://github.com/cursorless-dev/cursorless-talon.git cursorless-talon
+		```
+>
+		The folder structure should look something like the below:
+
+		~/.talon/user/community
+		~/.talon/user/community/apps
+		~/.talon/user/community/code
+		...
+		~/.talon/user/cursorless-talon
+		~/.talon/user/cursorless-talon/src
+		...
+
+		Now, restart Talon.
+<
+
+
+
+
+```
