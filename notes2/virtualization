@@ -246,3 +246,17 @@ virt-viewer over ssh with patched or git up-to-date virt-viewer, fixing shell in
 
 	```
 
+
+
+
+
+
+
+
+
+
+
+
+sudo apt install bindfs fuse
+echo "/var/snap/docker/common/var-lib-docker/volumes/robust_tmp/_data/ /home/koom/robust_tmp fuse.bindfs user=koom,force-group=koom" | sudo tee -a /etc/fstab
+
