@@ -50,12 +50,12 @@ Without these requirements, it is really a wild west of insanity IME. Much bette
 	
 	i'm testing no-ff merges now. 
 
+		instead of manipulating your history to create a nice squash commit that others are supposed to look at, you keep your messy history, create a nice merge commit, and teach others how to filter out the messy side of the tree
+
 		1) you have dev branches
 		2) you commit whatever, anything and everything, and you don't really even worry about commit messages
 		3) you no-ff merge dev branches into bigger streams (master), and that's where you hopefully take some care with a thought out merge message, and with the scope of your changes
 		4) and then you have some tricks to look at the history along the "first parent" line, or to look into the details
-
-		iow, instead of manipulating your history to create a nice squash commit that others are supposed to look at, you keep your messy history, create a nice merge commit, and teach others how to filter out the messy side of the tree
 
 
 		https://nvie.com/img/merge-without-ff@2x.png
@@ -88,7 +88,7 @@ Without these requirements, it is really a wild west of insanity IME. Much bette
 			
 			* prevent conflicts between changes contained in a squashed-in commit and the same changes left unsquashed (when you squash-merge a topic branch into develop but forget to throw it away and you continue piling commits onto it.. This could be solved by some higher-level workflow manager but it isnt.)
 			
-			* and at the same time, some abstraction (if you want to go by feature/topic, "just" look at all *merges* and hopefully reasonable git-blame behavior?
+			* and at the same time, some abstraction (if you want a high level overview of activity, "just" look at all *merges* and hopefully reasonable git-blame behavior?
 												
 		may have to throw away `git log` in favor for some graphical tool (gitk) 
 			because:
@@ -97,6 +97,7 @@ Without these requirements, it is really a wild west of insanity IME. Much bette
 			git log --graph --decorate --pretty=oneline --abbrev-commit
 			`
 			seems to do well.
+--first-parent ?
 			mmm https://gist.github.com/datagrok/4221767
 			
 

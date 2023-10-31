@@ -69,7 +69,7 @@ def get_filesystems():
 	elif hostname == 'jj':
 		fss = [{
 			'toplevel': '/d2',
-			'subvols': m(['images','images2','u']),
+			'subvols': m(['images','images2','u', 'dev3', 'home', 'var']),
 		}]
 	elif hostname == 'r64':
 		fss = [{
@@ -103,7 +103,7 @@ def rsync_ext4_filesystems_into_backup_folder(fss):
 	if hostname == 'hp':
 		rsync(fss, '/boot /root /etc /var/www /var/lib/docker/volumes')
 	elif hostname == 'jj':
-		rsync(fss, '/boot /home /root /etc /var/www /var/lib/docker/volumes /var/lib/snapd')
+		rsync(fss, '/boot /root /etc')
 
 
 

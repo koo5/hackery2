@@ -1,0 +1,6 @@
+[Unit]
+Description="datetime_loop"
+
+[Service]
+ExecStart=/home/koom/hackery2/src/hackery2/bin/datetime_loop.sh
+Restart=always
