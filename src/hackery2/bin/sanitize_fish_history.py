@@ -1,5 +1,27 @@
 #!/usr/bin/env python3
 
+"""
+
+[15:27:38] koom@jj /home/koom (master)  
+>> sanitize_fish_history.py 
+Reading '/home/koom/.local/share/fish/fish_history' ...
+
+Found bad word 'madafaka' in '~/.screenlayout/madafakaaa.sh'
+Found bad word 'madafaka' in '~/.screenlayout/madafaka_horiz_line.sh'
+Found bad word 'madafaka' in 'mv madafakaaa.sh dell+sony+samsung4k+tcl4k+lg4k+samsung4k.sh'
+Found bad word 'madafaka' in 'mv madafaka_horiz_line.sh dell+sony+samsung4k+tcl4k+lg4k+samsung4k_horiz.sh'
+
+wrote 5962 sane entries and dropped 4 insane entries
+now you can:
+	 diff ~/.local/share/fish/fish_history ~/.local/share/fish/sane_history
+	 cat ~/.local/share/fish/insane_history_2023-11-06_15-27-40.723223
+	 mv ~/.local/share/fish/sane_history ~/.local/share/fish/fish_history
+
+"""
+
+
+
+
 import os,time,datetime
 from os.path import expanduser
 
@@ -12,6 +34,7 @@ def lineafter(line, param):
 def fish_history_entries(fish_history_file_name = '~/.local/share/fish/fish_history'):
 	fish_src = expanduser(fish_history_file_name)
 	print(f"Reading '{fish_src}' ...")
+	print()
 	
 	cmd = None
 	
@@ -44,11 +67,11 @@ def fish_history_entries(fish_history_file_name = '~/.local/share/fish/fish_hist
 		except StopIteration:
 			pass
 def is_sane(entry):
-	for bad_word in 'mqtt mosquitto'.split():
+	for bad_word in 'mqtt mosquitto madafaka'.split():
 		#print(f"""{bad_word} in {entry['cmd']}?""")
 		if bad_word in entry['cmd']:
 			print(f"Found bad word '{bad_word}' in '{entry['cmd']}'")
-			print(f"Removing entry '{entry['cmd']}'")
+			#print(f"Removing entry '{entry['cmd']}'")
 			return False
 	return True
 
@@ -69,8 +92,9 @@ def sanitize():
 	num_insane = 0
 	new_history = []
 	refuse = []
-	for entry in fish_history_entries():
-		print(entry)
+	fish_history_file_name = '~/.local/share/fish/fish_history'
+	for entry in fish_history_entries(fish_history_file_name):
+		#print(entry)
 		sane = is_sane(entry)
 		if sane:
 			num_sane += 1
@@ -80,10 +104,17 @@ def sanitize():
 			new_history.append(entry)
 		else:
 			refuse.append(entry)
-	write_history(new_history, '~/.local/share/fish/sane_history')
+	sane_history_fn = '~/.local/share/fish/sane_history'
+	write_history(new_history, sane_history_fn)
 	# new file name with timestamp with nonosec precision:
 	insane_history_fn = '~/.local/share/fish/insane_history_' + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f')
 	write_history(refuse, insane_history_fn)
+	print()
 	print(f"wrote {num_sane} sane entries and dropped {num_insane} insane entries")
+	print(f"now you can:")
+	print(f"\t diff {fish_history_file_name} {sane_history_fn}")
+	print(f"\t cat {insane_history_fn}")
+	print(f"\t mv {sane_history_fn} {fish_history_file_name}")
+
 
 sanitize()
