@@ -69,7 +69,7 @@ def get_filesystems():
 	elif hostname == 'jj':
 		fss = [{
 			'toplevel': '/d2',
-			'subvols': m(['images','images2','u', 'dev3', 'home', 'var']),
+			'subvols': m(['images2','u', 'dev3', 'home', '/']),
 		}]
 	elif hostname == 'r64':
 		fss = [{
