@@ -1,0 +1,5 @@
+# this opens the docker up
+docker exec -it metagpt /bin/bash
+
+# this creates a cli snake game
+python startup.py "Write a cli snake game" --code_review True
