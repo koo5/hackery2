@@ -36,49 +36,40 @@ if __name__ == '__main__' and __package__ is None:
 			pos: self.pos
 			size: self.size
 
-BoxLayout:
-	orientation: 'horizontal'
 
-	MapView:
-		id: mapview
-		lat: 50.6394
-		lon: 3.057
-		zoom: 8
-
-	BoxLayout:
-		orientation: 'vertical'
-
-		BoxLayout:
+MapView:
+	id: mapview
+	lat: 50.6394
+	lon: 3.057
+	zoom: 8
+	
+	
+	Image:
+		id: pic1
+	
+		canvas:
+			Color:
+				rgba: 1, 1, 0.5, 1
+	
+	
+	Toolbar:
+		Button:
+			text: "France"
+			on_release: mapview.center_on(50.6394, 3.057)
+		Button:
+			text: "Australia"
+			on_release: mapview.center_on(-33.867, 151.206)
+		Spinner:
+			text: "mapnik"
+			values: MapSource.providers.keys()
+			on_text: mapview.map_source = self.text
+	
+	Toolbar:
+		Label:
+			text: "Lon: {}".format(mapview.lon)
+		Label:
+			text: "Lat: {}".format(mapview.lat)
 		
-			Image:
-				id: pics
-		
-				orientation: 'vertical'
-
-				canvas:
-					Color:
-						rgba: 1, 1, 0.5, 1
-					Rectangle:
-						pos: self.pos
-						size: self.size
-
-		Toolbar:
-			Button:
-				text: "France"
-				on_release: mapview.center_on(50.6394, 3.057)
-			Button:
-				text: "Australia"
-				on_release: mapview.center_on(-33.867, 151.206)
-			Spinner:
-				text: "mapnik"
-				values: MapSource.providers.keys()
-				on_text: mapview.map_source = self.text
-
-		Toolbar:
-			Label:
-				text: "Lon: {}".format(mapview.lon)
-			Label:
-				text: "Lat: {}".format(mapview.lat)
 	"""
 	)
 
@@ -86,24 +77,23 @@ BoxLayout:
 images = []
 
 # Create a function to update the canvas with images
-def update_canvas(pics):
+def update_canvas(x):
 	# Clear the canvas
-	pics.canvas.clear()
-	print(pics.canvas)
-	# Draw all the images on the canvas
-	for img in images:
-		pics.canvas.add(Color(1, 1, 1))
-		pics.canvas.add(Rectangle(pos=img.pos, size=img.size, source=img.source))
+	x.canvas.clear()
+
+	#for img in images:
+	#	pics.canvas.add(Color(1, 1, 1))
+	#	pics.canvas.add(Rectangle(pos=img.pos, size=img.size, source=img.source))
 
 def on_map_relocated(obj, pos, zoom):
 	print((obj, pos, zoom))
 	# Add an image at the new map location
 	images.append(Image(source='/home/koom/Downloads/wallpapertip_vector-wallpaper_159196.jpg', pos=(0,0), size=(100, 100)))
 	# Update the canvas to draw the new images
-	update_canvas(root.ids.pics)
+	update_canvas(root.ids.pic1)
 
 
 
-root.ids.mapview.bind(on_map_relocated=on_map_relocated)
+root.bind(on_map_relocated=on_map_relocated)
 
 runTouchApp(root)
