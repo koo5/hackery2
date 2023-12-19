@@ -1,0 +1,6 @@
+https://unix.stackexchange.com/questions/473721/calibrating-a-touch-screen-on-dual-monitors-one-touch-one-not
+
+xinput --map-to-output 17 DP-5
+
+
+
