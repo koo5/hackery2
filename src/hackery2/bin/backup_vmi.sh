@@ -9,18 +9,17 @@ rsync -av --progress -h   -e 'hpnssh -p 44' -r \
   --exclude '.npm'  \
   --exclude 'site-packages'  \
   --exclude 'node_modules'   \
---include "/var/www/***" \
---include '/var/lib/docker/volumes/***' \
---include '/var/log/***' \
---include '/var/lib/quassel/***' \
---include '/var/' \
-  --exclude '*'     \
+  --exclude '/var/lib/docker/overlay2/'  \
+  --exclude '/var/snap/docker/common/var-lib-docker/overlay2/'  \
+  --exclude '/homee/koom/go/'  \
+  --include '/var/***' \
+  --include '/etc/***'  \
+  --include '/root/***'  \
+  --include '/home/***'   \
+  --exclude '*'  \
   root@vmi579006.contaboserver.net:// ~/backups/vmi579006_(date '+%F-%H-%M-%S')
 
 
 # https://unix.stackexchange.com/questions/595411/why-rsync-doesnt-include-a-nested-directory
 #  --include '/var/***' \
-#  --include '/etc/***'  \
-#  --include '/root/***'    \
-#  --include '/home/***'   \
 

@@ -1,0 +1,1 @@
+xfce4-terminal --role=role1 --title aaa --command mc --tab --title bbb --command htop
