@@ -74,7 +74,7 @@ def get_filesystems():
 	elif hostname == 'r64':
 		fss = [{
 			'toplevel': '/bac4',
-			'subvols': m(['lean', 'images_win', 'cold'])
+			'subvols': m(['lean', 'cold', 'images_win', 'images/win10-chrome-colemak-acrobat-qt-accrip0.raw'])
 		},
 		{
 			'toplevel': '/',

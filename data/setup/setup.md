@@ -1,8 +1,15 @@
 ## log in
 ```
 set --universal MY_VPS_IP ....
+set --universal CLIENT_PUBKEY_VALUE=(cat ~/.ssh/id_ed25519.pub)
 
-ssh -t root@$MY_VPS_IP  CLIENT_PUBKEY_VALUE=\"(cat ~/.ssh/id_ed25519.pub)\" bash -c "mkdir ~/.ssh; echo $CLIENT_PUBKEY_VALUE >> ~/.ssh/authorized_keys"
+
+ugh, is ssh broken?
+
+ssh -t root@$MY_VPS_IP bash -c "mkdir -p ~/.ssh; echo $CLIENT_PUBKEY_VALUE >> ~/.ssh/authorized_keys"
+
+ssh -t root@$MY_VPS_IP CLIENT_PUBKEY_VALUE=(cat ~/.ssh/id_ed25519.pub) bash -c "mkdir -p ~/.ssh; echo $CLIENT_PUBKEY_VALUE >> ~/.ssh/authorized_keys"
+
 ```
 
 ## basics0
@@ -69,8 +76,7 @@ sudo apt install -y git ntpdate
 
 sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
 
-sudo apt install -y mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3 auditd
-sudo apt install -y iotop-c 
+sudo apt install -y mc htop tmux screen iotop jnettop net-tools ufw openssh-server ssh wget traceroute tcpdump spectre-meltdown-checker smartmontools python3 powertop lsof needrestart debian-goodies mailcheck iperf3 auditd iotop-c
 # https://gitlab.com/volian/nala
 
 git clone https://github.com/koo5/hackery2.git
@@ -515,3 +521,10 @@ for tun in tun0 tun1
 ```
 
 
+
+
+## snap
+```
+sudo apt install snapd
+
+```

@@ -5,9 +5,9 @@ import os,subprocess,time,shlex,logging, fire, ptyprocess
 
 from ptyprocess import PtyProcess
 
-l = logging.getLogger()
-l.setLevel(logging.DEBUG)
-l.addHandler(logging.StreamHandler())
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+log.addHandler(logging.StreamHandler())
 
 
 sq = shlex.quote
@@ -35,6 +35,7 @@ def cc(cmd):
 
 
 def ccs(cmd):
+	log.debug((cmd))
 	return subprocess.check_call(cmd, shell=True, universal_newlines=True)
 
 
