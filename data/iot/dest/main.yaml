@@ -1,0 +1,141 @@
+
+
+substitutions:
+  ip: 10.0.0.50
+  name: dest
+  clock: ntp
+
+
+
+esphome:
+  name: $name
+  on_boot:
+    then:
+      - logger.log: 'boOoOoOoOooOoOoOoOt'
+
+
+esp8266:
+  board: nodemcu
+
+
+
+
+logger:
+  level: INFO
+
+
+
+api:
+
+
+#mqtt:
+#  broker: !secret mqtt_host
+#  port: !secret mqtt_port
+#  username: !secret mqtt_user
+#  password: !secret mqtt_password
+#  keepalive: 8s
+#  reboot_timeout: 45min
+
+
+
+wifi:
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: $ip
+      gateway: 10.0.0.138
+      subnet: 255.255.255.0
+      dns1: 10.0.0.138
+      dns2: 8.8.8.8
+
+
+ota:
+  password: ""
+
+
+captive_portal:
+
+
+web_server:
+  port: 80
+
+
+sun:
+  latitude: 50.0755°
+  longitude: 14.4378°
+
+  on_sunrise:
+    - then:
+        - logger.log: Good morning!
+  on_sunset:
+    - then:
+        - logger.log: Good evening!
+
+
+
+
+text_sensor:
+  - platform: sun
+    name: Next Sunrise
+    type: sunrise
+  - platform: sun
+    name: Next Sunset
+    type: sunset
+  - platform: template
+    name: "Time NTP"
+    lambda: |-
+      char str[30];
+      if (!id(ntp).now().is_valid()) { return { "----" }; }
+      time_t currTime = id(ntp).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
+
+
+
+time:
+  - platform: sntp
+    id: ntp
+    timezone: Europe/Prague
+
+
+
+sensor:
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 1s
+  - platform: uptime
+    name: Uptime Sensor
+  - platform: sun
+    name: Sun Elevation
+    type: elevation
+  - platform: sun
+    name: Sun Azimuth
+    type: azimuth
+
+
+
+binary_sensor:
+  - !include
+    file: wetness_raw.yaml
+    vars:
+      n: 1
+      pin: D1
+  - !include
+    file: wetness_raw.yaml
+    vars:
+      n: 2
+      pin: D2
+
+
+
+switch:
+  - platform: restart
+    id: manual_restart
+    name: "Living Room Restart"
+
+
+
+
