@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data/xrandr/arandr.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/fly0/notes" beforeDir="false" afterPath="$PROJECT_DIR$/data/fly0/notes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/setup/machines/jj/monitors.timer" beforeDir="false" afterPath="$PROJECT_DIR$/data/setup/machines/jj/monitors.timer" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/hackery2/bin/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/hackery2/bin/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hackery2/bin/jj_monitors.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hackery2/bin/jj_monitors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hackery2/bin/xrandr.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hackery2/bin/xrandr.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

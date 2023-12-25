@@ -23,7 +23,10 @@ for o in outputs:
 for o in reversed(outputs):
 	if o['off']:
 		#print(o)
-		subprocess.check_call(['xrandr', '--output', o['output'], '--off'])
+		try:
+			subprocess.check_call(['xrandr', '--output', o['output'], '--off'])
+		except subprocess.CalledProcessError as e:
+			log.debug(f'xrandr failed for {o=} : {e=}')
 		outputs.remove(o)
 
 outputs.sort(key=lambda x: x['pos'][1])

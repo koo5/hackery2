@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../data/xrandr/arandr.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../data/fly0/notes" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/fly0/notes" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../data/setup/machines/jj/monitors.timer" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/setup/machines/jj/monitors.timer" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jj_monitors.py" beforeDir="false" afterPath="$PROJECT_DIR$/jj_monitors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xrandr.py" beforeDir="false" afterPath="$PROJECT_DIR$/xrandr.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +128,7 @@
       <workItem from="1698945166086" duration="2774000" />
       <workItem from="1699270082456" duration="7936000" />
       <workItem from="1703412728534" duration="287000" />
-      <workItem from="1703420040534" duration="942000" />
+      <workItem from="1703420040534" duration="1312000" />
     </task>
     <servers />
   </component>
