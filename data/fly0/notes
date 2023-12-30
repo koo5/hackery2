@@ -13,3 +13,8 @@ todo - will need non-hollow containers
 a full web proxy is needed
  - a standalone web proxy container is needed
  - this could be another fly machine, or deployed locally,
+
+
+
+worker:
+stateless - 

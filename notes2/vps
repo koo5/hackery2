@@ -1,0 +1,41 @@
+
+
+---
+
+
+grab 2.xxx binary from https://github.com/docker/compose/releases/
+wget into .local/bin/ , chmod +x
+
+  (https://github.com/docker/compose/releases/download/v2.17.0-rc.1/docker-compose-linux-x86_64)
+
+---
+sudo snap install docker --channel core18/stable
+
+---
+
+
+dont run https on nonstandard ports (browsers are evil), create more domains instead.
+
+
+---
+
+install influxdb2 and telegraf from influxdata.com
+
+  (https://dl.influxdata.com/influxdb/releases/influxdb2_2.7.4-1_amd64.deb)
+(maybe influxdb could run under compose..)
+
+telegraf ppa:
+  (# influxdata-archive_compat.key GPG fingerprint:...)
+
+
+---
+
+
+/home/user/bin/influx auth create --all-access -u user2 -o ooo
+
+---
+
+
+
+
+
