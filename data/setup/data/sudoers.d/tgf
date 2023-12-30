@@ -1,0 +1,5 @@
+telegraf ALL=(ALL) NOPASSWD: /usr/sbin/nvme
+telegraf ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
+_telegraf ALL=(ALL) NOPASSWD: /usr/sbin/nvme
+_telegraf ALL=(ALL) NOPASSWD: /usr/sbin/smartctl
+
