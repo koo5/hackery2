@@ -7,6 +7,7 @@ esp8266:
 logger:
 
 api:
+  #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
   reboot_timeout: 0s
   password: ""
   services:
@@ -61,6 +62,16 @@ switch:
     id: vetrak
     pin: D2
 
+  - platform: gpio
+    name: "onboard_led"
+    pin: GPIO16
+    inverted: true
+    
+  - platform: gpio
+    name: "onboard_led2"
+    pin: GPIO2
+    inverted: true
+ 
     
 sensor:
   - platform: dht
@@ -71,9 +82,14 @@ sensor:
     humidity:
       name: "Humidity"
     update_interval: 3s
+
   - platform: dallas
     index: 0
     name: "dangle"
+
+  - platform: dallas
+    index: 1
+    name: "dangle2"
 
 
     
@@ -106,14 +122,14 @@ climate:
         default_target_temperature_high: 21 °C
 
 
-light:
-  - platform: neopixelbus
-    id: my_light
-    type: GRB
-    variant: WS2811
-    pin: D4
-    num_leds: 60
-    name: "NeoPixel Light"
+#light:
+#  - platform: neopixelbus
+#    id: my_light
+#    type: GRB
+#    variant: WS2811
+#    pin: D4
+#    num_leds: 60
+#    name: "NeoPixel Light"
 
 #binary_sensor:
 #  - platform: gpio
@@ -125,15 +141,22 @@ light:
 
 web_server:
   port: 80
-  ota: false
+  ota: true
 
 dallas:
   - pin: D6
-
-
-
+    update_interval: 3s
 
 
 # Only pins that support both input & output have integrated pull-up and pull-down resistors. Input-only GPIOs 34-39 do not.
 
+
+
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  keepalive: 10s
+  reboot_timeout: 50min
 
