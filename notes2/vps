@@ -1,0 +1,73 @@
+
+
+---
+
+
+grab 2.xxx binary from https://github.com/docker/compose/releases/
+wget into .local/bin/ , chmod +x
+
+  (https://github.com/docker/compose/releases/download/v2.17.0-rc.1/docker-compose-linux-x86_64)
+
+---
+sudo snap install docker --channel core18/stable
+
+---
+
+
+dont run https on nonstandard ports (browsers are evil), create more domains instead.
+
+
+---
+
+install influxdb2 and telegraf from influxdata.com
+
+  (https://dl.influxdata.com/influxdb/releases/influxdb2_2.7.4-1_amd64.deb)
+(maybe influxdb could run under compose..)
+
+telegraf ppa:
+  (# influxdata-archive_compat.key GPG fingerprint:...)
+
+
+---
+
+
+/home/user/bin/influx auth create --all-access -u user2 -o ooo
+
+---
+
+
+
+
+
+/lib/systemd/system/telegraf.service   [----]  1 L:[  1+17  18/ 24] *(472 / 577b) 0067 0x043                                             
+[Unit]
+Description=Telegraf
+Documentation=https://github.com/influxdata/telegraf
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+EnvironmentFile=-/etc/default/telegraf
+User=telegraf
+ExecStart=/usr/bin/telegraf -config /etc/telegraf/telegraf.conf -config-directory /etc/telegraf/telegraf.d $TELEGRAF_OPTS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartForceExitStatus=SIGPIPE
+KillMode=mixed
+TimeoutStopSec=5
+LimitMEMLOCK=8M:8M
+#CapabilityBoundingSet=CAP_NET_RAW
+AmbientCapabilities=CAP_NET_RAW
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+(https://github.com/influxdata/telegraf/issues/8690)
+
+---
+
+
+
