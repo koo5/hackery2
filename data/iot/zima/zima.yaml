@@ -56,7 +56,7 @@ globals:
    - id: heating_global_bool
      type: bool
      restore_value: no
-     initial_value: 0
+     initial_value: '0'
      
 
 
@@ -65,13 +65,14 @@ globals:
 switch:
   - platform: template
     name: heating_global_switch
+    id: heating_global_switch
     lambda: |- 
       return id(heating_global_bool);
-
+    optimistic: true
 
   - platform: gpio
-    name: "topeni"
-    id: topeni
+    id: ventil
+    name: ventil
     pin: 
         number: D1
         inverted: true
@@ -96,19 +97,28 @@ sensor:
   - platform: dht
     pin: D5
     temperature:
-      name: "Temperature"
-      id: dht1
+      name: "onboard temp 2"
     humidity:
-      name: "Humidity"
+      name: "onboard hum 2"
+    update_interval: 3s
+
+  - platform: dht
+    pin: D7
+    temperature:
+      name: "onboard temp 1"
+    humidity:
+      name: "onboard hum 1"
     update_interval: 3s
 
   - platform: dallas
     index: 0
+    id: "central_air_temperature"
     name: "central_air_temperature"
 
   - platform: dallas
     index: 1
     id: radiator
+    name: radiator
 
 
     
@@ -149,13 +159,13 @@ interval:
   - interval: 5s
     then:
       - lambda: |-
-          if (id(heating_global_bool).state) {
-            id(topeni).turn_on();
+          if (id(heating_global_bool)) {
+            id(ventil).turn_on();
           } else {
             if (id(radiator).state > 25) {
-              id(topeni).turn_off();
+              id(ventil).turn_off();
             } else {
-              id(topeni).turn_on();
+              id(ventil).turn_on();
             }
           }
           
