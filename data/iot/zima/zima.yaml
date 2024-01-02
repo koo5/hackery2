@@ -49,7 +49,26 @@ wifi:
 captive_portal:
 
 
+
+
+
+globals:
+   - id: heating_global_bool
+     type: bool
+     restore_value: no
+     initial_value: 0
+     
+
+
+
+
 switch:
+  - platform: template
+    name: heating_global_switch
+    lambda: |- 
+      return id(heating_global_bool);
+
+
   - platform: gpio
     name: "topeni"
     id: topeni
@@ -85,30 +104,33 @@ sensor:
 
   - platform: dallas
     index: 0
-    name: "dangle"
+    name: "central_air_temperature"
 
   - platform: dallas
     index: 1
-    name: "dangle2"
+    id: radiator
 
 
     
 climate:
   - platform: thermostat
     name: "Thermostat Climate Controller"
-    sensor: dht1
+    sensor: central_air_temperature
+    
     min_cooling_off_time: 3s
     min_cooling_run_time: 3s
     min_heating_off_time: 3s
     min_heating_run_time: 3s
     min_idle_time: 3s
+    
     cool_action:
       - switch.turn_on: vetrak
     heat_action:
-      - switch.turn_on: topeni
+      - switch.turn_on: heating_global_switch
     idle_action:
-      - switch.turn_off: topeni
       - switch.turn_off: vetrak
+      - switch.turn_off: heating_global_switch
+
     default_preset: sleep
     on_boot_restore_from: memory
     preset:
@@ -122,22 +144,22 @@ climate:
         default_target_temperature_high: 21 °C
 
 
-#light:
-#  - platform: neopixelbus
-#    id: my_light
-#    type: GRB
-#    variant: WS2811
-#    pin: D4
-#    num_leds: 60
-#    name: "NeoPixel Light"
 
-#binary_sensor:
-#  - platform: gpio
-#    pin: D5
-#    name: "Living Room Dehumidifier Toggle Button"
-#    on_press:
-#      then:
-#        - switch.toggle: topeni
+interval:
+  - interval: 5s
+    then:
+      - lambda: |-
+          if (id(heating_global_bool).state) {
+            id(topeni).turn_on();
+          } else {
+            if (id(radiator).state > 25) {
+              id(topeni).turn_off();
+            } else {
+              id(topeni).turn_on();
+            }
+          }
+          
+
 
 web_server:
   port: 80

@@ -12,6 +12,6 @@
           value: !lambda |-
             return id($clock).utcnow().timestamp;
       - switch.turn_on: pump${n}
-      - delay: 10s
+      - delay: 6s
       - switch.turn_off: pump${n}
-      - delay: 5h
+      #- delay: 5h # this should be handled by thermostat

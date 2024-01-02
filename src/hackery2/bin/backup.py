@@ -113,7 +113,7 @@ def rsync(fss, what):
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
 	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its result
-	srun(f'sudo rsync -v -a -S -v --progress -r --delete {what} {where}')
+	srun(f'sudo rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
 
 
 def add_backup_subvols(fs):
