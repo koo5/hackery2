@@ -5,6 +5,7 @@ esp8266:
   board: nodemcu
 
 logger:
+  level: DEBUG
 
 api:
   #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
@@ -50,6 +51,8 @@ captive_portal:
 
 
 
+network:
+  enable_ipv6: true
 
 
 globals:
@@ -66,12 +69,23 @@ switch:
   - platform: template
     name: heating_global_switch
     id: heating_global_switch
+    internal: false
     lambda: |- 
       return id(heating_global_bool);
     optimistic: true
+    turn_on_action:
+      - globals.set:
+          id: heating_global_bool
+          value: 'true'
+    turn_off_action:
+      - globals.set:
+          id: heating_global_bool
+          value: 'false'
+
 
   - platform: gpio
     id: ventil
+    internal: false
     name: ventil
     pin: 
         number: D1
@@ -80,6 +94,7 @@ switch:
   - platform: gpio
     name: "vetrak"
     id: vetrak
+    internal: false
     pin: D2
 
   - platform: gpio
@@ -110,13 +125,20 @@ sensor:
       name: "onboard hum 1"
     update_interval: 3s
 
-  - platform: dallas
-    index: 0
-    id: "central_air_temperature"
-    name: "central_air_temperature"
 
   - platform: dallas
-    index: 1
+    address: 0x6d011453b48eaa28
+    id: "central_air_temperature"
+    name: "air"
+
+  - platform: dallas
+    address: 0xea00000a4c49d628
+    id: venky
+    name: venky
+
+
+  - platform: dallas
+    address: 0xed40d8271e64ff28
     id: radiator
     name: radiator
 

@@ -14,6 +14,10 @@ esp32:
   board: 
 
 
+network:
+  enable_ipv6: true
+
+
 wifi:
   networks:
   - ssid: !secret ssid
