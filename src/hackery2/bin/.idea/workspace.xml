@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../data/infra/arandr.diff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../data/python/.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../data/ansible/hosts" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/ansible/hosts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../data/iot/zima/zima.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/iot/zima/zima.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../notes2/iot" beforeDir="false" afterPath="$PROJECT_DIR$/../../../notes2/iot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backup.py" beforeDir="false" afterPath="$PROJECT_DIR$/backup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backup.sh" beforeDir="false" afterPath="$PROJECT_DIR$/backup.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,6 +130,7 @@
       <workItem from="1703412728534" duration="287000" />
       <workItem from="1703420040534" duration="1312000" />
       <workItem from="1704137868678" duration="1344000" />
+      <workItem from="1704319161643" duration="688000" />
     </task>
     <servers />
   </component>
