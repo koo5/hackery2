@@ -5,7 +5,7 @@ esp8266:
   board: nodemcu
 
 logger:
-  level: DEBUG
+  level: INFO
 
 api:
   #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
@@ -109,6 +109,11 @@ switch:
  
     
 sensor:
+
+  - platform: uptime
+    name: Uptime Sensor
+
+
   - platform: dht
     pin: D5
     temperature:
@@ -213,4 +218,19 @@ mqtt:
   password: !secret mqtt_password
   keepalive: 10s
   reboot_timeout: 50min
+
+
+
+button:
+  - platform: wake_on_lan
+    name: "jj"
+    target_mac_address: fc:34:97:a1:f5:ca
+
+  - platform: wake_on_lan
+    name: "Start hp"
+    target_mac_address: a4:5d:36:9b:18:16
+
+  - platform: wake_on_lan
+    name: "r64"
+    target_mac_address: a8:a1:59:38:51:47
 
