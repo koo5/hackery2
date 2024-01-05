@@ -117,17 +117,17 @@ def rsync(fss, what):
 
 
 def add_backup_subvols(fs):
-	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is on inherent need to only support a flat structure.
+	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is no inherent need to only support a flat structure.
+	# gotta do something like sudo btrfs subvolume list -q -t -R -u -a $fsroot | grep live | grep -v ".bfg_snapshots"
+	# but preferably using bfg's facilities.	
 	
-	#for host in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
 	os.chdir(fs['toplevel'] + '/backups/')
 	for host in glob.glob('*'):
 		os.chdir(fs['toplevel'] + '/backups/' + host)
 		fs['subvols'] += [{'target_dir': host,
-						  'name': name,
+						  'name': name[:-1],
 						  'source_path': '/backups/' + host + '/'} for name in
-						  #glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + host)]
-						  glob.glob('*')]
+						  glob.glob('*/')]
 
 
 
