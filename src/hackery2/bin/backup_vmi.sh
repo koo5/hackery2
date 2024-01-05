@@ -1,5 +1,11 @@
 #!/usr/bin/env fish
 
+set MACHINE $argv[1]
+echo $MACHINE
+set DATE (date '+%F-%H-%M-%S')
+set DSTDIR "$MACHINE"_"$DATE"
+echo $DSTDIR
+
 
 rsync -av --progress -h   -e 'hpnssh -p 44' -r \
   --exclude 'dont_backup'  \
@@ -11,15 +17,15 @@ rsync -av --progress -h   -e 'hpnssh -p 44' -r \
   --exclude 'node_modules'   \
   --exclude '/var/lib/docker/overlay2/'  \
   --exclude '/var/snap/docker/common/var-lib-docker/overlay2/'  \
-  --exclude '/home/koom/go/'  \
+  --exclude '/home/*/go/'  \
+  --exclude '/home/*/.gradle/'  \
   --include '/var/***' \
   --include '/etc/***'  \
   --include '/root/***'  \
   --include '/home/***'   \
   --exclude '*'  \
-  root@vmi579006.contaboserver.net:// vmi579006_(date '+%F-%H-%M-%S')
+  root@$MACHINE:// $DSTDIR/
 
 
 # https://unix.stackexchange.com/questions/595411/why-rsync-doesnt-include-a-nested-directory
-#  --include '/var/***' \
 
