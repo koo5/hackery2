@@ -64,7 +64,7 @@ def get_filesystems():
 	if hostname == 'hp':
 		fss = [{
 			'toplevel': '/mx500data',
-			'subvols': m(['home', 'lean','leanpriv', 'live/dev3']),
+			'subvols': m(['home', 'lean','leanpriv', 'dev3']),
 		}]
 	elif hostname == 'jj':
 		fss = [{
