@@ -3,6 +3,16 @@
 
 """
 --local
+"it seems that this would be preferred to snapper or similar, as it would also backup ext4 filesystems, cloud machines, etc, and do everything from the same confguration used for actual remote backups.
+it's just needed to set this up with cron.
+
+cron on backup servir:
+every 1h: ~/backup_clouds.sh; backup.sh --local
+
+cron on workstation:
+every 1h: backup.sh
+...too many disk spinups for backup machine?
+
 """
 
 
