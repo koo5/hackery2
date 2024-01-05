@@ -13,6 +13,11 @@ cron on workstation:
 every 1h: backup.sh
 ...too many disk spinups for backup machine?
 
+todo:
+bfg fix common parent lookup for toplevel subvol.
+track snapshot origin in .bfg/bfg.json in snapshot. why?
+send all snapshots in succession.
+
 """
 
 
