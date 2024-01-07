@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../notes2/iot" beforeDir="false" afterPath="$PROJECT_DIR$/../../../notes2/iot" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -131,6 +128,7 @@
       <workItem from="1703420040534" duration="1312000" />
       <workItem from="1704137868678" duration="1344000" />
       <workItem from="1704319161643" duration="688000" />
+      <workItem from="1704648406786" duration="916000" />
     </task>
     <servers />
   </component>
