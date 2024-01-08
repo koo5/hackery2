@@ -29,7 +29,13 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	#anything else? 
 	#pause firefox? pause some vms?
 	fss = get_filesystems()
+
+	if hostname == 'r64':
+		for cloud_host in json.load(open(expanduser('~/secrets.json')))['cloud_servers']
+			rsync_from_clouds(fss, cloud_host)
+
 	rsync_ext4_filesystems_into_backup_folder(fss)
+
 	add_backup_subvols(fss[0])
 	transfer_btrfs_subvolumes(sshstr, fss, target_fs)
 
@@ -64,7 +70,7 @@ def get_filesystems():
 	if hostname == 'hp':
 		fss = [{
 			'toplevel': '/mx500data',
-			'subvols': m(['home', 'lean','leanpriv', 'live/dev3']),
+			'subvols': m(['home', 'lean','leanpriv', 'dev3']),
 		}]
 	elif hostname == 'jj':
 		fss = [{
@@ -114,6 +120,26 @@ def rsync(fss, what):
 		ccs(f'sudo btrfs sub create {where}')
 	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its result
 	srun(f'sudo rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
+
+
+
+import getpass
+import os
+import grp
+
+
+def rsync_from_clouds(fss, cloud_host):
+
+	where = f"{fss[0]['toplevel']}/backups/{cloud_host}/root"
+	if not Path(where).exists():
+		ccs(f'sudo btrfs sub create {where}')
+	
+	username = getpass.getuser()
+	group_name = grp.getgrgid(os.getgid()).gr_name
+	
+	ccs(f'sudo chown {username}:{group_name} {where}')
+
+	srun(f'backup_vmi2.sh {cloud_host} {where}')
 
 
 def add_backup_subvols(fs):
