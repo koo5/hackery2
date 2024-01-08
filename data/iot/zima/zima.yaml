@@ -7,22 +7,22 @@ esp8266:
 logger:
   level: INFO
 
-api:
-  #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
-  reboot_timeout: 0s
-  password: ""
-  services:
-    - service: vyvetrat
-      then:
-        - switch.turn_on: vetrak
-        - delay: 3s
-        - switch.turn_off: vetrak
+#api:
+#  #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
+#  reboot_timeout: 0s
+#  password: ""
+#  services:
+#    - service: vyvetrat
+#      then:
+#        - switch.turn_on: vetrak
+#        - delay: 3s
+#        - switch.turn_off: vetrak
 
-    - service: zablikat
-      variables:
-        my_brightness: int
-        my_effect: string
-      then:
+#    - service: zablikat
+#      variables:
+#        my_brightness: int
+#        my_effect: string
+#      then:
 #        - light.turn_on:
 #            id: my_light
 #            brightness: !lambda 'return my_brightness;'
@@ -42,12 +42,9 @@ wifi:
     subnet: 255.255.255.0
     dns1: 192.168.8.1
   
-  ap:
-    password: !secret fallback_password
-
     
     
-captive_portal:
+#captive_portal:
 
 
 
@@ -67,8 +64,8 @@ globals:
 
 switch:
   - platform: template
-    name: heating_global_switch
-    id: heating_global_switch
+    name: heating
+    id: heating
     internal: false
     lambda: |- 
       return id(heating_global_bool);
@@ -84,9 +81,10 @@ switch:
 
 
   - platform: gpio
-    id: ventil
+    id: _valve
     internal: false
-    name: ventil
+    name: _valve
+    entity_category: DIAGNOSTIC
     pin: 
         number: D1
         inverted: true
@@ -163,10 +161,10 @@ climate:
     cool_action:
       - switch.turn_on: vetrak
     heat_action:
-      - switch.turn_on: heating_global_switch
+      - switch.turn_on: heating
     idle_action:
       - switch.turn_off: vetrak
-      - switch.turn_off: heating_global_switch
+      - switch.turn_off: heating
 
     default_preset: sleep
     on_boot_restore_from: memory
@@ -187,12 +185,12 @@ interval:
     then:
       - lambda: |-
           if (id(heating_global_bool)) {
-            id(ventil).turn_on();
+            id(_valve).turn_on();
           } else {
             if (id(radiator).state > 25) {
-              id(ventil).turn_off();
+              id(_valve).turn_off();
             } else {
-              id(ventil).turn_on();
+              id(_valve).turn_on();
             }
           }
           
@@ -223,7 +221,7 @@ mqtt:
 
 button:
   - platform: wake_on_lan
-    name: "jj"
+    name: "Start jj"
     target_mac_address: fc:34:97:a1:f5:ca
 
   - platform: wake_on_lan
@@ -231,6 +229,6 @@ button:
     target_mac_address: a4:5d:36:9b:18:16
 
   - platform: wake_on_lan
-    name: "r64"
+    name: "Start r64"
     target_mac_address: a8:a1:59:38:51:47
 

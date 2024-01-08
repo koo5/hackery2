@@ -1,4 +1,27 @@
 #!/usr/bin/env python3
+
+
+"""
+--local
+"it seems that this would be preferred to snapper or similar, as it would also backup ext4 filesystems, cloud machines, etc, and do everything from the same confguration used for actual remote backups.
+it's just needed to set this up with cron.
+
+cron on backup servir:
+every 1h: ~/backup_clouds.sh; backup.sh --local
+
+cron on workstation:
+every 1h: backup.sh
+...too many disk spinups for backup machine?
+
+todo:
+bfg fix common parent lookup for toplevel subvol.
+track snapshot origin in .bfg/bfg.json in snapshot. why?
+send all snapshots in succession.
+
+"""
+
+
+
 import glob
 from pathlib import Path
 
@@ -101,7 +124,11 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 
 			target_subvol_name = name if name != '/' else '_root'
 
+			ccs(f"""date""")
 			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
+			ccs(f"""date""")
+			print('', file = sys.stderr)
+
 
 
 def rsync_ext4_filesystems_into_backup_folder(fss):
