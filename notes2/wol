@@ -1,0 +1,17 @@
+sudo apt install ethtool
+sudo ethtool enp5s0
+sudo ethtool enp10s0
+sudo ethtool --change enp5s0 wol g
+
+wakeonlan "a8:a1:59:38:51:47"
+
+
+
+
+
+
+
+
+
+
+#Bonjour Sleep Proxy?
