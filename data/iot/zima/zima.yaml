@@ -81,9 +81,9 @@ switch:
 
 
   - platform: gpio
-    id: _valve
+    id: _valve_open
     internal: false
-    name: _valve
+    name: _valve_open
     entity_category: DIAGNOSTIC
     pin: 
         number: D1
@@ -185,12 +185,12 @@ interval:
     then:
       - lambda: |-
           if (id(heating_global_bool)) {
-            id(_valve).turn_on();
+            id(_valve_open).turn_on();
           } else {
             if (id(radiator).state > 25) {
-              id(_valve).turn_off();
+              id(_valve_open).turn_off();
             } else {
-              id(_valve).turn_on();
+              id(_valve_open).turn_on();
             }
           }
           

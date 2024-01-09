@@ -54,7 +54,7 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	fss = get_filesystems()
 
 	if hostname == 'r64':
-		for cloud_host in json.load(open(expanduser('~/secrets.json')))['cloud_servers']
+		for cloud_host in json.load(open(expanduser('~/secrets.json')))['cloud_servers']:
 			rsync_from_clouds(fss, cloud_host)
 
 	rsync_ext4_filesystems_into_backup_folder(fss)

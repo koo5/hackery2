@@ -3,6 +3,8 @@
 # - use nail varnish or similar to seal the edges of the pcb
 # - VCC = 3.3V – 5.5V
 
+# motor psu protection 2 x TVS BZW06-5V8 in series
+
 
 substitutions:
   ip: 192.168.8.31
@@ -88,7 +90,7 @@ sensor:
     pin: 35
     id: dryness
     name: "dryness"
-    update_interval: 10s
+    update_interval: 1s
     attenuation: 11db
     filters:
       - multiply: 10
@@ -117,8 +119,8 @@ light:
 switch:
   - platform: gpio
     pin: 19
-    id: s3
-    name: "s3"
+    id: pump_switch
+    name: "pump_switch"
     restore_mode: ALWAYS_OFF
 
   - platform: restart
@@ -142,7 +144,7 @@ climate:
       - logger.log: cool!
     idle_action:
       - light.turn_off: status
-      - switch.turn_off: s3
+      - switch.turn_off: pump_switch
     default_preset: Home
     preset:
       - name: Home
@@ -282,6 +284,6 @@ script:
       - delay: 2s
       - light.turn_off: status
 
-      - switch.turn_on: s3
+      - switch.turn_on: pump_switch
       - delay: 0.3s
-      - switch.turn_off: s3
+      - switch.turn_off: pump_switch
