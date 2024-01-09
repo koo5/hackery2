@@ -11,30 +11,20 @@ substitutions:
   name: banana
   clock: ntp
 
+
 esphome:
   name: $name
   on_boot:
     then:
-      - logger.log: 'booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot'
+      - logger.log: 'booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot'
+
 
 esp32:
   board: denky32
-  #framework:
-    #type: esp-idf
-    #version: latest
-    # Custom sdkconfig options
-    #sdkconfig_options:
-    #  CONFIG_COMPILER_OPTIMIZATION_SIZE: y
-    # Advanced tweaking options
-    #advanced:
-    #  ignore_efuse_mac_crc: false
 
 
-#network:
-#  enable_ipv6: true
-
-
-captive_portal:
+network:
+  enable_ipv6: true
 
 
 web_server:
@@ -51,10 +41,7 @@ wifi:
       gateway: 192.168.8.1
       subnet: 255.255.255.0
       dns1: 192.168.8.1
-      dns2: 8.8.8.8
-#  ap:
-#    ssid: !secret fallback_ssid
-#    password: !secret fallback_password
+      #dns2: 8.8.8.8
 
 
 api:
@@ -67,8 +54,8 @@ mqtt:
   port: !secret mqtt_port
   username: !secret mqtt_user
   password: !secret mqtt_password
-  keepalive: 8s
-  reboot_timeout: 5min
+  keepalive: 10s
+  reboot_timeout: 50min
 
 
 ota:
@@ -76,6 +63,7 @@ ota:
 
     
 logger:
+  level: DEBUG
 
 
 sensor:
@@ -149,7 +137,7 @@ climate:
     preset:
       - name: Home
         mode: COOL
-        default_target_temperature_high: 15 °C
+        default_target_temperature_high: 16.3 °C
 
 
 
@@ -287,3 +275,18 @@ script:
       - switch.turn_on: pump_switch
       - delay: 0.3s
       - switch.turn_off: pump_switch
+
+
+button:
+  - platform: wake_on_lan
+    name: "Start jj"
+    target_mac_address: fc:34:97:a1:f5:ca
+
+  - platform: wake_on_lan
+    name: "Start hp"
+    target_mac_address: a4:5d:36:9b:18:16
+
+  - platform: wake_on_lan
+    name: "Start r64"
+    target_mac_address: a8:a1:59:38:51:47
+
