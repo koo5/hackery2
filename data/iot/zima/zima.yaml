@@ -150,7 +150,7 @@ sensor:
 climate:
   - platform: thermostat
     name: "Thermostat Climate Controller"
-    sensor: central_air_temperature
+    sensor: bed_air_temp
     
     min_cooling_off_time: 3s
     min_cooling_run_time: 3s
@@ -199,6 +199,8 @@ interval:
 web_server:
   port: 80
   ota: true
+
+
 
 dallas:
   - pin: D6
