@@ -99,8 +99,8 @@ sensor:
       
 light:
   - platform: status_led
-    name: "status LED(pin2)"
-    id: status
+    name: "status_led"
+    id: status_led
     pin: 2
 
 
@@ -131,7 +131,7 @@ climate:
     cool_action:
       - logger.log: cool!
     idle_action:
-      - light.turn_off: status
+      - light.turn_off: status_led
       - switch.turn_off: pump_switch
     default_preset: Home
     preset:
@@ -268,9 +268,9 @@ script:
           value: !lambda |-
             return id($clock).utcnow().timestamp;
 
-      - light.turn_on: status
+      - light.turn_on: status_led
       - delay: 2s
-      - light.turn_off: status
+      - light.turn_off: status_led
 
       - switch.turn_on: pump_switch
       - delay: 0.3s
