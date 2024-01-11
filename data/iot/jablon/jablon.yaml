@@ -52,8 +52,8 @@ api:
 mqtt:
   broker: !secret mqtt_host
   port: !secret mqtt_port
-  username: !secret mqtt_user
-  password: !secret mqtt_password
+  #username: !secret mqtt_user
+  #password: !secret mqtt_password
   keepalive: 10s
   reboot_timeout: 50min
 
@@ -63,7 +63,7 @@ ota:
 
     
 logger:
-  level: DEBUG
+  level: VERBOSE
 
 
 sensor:
@@ -72,13 +72,13 @@ sensor:
 
   - platform: wifi_signal
     name: "Irrigation Wifi"
-    update_interval: 60s
+    update_interval: 10s
     
   - platform: adc
     pin: 35
     id: dryness
     name: "dryness"
-    update_interval: 1s
+    update_interval: 3s
     attenuation: 11db
     filters:
       - multiply: 10
