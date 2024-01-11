@@ -99,8 +99,8 @@ sensor:
       
 light:
   - platform: status_led
-    name: "status_led"
-    id: status_led
+    name: "status_led_gpio2"
+    id: status_led_gpio2
     pin: 2
 
 
@@ -131,7 +131,7 @@ climate:
     cool_action:
       - logger.log: cool!
     idle_action:
-      - light.turn_off: status_led
+      - light.turn_off: status_led_gpio2
       - switch.turn_off: pump_switch
     default_preset: Home
     preset:
@@ -268,9 +268,9 @@ script:
           value: !lambda |-
             return id($clock).utcnow().timestamp;
 
-      - light.turn_on: status_led
+      - light.turn_on: status_led_gpio2
       - delay: 2s
-      - light.turn_off: status_led
+      - light.turn_off: status_led_gpio2
 
       - switch.turn_on: pump_switch
       - delay: 0.3s
