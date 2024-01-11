@@ -96,7 +96,7 @@ switch:
     pin: D2
 
   - platform: gpio
-    name: "onboard_led"
+    name: "onboard_led1"
     pin: GPIO16
     inverted: true
     
@@ -131,7 +131,7 @@ sensor:
 
   - platform: dallas
     address: 0x6d011453b48eaa28
-    id: "central_air_temperature"
+    id: "bed_air_temp"
     name: "air"
 
   - platform: dallas
@@ -187,7 +187,7 @@ interval:
           if (id(heating_global_bool)) {
             id(_valve_open).turn_on();
           } else {
-            if (id(radiator).state > 25) {
+            if (id(radiator).state > 20) {
               id(_valve_open).turn_off();
             } else {
               id(_valve_open).turn_on();
@@ -216,6 +216,7 @@ mqtt:
   password: !secret mqtt_password
   keepalive: 10s
   reboot_timeout: 50min
+  
 
 
 
