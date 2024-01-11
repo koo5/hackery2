@@ -104,8 +104,12 @@ switch:
     name: "onboard_led2"
     pin: GPIO2
     inverted: true
- 
-    
+
+  - platform: restart
+    id: manual_restart
+    name: "Living Room Restart"
+
+
 sensor:
 
   - platform: uptime

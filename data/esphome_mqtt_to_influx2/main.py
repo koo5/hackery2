@@ -6,6 +6,7 @@ connect to mqtt broker and subscribe to all topics. Connect to influxdb 2v, and 
 
 """
 
+
 import threading
 import datetime
 import os
@@ -15,8 +16,15 @@ import time
 import logging
 
 
+
 logging.basicConfig(level=logging.DEBUG)
 debug = logging.getLogger(__name__).debug
+
+
+
+process_started = datetime.datetime.utcnow()
+hostname = subprocess.check_output(['hostname'], text=True).strip()
+
 
 
 from secrets import secret
@@ -39,7 +47,7 @@ mqtt_config = dict(
 
 
 
-hostname = subprocess.check_output(['hostname'], text=True).strip()
+
 
 
 
@@ -80,7 +88,7 @@ threading.Thread(target=outflux_loop, name='outflux', daemon=True).start()
 
 
 
-process_started = datetime.datetime.utcnow()
+
 
 
 def uptime_loop():
@@ -148,6 +156,7 @@ def on_connect(client, userdata, flags, rc, properties=None):
 
 def on_message(client, userdata, msg):
 
+	ts = datetime.datetime.utcnow()
 	topic = msg.topic
 	payload = msg.payload.decode()
 	
