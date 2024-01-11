@@ -161,10 +161,17 @@ def on_message(client, userdata, msg):
 	payload = msg.payload.decode()
 	
 	debug(f"on_message: {topic} : {payload.__repr__()}")
+	
 	point = esphome_to_influx(topic, payload)
+	if point is None:
+		return
+		
+	point.time(ts)
+	
 	debug(f'point={str(point)}')
 	
 	outflux.put(point)
+
 	qs = outflux.qsize()
 	if qs > 100:
 		debug(f"outflux queue length: {qs}")
@@ -186,6 +193,8 @@ def esphome_to_influx(topic, payload):
 	
 	if topic[-1] == 'state':
 		topic = topic[:-1]
+		
+	topic = list(map(fix_field, topic))
 		
 	try:
 		payload = float(payload)
@@ -212,6 +221,11 @@ def esphome_to_influx(topic, payload):
 	return point
 
 
+
+def fix_field(field):
+	if field.startswith('_'):
+		field = 'X' + field[1:]
+	return field
 
 
 if os.environ.get('DEBUG_AUTH'):

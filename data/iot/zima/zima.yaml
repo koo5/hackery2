@@ -115,6 +115,9 @@ sensor:
   - platform: uptime
     name: Uptime Sensor
 
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 10s
 
   - platform: dht
     pin: D5
