@@ -63,7 +63,7 @@ ota:
 
     
 logger:
-  level: VERBOSE
+  level: DEBUG
 
 
 sensor:
