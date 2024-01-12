@@ -5,8 +5,7 @@
 connect to mqtt broker and subscribe to all topics. Connect to influxdb 2v, and submit each message as a measurement.
 
 """
-
-
+import sys
 import threading
 import datetime
 import os
@@ -62,27 +61,70 @@ else:
 	debug(f"""connecting to influxdb url={influxdb_config['url']}, token={influxdb_config['token'][:1]}..{influxdb_config['token'][-1:]}, {influxdb_config['org']=}, {influxdb_config['bucket']=}""")
 
 
-influx_client = InfluxDBClient(
-	url=influxdb_config['url'],
-	token=influxdb_config['token'],
-	org=influxdb_config['org'],
+def uptime():
+	return float((datetime.datetime.utcnow() - process_started).total_seconds())
 
-	enable_gzip=True,
+def uptime_points(note):
+	return [
+		Point('server').
+				tag("host", hostname).
+				tag('note', note).
+				tag("service", 'esphome_mqtt_to_influx2').
+				tag("process_started", str(process_started.isoformat())).
+				field("uptime", uptime()),
+		Point('server').
+				tag("host", hostname).
+				tag('note', note).
+				tag("service", 'esphome_mqtt_to_influx2').
+				tag("process_started", str(process_started.isoformat())).
+				field("unix_timestamp", time.time()),
+		Point('server').
+				tag("host", hostname).
+				tag('note', note).
+				tag("service", 'esphome_mqtt_to_influx2').
+				tag("process_started", str(process_started.isoformat())).
+				field("datetime", datetime.datetime.utcnow().isoformat())
+	]
+
+
 	
-)
 
-#with influx_client:
-debug(f"""influxdb version: {influx_client.health().version}""")
+def make_influx_client():
+	return InfluxDBClient(
+		url=influxdb_config['url'],
+		token=influxdb_config['token'],
+		org=influxdb_config['org'],
+	
+		enable_gzip=True,
+	)
+
+
+
+with make_influx_client() as synchronous_influx_client:
+	debug(f"""influxdb version: {synchronous_influx_client.health()}""")
+	with synchronous_influx_client.write_api(write_options=SYNCHRONOUS) as write_api:
+		write_api.write(
+			bucket=influxdb_config['bucket'], 
+			org=influxdb_config['org'],
+			record=uptime_points('start')[0]
+		)
+	
+
 
 
 outflux = queue.Queue()
 
 
 def outflux_loop():
-	write_api = WriteApi(influxdb_client=influx_client)
-	while True:
-		point = outflux.get()
-		write_api.write(bucket=influxdb_config['bucket'], org=influxdb_config['org'], record=point)
+	try:		
+		with make_influx_client() as influx_client:
+			write_api = WriteApi(influxdb_client=influx_client)
+			while True:
+				point = outflux.get()
+				write_api.write(bucket=influxdb_config['bucket'], org=influxdb_config['org'], record=point)
+	except Exception as e:
+		debug(f"outflux_loop: {e}")
+		sys.exit(1)
 
 threading.Thread(target=outflux_loop, name='outflux', daemon=True).start()
 
@@ -92,55 +134,35 @@ threading.Thread(target=outflux_loop, name='outflux', daemon=True).start()
 
 
 def uptime_loop():
-	sleep_secs = 1
-	while True:
-		time.sleep(sleep_secs)
-		for point in uptime_points('outflux thread writer, batched'):
-			outflux.put(point)
+	try:
+		sleep_secs = 1
+		while True:
+			time.sleep(sleep_secs)
+			for point in uptime_points('outflux_thread_writer_batched'):
+				outflux.put(point)
+	except Exception as e:
+		debug(f"loop: {e}")
+		sys.exit(1)
 
 
 def uptime_loop2():
-	write_api2 = WriteApi(influxdb_client=influx_client, write_options=SYNCHRONOUS)
-	sleep_secs = 1
-	while True:
-		time.sleep(sleep_secs)
-		for point in uptime_points('synchronous writer'):
-			write_api2.write(bucket=influxdb_config['bucket'], org=influxdb_config['org'], record=point)
-
+	try:
+		with make_influx_client() as influx_client:
+			write_api2 = WriteApi(influxdb_client=influx_client, write_options=SYNCHRONOUS)
+			sleep_secs = 1
+			while True:
+				time.sleep(sleep_secs)
+				for point in uptime_points('synchronous_writer'):
+					write_api2.write(bucket=influxdb_config['bucket'], org=influxdb_config['org'], record=point)
+	except Exception as e:
+		debug(f"loop: {e}")
+		sys.exit(1)
+	
 
 
 threading.Thread(target=uptime_loop, name='esphome_mqtt_to_influx2_uptime', daemon=True).start()
 threading.Thread(target=uptime_loop2, name='esphome_mqtt_to_influx2_uptime2', daemon=True).start()
 
-
-
-def uptime():
-	return float((datetime.datetime.utcnow() - process_started).total_seconds())
-
-def uptime_points(note):
-	return [
-		Point('server').
-				tag("host", hostname).
-				field('note', note).
-				tag("service", 'esphome_mqtt_to_influx2').
-				tag("process_started", str(process_started.isoformat())).
-				field("uptime", uptime()),
-		Point('server').
-				tag("host", hostname).
-				field('note', note).
-				field("unix_timestamp", time.time())
-	]
-
-
-
-def write_uptime_sync():
-	with influx_client.write_api(write_options=SYNCHRONOUS) as write_api:
-		write_api.write(
-			bucket=influxdb_config['bucket'], 
-			org=influxdb_config['org'],
-			record=uptime_points('start')[0])
-	
-write_uptime_sync()
 
 
 
