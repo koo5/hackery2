@@ -54,7 +54,7 @@ mqtt:
   port: !secret mqtt_port
   #username: !secret mqtt_user
   #password: !secret mqtt_password
-  keepalive: 10s
+  keepalive: 5s
   reboot_timeout: 3min
 
 
@@ -63,7 +63,7 @@ ota:
 
     
 logger:
-  level: DEBUG
+  level: INFO
 
 
 sensor:
@@ -90,12 +90,6 @@ sensor:
     name: Sun Azimuth
     type: azimuth
 
-#  - platform: template
-#    name: "action"
-#    lambda: |-
-#        return id(suchostat).action ;
-#    update_interval: 2s
-      
       
 light:
   - platform: status_led
@@ -109,6 +103,12 @@ switch:
     pin: 19
     id: pump_switch
     name: "pump_switch"
+    restore_mode: ALWAYS_OFF
+
+  - platform: gpio
+    pin: 20
+    id: dummy
+    name: "dummy"
     restore_mode: ALWAYS_OFF
 
   - platform: restart
