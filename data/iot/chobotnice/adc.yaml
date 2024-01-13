@@ -1,0 +1,9 @@
+    platform: adc
+    pin: ${pin}
+    id: adc${pin}
+    name: "adc${pin}"
+    update_interval: 0.3s
+    attenuation: auto
+    #attenuation: 11db
+    #filters:
+    #  - lambda: return 30 - (x * 10);

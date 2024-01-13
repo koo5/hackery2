@@ -1,0 +1,73 @@
+
+substitutions:
+  ip: 10.0.0.47
+  clock: ntp
+  mqtt_topic_prefix: $name
+
+
+esphome:
+  name: $name
+  on_boot:
+    then:
+      - logger.log: 'boOoOoOoOooOoOoOoOt'
+
+
+esp8266:
+  board: nodemcu
+
+
+logger:
+  level: INFO
+
+
+ota:
+  password: ""
+
+
+wifi:
+#  enable_on_boot: false  # new config option
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: $ip
+      gateway: 10.0.0.138
+      subnet: 255.255.255.0
+      dns1: 10.0.0.138
+      dns2: 8.8.8.8
+
+
+
+network:
+  enable_ipv6: true
+
+
+web_server:
+  port: 80
+  ota: true
+
+
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  keepalive: 10s
+  reboot_timeout: 50min
+  #topic_prefix: $mqtt_topic_prefix
+  topic_prefix: koom_sklep
+
+sensor:
+
+  - platform: uptime
+    name: Uptime Sensor
+
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 10s
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: A0
+

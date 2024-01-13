@@ -31,11 +31,6 @@ mqtt:
   reboot_timeout: 145min
 
 
-#api:
-#  #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
-#  reboot_timeout: 0s
-
-
 wifi:
   networks:
   - ssid: !secret ssid
@@ -54,9 +49,6 @@ network:
 
 ota:
   password: ""
-
-
-captive_portal:
 
 
 web_server:

@@ -1,0 +1,237 @@
+
+substitutions:
+  ip: 10.0.0.46
+  name: chobotnice
+  clock: ntp
+
+esphome:
+  name: $name
+  on_boot:
+    then:
+      - logger.log: 'boOoOoOoOooOoOoOoOt'
+
+esp32:
+  board: esp32dev
+
+
+logger:
+  level: DEBUG
+
+
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  keepalive: 8s
+  reboot_timeout: 145min
+
+
+wifi:
+#  enable_on_boot: false  # new config option
+  networks:
+  - ssid: !secret ssid
+    password: !secret password
+    manual_ip:
+      static_ip: $ip
+      gateway: 10.0.0.138
+      subnet: 255.255.255.0
+      dns1: 10.0.0.138
+      dns2: 8.8.8.8
+
+
+
+network:
+  enable_ipv6: true
+
+
+ota:
+  password: ""
+
+
+
+web_server:
+  port: 80
+
+
+sun:
+  latitude: 50.0755°
+  longitude: 14.4378°
+
+  on_sunrise:
+    - then:
+        - logger.log: Good morning!
+  on_sunset:
+    - then:
+        - logger.log: Good evening!
+
+
+
+
+text_sensor:
+  - platform: sun
+    name: Next Sunrise
+    type: sunrise
+  - platform: sun
+    name: Next Sunset
+    type: sunset
+  - platform: template
+    name: "Time NTP"
+    lambda: |-
+      char str[30];
+      if (!id(ntp).now().is_valid()) { return { "----" }; }
+      time_t currTime = id(ntp).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
+
+
+
+time:
+  - platform: sntp
+    id: ntp
+    timezone: Europe/Prague
+
+
+
+sensor:
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 1s
+  - platform: uptime
+    name: Uptime Sensor
+  - platform: sun
+    name: Sun Elevation
+    type: elevation
+  - platform: sun
+    name: Sun Azimuth
+    type: azimuth
+
+
+
+# ok:
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 32
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 33
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 34
+
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 35
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 36
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 39
+
+
+
+## no wifi:
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 25
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 26
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 27
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 14
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 13
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 4
+
+
+
+## strapping:
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 0
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 2
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 15
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 12
+
+
+
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 16
+      mode:
+        input: true
+        pullup: true
+    id: switch16
+    name: "switch16"
+    filters:
+      - delayed_on: 10ms
+
+    on_press:
+    - logger.log: "Switch Turned On!"
+    - wifi.enable:  # new action
+    on_release:
+    - logger.log: "Switch Turned Off!"
+    - wifi.disable:  # new action
+
+
+  - platform: gpio
+    pin:
+      number: 17
+      mode:
+        input: true
+        pullup: true
+    id: switch17
+    name: "switch17"
+    filters:
+      - delayed_on: 10ms
+
