@@ -5,9 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../data/esphome_mqtt_to_influx2/secrets.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../../data/esphome_mqtt_to_influx2/secrets/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../../data/iot/zima/zima.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/iot/zima/zima.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -137,6 +134,7 @@
       <workItem from="1704696962402" duration="501000" />
       <workItem from="1704728166557" duration="898000" />
       <workItem from="1704995405037" duration="630000" />
+      <workItem from="1705433740051" duration="1034000" />
     </task>
     <servers />
   </component>
