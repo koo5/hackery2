@@ -13,7 +13,7 @@
     min_heating_off_time: 1440min
 
     min_heating_run_time: 6s
-    max_heating_run_time: 8s
+    max_heating_run_time: 18s
 
     default_preset: Home
     preset:

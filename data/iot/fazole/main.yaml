@@ -1,4 +1,5 @@
 #https://www.elprocus.com/vga-connector/
+# https://www.amazon.sa/-/en/AITRIP-Display-Bluetooth-Internet-Development/dp/B08DHVX9XM
 
 
 
@@ -19,7 +20,7 @@ esp32:
 
 
 logger:
-  level: VERY_VERBOSE
+  level: INFO
 
 
 mqtt:
@@ -27,8 +28,8 @@ mqtt:
   port: !secret mqtt_port
   username: !secret mqtt_user
   password: !secret mqtt_password
-  keepalive: 8s
-  reboot_timeout: 145min
+  #keepalive: 2s
+  #reboot_timeout: 145min
 
 
 wifi:
@@ -110,6 +111,7 @@ sensor:
     type: azimuth
 
 
+
   - !include
     file: wetness_raw.yaml
     vars:
@@ -119,6 +121,8 @@ sensor:
     file: wetness.yaml
     vars:
       n: 1
+
+
   - !include
     file: wetness_raw.yaml
     vars:
@@ -128,6 +132,8 @@ sensor:
     file: wetness.yaml
     vars:
       n: 2
+
+
   - !include
     file: wetness_raw.yaml
     vars:
@@ -137,6 +143,8 @@ sensor:
     file: wetness.yaml
     vars:
       n: 3
+
+
   - !include
     file: wetness_raw.yaml
     vars:
@@ -148,10 +156,39 @@ sensor:
       n: 4
 
 
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 36
+
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 39
+
+
+
+  - platform: max6675
+    name: "Living Room Temperature"
+    cs_pin: 16
+    update_interval: 1s
+
+
+spi:
+  miso_pin: 4
+  clk_pin: 17
+
+
+
+
+
 switch:
   - platform: restart
     id: manual_restart
     name: "Living Room Restart"
+
   - platform: gpio
     pin: 21
     id: dummy
