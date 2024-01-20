@@ -11,7 +11,6 @@
       - delay: 1s
 
     min_heating_off_time: 1440min
-
     min_heating_run_time: 6s
     max_heating_run_time: 18s
 
@@ -19,7 +18,7 @@
     preset:
       - name: Home
         mode: HEAT
-        default_target_temperature_low: 14 °C
+        default_target_temperature_low: 10 °C
     
     supplemental_heating_delta: 0
     supplemental_heating_action:

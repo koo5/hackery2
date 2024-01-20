@@ -1,6 +1,8 @@
 #https://www.elprocus.com/vga-connector/
-# https://www.amazon.sa/-/en/AITRIP-Display-Bluetooth-Internet-Development/dp/B08DHVX9XM
 
+#https://www.upesy.com/blogs/tutorials/esp32-pinout-reference-gpio-pins-ultimate-guide
+
+# https://www.laskakit.cz/iot-esp-32s-2-4ghz-dual-mode-wifi-bluetooth-rev-1--cp2102/#relatedFiles
 
 
 substitutions:
@@ -20,7 +22,7 @@ esp32:
 
 
 logger:
-  level: INFO
+  level: DEBUG
 
 
 mqtt:
@@ -33,6 +35,7 @@ mqtt:
 
 
 wifi:
+  power_save_mode: none
   networks:
   - ssid: !secret ssid
     password: !secret password
@@ -116,7 +119,7 @@ sensor:
     file: wetness_raw.yaml
     vars:
       n: 1
-      pin: 33
+      pin: 36
   - !include
     file: wetness.yaml
     vars:
@@ -127,7 +130,7 @@ sensor:
     file: wetness_raw.yaml
     vars:
       n: 2
-      pin: 32
+      pin: 39
   - !include
     file: wetness.yaml
     vars:
@@ -138,7 +141,7 @@ sensor:
     file: wetness_raw.yaml
     vars:
       n: 3
-      pin: 35
+      pin: 34
   - !include
     file: wetness.yaml
     vars:
@@ -149,36 +152,35 @@ sensor:
     file: wetness_raw.yaml
     vars:
       n: 4
-      pin: 34
+      pin: 35
   - !include
     file: wetness.yaml
     vars:
       n: 4
 
 
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 32
+
 
   - !include
     file: adc.yaml
     vars:
-      pin: 36
-
-
-  - !include
-    file: adc.yaml
-    vars:
-      pin: 39
+      pin: 33
 
 
 
   - platform: max6675
     name: "Living Room Temperature"
-    cs_pin: 16
+    cs_pin: 22
     update_interval: 1s
 
 
 spi:
-  miso_pin: 4
-  clk_pin: 17
+  miso_pin: 21
+  clk_pin: 23
 
 
 
@@ -189,34 +191,31 @@ switch:
     id: manual_restart
     name: "Living Room Restart"
 
-  - platform: gpio
-    pin: 21
-    id: dummy
-    #name: "interlock dummy"
-    restore_mode: ALWAYS_OFF
-    inverted: true
-    interlock: [dummy, pump1, pump2, pump3, pump4]
-
   - !include
     file: switch.yaml
     vars:
       n: 1
-      pin: 18
+      pin: 13
   - !include
     file: switch.yaml
     vars:
       n: 2
-      pin: 23
+      pin: 14
   - !include
     file: switch.yaml
     vars:
       n: 3
-      pin: 19
+      pin: 27
   - !include
     file: switch.yaml
     vars:
       n: 4
-      pin: 22
+      pin: 26
+#  - !include
+#    file: switch.yaml
+#    vars:
+#      n: 3
+#      pin: 25
 
 
 climate:

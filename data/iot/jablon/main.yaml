@@ -29,7 +29,7 @@ network:
 
 web_server:
   port: 80
-  ota: true
+#  ota: true
 
 
 wifi:
@@ -63,7 +63,7 @@ ota:
 
     
 logger:
-  level: INFO
+  level: DEBUG
 
 
 sensor:
