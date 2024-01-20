@@ -6,6 +6,9 @@
 #
 #For best performance and faster startup times, the current baseline needs to be ....
 
+# The ABC-algorithm constantly keeps track of the sensor’s lowest reading over a preconfigured time interval and slowly corrects for any long-term drift detected when compared to the expected fresh air value of 400 ppm (or 0.04%vol) CO₂. In normal indoor applications, the carbon dioxide level drops to nearly outside air at some point during a week. By sampling the values for an 8-day period and then comparing the lowest value with the meters 400 point, the meter can understand if it needs to adjust the zero point. 
+
+
 
 substitutions:
   name: $name
