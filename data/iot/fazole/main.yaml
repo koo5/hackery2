@@ -57,7 +57,10 @@ ota:
 
 web_server:
   port: 80
-
+  #css_include: "web/webserver-v1.min.css"
+  #css_url: ""
+  #js_include: "web/webserver-v1.min.js"
+  #js_url: ""
 
 sun:
   latitude: 50.0755°
@@ -90,6 +93,23 @@ text_sensor:
       //strftime(str, sizeof(str), "%c", localtime(&currTime));
       return  { str };
     update_interval: 1s
+
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 1
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 2
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 3
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 4
 
 
 
