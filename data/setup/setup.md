@@ -14,14 +14,18 @@ ssh -t root@$MY_VPS_IP CLIENT_PUBKEY_VALUE=(cat ~/.ssh/id_ed25519.pub) bash -c "
 
 ## basics0
 ```
-sudo apt install -y fish net-tools
+sudo apt install -y fish
+
+# problem: >> sudo tail -f /var/log/syslog | grep kernel | grep kernel
+sudo rm /usr/share/fish/functions/grep.fish
+
 fish
 ```	
 
 ## basics0.1
 
 ```
-sudo apt install apt-config-auto-update unattended-upgrades apt-listchanges mailutils powermgmt-base
+sudo apt install net-tools apt-config-auto-update unattended-upgrades apt-listchanges mailutils powermgmt-base
 ```
 
 ```

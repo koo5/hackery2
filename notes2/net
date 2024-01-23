@@ -1,0 +1,2 @@
+nmcli connection modify <connection-name> ipv4.route-metric 1
+

@@ -1,0 +1,221 @@
+# https://www.airgradient.com/documentation/diy/
+
+# https://esphome.io/components/sensor/sgp30.html
+-
+# The SGP30 sensor will re-calibrate its baseline each time it is powered on. During the first power-up this will take up to 12 hours. Exposing to outside air for at least 10 minutes cumulative time is advised during the calibration period.
+#
+#For best performance and faster startup times, the current baseline needs to be ....
+
+# The ABC-algorithm constantly keeps track of the sensor’s lowest reading over a preconfigured time interval and slowly corrects for any long-term drift detected when compared to the expected fresh air value of 400 ppm (or 0.04%vol) CO₂. In normal indoor applications, the carbon dioxide level drops to nearly outside air at some point during a week. By sampling the values for an 8-day period and then comparing the lowest value with the meters 400 point, the meter can understand if it needs to adjust the zero point. 
+
+
+
+substitutions:
+  name: $name
+ota:
+  password: !secret otapass
+
+wifi:
+  power_save_mode: none
+
+  ap:
+    ssid: !secret apssid
+    password: !secret appass
+
+  networks:
+  - ssid: !secret ssid1
+    password: !secret password1
+    manual_ip:
+      static_ip: !secret ip1
+      gateway: !secret gateway1
+      subnet: 255.255.255.0
+      dns1: !secret gateway1
+      dns2: 8.8.8.8
+
+  - ssid: !secret ssid2
+    password: !secret password2
+    manual_ip:
+      static_ip: !secret ip2
+      gateway: !secret gateway2
+      subnet: 255.255.255.0
+      dns1: !secret gateway2
+      dns2: 8.8.8.8
+
+  use_address: "wtf"
+
+
+captive_portal:
+
+
+network:
+  enable_ipv6: true
+
+logger:
+  level: DEBUG
+
+
+mqtt:
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  #keepalive: 2s
+  #reboot_timeout: 145min
+
+#mqtt:
+#  broker: broker.hivemq.com
+
+
+
+web_server:
+  port: 80
+
+
+esphome:
+  name: $name
+  platform: ESP8266
+  board: d1_mini_pro
+  on_boot:
+    then:
+      - logger.log: 'boOoOoOoOooOoOoOoOt'
+
+api:
+  reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently
+
+
+
+
+### ~/repos/ajfriesen/ESPHome-AirGradient/0/ESPHome-AirGradient/air-gradient-diy.yaml
+
+
+#dashboard_import:
+# package_import_url: github://esphome/esphome-project-template/project-template-esp32.yaml@v6
+#  package_import_url: github://ajfriesen/ESPHome-AirGradient/main/air-gradient.yaml
+
+i2c:
+  sda: D2
+  scl: D1
+
+font:
+  - file: "fonts/UbuntuMono-B.ttf"
+    id: fff
+    size: 16
+
+display:
+  - platform: ssd1306_i2c
+    id: oled
+    model: "SSD1306 64x48"
+    pages:
+      - id: page1
+        lambda: |-
+          it.printf(0, 0,  id(fff), "Wif %.0f",   id(wifi1).state);
+          it.printf(0, 14, id(fff), "Hum %.0f%%", id(humidity).state);
+          it.printf(0, 28, id(fff), "Tmp %.0fC",  id(temp).state);
+      - id: page2
+        lambda: |- 
+          it.printf(0, 0,   id(fff), "PM1 %.0f",  id(pm1).state);
+          it.printf(0, 14,  id(fff), "2.5 %.0f",  id(pm2_5).state);
+          it.printf(0, 28,  id(fff), " 10 %.0f",  id(pm10).state);
+      - id: page3
+        lambda: |- 
+          it.printf(0, 0,   id(fff), "CO2 %.0f",  id(co2).state);
+          it.printf(0, 14,  id(fff), "eCO %.0f",  id(eco2).state);
+          it.printf(0, 28,  id(fff), "TVO %.0f",  id(tvoc).state);
+
+
+interval:
+  - interval: 6s
+    then:
+      - display.page.show_next: oled
+      - component.update: oled
+
+uart:
+  - rx_pin: D5
+    tx_pin: D6
+    baud_rate: 9600
+    id: uart10
+
+  - rx_pin: D4
+    tx_pin: D3
+    baud_rate: 9600
+    id: uart20
+
+sensor:
+
+  - platform: wifi_signal
+    id: wifi1
+    name: "Irrigation Wifi"
+    update_interval: 3s
+
+  - platform: sht3xd
+    temperature:
+      id: temp
+      name: "Temperature"
+    humidity:
+      id: humidity
+      name: "Humidity"
+    address: 0x44
+    update_interval: 4s
+
+  - platform: pmsx003
+    id: pms
+    # https://www.aliexpress.com/item/32944660534.html
+    # type can be PMSX003, PMS5003S, PMS5003T, PMS5003ST
+    # https://esphome.io/components/sensor/pmsx003.html
+    type: PMSX003
+    uart_id: uart10
+    pm_1_0:
+      id: pm1
+      name: "Particulate Matter <1.0µm Concentration"
+    pm_2_5:
+      id: pm2_5
+      name: "Particulate Matter <2.5µm Concentration"
+    pm_10_0:
+      id: pm10
+      name: "Particulate Matter <10.0µm Concentration"
+    formaldehyde:
+      id: hcho
+      name: "Formaldehyde (HCHO) concentration in µg per cubic meter"
+    update_interval: 600s
+
+  - platform: senseair
+    # https://www.aliexpress.com/item/1005004123170360.html
+    uart_id: uart20
+    co2:
+      id: co2
+      name: "SenseAir CO2 Value"
+    update_interval: 4s
+
+  - platform: sgp30
+    eco2:
+      id: eco2
+      name: "Workshop eCO2"
+      accuracy_decimals: 1
+    tvoc:
+      id: tvoc
+      name: "Workshop TVOC"
+      accuracy_decimals: 1
+    store_baseline: yes
+    compensation:
+      temperature_source: temp
+      humidity_source: humidity
+    update_interval: 1s
+
+  - platform: ultrasonic
+    trigger_pin: D7
+    echo_pin: D8
+    name: "Ultrasonic Sensor"
+    update_interval: 1s
+    filters:
+      - delta: 20%
+    on_value:
+      then:
+        - lambda: !lambda |-
+            id(oled).contrast = 255;
+        - delay: 50s
+        - lambda: !lambda |-
+            id(oled).contrast = 0;
+
+
+
+

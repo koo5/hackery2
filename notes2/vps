@@ -39,7 +39,7 @@ telegraf ppa:
 
 
 
-/lib/systemd/system/telegraf.service   [----]  1 L:[  1+17  18/ 24] *(472 / 577b) 0067 0x043                                             
+/lib/systemd/system/telegraf.service  :
 [Unit]
 Description=Telegraf
 Documentation=https://github.com/influxdata/telegraf
@@ -69,5 +69,24 @@ WantedBy=multi-user.target
 
 ---
 
+
+
+
+
+
+
+
+
+
+
+
+-----------------
+fuck influx from deb!
+
+
+https://github.com/docker-library/docs/blob/master/influxdb/README.md
+
+
+docker exec influxdb2 influx 
 
 

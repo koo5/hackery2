@@ -1,4 +1,27 @@
 #!/usr/bin/env python3
+
+
+"""
+--local
+"it seems that this would be preferred to snapper or similar, as it would also backup ext4 filesystems, cloud machines, etc, and do everything from the same confguration used for actual remote backups.
+it's just needed to set this up with cron.
+
+cron on backup servir:
+every 1h: ~/backup_clouds.sh; backup.sh --local
+
+cron on workstation:
+every 1h: backup.sh
+...too many disk spinups for backup machine?
+
+todo:
+bfg fix common parent lookup for toplevel subvol.
+track snapshot origin in .bfg/bfg.json in snapshot. why?
+send all snapshots in succession.
+
+"""
+
+
+
 import glob
 from pathlib import Path
 
@@ -29,7 +52,13 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	#anything else? 
 	#pause firefox? pause some vms?
 	fss = get_filesystems()
+
+	if hostname == 'r64':
+		for cloud_host in json.load(open(expanduser('~/secrets.json')))['cloud_servers']:
+			rsync_from_clouds(fss, cloud_host)
+
 	rsync_ext4_filesystems_into_backup_folder(fss)
+
 	add_backup_subvols(fss[0])
 	transfer_btrfs_subvolumes(sshstr, fss, target_fs)
 
@@ -64,7 +93,7 @@ def get_filesystems():
 	if hostname == 'hp':
 		fss = [{
 			'toplevel': '/mx500data',
-			'subvols': m(['home', 'lean','leanpriv', 'live/dev3']),
+			'subvols': m(['home', 'lean','leanpriv', 'dev3']),
 		}]
 	elif hostname == 'jj':
 		fss = [{
@@ -95,7 +124,11 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 
 			target_subvol_name = name if name != '/' else '_root'
 
+			ccs(f"""date""")
 			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
+			ccs(f"""date""")
+			print('', file = sys.stderr)
+
 
 
 def rsync_ext4_filesystems_into_backup_folder(fss):
@@ -113,21 +146,41 @@ def rsync(fss, what):
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
 	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its result
-	srun(f'sudo rsync -v -a -S -v --progress -r --delete {what} {where}')
+	srun(f'sudo rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
+
+
+
+import getpass
+import os
+import grp
+
+
+def rsync_from_clouds(fss, cloud_host):
+
+	where = f"{fss[0]['toplevel']}/backups/{cloud_host}/root"
+	if not Path(where).exists():
+		ccs(f'sudo btrfs sub create {where}')
+	
+	username = getpass.getuser()
+	group_name = grp.getgrgid(os.getgid()).gr_name
+	
+	ccs(f'sudo chown {username}:{group_name} {where}')
+
+	srun(f'backup_vmi2.sh {cloud_host} {where}')
 
 
 def add_backup_subvols(fs):
-	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is on inherent need to only support a flat structure.
+	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is no inherent need to only support a flat structure.
+	# gotta do something like sudo btrfs subvolume list -q -t -R -u -a $fsroot | grep live | grep -v ".bfg_snapshots"
+	# but preferably using bfg's facilities.	
 	
-	#for host in glob.glob('*', root_dir=fs['toplevel'] + '/backups/'):
 	os.chdir(fs['toplevel'] + '/backups/')
 	for host in glob.glob('*'):
 		os.chdir(fs['toplevel'] + '/backups/' + host)
 		fs['subvols'] += [{'target_dir': host,
-						  'name': name,
+						  'name': name[:-1],
 						  'source_path': '/backups/' + host + '/'} for name in
-						  #glob.glob('*', root_dir=fs['toplevel'] + '/backups/' + host)]
-						  glob.glob('*')]
+						  glob.glob('*/')]
 
 
 

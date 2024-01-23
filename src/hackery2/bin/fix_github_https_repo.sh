@@ -14,18 +14,26 @@ if [ -z "$REPO_URL" ]; then
 fi
 
 USER=`echo $REPO_URL | sed -Ene's#https://github.com/([^/]*)/(.*)(\.git)?#\1#p'`
+HOST=github.com
 if [ -z "$USER" ]; then
-  echo "-- ERROR:  Could not identify User."
-  exit
+  USER=`echo $REPO_URL | sed -Ene's#https://gitlab.com/([^/]*)/(.*)(\.git)?#\1#p'`
+  HOST=gitlab.com
+  if [ -z "$USER" ]; then
+    echo "-- ERROR:  Could not identify User."
+    exit
+  fi
 fi
 
 REPO=`echo $REPO_URL | sed -Ene's#https://github.com/([^/]*)/(.*)#\2#p'`
 if [ -z "$REPO" ]; then
-  echo "-- ERROR:  Could not identify Repo."
-  exit
+  REPO=`echo $REPO_URL | sed -Ene's#https://gitlab.com/([^/]*)/(.*)#\2#p'`
+  if [ -z "$REPO" ]; then
+    echo "-- ERROR:  Could not identify Repo."
+    exit
+  fi
 fi
 
-NEW_URL="git@github.com:$USER/$REPO"
+NEW_URL="git@$HOST:$USER/$REPO"
 echo "Changing repo url from "
 echo "  '$REPO_URL'"
 echo "      to "

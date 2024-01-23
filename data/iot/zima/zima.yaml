@@ -5,23 +5,24 @@ esp8266:
   board: nodemcu
 
 logger:
+  level: INFO
 
-api:
-  #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
-  reboot_timeout: 0s
-  password: ""
-  services:
-    - service: vyvetrat
-      then:
-        - switch.turn_on: vetrak
-        - delay: 3s
-        - switch.turn_off: vetrak
+#api:
+#  #If you enable MQTT and you do not use the “native API” for Home Assistant, you must remove the api: line from your ESPHome configuration, otherwise the ESP will reboot every 15 minutes because no client connected to the native API.
+#  reboot_timeout: 0s
+#  password: ""
+#  services:
+#    - service: vyvetrat
+#      then:
+#        - switch.turn_on: vetrak
+#        - delay: 3s
+#        - switch.turn_off: vetrak
 
-    - service: zablikat
-      variables:
-        my_brightness: int
-        my_effect: string
-      then:
+#    - service: zablikat
+#      variables:
+#        my_brightness: int
+#        my_effect: string
+#      then:
 #        - light.turn_on:
 #            id: my_light
 #            brightness: !lambda 'return my_brightness;'
@@ -41,18 +42,49 @@ wifi:
     subnet: 255.255.255.0
     dns1: 192.168.8.1
   
-  ap:
-    password: !secret fallback_password
+    
+    
+#captive_portal:
 
-    
-    
-captive_portal:
+
+
+network:
+  enable_ipv6: true
+
+
+globals:
+   - id: heating_global_bool
+     type: bool
+     restore_value: no
+     initial_value: '0'
+     
+
+
 
 
 switch:
+  - platform: template
+    name: heating
+    id: heating
+    internal: false
+    lambda: |- 
+      return id(heating_global_bool);
+    optimistic: true
+    turn_on_action:
+      - globals.set:
+          id: heating_global_bool
+          value: 'true'
+    turn_off_action:
+      - globals.set:
+          id: heating_global_bool
+          value: 'false'
+
+
   - platform: gpio
-    name: "topeni"
-    id: topeni
+    id: _valve_open
+    internal: false
+    name: _valve_open
+    entity_category: DIAGNOSTIC
     pin: 
         number: D1
         inverted: true
@@ -60,10 +92,11 @@ switch:
   - platform: gpio
     name: "vetrak"
     id: vetrak
+    internal: false
     pin: D2
 
   - platform: gpio
-    name: "onboard_led"
+    name: "onboard_led1"
     pin: GPIO16
     inverted: true
     
@@ -71,44 +104,75 @@ switch:
     name: "onboard_led2"
     pin: GPIO2
     inverted: true
- 
-    
+
+  - platform: restart
+    id: manual_restart
+    name: "Living Room Restart"
+
+
 sensor:
+
+  - platform: uptime
+    name: Uptime Sensor
+
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 10s
+
   - platform: dht
     pin: D5
     temperature:
-      name: "Temperature"
-      id: dht1
+      name: "onboard temp 2"
     humidity:
-      name: "Humidity"
+      name: "onboard hum 2"
     update_interval: 3s
 
-  - platform: dallas
-    index: 0
-    name: "dangle"
+  - platform: dht
+    pin: D7
+    temperature:
+      name: "onboard temp 1"
+    humidity:
+      name: "onboard hum 1"
+    update_interval: 3s
+
 
   - platform: dallas
-    index: 1
-    name: "dangle2"
+    address: 0x6d011453b48eaa28
+    id: "bed_air_temp"
+    name: "air"
+
+  - platform: dallas
+    address: 0xea00000a4c49d628
+    id: venky
+    name: venky
+
+
+  - platform: dallas
+    address: 0xed40d8271e64ff28
+    id: radiator
+    name: radiator
 
 
     
 climate:
   - platform: thermostat
     name: "Thermostat Climate Controller"
-    sensor: dht1
+    sensor: bed_air_temp
+    
     min_cooling_off_time: 3s
     min_cooling_run_time: 3s
     min_heating_off_time: 3s
     min_heating_run_time: 3s
     min_idle_time: 3s
+    
     cool_action:
       - switch.turn_on: vetrak
     heat_action:
-      - switch.turn_on: topeni
+      - switch.turn_on: heating
     idle_action:
-      - switch.turn_off: topeni
       - switch.turn_off: vetrak
+      - switch.turn_off: heating
+
     default_preset: sleep
     on_boot_restore_from: memory
     preset:
@@ -122,26 +186,28 @@ climate:
         default_target_temperature_high: 21 °C
 
 
-#light:
-#  - platform: neopixelbus
-#    id: my_light
-#    type: GRB
-#    variant: WS2811
-#    pin: D4
-#    num_leds: 60
-#    name: "NeoPixel Light"
 
-#binary_sensor:
-#  - platform: gpio
-#    pin: D5
-#    name: "Living Room Dehumidifier Toggle Button"
-#    on_press:
-#      then:
-#        - switch.toggle: topeni
+interval:
+  - interval: 5s
+    then:
+      - lambda: |-
+          if (id(heating_global_bool)) {
+            id(_valve_open).turn_on();
+          } else {
+            if (id(radiator).state > 20) {
+              id(_valve_open).turn_off();
+            } else {
+              id(_valve_open).turn_on();
+            }
+          }
+          
+
 
 web_server:
   port: 80
   ota: true
+
+
 
 dallas:
   - pin: D6
@@ -159,4 +225,20 @@ mqtt:
   password: !secret mqtt_password
   keepalive: 10s
   reboot_timeout: 50min
+  
+
+
+
+button:
+  - platform: wake_on_lan
+    name: "Start jj"
+    target_mac_address: fc:34:97:a1:f5:ca
+
+  - platform: wake_on_lan
+    name: "Start hp"
+    target_mac_address: a4:5d:36:9b:18:16
+
+  - platform: wake_on_lan
+    name: "Start r64"
+    target_mac_address: a8:a1:59:38:51:47
 

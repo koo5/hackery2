@@ -1,0 +1,24 @@
+diff '--color=auto' -r arandr-0.1.10/screenlayout/gui.py arandr_0.1.10_patched/screenlayout/gui.py
+112c112
+<     def __init__(self, file=None, randr_display=None, force_version=False):
+---
+>     def __init__(self, file=None, randr_display=None, force_version=False, zoomout=8):
+177a178,179
+>         self.set_zoom(zoomout)
+>
+330a333,342
+>         '--zoomout',
+>         help=(
+>             'set view scale zoomout ratio, can be 4, 8 or 16'
+>             '(default: 1:8)'
+>         ),
+>         metavar='Z',
+>         type=int,
+>         default=8
+>     )
+>     parser.add_option(
+347c359,360
+<         force_version=options.force_version
+---
+>         force_version=options.force_version,
+>         zoomout=options.zoomout

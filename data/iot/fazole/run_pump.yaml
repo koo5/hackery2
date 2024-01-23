@@ -2,16 +2,22 @@
     mode: parallel
     max_runs: 1
     then:
-      - wait_until:
-         - switch.is_off: pump1
-         - switch.is_off: pump2
-         - switch.is_off: pump3
-         - switch.is_off: pump4
-      - number.set:
-          id: last_pump_ts${n}
-          value: !lambda |-
-            return id($clock).utcnow().timestamp;
-      - switch.turn_on: pump${n}
-      - delay: 10s
-      - switch.turn_off: pump${n}
-      - delay: 5h
+      - if:
+          condition:
+              lambda: |-
+                  return (id(ntp).utcnow().timestamp > 1680000000) && (id(ntp).utcnow().timestamp - id(last_pump_ts${n}).state > 60*60*20);
+          then:
+            - wait_until:
+               - switch.is_off: pump1
+               - switch.is_off: pump2
+               - switch.is_off: pump3
+               - switch.is_off: pump4
+
+            - number.set:
+                id: last_pump_ts${n}
+                value: !lambda |-
+                  return id($clock).utcnow().timestamp;
+            - switch.turn_on: pump${n}
+            - delay: 6s
+            - switch.turn_off: pump${n}
+            #- delay: 5h # this should be handled by thermostat

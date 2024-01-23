@@ -1,0 +1,10 @@
+    platform: template
+    id: last_pump_ts_text${n}
+    name: "last_pump_ts_text ${n}"
+    lambda: |-
+      char str[30];
+      time_t currTime = id(last_pump_ts${n}).state;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s

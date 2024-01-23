@@ -1,11 +1,7 @@
 #!/usr/bin/env fish
 
 set MACHINE $argv[1]
-echo $MACHINE
-set DATE (date '+%F-%H-%M-%S')
-set DSTDIR "$MACHINE"_"$DATE"
-echo $DSTDIR
-
+set DSTDIR $argv[2]
 
 rsync -av --progress -h   -e 'hpnssh -p 44' -r \
   --exclude 'dont_backup'  \
@@ -25,7 +21,4 @@ rsync -av --progress -h   -e 'hpnssh -p 44' -r \
   --include '/home/***'   \
   --exclude '*'  \
   root@$MACHINE:// $DSTDIR/
-
-
-# https://unix.stackexchange.com/questions/595411/why-rsync-doesnt-include-a-nested-directory
 

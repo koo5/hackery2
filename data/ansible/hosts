@@ -3,10 +3,12 @@ mms:
     hovno:
       hovno
   hosts:
-    hp:
+    hp.internal:44:
     jj:
-    r64:
+    r64.internal:44:
     dev3-hp:
     dev3-jj:
-    vmi579006.contaboserver.net:
-      hovno: {{vmi_sudo_password}}
+    iot.internal:
+      hovno: "{{vmi_sudo_password}}"
+    "vmi579006.contaboserver.net":
+      hovno: "{{vmi_sudo_password}}"

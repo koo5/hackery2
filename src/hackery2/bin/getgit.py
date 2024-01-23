@@ -89,7 +89,9 @@ else:
 					print ("...")
 			try:
 				print ("Cloning " + res[0][1] + "...")
-				os.system("git clone https://github.com/"+res[0][1]+".git")
+				cmd = "git clone https://github.com/"+res[0][1]+".git"
+				print (cmd)
+				os.system(cmd)
 			except Exception as e:
 				print ("An error occured:", e)
 

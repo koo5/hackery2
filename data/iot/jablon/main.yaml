@@ -3,41 +3,33 @@
 # - use nail varnish or similar to seal the edges of the pcb
 # - VCC = 3.3V – 5.5V
 
+# motor psu protection 2 x TVS BZW06-5V8 in series
+
 
 substitutions:
   ip: 192.168.8.31
   name: banana
   clock: ntp
 
+
 esphome:
   name: $name
   on_boot:
     then:
-      - logger.log: 'booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot'
+      - logger.log: 'booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooot'
+
 
 esp32:
   board: denky32
-  #framework:
-    #type: esp-idf
-    #version: latest
-    # Custom sdkconfig options
-    #sdkconfig_options:
-    #  CONFIG_COMPILER_OPTIMIZATION_SIZE: y
-    # Advanced tweaking options
-    #advanced:
-    #  ignore_efuse_mac_crc: false
 
 
-#network:
-#  enable_ipv6: true
-
-
-captive_portal:
+network:
+  enable_ipv6: true
 
 
 web_server:
   port: 80
-  ota: true
+#  ota: true
 
 
 wifi:
@@ -49,10 +41,7 @@ wifi:
       gateway: 192.168.8.1
       subnet: 255.255.255.0
       dns1: 192.168.8.1
-      dns2: 8.8.8.8
-#  ap:
-#    ssid: !secret fallback_ssid
-#    password: !secret fallback_password
+      #dns2: 8.8.8.8
 
 
 api:
@@ -63,10 +52,10 @@ api:
 mqtt:
   broker: !secret mqtt_host
   port: !secret mqtt_port
-  username: !secret mqtt_user
-  password: !secret mqtt_password
-  keepalive: 8s
-  reboot_timeout: 5min
+  #username: !secret mqtt_user
+  #password: !secret mqtt_password
+  keepalive: 5s
+  reboot_timeout: 3min
 
 
 ota:
@@ -74,6 +63,7 @@ ota:
 
     
 logger:
+  level: DEBUG
 
 
 sensor:
@@ -82,13 +72,13 @@ sensor:
 
   - platform: wifi_signal
     name: "Irrigation Wifi"
-    update_interval: 60s
+    update_interval: 10s
     
   - platform: adc
     pin: 35
     id: dryness
     name: "dryness"
-    update_interval: 10s
+    update_interval: 3s
     attenuation: 11db
     filters:
       - multiply: 10
@@ -100,25 +90,25 @@ sensor:
     name: Sun Azimuth
     type: azimuth
 
-#  - platform: template
-#    name: "action"
-#    lambda: |-
-#        return id(suchostat).action ;
-#    update_interval: 2s
-      
       
 light:
   - platform: status_led
-    name: "status LED(pin2)"
-    id: status
+    name: "status_led_gpio2"
+    id: status_led_gpio2
     pin: 2
 
 
 switch:
   - platform: gpio
     pin: 19
-    id: s3
-    name: "s3"
+    id: pump_switch
+    name: "pump_switch"
+    restore_mode: ALWAYS_OFF
+
+  - platform: gpio
+    pin: 20
+    id: dummy
+    name: "dummy"
     restore_mode: ALWAYS_OFF
 
   - platform: restart
@@ -141,13 +131,13 @@ climate:
     cool_action:
       - logger.log: cool!
     idle_action:
-      - light.turn_off: status
-      - switch.turn_off: s3
+      - light.turn_off: status_led_gpio2
+      - switch.turn_off: pump_switch
     default_preset: Home
     preset:
       - name: Home
         mode: COOL
-        default_target_temperature_high: 15 °C
+        default_target_temperature_high: 16.3 °C
 
 
 
@@ -278,10 +268,25 @@ script:
           value: !lambda |-
             return id($clock).utcnow().timestamp;
 
-      - light.turn_on: status
+      - light.turn_on: status_led_gpio2
       - delay: 2s
-      - light.turn_off: status
+      - light.turn_off: status_led_gpio2
 
-      - switch.turn_on: s3
+      - switch.turn_on: pump_switch
       - delay: 0.3s
-      - switch.turn_off: s3
+      - switch.turn_off: pump_switch
+
+
+button:
+  - platform: wake_on_lan
+    name: "Start jj"
+    target_mac_address: fc:34:97:a1:f5:ca
+
+  - platform: wake_on_lan
+    name: "Start hp"
+    target_mac_address: a4:5d:36:9b:18:16
+
+  - platform: wake_on_lan
+    name: "Start r64"
+    target_mac_address: a8:a1:59:38:51:47
+

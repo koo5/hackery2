@@ -4,4 +4,4 @@
     name: "pump${n}"
     restore_mode: ALWAYS_OFF
     inverted: true
-    interlock: [dummy, pump1, pump2, pump3, pump4]
+    interlock: [pump1, pump2, pump3, pump4]

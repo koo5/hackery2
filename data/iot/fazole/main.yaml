@@ -1,5 +1,8 @@
 #https://www.elprocus.com/vga-connector/
 
+#https://www.upesy.com/blogs/tutorials/esp32-pinout-reference-gpio-pins-ultimate-guide
+
+# https://www.laskakit.cz/iot-esp-32s-2-4ghz-dual-mode-wifi-bluetooth-rev-1--cp2102/#relatedFiles
 
 
 substitutions:
@@ -19,10 +22,7 @@ esp32:
 
 
 logger:
-  level: INFO
-
-
-api:
+  level: DEBUG
 
 
 mqtt:
@@ -30,11 +30,12 @@ mqtt:
   port: !secret mqtt_port
   username: !secret mqtt_user
   password: !secret mqtt_password
-  keepalive: 8s
-  reboot_timeout: 45min
+  #keepalive: 2s
+  #reboot_timeout: 145min
 
 
 wifi:
+  power_save_mode: none
   networks:
   - ssid: !secret ssid
     password: !secret password
@@ -46,16 +47,20 @@ wifi:
       dns2: 8.8.8.8
 
 
+network:
+  enable_ipv6: true
+
+
 ota:
   password: ""
 
 
-captive_portal:
-
-
 web_server:
   port: 80
-
+  #css_include: "web/webserver-v1.min.css"
+  #css_url: ""
+  #js_include: "web/webserver-v1.min.js"
+  #js_url: ""
 
 sun:
   latitude: 50.0755°
@@ -89,6 +94,23 @@ text_sensor:
       return  { str };
     update_interval: 1s
 
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 1
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 2
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 3
+  - !include
+    file: last_pump_ts_text.yaml
+    vars:
+      n: 4
+
 
 
 time:
@@ -112,76 +134,108 @@ sensor:
     type: azimuth
 
 
+
   - !include
     file: wetness_raw.yaml
     vars:
       n: 1
-      pin: 33
+      pin: 36
   - !include
     file: wetness.yaml
     vars:
       n: 1
+
+
   - !include
     file: wetness_raw.yaml
     vars:
       n: 2
-      pin: 32
+      pin: 39
   - !include
     file: wetness.yaml
     vars:
       n: 2
+
+
   - !include
     file: wetness_raw.yaml
     vars:
       n: 3
-      pin: 35
-  - !include
-    file: wetness.yaml
-    vars:
-      n: 3
-  - !include
-    file: wetness_raw.yaml
-    vars:
-      n: 4
       pin: 34
   - !include
     file: wetness.yaml
     vars:
+      n: 3
+
+
+  - !include
+    file: wetness_raw.yaml
+    vars:
       n: 4
+      pin: 35
+  - !include
+    file: wetness.yaml
+    vars:
+      n: 4
+
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 32
+
+
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 33
+
+
+
+  - platform: max6675
+    name: "Living Room Temperature"
+    cs_pin: 22
+    update_interval: 1s
+
+
+spi:
+  miso_pin: 21
+  clk_pin: 23
+
+
+
 
 
 switch:
   - platform: restart
     id: manual_restart
     name: "Living Room Restart"
-  - platform: gpio
-    pin: 21
-    id: dummy
-    #name: "interlock dummy"
-    restore_mode: ALWAYS_OFF
-    inverted: true
-    interlock: [dummy, pump1, pump2, pump3, pump4]
 
   - !include
     file: switch.yaml
     vars:
       n: 1
-      pin: 18
+      pin: 13
   - !include
     file: switch.yaml
     vars:
       n: 2
-      pin: 23
+      pin: 14
   - !include
     file: switch.yaml
     vars:
       n: 3
-      pin: 19
+      pin: 27
   - !include
     file: switch.yaml
     vars:
       n: 4
-      pin: 22
+      pin: 26
+#  - !include
+#    file: switch.yaml
+#    vars:
+#      n: 3
+#      pin: 25
 
 
 climate:
