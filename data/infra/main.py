@@ -3,7 +3,23 @@ import sys
 import time
 
 """
-the following code describes and declares the entire IOT infrastructure.
+the following code describes and maintains the entire IOT infrastructure.
+
+The IOT infrastructure is composed of the following components:
+
+# the VPS ("vps2")
+running the following services:
+## influxdb
+ 
+## mosquitto
+
+ 
+
+# IOT devices
+
+
+
+# grafana
 
 
 
