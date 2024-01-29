@@ -1,7 +1,7 @@
 # https://www.airgradient.com/documentation/diy/
 
 # https://esphome.io/components/sensor/sgp30.html
--
+
 # The SGP30 sensor will re-calibrate its baseline each time it is powered on. During the first power-up this will take up to 12 hours. Exposing to outside air for at least 10 minutes cumulative time is advised during the calibration period.
 #
 #For best performance and faster startup times, the current baseline needs to be ....
@@ -12,8 +12,11 @@
 
 substitutions:
   name: $name
+
+
 ota:
   password: !secret otapass
+
 
 wifi:
   power_save_mode: none
@@ -121,12 +124,36 @@ display:
           it.printf(0, 0,   id(fff), "CO2 %.0f",  id(co2).state);
           it.printf(0, 14,  id(fff), "eCO %.0f",  id(eco2).state);
           it.printf(0, 28,  id(fff), "TVO %.0f",  id(tvoc).state);
+      - id: page4
+        lambda: |-  
+          char time_string[10] = "----";
+          char date_string[10] = "----";
+          if (id(ntp).now().is_valid()) 
+          {
+            time_t currTime = id(ntp).now().timestamp;
+            strftime(time_string, sizeof(time_string), "%H:%M:%S", localtime(&currTime));
+            strftime(date_string, sizeof(date_string), "%Y-%m-%d", localtime(&currTime));
+          }
+          it.printf(0, 0,   id(fff), time_string);
+          it.printf(0, 14,   id(fff), date_string);
+          it.printf(0, 28,   id(fff), "");
+      - id: blank
+        lambda: |- 
+          {};
 
 
 interval:
   - interval: 6s
     then:
-      - display.page.show_next: oled
+      - if:
+          condition:
+            lambda: |-
+              return (id(ntp).state - id(last_interaction).state < 60)
+          then:
+            - display.page.show_next: oled
+          else:
+            - display.page.show: blank
+
       - component.update: oled
 
 uart:
@@ -210,12 +237,47 @@ sensor:
       - delta: 20%
     on_value:
       then:
-        - lambda: !lambda |-
-            id(oled).contrast = 255;
-        - delay: 50s
-        - lambda: !lambda |-
-            id(oled).contrast = 0;
+        - component.resume: pms
+#
+#        - pms.set_update_interval:
+#            minutes: !lambda |-
+#              if (x > 100) {
+#                return 1;
+#              } else {
+#                return 10;
+#              }
+#        - lambda: !lambda |-
+#            id(oled).contrast = 255;
+#        - delay: 50s
+#        - lambda: !lambda |-
+#            id(oled).contrast = 0;
+#
 
 
 
+time:
+  - platform: sntp
+    id: ntp
+    on_time_sync:
+      then:
+        - logger.log: "Synchronized clock."
 
+
+
+text_sensor:
+  - platform: sun
+    name: Next Sunrise
+    type: sunrise
+  - platform: sun
+    name: Next Sunset
+    type: sunset
+  - platform: template
+    name: "Time NTP"
+    lambda: |-
+      char str[30];
+      if (!id(ntp).now().is_valid()) { return { "----" }; }
+      time_t currTime = id(ntp).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
