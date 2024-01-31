@@ -183,7 +183,16 @@ text_sensor:
       return  { str };
     update_interval: 15s
 
-
+  - platform: template
+    id: last_pump_ts_text
+    name: last_pump_ts_text
+    lambda: |-
+      char str[30];
+      time_t currTime = id(last_pump_ts).state;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 1s
 
 
 time:
