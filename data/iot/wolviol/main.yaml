@@ -150,7 +150,7 @@ script:
       - logger.log: "jawol!"
       - servo.write:
           id: my_servo
-          level: 55%
+          level: 52%
       - delay: 0.5s
       - servo.write:
           id: my_servo
