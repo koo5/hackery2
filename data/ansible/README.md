@@ -25,3 +25,12 @@ ansible -i workers.yaml mms -m shell -a 'uname -a'
 ansible -i workers.yaml mms -m shell -a 'date --utc --rfc-2822'
 ansible-playbook -i workers.yaml playbook1.yaml
 
+
+
+
+## pass
+
+ echo "my-ansible-vault-pw" > ~/my-ansible-vault-pw-file
+ ansible-vault encrypt_string --vault-id my_user@~/my-ansible-vault-pw-file 'pass' --name 'vmi_sudo_password'
+
+
