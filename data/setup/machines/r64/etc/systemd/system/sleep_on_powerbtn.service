@@ -1,0 +1,9 @@
+[Unit]
+Description=sleep_on_powerbtn
+
+[Service]
+ExecStart=/home/koom/hackery2/src/hackery2/bin/sleep_on_powerbtn.py
+
+[Install]
+WantedBy=multi-user.target
+

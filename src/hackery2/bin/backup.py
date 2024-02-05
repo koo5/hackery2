@@ -54,7 +54,7 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	fss = get_filesystems()
 
 	if hostname == 'r64':
-		for cloud_host in json.load(open(expanduser('~/secrets.json')))['cloud_servers']:
+		for cloud_host in json.load(open(os.path.expanduser('~/secrets.json')))['cloud_servers']:
 			rsync_from_clouds(fss, cloud_host)
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
@@ -157,7 +157,9 @@ import grp
 
 def rsync_from_clouds(fss, cloud_host):
 
-	where = f"{fss[0]['toplevel']}/backups/{cloud_host}/root"
+	where = f"{fss[0]['toplevel']}/backups/cloud/{cloud_host}/root"
+
+	os.makedirs(where, exist_ok=True)
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
 	
