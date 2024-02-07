@@ -78,6 +78,10 @@ button:
     name: "Start r64"
     target_mac_address: a8:a1:59:38:51:47
 
+  - platform: template
+    name: "WOL"
+    on_press:
+      - script.execute: wol
 
 
 servo:
