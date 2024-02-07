@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hackery2/bin/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/hackery2/bin/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/ygg/tweak_ygg_conf.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/ansible/workers.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/data/ansible/workers.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/ygg/yggdrasil_conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/ygg/yggdrasil_conf.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,24 +41,24 @@
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-50da183f06c8-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13135.95" />
+        <option value="bundled-python-sdk-5a2391486177-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13763.11" />
       </set>
     </attachedChunks>
   </component>
@@ -72,6 +73,7 @@
       <workItem from="1697406616279" duration="746000" />
       <workItem from="1698590076426" duration="4032000" />
       <workItem from="1703414304810" duration="1222000" />
+      <workItem from="1706871929785" duration="1035000" />
     </task>
     <servers />
   </component>

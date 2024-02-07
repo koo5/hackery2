@@ -1,6 +1,6 @@
 import hjson
 
-local_fn = '/etc/yggdrasil.conf'
+local_fn = '/etc/yggdrasil/yggdrasil.conf'
 
 def load_local():
 	with open(local_fn) as f:
