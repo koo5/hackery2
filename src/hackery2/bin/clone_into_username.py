@@ -87,7 +87,16 @@ again with a number"""
 @click.argument('lookie', nargs=1)
 @click.argument('optional_clone_args', nargs=-1)
 def magic(lookie, **kwargs):
-	if lookie.isdigit():
+
+	try:
+		url = urllib.parse.urlparse(lookie)
+	except:
+		url = None
+
+	if url:
+		clone(lookie, **kwargs)
+
+	elif lookie.isdigit():
 		name = num_search(lookie)
 		if name == None:
 			logger.info( "wat")

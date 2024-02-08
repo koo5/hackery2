@@ -1,0 +1,3 @@
+#!/usr/bin/env fish
+
+ping $argv | ts "%d_%H-%M-%S"

@@ -1,0 +1,8 @@
+ journalctl -u systemd-logind.service -f -o json | jq '{time: .__REALTIME_TIMESTAMP, message: .MESSAGE}'
+
+ journalctl -u systemd-logind.service -f -o json
+
+ journalctl -u systemd-logind.service -f -o json-pretty
+
+
+

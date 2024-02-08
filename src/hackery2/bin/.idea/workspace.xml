@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../../data/iot/fazole/last_pump_ts_text.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../../data/iot/fazole/main.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/iot/fazole/main.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clone_into_username.py" beforeDir="false" afterPath="$PROJECT_DIR$/clone_into_username.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/getgit.py" beforeDir="false" afterPath="$PROJECT_DIR$/getgit.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,6 +149,7 @@
       <workItem from="1705433740051" duration="1034000" />
       <workItem from="1705854652819" duration="26000" />
       <workItem from="1705854692427" duration="563000" />
+      <workItem from="1705856280889" duration="693000" />
     </task>
     <servers />
   </component>

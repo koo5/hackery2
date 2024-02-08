@@ -3,6 +3,8 @@
 set MACHINE $argv[1]
 set DSTDIR $argv[2]
 
+mkdir -p $DSTDIR
+
 rsync -av --progress -h   -e 'hpnssh -p 44' -r \
   --exclude 'dont_backup'  \
   --exclude 'venv' \
