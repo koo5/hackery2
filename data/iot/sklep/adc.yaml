@@ -7,3 +7,18 @@
     #attenuation: 11db
     #filters:
     #  - lambda: return 30 - (x * 10);
+    on_value_range:
+      - above: 65.0
+        then:
+          - logger.log: "adc${pin} is above 65.0"
+          - http_request.post:
+              url: !webhook1
+              headers:
+                Content-Type: application/json
+              json:
+                key: value
+              verify_ssl: false
+
+          
+            
+          

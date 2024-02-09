@@ -71,3 +71,7 @@ sensor:
     vars:
       pin: A0
 
+
+http_request:
+  timeout: 100s
+  
