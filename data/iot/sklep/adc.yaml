@@ -3,22 +3,26 @@
     id: adc${pin}
     name: "adc${pin}"
     update_interval: 0.3s
-    #attenuation: auto
-    #attenuation: 11db
-    #filters:
-    #  - lambda: return 30 - (x * 10);
+    filters:
+      - median:
+          window_size: 3
+          send_every: 3
+          send_first_at: 3
     on_value_range:
-      - above: 65.0
+      - below: 0.85
         then:
-          - logger.log: "adc${pin} is above 65.0"
+# number.set
+#          - script.execute:
+#              id: vodaaa
+          - logger.log: "adc${pin} is bad"
           - http_request.post:
-              url: !webhook1
+              url: !secret webhook1
               headers:
-                Content-Type: application/json
-              json:
-                key: value
+                Content-Type: "application/json"
+ #https://esphome.io/components/http_request.html#post-body-in-json-format-syntax-1
+              json: |-
+                root["message"] = "value";
+                root["priority"] = 5;
+                root["title"] = "mas ve sklepe akvarko";
               verify_ssl: false
 
-          
-            
-          
