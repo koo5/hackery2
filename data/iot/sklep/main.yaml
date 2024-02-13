@@ -55,7 +55,7 @@ mqtt:
   keepalive: 10s
   reboot_timeout: 50min
   #topic_prefix: $mqtt_topic_prefix
-  topic_prefix: koom_sklep
+  topic_prefix: "koo5/sklep"
 
 sensor:
 
