@@ -7,5 +7,5 @@ for line in process.stdout:
 	#print(line.__repr__())
 	line = line.strip()
 	if line.endswith('Power key pressed.'):
-		print('sleep.')
-		os.system('/home/koom/hackery2/src/hackery2/bin/sleep.sh')
+		print('sleep..')
+		os.system('/home/koom/hackery2/src/hackery2/bin/sleep.sh&')
