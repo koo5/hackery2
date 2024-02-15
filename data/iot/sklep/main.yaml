@@ -55,7 +55,7 @@ mqtt:
   keepalive: 10s
   reboot_timeout: 50min
   #topic_prefix: $mqtt_topic_prefix
-  topic_prefix: koom_sklep
+  topic_prefix: "koo5/sklep"
 
 sensor:
 
@@ -71,7 +71,22 @@ sensor:
     vars:
       pin: A0
 
-
+#
 http_request:
-  timeout: 100s
-  
+#  timeout: 100s
+
+#
+#script:
+#  - id: vodaaa
+#    then:
+#    - logger.log: "adc${pin} is bad"
+#    - http_request.post:
+#        url: !secret webhook1
+#        headers:
+#          Content-Type: application/json
+#        json:
+#          message: "adc${pin} is {{value}}"
+#          priority: 5
+#          title: "mas ve sklepe akvarko"
+#        verify_ssl: false
+#

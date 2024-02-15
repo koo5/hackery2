@@ -182,16 +182,16 @@ sensor:
       n: 4
 
 
-  - !include
-    file: adc.yaml
-    vars:
-      pin: 32
-
-
-  - !include
-    file: adc.yaml
-    vars:
-      pin: 33
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 32
+#
+#
+#  - !include
+#    file: adc.yaml
+#    vars:
+#      pin: 33
 
 
 
