@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../data/iot/fazole/main.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/iot/fazole/main.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clone_into_username.py" beforeDir="false" afterPath="$PROJECT_DIR$/clone_into_username.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/autonet.sh" beforeDir="false" afterPath="$PROJECT_DIR$/autonet.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +118,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-50da183f06c8-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13135.95" />
+        <option value="bundled-python-sdk-d68999036c7f-b11f5e8da5ad-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.14475.56" />
       </set>
     </attachedChunks>
   </component>
@@ -150,6 +150,7 @@
       <workItem from="1705854652819" duration="26000" />
       <workItem from="1705854692427" duration="563000" />
       <workItem from="1705856280889" duration="693000" />
+      <workItem from="1710164065032" duration="470000" />
     </task>
     <servers />
   </component>
