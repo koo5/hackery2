@@ -1,9 +1,10 @@
 #!/usr/bin/env fish
 
 
-ping -c 20 8.8.8.8; or sudo dhclient -v enp0s25
 
 cat /sys/class/net/enp0s25/carrier | grep 1; and begin
+	
+	ping -c 20 8.8.8.8; or sudo dhclient -v enp0s25
 
 	sudo dhcping -s  192.168.8.1   -h "a4:5d:36:9b:18:16"; and begin
 		sudo nmcli c show 'strasnice drat!' | grep GENERAL.STATE: | grep activated; 
@@ -21,6 +22,7 @@ cat /sys/class/net/enp0s25/carrier | grep 1; and begin
 		and exit 0;
 	end;
 
+end;
 exit 0
 
 
