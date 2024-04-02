@@ -141,6 +141,7 @@ sensor:
     id: "bed_air_temp"
     name: "air"
 
+
   - platform: dallas
     address: 0xea00000a4c49d628
     id: venky
@@ -211,7 +212,7 @@ web_server:
 
 dallas:
   - pin: D6
-    update_interval: 3s
+    update_interval: 15s
 
 
 # Only pins that support both input & output have integrated pull-up and pull-down resistors. Input-only GPIOs 34-39 do not.

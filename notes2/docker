@@ -135,3 +135,22 @@ https://news.ycombinator.com/item?id=34873687
 https://vsupalov.com/docker-arg-env-variable-guide/
 
 
+
+
+
+
+
+
+
+i'm finding the docker stack/swarm/compose jungle rather suboptimal for managing deployment even just on my dev machine. But this is probably evolving in the right direction:
+https://www.docker.com/blog/simplifying-kubernetes-with-docker-compose-and-friends/
+https://skaffold.dev/
+
+otoh, the whole situation with security updates in docker, and the whole culture of maximally minimal images configured by tweaking lenghty bash command lines..meh
+https://news.ycombinator.com/item?id=10782897
+https://github.com/docker-slim/docker-slim (not relevant but nice)
+
+better way to run python webapps? :
+https://github.com/phusion/baseimage-docker#whats_inside
+https://github.com/phusion/passenger-docker
+
