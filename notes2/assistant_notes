@@ -1,0 +1,15 @@
+https://forums.opensuse.org/t/how-to-stop-device-notifier-from-popping-up/107842/10
+ - stuff like this has to be googled. Functionality ("stop device notifier from popping up") should be first-class searchable content on your desktop.
+
+https://community.grafana.com/t/synthetic-monitoring-http-check-timeout/52761/2
+ - "10s ought to be enough for everybody"
+
+https://github.com/ansible/proposals/issues/92
+ - how is this not a huge disclaimer on the front page of https://www.ansible.com/ ?
+ - -vvvvvv
+ - -m trace
+ - ansible has a habit of getting silently stuck on frozen sshfs mounts and similar. Thats why the `  gather_subset: "!mounts"` in the play file.
+ - how are these not the first things to learn? Because they are the first things you run into.
+
+
+
