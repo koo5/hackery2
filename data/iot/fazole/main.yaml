@@ -197,13 +197,13 @@ sensor:
 
   - platform: max6675
     name: "Living Room Temperature"
-    cs_pin: 22
+    cs_pin: 18
     update_interval: 1s
 
 
 spi:
-  miso_pin: 21
-  clk_pin: 23
+  miso_pin: 17
+  clk_pin: 19
 
 
 
