@@ -1,3 +1,11 @@
+# motivation
+
+## improvement over e-mail protocols
+
+### spam and spam filtering
+
+
+
 # client
 
 
@@ -37,7 +45,7 @@ A domain name is an unchangeable identifier of the abstract concept of a "homese
 ## delegated server:
 
 A single IP address can host multiple web applications serving different DNS domains. This may be implemented and administered by a logic internal to the server software.
-
+m
 Steps 3.4 and 5 are deprecated because they use a service name not registered by IANA. They may be removed in a future version of the specification. Server admins are encouraged to use .well-known over any form of SRV records
  - https://spec.matrix.org/unstable/server-server-api/
 
@@ -58,7 +66,7 @@ Each homeserver publishes its public keys under /_matrix/key/v2/server. Homeserv
 
 
 
-# related projects / resources / meta
+# related projects and protocols / resources / meta 
 https://nate.mecca1.net/posts/2024-01-30_microblogging-protocols/
 
 
