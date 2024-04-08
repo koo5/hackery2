@@ -101,6 +101,8 @@ void loop() {
     bool alrighty = false;
     if (bytesRead == 40) {
 		std::cout << "40 Data received." << std::endl;
+		std::cout << std::endl;
+		
         // Process the data
         unsigned int pm25 = buffer[2] | buffer[1] << 8;
         unsigned int pm10 = buffer[4] | buffer[3] << 8;
@@ -126,7 +128,6 @@ void loop() {
         }
 
         if (check == sum && check != 0) {
-            std::cout << std::endl;
             
             std::cout << "PM2.5: " << pm25 << " ug/m3" << std::endl;            
             std::cout << "PM10: " << pm10 << " ug/m3" << std::endl;
