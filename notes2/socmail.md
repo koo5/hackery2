@@ -1,3 +1,31 @@
+# client
+
+
+fat client displays content, handles user interaction
+possible kinds of clients:
+  voice assistant
+  desktop app
+  web app (part of the node)
+  
+although the node serves a web version of the fat client, such fat client is not limited to connecting to the serving node. The node provides an api to the fat client. The fat client can maintain connections to multiple nodes, and it can also initiate http requests (or other kinds of connections?) to other kinds of services.
+
+
+# server
+
+Socmail network is composed of servers. Each server is a self-sovreign identity that can communicate with other servers. Servers are connected in a network, forming a graph. Each server has a unique identifier, and a public key. Servers can send messages to each other, and messages are signed with the sender's private key. Servers can also send messages to clients, and messages are signed with the server's private key. Servers can also send messages to other servers on behalf of clients, and messages are signed with the server's private key. 
+
+
+## identity and security
+Much of today's internet relies on the system of domain names and certificates. This system is centralized, and it is vulnerable to attacks. The Yellow Network is decentralized, and it does not rely on domain names or certificates. Instead, each server has a unique identifier, and a public key. 
+
+### messages
+Servers can send messages to each other, and messages are signed with the sender's private key. Servers can also send messages to clients, and messages are signed with the server's private key. Servers can also send messages to other servers on behalf of clients, and messages are signed with the server's private key.
+
+
+### inter-server communication
+nodes only send opaque json blobs among themselves, as directed by user interaction on the originating node
+
+
 ## server domains and discovery
 
 ## homeserver
@@ -18,8 +46,6 @@ GET /.well-known/matrix/server
 
 
 
-
-
 ## verifying server public keys
 
 ### pubkey database
@@ -30,20 +56,30 @@ Each homeserver publishes its public keys under /_matrix/key/v2/server. Homeserv
 
 
 
-------
 
-https://docs.farcaster.xyz/reference/frames/spec
 
-Any Ethereum address can register a Farcaster account by making an onchain transaction.
+# related projects / resources / meta
+https://nate.mecca1.net/posts/2024-01-30_microblogging-protocols/
 
+
+## matrix
+https://github.com/adrianrudnik/matrix-wellknown-server
 
 https://spec.matrix.org/latest/
 
+
+## bsky
 https://atproto.com/
 
 https://bsky.app/feeds
 
 https://blog.paulbohm.com/p/blue-sky-farcaster-substack-notes
+
+
+## farcaster
+Any Ethereum address can register a Farcaster account by making an onchain transaction.
+
+https://docs.farcaster.xyz/reference/frames/spec
 
 https://blockprotocol.org/docs/blocks/environments#your-own-application
 
@@ -51,8 +87,13 @@ https://github.com/farcasterxyz/protocol/blob/main/docs/OVERVIEW.md
 
 https://www.supercast.xyz/
 
+
+## nostr
+https://nostr.com/
+
+
+## ?
 https://yup.io/
 
-https://neynar.com/
-
+https://neynar.com
 
