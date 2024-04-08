@@ -78,11 +78,12 @@ def print_free_space_very_smartly():
 while True:
 	print_free_space_very_smartly()
 
-	fff = "utc" + datetime.utcnow().strftime("%Y_%m_%d_%H_%M_%S.%f") + ".png"
+	fff = "utc" + datetime.utcnow().strftime("%Y_%m_%d_T_%H_%M_%S.%f") + ".png"
 	tmp_fn = tmp_dir + fff
 	dest_fn = dest_dir + "/" + fff
-	cmd = ["scrot", "-o"] + sys.argv[3:] + [tmp_fn]
-	print(cmd)
+	cmd = ["scrot", "--overwrite"] + sys.argv[3:] + [tmp_fn]
+	cmd = ["spectacle", "--background", '--nonotify', '--pointer'] + sys.argv[3:] + ['--output', tmp_fn]
+	print(shlex.join(cmd))
 	subprocess.check_call(cmd)
 	safe_move(tmp_fn, dest_fn)
 

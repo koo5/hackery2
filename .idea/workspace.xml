@@ -5,9 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data/ygg/tweak_ygg_conf.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/ansible/workers.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/data/ansible/workers.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/ygg/yggdrasil_conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/ygg/yggdrasil_conf.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/airmaster/test.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/airmaster/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/data/airmaster/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/airmaster/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/airmaster/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hackery2/bin/screenshot-whole-loop.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hackery2/bin/screenshot-whole-loop.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +61,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-5a2391486177-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13763.11" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
+        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
       </set>
     </attachedChunks>
   </component>
@@ -74,6 +78,7 @@
       <workItem from="1698590076426" duration="4032000" />
       <workItem from="1703414304810" duration="1222000" />
       <workItem from="1706871929785" duration="1035000" />
+      <workItem from="1712602127891" duration="5684000" />
     </task>
     <servers />
   </component>
