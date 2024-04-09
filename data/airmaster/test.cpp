@@ -15,9 +15,13 @@ void puttt(std::string name, const std::string value)
 	if (!mosq)
 		return;
 	std::string topic = "am7/sensor/" + name + "/state";
-    int ret = mosquitto_publish(mosq, NULL, topic.c_str(), 7, "value.c_str()", 0, false);
+    std::cerr << topic << std::endl;
+    std::cerr << topic.c_str() << std::endl;
+    std::cerr << value << std::endl;
+    std::cerr << value.c_str() << std::endl;
+    int ret = mosquitto_publish(mosq, NULL, topic.c_str(), 7, value.c_str(), 0, false);
     if(ret){
-        std::cerr << "Can't publish to topic " << topic << std::endl;
+        std::cerr << "err" << ret << " , failed publish to topic " << topic << ", value: " << value << std::endl;
     }   
 }
 
@@ -82,17 +86,26 @@ bool setup() {
 		}
 	}
 
+	std::cout << "mosquitto_loop_start.." << std::endl;
+	mosquitto_loop_start(mosq);
+
 	puttt("hello", "world");
+    std::cout << "sleep.." << std::endl;
+    usleep(15 * 1000 * 1000);
+
     return true;
 }
 
 
 void loop() {
+
+
+    usleep(10 * 1000 * 1000);
+
+
     // Send command to the sensor
-    
     unsigned char command[] = {0x55, 0xCD, 0x47, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x69, 0x0D, 0x0A};
     write(serialPortFd, command, sizeof(command));
-
     usleep(1 * 1000 * 1000);
 
     // Read data from the sensor
@@ -129,19 +142,19 @@ void loop() {
 
         if (check == sum && check != 0) {
             
-            std::cout << "PM2.5: " << pm25 << " ug/m3" << std::endl;            
-            std::cout << "PM10: " << pm10 << " ug/m3" << std::endl;
-            std::cout << "HCHO: " << hcho << " ug/m3" << std::endl;
-            std::cout << "TVOC: " << tvoc << " ug/m3" << std::endl;
-            std::cout << "CO2: " << co2 << " ppm" << std::endl;
-            std::cout << "Temp: " << temp << " °C" << std::endl;
-            std::cout << "Hum: " << humidity << " %" << std::endl;
-            std::cout << "PM0.3: " << ppm03 << " ppm" << std::endl;
-            std::cout << "PM0.5: " << ppm05 << " ppm" << std::endl;
-            std::cout << "PM1.0: " << ppm1 << " ppm" << std::endl;
-            std::cout << "PM2.5: " << ppm2 << " ppm" << std::endl;
-            std::cout << "PM5.0: " << ppm5 << " ppm" << std::endl;
-            std::cout << "PM10: " << ppm10 << " ppm" << std::endl;
+            std::cout << "PM2.5: " << pm25 << " ug/m3" <<std::endl; puttt("PM2.5", std::to_string(pm25));
+            std::cout << "PM10: " << pm10 << " ug/m3" << std::endl; puttt("PM10", std::to_string(pm10));
+            std::cout << "HCHO: " << hcho << " ug/m3" << std::endl; puttt("HCHO", std::to_string(hcho));
+            std::cout << "TVOC: " << tvoc << " ug/m3" << std::endl; puttt("TVOC", std::to_string(tvoc));
+            std::cout << "CO2: " << co2 << " ppm" <<     std::endl; puttt("CO2", std::to_string(co2));
+            std::cout << "Temp: " << temp << " °C" <<    std::endl; puttt("temp", std::to_string(temp));
+            std::cout << "Hum: " << humidity << " %" <<  std::endl; puttt("hum", std::to_string(humidity));
+            std::cout << "PM0.3: " << ppm03 << " ppm" << std::endl; puttt("PPM0.3", std::to_string(ppm03));
+            std::cout << "PM0.5: " << ppm05 << " ppm" << std::endl; puttt("PPM0.5", std::to_string(ppm05));
+            std::cout << "PM1.0: " << ppm1 << " ppm" <<  std::endl; puttt("PPM1.0", std::to_string(ppm1));
+            std::cout << "PM2.5: " << ppm2 << " ppm" <<  std::endl; puttt("PPM2.5", std::to_string(ppm2));
+            std::cout << "PM5.0: " << ppm5 << " ppm" <<  std::endl; puttt("PPM5.0", std::to_string(ppm5));
+            std::cout << "PM10: " << ppm10 << " ppm" <<  std::endl; puttt("PPM10", std::to_string(ppm10));
             
             std::cout << std::endl;
             alrighty = true;
