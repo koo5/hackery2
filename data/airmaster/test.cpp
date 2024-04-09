@@ -6,9 +6,8 @@
 #include <mosquitto.h>
 
 
-const int baudRate = B19200;
 int serialPortFd;
-struct mosquitto *mosq;
+struct mosquitto *mosq = 0;
 
 
 void puttt(std::string name, const std::string value)
@@ -16,7 +15,7 @@ void puttt(std::string name, const std::string value)
 	if (!mosq)
 		return;
 	std::string topic = "am7/sensor/" + name + "/state";
-    int ret = mosquitto_publish(mosq, NULL, topic.c_str(), 7, value.c_str(), 0, false);
+    int ret = mosquitto_publish(mosq, NULL, topic.c_str(), 7, "value.c_str()", 0, false);
     if(ret){
         std::cerr << "Can't publish to topic " << topic << std::endl;
     }   
@@ -37,6 +36,7 @@ bool setup() {
     }
 
     // Configure serial port
+    const int baudRate = B19200;
     struct termios options;
     tcgetattr(serialPortFd, &options);
     cfsetispeed(&options, baudRate);
@@ -49,9 +49,8 @@ bool setup() {
     options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
     options.c_oflag &= ~OPOST;
     tcsetattr(serialPortFd, TCSANOW, &options);
-
     std::cout << "Serial communication initialized." << std::endl;
-    
+   
 
     mosquitto_lib_init();
     
@@ -90,10 +89,11 @@ bool setup() {
 
 void loop() {
     // Send command to the sensor
+    
     unsigned char command[] = {0x55, 0xCD, 0x47, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x69, 0x0D, 0x0A};
     write(serialPortFd, command, sizeof(command));
 
-    usleep(1000000); // Sleep for 1 second
+    usleep(1 * 1000 * 1000);
 
     // Read data from the sensor
     unsigned char buffer[40];
@@ -156,9 +156,11 @@ void loop() {
 	
 	if (!alrighty)
 	{
-		std::cerr << "bytesRead: " << bytesRead << ". Data: ";
+		std::cerr << "bytesRead: " << static_cast<int>(bytesRead)  << ". Data: ";
 		for (int i = 0; i < bytesRead; i++) {
         	std::cerr << std::hex << std::setw(3) << std::setfill('0') << static_cast<int>(buffer[i]) << " ";
+        	if (i == 39)
+        		break;
     	}
     	std::cerr << std::endl;	
 	}

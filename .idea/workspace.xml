@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="" />
+    <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/airmaster/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/airmaster/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/airmaster/test.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/data/airmaster/test.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -71,7 +75,8 @@
       <workItem from="1698590076426" duration="4032000" />
       <workItem from="1703414304810" duration="1222000" />
       <workItem from="1706871929785" duration="1035000" />
-      <workItem from="1712602127891" duration="5684000" />
+      <workItem from="1712602127891" duration="6008000" />
+      <workItem from="1712620939895" duration="96000" />
     </task>
     <servers />
   </component>
