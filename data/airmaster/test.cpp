@@ -15,10 +15,6 @@ void puttt(std::string name, const std::string value)
 	if (!mosq)
 		return;
 	std::string topic = "am7/sensor/" + name + "/state";
-    std::cerr << topic << std::endl;
-    std::cerr << topic.c_str() << std::endl;
-    std::cerr << value << std::endl;
-    std::cerr << value.c_str() << std::endl;
     int ret = mosquitto_publish(mosq, NULL, topic.c_str(), value.length(), value.c_str(), 1, true);
     if(ret){
         std::cerr << "err" << ret << " , failed publish to topic " << topic << ", value: " << value << std::endl;
@@ -102,6 +98,8 @@ void loop() {
 
     usleep(10 * 1000 * 1000);
 
+	unsigned char buffer[40];
+	int numBytesRead;// = read(serialPortFd, buffer, sizeof(buffer));
 
     // Send command to the sensor
     unsigned char command[] = {0x55, 0xCD, 0x47, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x69, 0x0D, 0x0A};
@@ -109,13 +107,32 @@ void loop() {
     usleep(1 * 1000 * 1000);
 
     // Read data from the sensor
-    unsigned char buffer[40];
-    int bytesRead = read(serialPortFd, buffer, sizeof(buffer));
+
+	while(true)
+	{
+		int r = read(serialPortFd, buffer, 1);
+		if (r == 1)
+		{
+			if (buffer[0] == 170)
+			{
+				break;
+			}
+		}
+	}
+	
+	usleep(100 * 1000);
+    
+    numBytesRead = read(serialPortFd, buffer+1, 39);
+
+	std::cerr << "numBytesRead: " << static_cast<int>(numBytesRead)  << ". Data: ";
+	for (int i = 0; i < numBytesRead+1; i++) {
+		std::cerr << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(buffer[i]) << " ";
+	}
+	std::cerr << std::endl;	
+
     bool alrighty = false;
-    if (bytesRead == 40) {
-		std::cout << "40 Data received." << std::endl;
-		std::cout << std::endl;
-		
+    if (numBytesRead == 39) {
+    
         // Process the data
         unsigned int pm25 = buffer[2] | buffer[1] << 8;
         unsigned int pm10 = buffer[4] | buffer[3] << 8;
@@ -140,7 +157,7 @@ void loop() {
             sum += buffer[i];
         }
 
-        if (check == sum && check != 0) {
+        if (check == sum/* && check != 0*/) {
             
             std::cout << "PM2.5: " << pm25 << " ug/m3" <<std::endl; puttt("PM2.5", std::to_string(pm25));
             std::cout << "PM10: " << pm10 << " ug/m3" << std::endl; puttt("PM10", std::to_string(pm10));
@@ -164,18 +181,11 @@ void loop() {
         }
         
     } else {
-        std::cerr << "Error, bytesRead != 40: " << bytesRead << std::endl;
+        std::cerr << "Error, numBytesRead != 40: " << static_cast<int>(numBytesRead) << std::endl;
     }
 	
 	if (!alrighty)
 	{
-		std::cerr << "bytesRead: " << static_cast<int>(bytesRead)  << ". Data: ";
-		for (int i = 0; i < bytesRead; i++) {
-        	std::cerr << std::hex << std::setw(3) << std::setfill('0') << static_cast<int>(buffer[i]) << " ";
-        	if (i == 39)
-        		break;
-    	}
-    	std::cerr << std::endl;	
 	}
 
 }
