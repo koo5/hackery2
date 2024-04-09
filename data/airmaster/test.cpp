@@ -19,7 +19,7 @@ void puttt(std::string name, const std::string value)
     std::cerr << topic.c_str() << std::endl;
     std::cerr << value << std::endl;
     std::cerr << value.c_str() << std::endl;
-    int ret = mosquitto_publish(mosq, NULL, topic.c_str(), 7, value.c_str(), 0, false);
+    int ret = mosquitto_publish(mosq, NULL, topic.c_str(), value.length(), value.c_str(), 1, true);
     if(ret){
         std::cerr << "err" << ret << " , failed publish to topic " << topic << ", value: " << value << std::endl;
     }   
