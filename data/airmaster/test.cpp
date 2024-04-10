@@ -209,3 +209,14 @@ int main() {
     
     return 0;
 }
+
+
+
+# more on the binary protocol:
+# https://github.com/SergiySeletsky/air-master-esphome/blob/main/components/airmaster/airmaster.cpp
+# https://github.com/SergiySeletsky/air-master-esphome/blob/main/components/airmaster/sensor.py
+# see also:
+# https://github.com/reejk/AirMasterConnect/blob/main/src/Program.cs
+# https://github.com/WeSpeakEnglish/air_master_am7_control
+# https://github.com/eclipse/mosquitto/blob/master/examples/publish/basic-1.c
+
