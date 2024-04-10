@@ -95,13 +95,13 @@ https://github.com/farcasterxyz/protocol/blob/main/docs/OVERVIEW.md
 
 https://www.supercast.xyz/
 
+https://neynar.com
+
 
 ## nostr
 https://nostr.com/
 
 
-## ?
+## an android multi-client
 https://yup.io/
-
-https://neynar.com
 
