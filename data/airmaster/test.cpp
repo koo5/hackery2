@@ -118,6 +118,7 @@ void loop() {
 				break;
 			}
 		}
+		usleep(10 * 1000);
 	}
 	
 	usleep(100 * 1000);
