@@ -77,12 +77,6 @@ again with a number"""
 
 
 
-
-
-
-
-
-
 @click.command()
 @click.argument('lookie', nargs=1)
 @click.argument('optional_clone_args', nargs=-1)

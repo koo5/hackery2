@@ -12,12 +12,11 @@ except:
 	cmd = 'run'
 
 
-for tty in ["/dev/ttyUSB0", "/dev/ttyACM0"]:
-	if os.path.exists(tty):
-		usb = f'--device {tty}'
-		break
-else:
-	usb = ''
-
+usb = ''
+#for tty in ["/dev/ttyUSB0", "/dev/ttyACM0"]:
+#	if os.path.exists(tty):
+#		usb = f'--device {tty}'
+#		break
+	
 os.system(f'fish -c "docker run --rm --network host -v /var/run/dbus:/var/run/dbus -v (pwd):/config {usb} -it esphome/esphome -s name {name} {cmd} main.yaml {usb}"')
 

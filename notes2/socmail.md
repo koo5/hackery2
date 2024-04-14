@@ -96,7 +96,7 @@ https://github.com/farcasterxyz/protocol/blob/main/docs/OVERVIEW.md
 https://www.supercast.xyz/
 
 https://neynar.com
-
+* https://docs.neynar.com/reference/fname-availability
 
 ## nostr
 https://nostr.com/
@@ -104,4 +104,23 @@ https://nostr.com/
 
 ## an android multi-client
 https://yup.io/
+
+
+
+
+
+
+
+
+
+# protocol notes
+
+https://github.com/grpc/grpc-web#wire-format-mode
+
+https://github.com/grpc/grpc-web#server-side-streaming
+
+https://docs.rs/tonic-web/latest/tonic_web/
+
+
+
 

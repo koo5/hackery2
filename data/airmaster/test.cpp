@@ -113,7 +113,7 @@ void loop() {
 		int r = read(serialPortFd, buffer, 1);
 		if (r == 1)
 		{
-			if (buffer[0] == 170)
+			if (buffer[0] == 170) //0xAA .. https://github.com/SergiySeletsky/air-master-esphome
 			{
 				break;
 			}
@@ -219,4 +219,5 @@ int main() {
 # https://github.com/reejk/AirMasterConnect/blob/main/src/Program.cs
 # https://github.com/WeSpeakEnglish/air_master_am7_control
 # https://github.com/eclipse/mosquitto/blob/master/examples/publish/basic-1.c
-
+# https://github.com/Detao/AirKiss/blob/master/AirKiss/AirKiss/airkiss.c
+# https://github.com/oldrev/sandwych-smartconfig
