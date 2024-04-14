@@ -139,7 +139,7 @@ sensor:
   - platform: dallas
     address: 0x6d011453b48eaa28
     id: "bed_air_temp"
-    name: "air"
+    name: "air temp"
 
 
   - platform: dallas

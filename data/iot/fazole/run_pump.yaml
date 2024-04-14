@@ -17,7 +17,33 @@
                 id: last_pump_ts${n}
                 value: !lambda |-
                   return id($clock).utcnow().timestamp;
+            - mqtt.publish:
+                topic: fazole/pump/pump4/state
+                payload: "watering"
             - switch.turn_on: pump${n}
-            - delay: 6s
+            - delay: 1s
+            - mqtt.publish:
+                topic: fazole/pump/pump4/state
+                payload: "watering"
+            - delay: 1s
+            - mqtt.publish:
+                topic: fazole/pump/pump4/state
+                payload: "watering"
+            - delay: 1s
+            - mqtt.publish:
+                topic: fazole/pump/pump4/state
+                payload: "watering"
+            - delay: 1s
+            - mqtt.publish:
+                topic: fazole/pump/pump4/state
+                payload: "watering"
+            - delay: 1s
+            - mqtt.publish:
+                topic: fazole/pump/pump4/state
+                payload: "watering"
+            - delay: 1s
             - switch.turn_off: pump${n}
-            #- delay: 5h # this should be handled by thermostat
+            - mqtt.publish:
+                topic: fazole/pump/pump4/state
+                payload: "off"
+            
