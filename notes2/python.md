@@ -148,3 +148,15 @@ https://news.ycombinator.com/item?id=28880782
 # packaging
 
 https://github.com/aequitas-aod/python-project-template
+
+
+
+# grpc
+
+https://grpc.io/docs/languages/python/quickstart/
+
+
+https://grpc.io/docs/guides/
+
+
+
