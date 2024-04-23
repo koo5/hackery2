@@ -6,6 +6,16 @@
 
 
 
+# binary protocol 
+
+https://github.com/grpc/grpc-web#wire-format-mode
+
+https://github.com/grpc/grpc-web#server-side-streaming
+
+https://docs.rs/tonic-web/latest/tonic_web/
+
+
+
 # client
 
 
@@ -110,17 +120,74 @@ https://yup.io/
 
 
 
+# concepts
+
+https://en.wikipedia.org/wiki/Public_key_infrastructure
 
 
 
-# protocol notes
+----
 
-https://github.com/grpc/grpc-web#wire-format-mode
+Homeservers are federated: the Matrix specification defines a Sever-Server API (also known as Federation API) to describe interactions between servers. Whenever a user is in a room, their homeserver needs to have a local copy of that room.
 
-https://github.com/grpc/grpc-web#server-side-streaming
-
-https://docs.rs/tonic-web/latest/tonic_web/
+---
 
 
+The APIs are implemented using HTTPS requests between each of the servers. These HTTPS requests are strongly authenticated using public key signatures at the TLS transport layer and using public key signatures in HTTP Authorization headers at the HTTP layer.
 
+---
+There are three main kinds of communication that occur between homeservers:
+
+Persistent Data Units (PDUs): These events are broadcast from one homeserver to any others that have joined the same room (identified by Room ID). They are persisted in long-term storage and record the history of messages and state for a room.
+
+Like email, it is the responsibility of the originating server of a PDU to deliver that event to its recipient servers. However PDUs are signed using the originating server’s private key so that it is possible to deliver them through third-party servers.
+
+Ephemeral Data Units (EDUs): These events are pushed between pairs of homeservers. They are not persisted and are not part of the history of a room, nor does the receiving homeserver have to reply to them.
+
+Queries: These are single request/response interactions between a given pair of servers, initiated by one side sending an HTTPS GET request to obtain some information, and responded by the other. They are not persisted and contain no long-term significant history. They simply request a snapshot state at the instant the query is made.
+
+EDUs and PDUs are further wrapped in an envelope called a Transaction, which is transferred from the origin to the destination homeserver using an HTTPS PUT request.
+---
+
+
+
+The mandatory baseline for server-server communication in Matrix is exchanging JSON objects over HTTPS APIs. More efficient transports may be specified in future as optional extensions.
+
+---
+
+
+"everything is a room"? One-to-one conversation is no different than multi-user?
+this concept may or may not hold depending on the cryptographic algorithms used, and the concept of a "room" might eventually come to mean just a nameless channel with no intrinsic properties.
+ie.: it may not always even store messages on behalf of its users.
+compare with the concept of a conversation (a client feature)
+
+
+https://spec.matrix.org/latest/server-server-api/
+TLS
+
+Server-server communication must take place over HTTPS.
+
+The destination server must provide a TLS certificate signed by a known Certificate Authority.
+
+Requesting servers are ultimately responsible for determining the trusted Certificate Authorities, however are strongly encouraged to rely on the operating system’s judgement. Servers can offer administrators a means to override the trusted authorities list. Servers can additionally skip the certificate validation for a given whitelist of domains or netmasks for the purposes of testing or in networks where verification is done elsewhere, such as with .onion addresses.
+
+Servers should respect SNI when making requests where possible: a SNI should be sent for the certificate which is expected, unless that certificate is expected to be an IP address in which case SNI is not supported and should not be sent.
+
+Servers are encouraged to make use of the Certificate Transparency project.
+
+
+---
+ensure that they all report the same public keys.
+
+This approach is borrowed from the Perspectives Project, but modified to include the NACL keys and to use JSON instead of XML. It has the advantage of avoiding a single trust-root since each server is free to pick which notary servers they trust and can corroborate the keys returned by a given notary server by querying other servers.
+
+---
+
+
+
+
+
+## encryption
+https://signal.org/docs/specifications/doubleratchet/
+These properties gives some protection to earlier or later encrypted messages in case of a compromise of a party's keys.
 
