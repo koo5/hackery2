@@ -126,6 +126,7 @@ https://en.wikipedia.org/wiki/Public_key_infrastructure
 
 
 
+
 ----
 
 Homeservers are federated: the Matrix specification defines a Sever-Server API (also known as Federation API) to describe interactions between servers. Whenever a user is in a room, their homeserver needs to have a local copy of that room.
@@ -148,6 +149,14 @@ Queries: These are single request/response interactions between a given pair of 
 
 EDUs and PDUs are further wrapped in an envelope called a Transaction, which is transferred from the origin to the destination homeserver using an HTTPS PUT request.
 ---
+
+
+
+Note
+
+Events are not limited to the types defined in this specification. New or custom event types can be created on a whim using the Java package naming convention. For example, a com.example.game.score event can be sent by clients and other clients would receive it through Matrix, assuming the client has access to the com.example namespace.
+
+----
 
 
 
@@ -182,10 +191,17 @@ ensure that they all report the same public keys.
 This approach is borrowed from the Perspectives Project, but modified to include the NACL keys and to use JSON instead of XML. It has the advantage of avoiding a single trust-root since each server is free to pick which notary servers they trust and can corroborate the keys returned by a given notary server by querying other servers.
 
 ---
+## protobuf / grpc
+
+https://github.com/grpc/grpc-web#wire-format-mode
 
 
 
+https://blog.postman.com/postman-now-supports-grpc/
 
+https://www.miroslavholec.cz/blog/grpc-nastroje
+
+https://www.miroslavholec.cz/blog/grpc-navrh-sluzeb
 
 ## encryption
 https://signal.org/docs/specifications/doubleratchet/

@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../notes2/socmail.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../notes2/socmail.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/autonet.sh" beforeDir="false" afterPath="$PROJECT_DIR$/autonet.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backup.py" beforeDir="false" afterPath="$PROJECT_DIR$/backup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +119,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-d68999036c7f-b11f5e8da5ad-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.14475.56" />
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
+        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
       </set>
     </attachedChunks>
   </component>
@@ -151,6 +153,7 @@
       <workItem from="1705854692427" duration="563000" />
       <workItem from="1705856280889" duration="693000" />
       <workItem from="1710164065032" duration="470000" />
+      <workItem from="1713603558578" duration="1128000" />
     </task>
     <servers />
   </component>
