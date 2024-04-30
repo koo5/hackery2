@@ -164,6 +164,13 @@ The mandatory baseline for server-server communication in Matrix is exchanging J
 
 ---
 
+If the token refresh fails and the error response included a soft_logout: true property, then the client can treat it as a soft logout and attempt to obtain a new access token by re-logging in. If the error response does not include a soft_logout: true property, the client should consider the user as being logged out.
+
+Handling of clients that do not support refresh tokens is up to the homeserver; clients indicate their support for refresh tokens by including a refresh_token: true property in the request body of the /login and /register endpoints. For example, homeservers may allow the use of non-expiring access tokens, or may expire access tokens anyways and rely on soft logout behaviour on clients that don’t support refreshing.
+---
+
+
+
 
 "everything is a room"? One-to-one conversation is no different than multi-user?
 this concept may or may not hold depending on the cryptographic algorithms used, and the concept of a "room" might eventually come to mean just a nameless channel with no intrinsic properties.
@@ -206,4 +213,58 @@ https://www.miroslavholec.cz/blog/grpc-navrh-sluzeb
 ## encryption
 https://signal.org/docs/specifications/doubleratchet/
 These properties gives some protection to earlier or later encrypted messages in case of a compromise of a party's keys.
+
+
+
+
+
+
+
+
+
+
+###
+```
+casove omezit challenge string
+
+
+
+1. moznost:
+prihlasovaci tanecek probehne pri kazdym otevreni WS spojeni
+2. moznost: 
+  pri prihlaseni se vygeneruje random token, kterym se client authenticuje pri nasledujicich otevrenich WS
+3. moznost:
+  jwt
+
+
+
+
+moduly prihlasovani / overovani uzivatelu:
+  jeden server druhymu potvrzuje existenci a authenticitu uzivatele, to je asi oauth flow
+
+
+odstavec k notary serverum jako dalsi alternative DKIM
+
+
+
+porovnat overeni protejsiho serveru(2x) s matrix spec
+
+
+
+    TODO - sepsat, jak se přesně navazuje spojení, jestli je tam nějaký endpoint pro WebTransport apod.
+
+ "command": "admin_login_request",
+ 
+ 
+ Spojení server-server
+
+
+```
+
+
+
+
+
+
+
 
