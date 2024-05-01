@@ -3,16 +3,73 @@
 ## improvement over e-mail protocols
 
 ### spam and spam filtering
-
+### migration
 
 
 # binary protocol 
+
+https://ably.com/blog/websocket-authentication
+
+
+## https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-07
+>The WebTransport Protocol Framework enables clients constrained by the Web security model to communicate with a remote server using a secure multiplexed transport. It consists of a set of individual protocols that are safe to expose to untrusted applications, combined with an abstract model that allows them to be used interchangeably.
+...
+>WebTransport avoids all of those issues by letting applications create a single transport object that can contain multiple streams multiplexed together in a single context (similar to SCTP, HTTP/2, QUIC and others), and can be also used to send unreliable datagrams (similar to UDP).
+
+>
+WebTransport session establishment is an asynchronous process. A session is considered ready from the client's perspective when the server has confirmed that it is willing to accept the session with the provided origin and URI. WebTransport protocols MAY allow clients to send data before the session is ready; however, they MUST NOT use mechanisms that are unsafe against replay attacks without an explicit indication from the client.
+
+
+>A datagram is a sequence of bytes that is limited in size (generally to the path MTU) and is not expected to be transmitted reliably. The general goal for WebTransport datagrams is to be similar in behavior to UDP while being subject to common requirements expressed in Section 2.
+
+>Streams SHOULD be sufficiently lightweight that they can be used as messages.
+
+>the creation of new streams is flow controlled as well: an endpoint may only open a limited number of streams until the peer explicitly allows creating more streams. From the perspective of the client, this is presented as a size-bounded queue of incoming streams.
+
+>For example, the client must not be able to distinguish between a network address that is unreachable and one that is reachable but is not a WebTransport server.
+
+>WebTransport does not support any traditional means of HTTP-based authentication. It is not necessarily based on HTTP, and hence does not support HTTP cookies or HTTP authentication.
+
+- https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-overview-07
+
+https://www.rfc-editor.org/rfc/rfc9297
+
+
+
+>The webtransport HTTP Upgrade Token uses the Capsule Protocol as defined in [HTTP-DATAGRAM].
+
+
+>WebTransport CONNECT requests and responses MAY contain the Priority header field (Section 5 of [RFC9218]); clients MAY reprioritize by sending PRIORITY_UPDATE frames (Section 7 of [RFC9218]).
+
+>Session IDs are used to demultiplex streams and datagrams belonging to different WebTransport sessions. On the wire, session IDs are encoded using the QUIC variable length integer scheme described in [RFC9000].The client MAY optimistically open unidirectional and bidirectional streams, as well as send datagrams, for a session that it has sent the CONNECT request for, even if it has not yet received the server's response to the request. On the server side, opening streams and sending datagrams is possible as soon as the CONNECT request has been received.
+
+> A stream ID is a 62-bit integer
+
+>A server can also grant clients a session ticket that can be used to reconnect to a server without going through a full handshake. This reduces the number of client-server connects and allows fast, secure reconnections.
+
+>UIC itself does not depend on any state being retained when resuming a connection unless 0-RTT is also used; see Section 7.4.1 of [QUIC-TRANSPORT] and Section 4.6.1. Application protocols could depend on state that is retained between resumed connections.Clients can store any state required for resumption along with the session ticket. Servers can use the session ticket to help carry state.Session resumption allows servers to link activity on the original connection with the resumed connection, which might be a privacy issue for clients. Clients can choose not to enable resumption to avoid creating this correlation. Clients SHOULD NOT reuse tickets as that allows entities other than the server to correlate connections;
+
+
+>[RFC8441] defines an extended CONNECT method in Section 4, enabled by the SETTINGS_ENABLE_CONNECT_PROTOCOL setting. That setting is defined for HTTP/3 by [RFC9220]. A server supporting WebTransport over HTTP/3 MUST send both the SETTINGS_WEBTRANSPORT_MAX_SESSIONS setting with a value greater than "0" and the SETTINGS_ENABLE_CONNECT_PROTOCOL setting with a value of "1". To use WebTransport over HTTP/3, clients MUST send the SETTINGS_ENABLE_CONNECT_PROTOCOL setting with a value of "1".
+
+
+>Quick UDP Internet Connections (QUIC) is a general-purpose transport layer protocol designed to replace the Transmission Control Protocol (TCP) through its flexibility, built-in security, fewer performance issues, and faster adoption rate. Originally developed by Google, QUIC uses User Datagram Protocol (UDP) as the low‑level transport mechanism for moving packets between client and server. Notably, QUIC also incorporates Transport Layer Security (TLS) as an integral component, not as an additional layer like HTTP/1.1 and HTTP/2.
+
+>HTTP/3, based on QUIC, is the third major version of the Hypertext Transfer Protocol (HTTP) and was adopted as an IETF standard in 2022. QUIC+HTTP/3 were created to solve inherent limitations with TCP that constrain performance and user experience.
+
+
+
 
 https://github.com/grpc/grpc-web#wire-format-mode
 
 https://github.com/grpc/grpc-web#server-side-streaming
 
 https://docs.rs/tonic-web/latest/tonic_web/
+
+
+
+> Například implicitní TCP port pro HTTPS je 443, aby se odlišil od portu 80 pro obyčejné HTTP. Nicméně v roce 1997 Internet Engineering Task Force doporučilo, aby aplikační protokoly vždy zahajovaly činnost bez zabezpečení a místo samostatných portů nabídly způsob pro přechod na TLS. S tím se jednoduché balení aplikačních dat do TLS, jaké používá Stunnel, nedokáže vypořádat. 
+ 
 
 
 
@@ -191,6 +248,52 @@ ensure that they all report the same public keys.
 This approach is borrowed from the Perspectives Project, but modified to include the NACL keys and to use JSON instead of XML. It has the advantage of avoiding a single trust-root since each server is free to pick which notary servers they trust and can corroborate the keys returned by a given notary server by querying other servers.
 
 ---
+There is no implicit ordering or hierarchy to room versions, and their principles are immutable once placed in the specification. Although there is a recommended set of versions, some rooms may benefit from features introduced by other versions. Rooms move between different versions by "upgrading" to the desired version. Due to versions not being ordered or hierarchical, this means a room can "upgrade" from version 2 to version 1, if it is so desired.
+
+
+---
+
+All data exchanged over Matrix is expressed as an “event”. Typically each client action (e.g. sending a message) correlates with exactly one event. Each event has a type which is used to differentiate different kinds of data. type values MUST be uniquely globally namespaced following Java’s package naming conventions, e.g. com.example.myapp.event.
+
+---
+
+
+
+
+For example, for client A to send a message to client B, client A performs an HTTP PUT of the required JSON event on its homeserver (HS) using the client-server API. A’s HS appends this event to its copy of the room’s event graph, signing the message in the context of the graph for integrity. A’s HS then replicates the message to B’s HS by performing an HTTP PUT using the server-server API. B’s HS authenticates the request, validates the event’s signature, authorises the event’s contents and then adds it to its copy of the room’s event graph. Client B then receives the message from his homeserver via a long-lived GET request.
+
+
+---
+
+
+
+
+The purpose of the transaction ID is to allow the homeserver to distinguish a new request from a retransmission of a previous request so that it can make the request idempotent.
+
+The transaction ID should only be used for this purpose.
+
+From the client perspective, after the request has finished, the {txnId} value should be changed by for the next request (how is not specified; a monotonically increasing integer is recommended).
+
+
+---
+
+>It is realistic to expect that some clients will be written to be run within a web browser or similar environment. In these cases, the homeserver should respond to pre-flight requests and supply Cross-Origin Resource Sharing (CORS) headers on all requests.
+
+>Servers MUST expect that clients will approach them with OPTIONS requests, allowing clients to discover the CORS headers. All endpoints in this specification support the OPTIONS method, however the server MUST NOT perform any logic defined for the endpoints when approached with an OPTIONS request.
+
+----
+
+On the other hand, Matrix has often got stuck in focusing on solving the Hard Problems of decentralisation, decentralised end-to-end encryption, and the logistical complexities of supporting a massive heterogeneous public communication network and its surrounding heterogeneous ecosystem. It’s fair to say that in the early days our focus was on making something that worked at all - and then later, we shifted to focusing on something that worked and scaled correctly… but we hadn’t managed to focus on ensuring that Matrix provides the building blocks necessary to create blazingly fast, hyper-efficient communication apps which has potential to outperform the centralised mainstream messaging services…
+
+---
+
+
+
+
+---
+
+
+
 ## protobuf / grpc
 
 https://github.com/grpc/grpc-web#wire-format-mode
@@ -206,4 +309,62 @@ https://www.miroslavholec.cz/blog/grpc-navrh-sluzeb
 ## encryption
 https://signal.org/docs/specifications/doubleratchet/
 These properties gives some protection to earlier or later encrypted messages in case of a compromise of a party's keys.
+
+## oauth
+https://matrix.org/blog/2023/09/better-auth/
+
+
+
+
+
+## encryption inside TLS
+https://medium.com/@chathurabimalka/the-importance-of-encrypting-the-entire-payload-even-over-an-https-tls-connection-6999e3d27a53
+
+```
+Profile photo for Assistant
+Assistant
+Bot
+Nov 30
+
+Using HTTPS for a REST API provides a good baseline level of security by encrypting the data transmitted between the client and the server. However, depending on the sensitivity of the data being transmitted and the potential threats your system may face, you may want to consider additional encryption measures.
+
+One option is to implement message-level encryption within the REST API, which would involve encrypting the payload of the API requests and responses using techniques such as symmetric or asymmetric encryption. This can provide an extra layer of protection for the data being transmitted.
+
+Ultimately, the decision to implement additional encryption on top of HTTPS for a REST API should be based on a thorough assessment of your security requirements and potential threats. Consulting with a security expert or team may be beneficial in making this determination.
+```
+
+
+```
+Related
+Do I have to use SSL with jwt? Is jwt enough?
+
+SSL and JWT solve very different problems...
+
+A JWT token brings authentication / authorization to its bearer. It is not encrypted. To prevent someone stealing the token, SSL is your best option.
+
+For instance, during login the user sends a user/password to the server. The server checks the password, and sends a token to the user.
+This token states: "this is user <user_id> and his role is <role1, role2>". It is signed by the server, so the server can check later that its content is not altered.
+
+For the next requests, the client will only send his token, not his username or password. The server will check the token's validity, and can assume that the information it contains is valid because it signed the token itself!
+
+Now if someone can get hold of this token, then they can impersonate the user.
+
+SSL helps by:
+
+    avoiding the client sending a user/password in clear on the network
+    making it impossible to steal the token
+```
+
+```
+
+
+HTTP Public Key Pinning (HPKP) is an obsolete Internet security mechanism delivered via an HTTP header which allows HTTPS websites to resist impersonation by attackers using misissued or otherwise fraudulent digital certificates.[1] A server uses it to deliver to the client (e.g. web browser) a set of hashes of public keys that must appear in the certificate chain of future connections to the same domain name.
+
+For example, attackers might compromise a certificate authority, and then mis-issue certificates for a web origin. To combat this risk, the HTTPS web server serves a list of “pinned” public key hashes valid for a given time; on subsequent connections, during that validity time, clients expect the server to use one or more of those public keys in its certificate chain. If it does not, an error message is shown, which cannot be (easily) bypassed by the user.
+
+The technique does not pin certificates, but public key hashes. This means that one can use the key pair to get a certificate from any certificate authority, when one has access to the private key. Also the user can pin public keys of root or intermediate certificates (created by certificate authorities), restricting site to certificates issued by the said certificate authority.
+
+Due to HPKP mechanism complexity and possibility of accidental misuse (potentially causing a lockout condition by system administrators), in 2017 browsers deprecated HPKP and in 2018 removed its support in favor of Certificate Transparency.[2][3]
+```
+
 
