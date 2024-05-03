@@ -84,6 +84,7 @@ sudo apt install -y mc htop tmux screen iotop jnettop net-tools ufw openssh-serv
 # https://gitlab.com/volian/nala
 
 git clone https://github.com/koo5/hackery2.git
+bash ~/hackery2/src/hackery2/install.sh
 sudo ~/hackery2/data/setup/data/mc/setup.sh
 
 set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/ ~/.local/bin/

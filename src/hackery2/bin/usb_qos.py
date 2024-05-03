@@ -9,7 +9,7 @@ import os,time,datetime,subprocess,shlex,glob,pathlib,sys,click
 def x(new_state):
 	print(new_state)
 
-	for f in glob.glob('/sys/devices/**/pm_qos_no_power_off'):
+	for f in pathlib.Path('/sys/devices/').rglob('pm_qos_no_power_off'):
 		print(f)
 
 		try:
