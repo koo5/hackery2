@@ -70,6 +70,9 @@ https://docs.rs/tonic-web/latest/tonic_web/
 
 > Například implicitní TCP port pro HTTPS je 443, aby se odlišil od portu 80 pro obyčejné HTTP. Nicméně v roce 1997 Internet Engineering Task Force doporučilo, aby aplikační protokoly vždy zahajovaly činnost bez zabezpečení a místo samostatných portů nabídly způsob pro přechod na TLS. S tím se jednoduché balení aplikačních dat do TLS, jaké používá Stunnel, nedokáže vypořádat. 
  
+## webtransport
+https://github.com/haproxy/haproxy/issues/2256
+https://github.com/w3c/webtransport/issues/525
 
 
 
@@ -207,6 +210,11 @@ Queries: These are single request/response interactions between a given pair of 
 EDUs and PDUs are further wrapped in an envelope called a Transaction, which is transferred from the origin to the destination homeserver using an HTTPS PUT request.
 ---
 
+
+Modules
+Modules are parts of the Client-Server API which are not universal to all endpoints. Modules are strictly defined within this specification and should not be mistaken for experimental extensions or optional features. A compliant server implementation MUST support all modules and supporting specification (unless the implementation only targets clients of certain profiles, in which case only the required modules for those feature profiles MUST be implemented). A compliant client implementation MUST support all the required modules and supporting specification for the Feature Profile it targets.
+
+---
 
 
 Note
@@ -371,6 +379,7 @@ Using HTTPS for a REST API provides a good baseline level of security by encrypt
 
 One option is to implement message-level encryption within the REST API, which would involve encrypting the payload of the API requests and responses using techniques such as symmetric or asymmetric encryption. This can provide an extra layer of protection for the data being transmitted.
 
+<<<<<<< Updated upstream
 Ultimately, the decision to implement additional encryption on top of HTTPS for a REST API should be based on a thorough assessment of your security requirements and potential threats. Consulting with a security expert or team may be beneficial in making this determination.
 ```
 
@@ -378,6 +387,12 @@ Ultimately, the decision to implement additional encryption on top of HTTPS for 
 ```
 Related
 Do I have to use SSL with jwt? Is jwt enough?
+=======
+
+
+user_register_user
+POST /_matrix/client/v3/delete_devices 
+
 
 SSL and JWT solve very different problems...
 
@@ -387,6 +402,7 @@ For instance, during login the user sends a user/password to the server. The ser
 This token states: "this is user <user_id> and his role is <role1, role2>". It is signed by the server, so the server can check later that its content is not altered.
 
 For the next requests, the client will only send his token, not his username or password. The server will check the token's validity, and can assume that the information it contains is valid because it signed the token itself!
+```
 
 Now if someone can get hold of this token, then they can impersonate the user.
 
@@ -395,7 +411,6 @@ SSL helps by:
     avoiding the client sending a user/password in clear on the network
     making it impossible to steal the token
 ```
->>>>>>> 3ab794a38ca35b54dcc0f15c0a3657d6262c3df4
 
 ```
 
