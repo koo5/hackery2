@@ -2,7 +2,8 @@
     source_id: wetness_raw${n}
     id: wetness${n}
     name: "wetness${n}"
-
+    force_update: true
+    
     filters:
 
       - sliding_window_moving_average:
@@ -12,3 +13,12 @@
 
 
       - delta: 0.1
+      
+      
+      
+      - heartbeat: 5s
+
+
+
+
+
