@@ -162,3 +162,10 @@ todo try:
 	
 	
 	
+
+
+prometheus alerts
+  - Abbas Gheydi
+  - https://play.google.com/store/apps/details?id=com.khafan.prometheusalerts&hl=en&gl=US
+  this connects to prometheus directly, not to alertmanager.
+  
