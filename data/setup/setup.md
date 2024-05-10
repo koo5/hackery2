@@ -77,6 +77,8 @@ echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/user
 sudo chsh -s /usr/bin/fish $USER
 
 sudo apt install -y git ntpdate 
+git config --global core.editor mcedit
+
 
 sudo ntpdate ntp.ubuntu.com; sudo apt update; sudo apt dist-upgrade -y --allow-downgrades
 

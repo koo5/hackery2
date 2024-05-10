@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../data/setup/setup.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../../data/setup/setup.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uevent.py" beforeDir="false" afterPath="$PROJECT_DIR$/uevent.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -155,6 +155,7 @@
       <workItem from="1713603558578" duration="1128000" />
       <workItem from="1714689025035" duration="877000" />
       <workItem from="1714743051129" duration="1261000" />
+      <workItem from="1714747498309" duration="9000" />
     </task>
     <servers />
   </component>
