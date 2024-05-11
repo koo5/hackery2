@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 
+
+
 import os,time,datetime,subprocess,shlex,glob,pathlib,sys,click,re
 
 
@@ -30,3 +32,6 @@ def x():
 
 if __name__ == '__main__':
 	x()
+
+
+# https://unix.stackexchange.com/questions/66901/how-to-bind-usb-device-under-a-static-name
