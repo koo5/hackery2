@@ -142,19 +142,42 @@ display:
           {};
 
 
+globals:
+  - id: awake
+    type: bool
+    restore_value: no
+    initial_value: 'true'
+    on_value:
+      - if:
+          condition:
+          lambda: |-
+            return id(awake).state ;
+          then:
+            - display.page.show: page1
+            - component.update: oled
+            - pms.set_update_interval: 1s
+          else:
+            - display.page.show: blank
+            - component.update: oled
+            - pms.set_update_interval: 1000s
+
+ 
+
 interval:
   - interval: 6s
     then:
       - if:
           condition:
             lambda: |-
-              return (id(ntp).state - id(last_interaction).state < 60)
+              return id(awake).state ;
           then:
             - display.page.show_next: oled
-          else:
-            - display.page.show: blank
-
-      - component.update: oled
+            - component.update: oled
+  - interval: 0.1s
+    then:
+      - lambda: |-
+           awake.set( (id(ntp).state - id(last_interaction).state < 120));
+           
 
 uart:
   - rx_pin: D5
@@ -205,6 +228,8 @@ sensor:
       name: "Formaldehyde (HCHO) concentration in µg per cubic meter"
     update_interval: 600s
 
+
+
   - platform: senseair
     # https://www.aliexpress.com/item/1005004123170360.html
     uart_id: uart20
@@ -212,6 +237,7 @@ sensor:
       id: co2
       name: "SenseAir CO2 Value"
     update_interval: 4s
+
 
   - platform: sgp30
     eco2:
@@ -228,31 +254,21 @@ sensor:
       humidity_source: humidity
     update_interval: 1s
 
+
   - platform: ultrasonic
     trigger_pin: D7
     echo_pin: D8
     name: "Ultrasonic Sensor"
-    update_interval: 1s
+    update_interval: 0.2s
     filters:
       - delta: 20%
     on_value:
       then:
         - component.resume: pms
+        - logger.log: "Ultrasonic Sensor triggered"
+        - lambda: |-
+            id(last_interaction) = id(ntp).state;
 #
-#        - pms.set_update_interval:
-#            minutes: !lambda |-
-#              if (x > 100) {
-#                return 1;
-#              } else {
-#                return 10;
-#              }
-#        - lambda: !lambda |-
-#            id(oled).contrast = 255;
-#        - delay: 50s
-#        - lambda: !lambda |-
-#            id(oled).contrast = 0;
-#
-
 
 
 time:
