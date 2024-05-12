@@ -142,11 +142,8 @@ display:
           {};
 
 
-globals:
+number:
   - id: awake
-    type: bool
-    restore_value: no
-    initial_value: 'true'
     on_value:
       - if:
           condition:
