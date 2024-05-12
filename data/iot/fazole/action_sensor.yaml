@@ -1,0 +1,14 @@
+    platform: copy
+    source_id: pump${n}
+    id: pump_action${n}
+    name: "pump_action${n}"
+    force_update: true
+    
+    filters:
+      
+      - heartbeat: 1s
+
+
+
+
+

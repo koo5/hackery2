@@ -21,29 +21,31 @@
                 topic: fazole/pump/pump4/state
                 payload: "watering"
             - switch.turn_on: pump${n}
-            - delay: 1s
+            - delay: 3s
             - mqtt.publish:
                 topic: fazole/pump/pump4/state
                 payload: "watering"
-            - delay: 1s
+            - delay: 3s
             - mqtt.publish:
                 topic: fazole/pump/pump4/state
                 payload: "watering"
-            - delay: 1s
+            - delay: 3s
             - mqtt.publish:
                 topic: fazole/pump/pump4/state
                 payload: "watering"
-            - delay: 1s
+            - delay: 3s
             - mqtt.publish:
                 topic: fazole/pump/pump4/state
                 payload: "watering"
-            - delay: 1s
+            - delay: 3s
             - mqtt.publish:
                 topic: fazole/pump/pump4/state
                 payload: "watering"
-            - delay: 1s
+            - delay: 3s
             - switch.turn_off: pump${n}
             - mqtt.publish:
                 topic: fazole/pump/pump4/state
                 payload: "off"
             
+            #- number.set:
+            #    id: last_pump_success_ts${n}

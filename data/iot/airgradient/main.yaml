@@ -278,12 +278,6 @@ time:
 
 
 text_sensor:
-  - platform: sun
-    name: Next Sunrise
-    type: sunrise
-  - platform: sun
-    name: Next Sunset
-    type: sunset
   - platform: template
     name: "Time NTP"
     lambda: |-
