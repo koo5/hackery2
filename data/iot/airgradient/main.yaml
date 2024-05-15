@@ -191,15 +191,15 @@ number:
  
 
 interval:
-#  - interval: 6s
-#    then:
-#      - if:
-#          condition:
-#            lambda: |-
-#              return id(awake).state ;
-#          then:
-#            - display.page.show_next: oled
-#            - component.update: oled
+  - interval: 6s
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return id(awake).state ;
+          then:
+            - display.page.show_next: oled
+            - component.update: oled
   - interval: 0.5s
     then:
       - number.set:
@@ -293,6 +293,7 @@ sensor:
     echo_pin: D8
     name: "Ultrasonic Sensor"
     update_interval: 0.2s
+    timeout: 2m
     filters:
       - delta: 20%
     on_value:

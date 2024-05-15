@@ -2,21 +2,31 @@
 
 import os
 import sys
-
-os.chdir(sys.argv[1])
-name = sys.argv[1].strip('/')
-
-try:
-	cmd = sys.argv[2]
-except:
-	cmd = 'run'
+import click 
 
 
-usb = ''
-#for tty in ["/dev/ttyUSB0", "/dev/ttyACM0"]:
-#	if os.path.exists(tty):
-#		usb = f'--device {tty}'
-#		break
+@click.command()
+@click.argument('dir', type=click.Path(exists=True))
+@click.argument('cmd', default='run')
+@click.option('--usb', default='', help='USB device to use')
+def run(dir, cmd, usb):
+
+	os.chdir(dir)
+	name = dir.strip('/')
 	
-os.system(f'fish -c "docker run --rm --network host -v /var/run/dbus:/var/run/dbus -v (pwd):/config {usb} -it esphome/esphome -s name {name} {cmd} main.yaml {usb}"')
+	if usb == 'auto':
+		for tty in ["/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyACM0"]:
+			if os.path.exists(tty):
+				usb = tty
+				break
+	
+	if usb != '':
+		usb = f'--device {usb}'			
+	
+	cmd = f"docker run --rm --network host -v /var/run/dbus:/var/run/dbus -v (pwd):/config {usb} -it esphome/esphome -s name {name} {cmd} main.yaml {usb}"
+	print(cmd)
+	os.system(f'fish -c "{cmd}"')
+	
 
+if __name__ == '__main__':
+	run()
