@@ -160,7 +160,7 @@ display:
 number:
   - platform: template
     step: 1
-    min_value: 1680000000
+    min_value:  680000000
     max_value: 2680000000
     id: last_interaction
     name: last_interaction
@@ -269,7 +269,7 @@ sensor:
     co2:
       id: co2
       name: "SenseAir CO2 Value"
-    update_interval: 1s
+    update_interval: 60s
 
 
   - platform: sgp30
