@@ -278,9 +278,9 @@ sensor:
         #- component.resume: pms
         - logger.log: "Ultrasonic Sensor triggered"
         - number.set:
-          id: last_interaction
-          value: !lambda |-
-            id(ntp).now();
+            id: last_interaction
+            value: !lambda |-
+              id(ntp).now();
 
 
 time:
