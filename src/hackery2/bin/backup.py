@@ -166,7 +166,9 @@ def backup_vps(toplevel, cloud_host):
 
 	where = pathlib.Path(f"{toplevel}/backups/{cloud_host}/root")
 
-	os.makedirs(where.parent, exist_ok=True)
+	#os.makedirs(where.parent, exist_ok=True)
+	ccs(f'sudo mkdir -p {where.parent}')
+	
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
 	
