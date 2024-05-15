@@ -136,7 +136,7 @@ display:
           }
           it.printf(0, 0,   id(fff), time_string);
           it.printf(0, 14,   id(fff), date_string);
-          it.printf(0, 28,   id(fff), "");
+          it.printf(0, 28,   id(fff), "   ");
       - id: blank
         lambda: |- 
           {};
