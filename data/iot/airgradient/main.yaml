@@ -186,7 +186,7 @@ interval:
     then:
       - number.set:
           id: awake
-          value: |- 
+          value: !lambda |- 
              return static_cast<float>(id(ntp).state - id(last_interaction).state < 120);
            
 
