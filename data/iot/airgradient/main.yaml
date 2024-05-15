@@ -87,12 +87,12 @@ api:
 
 
 
-switch:
-  - platform: gpio
-    pin: GPIO4
-    name: annoyingled
-    inverted: true
-    id: annoyingled
+#switch:
+#  - platform: gpio
+#    pin: GPIO4
+#    name: annoyingled
+#    inverted: true
+#    id: annoyingled
     
 
 ### ~/repos/ajfriesen/ESPHome-AirGradient/0/ESPHome-AirGradient/air-gradient-diy.yaml
@@ -184,15 +184,15 @@ number:
  
 
 interval:
-  - interval: 6s
-    then:
-      - if:
-          condition:
-            lambda: |-
-              return id(awake).state ;
-          then:
-            - display.page.show_next: oled
-            - component.update: oled
+#  - interval: 6s
+#    then:
+#      - if:
+#          condition:
+#            lambda: |-
+#              return id(awake).state ;
+#          then:
+#            - display.page.show_next: oled
+#            - component.update: oled
   - interval: 0.5s
     then:
       - number.set:
