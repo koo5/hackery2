@@ -143,20 +143,32 @@ display:
 
 
 number:
-  - id: awake
+  - platform: template
+    step: 1
+    min_value: 0
+    max_value: 99999999999999
+    id: last_interaction
+    optimistic: true
+
+  - platform: template
+    step: 1
+    min_value: 0
+    max_value: 1
+    id: awake
+    optimistic: true
     on_value:
       - if:
-          condition:
-          lambda: |-
-            return id(awake).state ;
-          then:
+         condition:
+           lambda: |-
+             return id(awake).state ;
+         then:
             - display.page.show: page1
             - component.update: oled
-            - pms.set_update_interval: 1s
-          else:
+            #- pms.set_update_interval: 1s
+         else:
             - display.page.show: blank
             - component.update: oled
-            - pms.set_update_interval: 1000s
+            #- pms.set_update_interval: 1000s
 
  
 
@@ -172,8 +184,10 @@ interval:
             - component.update: oled
   - interval: 0.1s
     then:
-      - lambda: |-
-           awake.set( (id(ntp).state - id(last_interaction).state < 120));
+      - number.set:
+          id: awake
+          value: |- 
+             static_cast<float>(id(ntp).state - id(last_interaction).state < 120);
            
 
 uart:
@@ -261,7 +275,7 @@ sensor:
       - delta: 20%
     on_value:
       then:
-        - component.resume: pms
+        #- component.resume: pms
         - logger.log: "Ultrasonic Sensor triggered"
         - lambda: |-
             id(last_interaction) = id(ntp).state;
