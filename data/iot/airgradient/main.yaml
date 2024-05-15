@@ -187,7 +187,7 @@ interval:
       - number.set:
           id: awake
           value: !lambda |- 
-             return (id(ntp).is_valid() && NAN != id(last_interaction).state) ? (static_cast<float>(id(ntp).now() - id(last_interaction).state < 120)) : 1;
+             return (id(ntp).now().is_valid() && NAN != id(last_interaction).state) ? (static_cast<float>(id(ntp).now() - id(last_interaction).state < 120)) : 1;
            
 
 uart:
