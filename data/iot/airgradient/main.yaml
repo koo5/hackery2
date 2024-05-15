@@ -87,6 +87,13 @@ api:
 
 
 
+switch:
+  - platform: gpio
+    pin: GPIO2
+    name: annoyingled
+    inverted: true
+    id: annoyingled
+    
 
 ### ~/repos/ajfriesen/ESPHome-AirGradient/0/ESPHome-AirGradient/air-gradient-diy.yaml
 
