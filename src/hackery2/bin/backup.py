@@ -23,6 +23,7 @@ send all snapshots in succession.
 
 
 import glob
+import pathlib
 from pathlib import Path
 
 from infra import *
@@ -54,14 +55,12 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	fss = get_filesystems()
 
 	if hostname == 'r64':
-		for cloud_host in json.load(open(os.path.expanduser('~/secrets.json')))['cloud_servers']:
-			rsync_from_clouds(fss, cloud_host)
+		backup_vpss(fss[0]['toplevel'])
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
 
 	add_backup_subvols(fss[0])
 	transfer_btrfs_subvolumes(sshstr, fss, target_fs)
-
 
 
 
@@ -140,12 +139,12 @@ def rsync_ext4_filesystems_into_backup_folder(fss):
 
 
 
-def rsync(fss, what):
+def rsync(fss, what, name='root_ext4'):
 	# this path corresponds to the structure expected by add_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
-	where = f"{fss[0]['toplevel']}/backups/{hostname}/root_ext4"
+	where = f"{fss[0]['toplevel']}/backups/{hostname}/{name}"
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
-	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its result
+	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its results
 	srun(f'sudo rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
 
 
@@ -155,11 +154,19 @@ import os
 import grp
 
 
-def rsync_from_clouds(fss, cloud_host):
 
-	where = f"{fss[0]['toplevel']}/backups/cloud/{cloud_host}/root"
 
-	os.makedirs(where, exist_ok=True)
+def backup_vpss(toplevel='/bac4'):
+	for cloud_host in json.load(open(os.path.expanduser('~/secrets.json')))['cloud_servers']:
+		backup_vps(toplevel, cloud_host)
+
+
+
+def backup_vps(toplevel, cloud_host):
+
+	where = pathlib.Path(f"{toplevel}/backups/{cloud_host}/root")
+
+	os.makedirs(where.parent, exist_ok=True)
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
 	
@@ -168,7 +175,8 @@ def rsync_from_clouds(fss, cloud_host):
 	
 	ccs(f'sudo chown {username}:{group_name} {where}')
 
-	srun(f'backup_vmi2.sh {cloud_host} {where}')
+	srun(f'backup_vps.sh {cloud_host} {where}')
+
 
 
 def add_backup_subvols(fs):

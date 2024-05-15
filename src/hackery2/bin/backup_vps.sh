@@ -1,11 +1,14 @@
 #!/usr/bin/env fish
 
+function e; or status --is-interactive; or exit 1; end
+
 set MACHINE $argv[1]
 set DSTDIR $argv[2]
 
-mkdir -p $DSTDIR
+mkdir -p $DSTDIR; e
+sleep 5; e
 
-rsync -av --progress -h   -e 'hpnssh -p 44' -r \
+rsync -av --progress -h -e hpnssh -r \
   --exclude 'dont_backup'  \
   --exclude 'venv' \
   --exclude '.cache'  \

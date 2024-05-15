@@ -1,0 +1,2 @@
+error = position - target
+pwr = fabs(u)
