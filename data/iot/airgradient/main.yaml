@@ -128,9 +128,10 @@ display:
         lambda: |-  
           char time_string[10] = "----";
           char date_string[10] = "----";
-          if (id(ntp).now().is_valid()) 
+          esphome::ESPTime now = id(ntp).now();
+          if (now.is_valid()) 
           {
-            time_t currTime = id(ntp).now().timestamp;
+            time_t currTime = now.timestamp;
             strftime(time_string, sizeof(time_string), "%H:%M:%S", localtime(&currTime));
             strftime(date_string, sizeof(date_string), "%Y-%m-%d", localtime(&currTime));
           }
@@ -187,7 +188,7 @@ interval:
       - number.set:
           id: awake
           value: !lambda |- 
-             return (id(ntp).now().is_valid() && NAN != id(last_interaction).state) ? (static_cast<float>(id(ntp).now() - id(last_interaction).state < 120)) : 1;
+             return (id(ntp).utcnow().timestamp.is_valid() && NAN != id(last_interaction).state) ? (static_cast<float>(id(ntp).now() - id(last_interaction).state < 120)) : 1;
            
 
 uart:
@@ -280,7 +281,7 @@ sensor:
         - number.set:
             id: last_interaction
             value: !lambda |-
-              return id(ntp).now();
+              return id(ntp).utcnow();
 
 
 time:
@@ -297,8 +298,8 @@ text_sensor:
     name: "Time NTP"
     lambda: |-
       char str[30];
-      if (!id(ntp).now().is_valid()) { return { "----" }; }
-      time_t currTime = id(ntp).now().timestamp;
+      if (!id(ntp).utcnow().is_valid()) { return { "----" }; }
+      time_t currTime = id(ntp).utcnow().timestamp;
       strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
       //strftime(str, sizeof(str), "%c", localtime(&currTime));
       return  { str };
