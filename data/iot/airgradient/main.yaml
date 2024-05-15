@@ -81,11 +81,18 @@ esphome:
   on_boot:
     then:
       - logger.log: 'boOoOoOoOooOoOoOoOt'
+      - number.set:
+          id: last_interaction
+          value: 0
 
 api:
   reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently
 
 
+light:
+  - platform: status_led
+    name: "status_led"
+    pin: GPIO4
 
 #switch:
 #  - platform: gpio
@@ -153,8 +160,8 @@ display:
 number:
   - platform: template
     step: 1
-    min_value: 0
-    max_value: 99999999999999
+    min_value: 1680000000
+    max_value: 2680000000
     id: last_interaction
     name: last_interaction
     optimistic: true
