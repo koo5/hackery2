@@ -182,11 +182,11 @@ number:
          then:
             - display.page.show: page1
             - component.update: oled
-            #- pms.set_update_interval: 1s
+            - pms.set_update_interval: 1s
          else:
             - display.page.show: blank
             - component.update: oled
-            #- pms.set_update_interval: 1000s
+            - pms.set_update_interval: 1000s
 
  
 
