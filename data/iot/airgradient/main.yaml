@@ -190,7 +190,7 @@ interval:
           value: !lambda |-
             esphome::ESPTime now = id(ntp).now();
             if (now.is_valid() && NAN != id(last_interaction).state) 
-              return static_cast<float>(id(ntp).now() - id(last_interaction).state < 120);
+              return static_cast<float>(now.timestamp - id(last_interaction).state < 120);
             else
               return 1.0;
            
