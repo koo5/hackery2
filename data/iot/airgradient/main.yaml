@@ -187,7 +187,7 @@ interval:
       - number.set:
           id: awake
           value: |- 
-             static_cast<float>(id(ntp).state - id(last_interaction).state < 120);
+             return static_cast<float>(id(ntp).state - id(last_interaction).state < 120);
            
 
 uart:
