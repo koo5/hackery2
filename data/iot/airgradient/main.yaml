@@ -186,7 +186,7 @@ interval:
           then:
             - display.page.show_next: oled
             - component.update: oled
-  - interval: 0.1s
+  - interval: 0.5s
     then:
       - number.set:
           id: awake
@@ -275,7 +275,6 @@ sensor:
 
 
   - platform: ultrasonic
-    name: ultrasonic
     trigger_pin: D7
     echo_pin: D8
     name: "Ultrasonic Sensor"
