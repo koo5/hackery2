@@ -16,7 +16,7 @@
       
       
       
-      - heartbeat: 5s
+      - heartbeat: 15s
 
 
 
