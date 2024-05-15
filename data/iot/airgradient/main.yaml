@@ -187,8 +187,12 @@ interval:
     then:
       - number.set:
           id: awake
-          value: !lambda |- 
-             return (id(ntp).utcnow().timestamp.is_valid() && NAN != id(last_interaction).state) ? (static_cast<float>(id(ntp).now() - id(last_interaction).state < 120)) : 1;
+          value: !lambda |-
+            esphome::ESPTime now = id(ntp).now();
+            if (now.is_valid() && NAN != id(last_interaction).state) 
+              return static_cast<float>(id(ntp).now() - id(last_interaction).state < 120);
+            else
+              return 1.0;
            
 
 uart:
