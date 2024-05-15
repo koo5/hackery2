@@ -89,7 +89,7 @@ api:
 
 switch:
   - platform: gpio
-    pin: GPIO2
+    pin: GPIO4
     name: annoyingled
     inverted: true
     id: annoyingled
