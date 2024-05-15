@@ -186,8 +186,13 @@ interval:
     then:
       - number.set:
           id: awake
+<<<<<<< Updated upstream
           value: !lambda |- 
              return static_cast<float>(id(ntp).state - id(last_interaction).state < 120);
+=======
+          value: |- 
+             return static_cast<float>(id(ntp).now() - id(last_interaction).state < 120);
+>>>>>>> Stashed changes
            
 
 uart:
@@ -277,9 +282,10 @@ sensor:
       then:
         #- component.resume: pms
         - logger.log: "Ultrasonic Sensor triggered"
-        - lambda: |-
-            id(last_interaction) = id(ntp).state;
-#
+        - number.set:
+          id: last_interaction
+          value: !lambda |-
+            id(ntp).now();
 
 
 time:
