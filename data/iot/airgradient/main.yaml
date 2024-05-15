@@ -288,22 +288,35 @@ sensor:
     update_interval: 1s
 
 
-  - platform: ultrasonic
-    trigger_pin: D7
-    echo_pin: D8
-    name: "Ultrasonic Sensor"
-    update_interval: 0.2s
-    timeout: 2m
-    filters:
-      - delta: 20%
-    on_value:
+
+binary_sensor:
+  - platform: gpio
+    pin: D8
+    on_press:
       then:
-        #- component.resume: pms
         - logger.log: "Ultrasonic Sensor triggered"
         - number.set:
             id: last_interaction
             value: !lambda |-
               return id(ntp).utcnow().timestamp;
+
+
+#  - platform: ultrasonic
+#    trigger_pin: D7
+#    echo_pin: D8
+#    name: "Ultrasonic Sensor"
+#    update_interval: 0.2s
+#    timeout: 2m
+#    filters:
+#      - delta: 20%
+#    on_value:
+#      then:
+#        #- component.resume: pms
+#        - logger.log: "Ultrasonic Sensor triggered"
+#        - number.set:
+#            id: last_interaction
+#            value: !lambda |-
+#              return id(ntp).utcnow().timestamp;
 
 
 time:
