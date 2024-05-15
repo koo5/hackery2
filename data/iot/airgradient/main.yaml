@@ -186,13 +186,8 @@ interval:
     then:
       - number.set:
           id: awake
-<<<<<<< Updated upstream
           value: !lambda |- 
              return static_cast<float>(id(ntp).state - id(last_interaction).state < 120);
-=======
-          value: |- 
-             return static_cast<float>(id(ntp).now() - id(last_interaction).state < 120);
->>>>>>> Stashed changes
            
 
 uart:
