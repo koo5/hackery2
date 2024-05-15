@@ -280,7 +280,7 @@ sensor:
         - number.set:
             id: last_interaction
             value: !lambda |-
-              id(ntp).now();
+              return id(ntp).now();
 
 
 time:
