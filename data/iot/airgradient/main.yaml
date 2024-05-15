@@ -149,13 +149,16 @@ number:
     min_value: 0
     max_value: 99999999999999
     id: last_interaction
+    name: last_interaction
     optimistic: true
+    
 
   - platform: template
     step: 1
     min_value: 0
     max_value: 1
     id: awake
+    name: awake
     optimistic: true
     on_value:
       - if:
