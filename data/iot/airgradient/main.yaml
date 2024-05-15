@@ -89,10 +89,10 @@ api:
   reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently
 
 
-light:
-  - platform: status_led
-    name: "status_led"
-    pin: GPIO2
+#light:
+#  - platform: status_led
+#    name: "status_led"
+#    pin: D4
 
 #switch:
 #  - platform: gpio
@@ -217,7 +217,7 @@ uart:
     tx_pin: D6
     baud_rate: 9600
     id: uart10
-
+    
   - rx_pin: D4
     tx_pin: D3
     baud_rate: 9600
@@ -269,7 +269,7 @@ sensor:
     co2:
       id: co2
       name: "SenseAir CO2 Value"
-    update_interval: 4s
+    update_interval: 1s
 
 
   - platform: sgp30
