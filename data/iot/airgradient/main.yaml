@@ -44,7 +44,7 @@ wifi:
       dns1: !secret gateway2
       dns2: 8.8.8.8
 
-  use_address: "wtf"
+  use_address: !secret ip2
 
 
 captive_portal:
