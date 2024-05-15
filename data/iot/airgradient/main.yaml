@@ -275,6 +275,7 @@ sensor:
 
 
   - platform: ultrasonic
+    name: ultrasonic
     trigger_pin: D7
     echo_pin: D8
     name: "Ultrasonic Sensor"
