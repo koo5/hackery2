@@ -174,19 +174,19 @@ number:
     id: awake
     name: awake
     optimistic: true
-    on_value:
-      - if:
-         condition:
-           lambda: |-
-             return id(awake).state ;
-         then:
-            - display.page.show: page1
-            - component.update: oled
-            - pms.set_update_interval: 1s
-         else:
-            - display.page.show: blank
-            - component.update: oled
-            - pms.set_update_interval: 1000s
+#    on_value:
+#      - if:
+#         condition:
+#           lambda: |-
+#             return id(awake).state ;
+#         then:
+#            - display.page.show: page1
+#            - component.update: oled
+#            #- pms.set_update_interval: 1s
+#         else:
+#            - display.page.show: blank
+#            - component.update: oled
+#            #- pms.set_update_interval: 1000s
 
  
 
@@ -200,12 +200,26 @@ interval:
           then:
             - display.page.show_next: oled
             - component.update: oled
-  - interval: 0.5s
+          else:
+            - display.page.show: blank
+            - component.update: oled
+          
+
+  - interval: 1s
     then:
+      - if:
+         condition:  
+            lambda: |-
+              return id(proximity).state ;
+         then:
+              - number.set:
+                  id: last_interaction
+                  value: !lambda |-
+                    return id(ntp).utcnow().timestamp;
       - number.set:
           id: awake
           value: !lambda |-
-            esphome::ESPTime now = id(ntp).now();
+            esphome::ESPTime now = id(ntp).utcnow();
             if (now.is_valid() && NAN != id(last_interaction).state) 
               return static_cast<float>(now.timestamp - id(last_interaction).state < 120);
             else
@@ -291,14 +305,14 @@ sensor:
 
 binary_sensor:
   - platform: gpio
-    pin: D8
+    id: proximity
+    name: "Proximity Sensor"
+    pin: D7
+    filters:
+      - invert:
     on_press:
       then:
         - logger.log: "Ultrasonic Sensor triggered"
-        - number.set:
-            id: last_interaction
-            value: !lambda |-
-              return id(ntp).utcnow().timestamp;
 
 
 #  - platform: ultrasonic
