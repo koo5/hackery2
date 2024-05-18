@@ -147,7 +147,7 @@ display:
           {
             time_t currTime = now.timestamp;
             strftime(time_string, sizeof(time_string), "%H:%M:%S", localtime(&currTime));
-            strftime(date_string, sizeof(date_string), "%Y-%m-%d", localtime(&currTime));
+            strftime(date_string, sizeof(date_string), "%y-%m-%d", localtime(&currTime));
           }
           it.printf(0, 0,   id(fff), time_string);
           it.printf(0, 14,   id(fff), date_string);
@@ -160,7 +160,7 @@ display:
 number:
   - platform: template
     step: 1
-    min_value:  680000000
+    min_value:  0
     max_value: 2680000000
     id: last_interaction
     name: last_interaction
@@ -191,7 +191,7 @@ number:
  
 
 interval:
-  - interval: 6s
+  - interval: 3s
     then:
       - if:
           condition:
@@ -273,7 +273,7 @@ sensor:
     formaldehyde:
       id: hcho
       name: "Formaldehyde (HCHO) concentration in µg per cubic meter"
-    update_interval: 600s
+    #update_interval: 6s
 
 
 
