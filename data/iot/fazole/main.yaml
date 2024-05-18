@@ -300,4 +300,21 @@ number:
     vars:
       n: 4
 
+  - !include
+    file: last_pump_success_ts.yaml
+    vars:
+      n: 1
+  - !include
+    file: last_pump_success_ts.yaml
+    vars:
+      n: 2
+  - !include
+    file: last_pump_success_ts.yaml
+    vars:
+      n: 3
+  - !include
+    file: last_pump_success_ts.yaml
+    vars:
+      n: 4
+
 

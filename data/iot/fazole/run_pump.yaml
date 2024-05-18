@@ -18,34 +18,36 @@
                 value: !lambda |-
                   return id($clock).utcnow().timestamp;
             - mqtt.publish:
-                topic: fazole/pump/pump4/state
+                topic: fazole/pump/pump${n}/state
                 payload: "watering"
             - switch.turn_on: pump${n}
             - delay: 3s
             - mqtt.publish:
-                topic: fazole/pump/pump4/state
+                topic: fazole/pump/pump${n}/state
                 payload: "watering"
             - delay: 3s
             - mqtt.publish:
-                topic: fazole/pump/pump4/state
+                topic: fazole/pump/pump${n}/state
                 payload: "watering"
             - delay: 3s
             - mqtt.publish:
-                topic: fazole/pump/pump4/state
+                topic: fazole/pump/pump${n}/state
                 payload: "watering"
             - delay: 3s
             - mqtt.publish:
-                topic: fazole/pump/pump4/state
+                topic: fazole/pump/pump${n}/state
                 payload: "watering"
             - delay: 3s
             - mqtt.publish:
-                topic: fazole/pump/pump4/state
+                topic: fazole/pump/pump${n}/state
                 payload: "watering"
             - delay: 3s
             - switch.turn_off: pump${n}
             - mqtt.publish:
-                topic: fazole/pump/pump4/state
-                payload: "off"
+                topic: fazole/pump/pump${n}/state
+                payload: "done"
             
-            #- number.set:
-            #    id: last_pump_success_ts${n}
+            - number.set:
+                id: last_pump_success_ts${n}
+                value: !lambda |-
+                  return id($clock).utcnow().timestamp;

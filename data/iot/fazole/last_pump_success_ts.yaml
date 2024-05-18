@@ -1,0 +1,10 @@
+    platform: template
+    id: last_pump_success_ts${n}
+    name: "last_pump_success_ts ${n}"
+    min_value: 0
+    max_value: 3360287004
+    step: 1
+    restore_value: true
+    initial_value: 0
+    optimistic: true
+

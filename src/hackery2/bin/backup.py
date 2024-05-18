@@ -177,7 +177,7 @@ def backup_vps(toplevel, cloud_host):
 	
 	ccs(f'sudo chown {username}:{group_name} {where}')
 
-	ccs(f'backup_vps.sh {cloud_host} {where}')
+	ccs(f'backup_vps.sh {cloud_host} {where}; true')
 
 
 
