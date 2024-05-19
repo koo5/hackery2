@@ -13,7 +13,8 @@ with open('/dev/ttyUSB0', 'rb') as f:
 	
 		l = f.readline()
 
-		#print(l)
+		sys.stderr.write(str(l))
+		sys.stderr.write('\n')
 		
 		if len(l) == 0:
 			continue

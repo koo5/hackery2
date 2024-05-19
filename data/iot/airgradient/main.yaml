@@ -138,23 +138,23 @@ display:
           it.printf(0, 0,   id(fff), "CO2 %.0f",  id(co2).state);
           it.printf(0, 14,  id(fff), "eCO %.0f",  id(eco2).state);
           it.printf(0, 28,  id(fff), "TVO %.0f",  id(tvoc).state);
-      - id: page4
-        lambda: |-  
-          char time_string[10] = "----";
-          char date_string[10] = "----";
-          esphome::ESPTime now = id(ntp).now();
-          if (now.is_valid()) 
-          {
-            time_t currTime = now.timestamp;
-            strftime(time_string, sizeof(time_string), "%H:%M:%S", localtime(&currTime));
-            strftime(date_string, sizeof(date_string), "%y-%m-%d", localtime(&currTime));
-          }
-          it.printf(0, 0,   id(fff), time_string);
-          it.printf(0, 14,   id(fff), date_string);
-          it.printf(0, 28,   id(fff), "   ");
-      - id: blank
-        lambda: |- 
-          {};
+#      - id: page4
+#        lambda: |-  
+#          char time_string[10] = "----";
+#          char date_string[10] = "----";
+#          esphome::ESPTime now = id(ntp).now();
+#          if (now.is_valid()) 
+#          {
+#            time_t currTime = now.timestamp;
+#            strftime(time_string, sizeof(time_string), "%H:%M:%S", localtime(&currTime));
+#            strftime(date_string, sizeof(date_string), "%y-%m-%d", localtime(&currTime));
+#          }
+#          it.printf(0, 0,   id(fff), time_string);
+#          it.printf(0, 14,   id(fff), date_string);
+#          it.printf(0, 28,   id(fff), "   ");
+#      - id: blank
+#        lambda: |- 
+#          {};
 
 
 number:
@@ -165,6 +165,8 @@ number:
     id: last_interaction
     name: last_interaction
     optimistic: true
+    on_value:
+      - logger.log: 'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
     
 
   - platform: template
@@ -200,9 +202,9 @@ interval:
           then:
             - display.page.show_next: oled
             - component.update: oled
-          else:
-            - display.page.show: blank
-            - component.update: oled
+#          else:
+#            - display.page.show: blank
+#            - component.update: oled
           
 
   - interval: 1s
@@ -270,10 +272,10 @@ sensor:
     pm_10_0:
       id: pm10
       name: "Particulate Matter <10.0µm Concentration"
-    formaldehyde:
-      id: hcho
-      name: "Formaldehyde (HCHO) concentration in µg per cubic meter"
-    #update_interval: 6s
+#    formaldehyde:
+#      id: hcho
+#      name: "Formaldehyde (HCHO) concentration in µg per cubic meter"
+    update_interval: 30s
 
 
 
@@ -307,7 +309,7 @@ binary_sensor:
   - platform: gpio
     id: proximity
     name: "Proximity Sensor"
-    pin: D7
+    pin: D8
     filters:
       - invert:
     on_press:
