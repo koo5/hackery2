@@ -140,21 +140,44 @@ mqtt:
     qos: 0
     then:
       - script.execute: wol
-#  on_json_message:
-#    topic: "jwol/jj"
-#    qos: 0
-#    then:
-#    x["length"];
+
+
+      
+  on_json_message:
+    topic: "jwol/jj"
+    qos: 0
+    then:
+      - script.execute:
+          id: jwol
+          len: !lambda |-
+            int len = 10;
+            if (x.containsKey("len"))
+              len = x["len"];
+            return len;
 
 
 script:
+
+  - id: jwol
+    parameters:
+      len: int
+    then:
+      - logger.log: "jawol!"
+      - lambda: |-
+          id(my_servo).write(len / 100.0);
+      - delay: 0.5s
+      - servo.write:
+          id: my_servo
+          level: 0%
+      - delay: 0.5s
+
   - id: wol
     mode: single
     then:
       - logger.log: "jawol!"
       - servo.write:
           id: my_servo
-          level: 52%
+          level: 58%
       - delay: 0.5s
       - servo.write:
           id: my_servo

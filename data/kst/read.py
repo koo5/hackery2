@@ -3,8 +3,20 @@ import sys
 
 ll = '#'.encode('utf-8')
 
+tty = '/dev/ttyUSB0'
 
-with open('/dev/ttyUSB0', 'rb') as f:
+import os
+
+if not os.path.exists(tty):
+	tty = '/dev/ttyUSB1'
+
+if not os.path.exists(tty):
+	tty = '/dev/ttyUSB2'
+
+# set baud rate
+os.system('stty -F ' + tty + ' 115200')
+
+with open(tty, 'rb') as f:
 	
 	legend = None
 
@@ -19,7 +31,7 @@ with open('/dev/ttyUSB0', 'rb') as f:
 		if len(l) == 0:
 			continue
 
-		if l[0] == 35:
+		if len(l) > 2 and l[0] == 35 and l[1] == 35: 
 			print(l.decode('utf-8').strip().rstrip(',')[1:])
 			legend = True
 

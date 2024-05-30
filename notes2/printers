@@ -4,3 +4,330 @@ https://support.brother.com/g/b/downloadlist.aspx?c=us_ot&lang=en&prod=hll2390dw
 
 
 
+
+
+
+lpadmin -p MFCJ6920DW -v socket://192.168.8.99 -E
+
+
+
+
+
+
+
+
+
+
+ sudo ./linux-brprinter-installer-2.2.3-1
+Input model name ->MFC-J6920DW
+
+You are going to install following packages.
+   mfcj6920dwlpr-3.0.0-1.i386.deb
+   mfcj6920dwcupswrapper-3.0.0-1.i386.deb
+   brscan4-0.4.11-1.amd64.deb
+   brscan-skey-0.3.2-0.amd64.deb
+OK? [y/N] ->y
+
+Hit:1 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Ign:2 https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 InRelease      
+Hit:3 http://archive.ubuntu.com/ubuntu jammy InRelease                         
+Hit:4 https://repo.skype.com/deb stable InRelease                              
+Hit:5 http://archive.ubuntu.com/ubuntu jammy-security InRelease                
+Hit:6 https://dl.google.com/linux/chrome/deb stable InRelease                  
+Get:7 https://dl.cloudsmith.io/public/asbru-cm/release/deb/ubuntu jammy InRelease [4 958 B]
+Hit:8 http://archive.ubuntu.com/ubuntu jammy-updates InRelease                 
+Hit:9 https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 Release        
+Hit:10 https://ppa.launchpadcontent.net/kelebek333/hplip/ubuntu jammy InRelease
+Hit:11 https://ppa.launchpadcontent.net/kst-plot/ppa/ubuntu jammy InRelease    
+Hit:12 https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu jammy InRelease 
+Hit:13 https://esm.ubuntu.com/apps/ubuntu jammy-apps-security InRelease    
+Hit:14 https://ppa.launchpadcontent.net/obsproject/obs-studio/ubuntu jammy InRelease
+Hit:15 https://esm.ubuntu.com/apps/ubuntu jammy-apps-updates InRelease     
+Hit:16 https://esm.ubuntu.com/infra/ubuntu jammy-infra-security InRelease
+Hit:17 http://security.ubuntu.com/ubuntu jammy-security InRelease
+Hit:18 https://esm.ubuntu.com/infra/ubuntu jammy-infra-updates InRelease
+Hit:19 http://repo.netdata.cloud/repos/edge/ubuntu jammy/ InRelease
+Hit:20 http://repo.netdata.cloud/repos/repoconfig/ubuntu jammy/ InRelease
+Fetched 4 958 B in 4s (1 276 B/s)
+Reading package lists... Done
+W: https://repo.skype.com/deb/dists/stable/InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+W: https://repo.mongodb.org/apt/ubuntu/dists/jammy/mongodb-org/6.0/Release.gpg: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+E: dpkg was interrupted, you must manually run 'sudo dpkg --configure -a' to correct the problem. 
+dpkg -x mfcj6920dwlpr-3.0.0-1.i386.deb /
+dpkg -x mfcj6920dwcupswrapper-3.0.0-1.i386.deb /
+(Reading database ... 600122 files and directories currently installed.)
+Purging configuration files for mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+dpkg-deb: building package 'mfcj6920dwlpr' in 'mfcj6920dwlpr-3.0.0-1a.i386.deb'.
+dpkg -b ./brother_driver_packdir mfcj6920dwlpr-3.0.0-1a.i386.deb
+dpkg-deb: building package 'mfcj6920dwcupswrapper' in 'mfcj6920dwcupswrapper-3.0.0-1a.i386.deb'.
+dpkg -b ./brother_driver_packdir mfcj6920dwcupswrapper-3.0.0-1a.i386.deb
+dpkg -i --force-all mfcj6920dwlpr-3.0.0-1a.i386.deb
+(Reading database ... 600126 files and directories currently installed.)
+Preparing to unpack mfcj6920dwlpr-3.0.0-1a.i386.deb ...
+Unpacking mfcj6920dwlpr:i386 (3.0.0-1) over (3.0.0-1) ...
+Setting up mfcj6920dwlpr:i386 (3.0.0-1) ...
+dpkg -i --force-all mfcj6920dwcupswrapper-3.0.0-1a.i386.deb
+Selecting previously unselected package mfcj6920dwcupswrapper:i386.
+(Reading database ... 600126 files and directories currently installed.)
+Preparing to unpack mfcj6920dwcupswrapper-3.0.0-1a.i386.deb ...
+Unpacking mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Setting up mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Restarting cups (via systemctl): cups.service.
+lpadmin -p MFCJ6920DW -E -v usb://HP/LaserJet%20Professional%20P1102?serial=000000000QN00BYJPR1a -P /usr/share/cups/model/Brother/brother_mfcj6920dw_printer_en.ppd
+lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS.
+#
+Will you specify the Device URI? [Y/n] ->y
+
+
+0: beh
+1: ipp
+2: socket
+3: usb://HP/LaserJet%20Professional%20P1102?serial=000000000QN00BYJPR1a
+4: cups-brf:/
+5: lpd
+6: ipps
+7: http
+8: hp:/usb/HP_LaserJet_Professional_P1102?serial=000000000QN00BYJPR1a
+9: https
+10: serial:/dev/ttyS4?baud=115200
+11: smb
+12: hpfax
+13: lpd://BRN30055CC6FE93/BINARY_P1
+14 (I): Specify IP address.
+15 (A): Auto. (usb://dev/usblp0)
+
+select the number of destination Device URI. ->7
+
+lpadmin -p MFCJ6920DW -v http -E
+lpadmin: Bad device-uri "http".
+Test Print? [y/N] ->
+
+You are going to install following packages.
+   brscan4-0.4.11-1.amd64.deb
+dpkg -i --force-all brscan4-0.4.11-1.amd64.deb
+(Reading database ... 600130 files and directories currently installed.)
+Preparing to unpack brscan4-0.4.11-1.amd64.deb ...
+Unpacking brscan4 (0.4.11-1) over (0.4.11-1) ...
+Setting up brscan4 (0.4.11-1) ...
+This software is based in part on the work of the Independent JPEG Group.
+You are going to install following packages.
+   brscan-skey-0.3.2-0.amd64.deb
+dpkg -i --force-all brscan-skey-0.3.2-0.amd64.deb
+(Reading database ... 600130 files and directories currently installed.)
+Preparing to unpack brscan-skey-0.3.2-0.amd64.deb ...
+Unpacking brscan-skey (0.3.2-0) over (0.3.2-0) ...
+Setting up brscan-skey (0.3.2-0) ...
+ enter IP address ->192.168.8.99                                                               
+
+brsaneconfig4 -a name=MFC-J6920DW model=MFC-J6920DW ip=192.168.8.99
+Hit Enter/Return key.
+[2921d46f] [19:53:49] koom@hp /home/koom/fufufu (master) 
+ brsaneconfig4 -a name=MFC-J6920DW model=MFC-J6920DW ip=192.168.8.99
+
+"MFC-J6920DW" is already registered.
+[2921d46f] [19:53:56] koom@hp /home/koom/fufufu (master) 
+ sudo ./linux-brprinter-installer-2.2.3-1
+Input model name ->MFC-J6920DW
+
+You are going to install following packages.
+   mfcj6920dwlpr-3.0.0-1.i386.deb
+   mfcj6920dwcupswrapper-3.0.0-1.i386.deb
+   brscan4-0.4.11-1.amd64.deb
+   brscan-skey-0.3.2-0.amd64.deb
+OK? [y/N] ->y
+
+Hit:1 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Ign:2 https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 InRelease         
+Hit:3 http://archive.ubuntu.com/ubuntu jammy InRelease                            
+Hit:4 https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 Release                                          
+Hit:5 https://ppa.launchpadcontent.net/kelebek333/hplip/ubuntu jammy InRelease                                   
+Hit:6 http://archive.ubuntu.com/ubuntu jammy-security InRelease                                    
+Hit:7 https://ppa.launchpadcontent.net/kst-plot/ppa/ubuntu jammy InRelease                  
+Hit:8 https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu jammy InRelease                                                                   
+Hit:9 https://ppa.launchpadcontent.net/obsproject/obs-studio/ubuntu jammy InRelease                                                             
+Hit:10 http://archive.ubuntu.com/ubuntu jammy-updates InRelease                                                   
+Hit:11 https://repo.skype.com/deb stable InRelease                                                                
+Get:12 https://dl.cloudsmith.io/public/asbru-cm/release/deb/ubuntu jammy InRelease [4 958 B]
+Hit:13 https://dl.google.com/linux/chrome/deb stable InRelease                  
+Hit:15 https://esm.ubuntu.com/apps/ubuntu jammy-apps-security InRelease      
+Hit:16 https://esm.ubuntu.com/apps/ubuntu jammy-apps-updates InRelease       
+Hit:17 http://security.ubuntu.com/ubuntu jammy-security InRelease
+Hit:18 https://esm.ubuntu.com/infra/ubuntu jammy-infra-security InRelease
+Hit:19 https://esm.ubuntu.com/infra/ubuntu jammy-infra-updates InRelease
+Hit:20 http://repo.netdata.cloud/repos/edge/ubuntu jammy/ InRelease
+Hit:21 http://repo.netdata.cloud/repos/repoconfig/ubuntu jammy/ InRelease
+Fetched 4 958 B in 4s (1 331 B/s)
+Reading package lists... Done
+W: https://repo.mongodb.org/apt/ubuntu/dists/jammy/mongodb-org/6.0/Release.gpg: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+W: https://repo.skype.com/deb/dists/stable/InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Package ia32-libs is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+However the following packages replace it:
+  lib32z1
+
+E: Package 'ia32-libs' has no installation candidate
+dpkg -x mfcj6920dwlpr-3.0.0-1.i386.deb /
+dpkg -x mfcj6920dwcupswrapper-3.0.0-1.i386.deb /
+(Reading database ... 600126 files and directories currently installed.)
+Removing mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Restarting cups (via systemctl): cups.service.
+Purging configuration files for mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+dpkg-deb: building package 'mfcj6920dwlpr' in 'mfcj6920dwlpr-3.0.0-1a.i386.deb'.
+dpkg -b ./brother_driver_packdir mfcj6920dwlpr-3.0.0-1a.i386.deb
+dpkg-deb: building package 'mfcj6920dwcupswrapper' in 'mfcj6920dwcupswrapper-3.0.0-1a.i386.deb'.
+dpkg -b ./brother_driver_packdir mfcj6920dwcupswrapper-3.0.0-1a.i386.deb
+dpkg -i --force-all mfcj6920dwlpr-3.0.0-1a.i386.deb
+(Reading database ... 600126 files and directories currently installed.)
+Preparing to unpack mfcj6920dwlpr-3.0.0-1a.i386.deb ...
+Unpacking mfcj6920dwlpr:i386 (3.0.0-1) over (3.0.0-1) ...
+Setting up mfcj6920dwlpr:i386 (3.0.0-1) ...
+dpkg -i --force-all mfcj6920dwcupswrapper-3.0.0-1a.i386.deb
+Selecting previously unselected package mfcj6920dwcupswrapper:i386.
+(Reading database ... 600126 files and directories currently installed.)
+Preparing to unpack mfcj6920dwcupswrapper-3.0.0-1a.i386.deb ...
+Unpacking mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Setting up mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Restarting cups (via systemctl): cups.service.
+lpadmin -p MFCJ6920DW -E -v usb:/dev/usb/lp0 -P /usr/share/cups/model/Brother/brother_mfcj6920dw_printer_en.ppd
+lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS.
+#
+Will you specify the Device URI? [Y/n] ->
+
+
+0: beh
+1: socket
+2: lpd
+3: cups-brf:/
+4: ipps
+5: https
+6: http
+7: hp
+8: serial:/dev/ttyS4?baud=115200
+9: smb
+10: ipp
+11: hpfax
+12: lpd://BRN30055CC6FE93/BINARY_P1
+13 (I): Specify IP address.
+14 (A): Auto. (usb://dev/usblp0)
+
+select the number of destination Device URI. ->6
+
+lpadmin -p MFCJ6920DW -v http -E
+lpadmin: Bad device-uri "http".
+Test Print? [y/N] ->y
+
+wait 5s.
+lpr -P MFCJ6920DW /usr/share/cups/data/testprint
+You are going to install following packages.
+   brscan4-0.4.11-1.amd64.deb
+dpkg -i --force-all brscan4-0.4.11-1.amd64.deb
+(Reading database ... 600130 files and directories currently installed.)
+Preparing to unpack brscan4-0.4.11-1.amd64.deb ...
+Unpacking brscan4 (0.4.11-1) over (0.4.11-1) ...
+Setting up brscan4 (0.4.11-1) ...
+This software is based in part on the work of the Independent JPEG Group.
+You are going to install following packages.
+   brscan-skey-0.3.2-0.amd64.deb
+dpkg -i --force-all brscan-skey-0.3.2-0.amd64.deb
+(Reading database ... 600130 files and directories currently installed.)
+Preparing to unpack brscan-skey-0.3.2-0.amd64.deb ...
+Unpacking brscan-skey (0.3.2-0) over (0.3.2-0) ...
+Setting up brscan-skey (0.3.2-0) ...
+ enter IP address ->^C⏎                                                                                                                                                                        [2921d46f] [19:56:28] koom@hp /home/koom/fufufu (master) [SIGINT]
+ sudo ./linux-brprinter-installer-2.2.3-1
+Input model name ->MFC-J6920DW
+
+You are going to install following packages.
+   mfcj6920dwlpr-3.0.0-1.i386.deb
+   mfcj6920dwcupswrapper-3.0.0-1.i386.deb
+   brscan4-0.4.11-1.amd64.deb
+   brscan-skey-0.3.2-0.amd64.deb
+OK? [y/N] ->y
+
+Hit:1 http://archive.ubuntu.com/ubuntu jammy-backports InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu jammy InRelease                                   
+Ign:3 https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 InRelease                
+Hit:4 http://archive.ubuntu.com/ubuntu jammy-security InRelease                                                                
+Hit:5 http://archive.ubuntu.com/ubuntu jammy-updates InRelease                                                                                       
+Hit:6 https://dl.google.com/linux/chrome/deb stable InRelease                                                                                        
+Hit:7 https://ppa.launchpadcontent.net/kelebek333/hplip/ubuntu jammy InRelease                                            
+Hit:8 https://ppa.launchpadcontent.net/kst-plot/ppa/ubuntu jammy InRelease                                                
+Hit:9 https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 Release                                                                     
+Hit:10 https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu jammy InRelease                                                              
+Hit:11 https://ppa.launchpadcontent.net/obsproject/obs-studio/ubuntu jammy InRelease                                                       
+Hit:12 https://repo.skype.com/deb stable InRelease                                                                   
+Get:13 https://dl.cloudsmith.io/public/asbru-cm/release/deb/ubuntu jammy InRelease [4 958 B]            
+Hit:14 https://esm.ubuntu.com/apps/ubuntu jammy-apps-security InRelease                                            
+Hit:15 https://esm.ubuntu.com/apps/ubuntu jammy-apps-updates InRelease     
+Hit:16 http://security.ubuntu.com/ubuntu jammy-security InRelease
+Hit:17 https://esm.ubuntu.com/infra/ubuntu jammy-infra-security InRelease
+Hit:18 https://esm.ubuntu.com/infra/ubuntu jammy-infra-updates InRelease
+Hit:19 http://repo.netdata.cloud/repos/edge/ubuntu jammy/ InRelease
+Hit:21 http://repo.netdata.cloud/repos/repoconfig/ubuntu jammy/ InRelease
+Fetched 4 958 B in 2s (2 014 B/s)
+Reading package lists... Done
+W: https://repo.mongodb.org/apt/ubuntu/dists/jammy/mongodb-org/6.0/Release.gpg: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+W: https://repo.skype.com/deb/dists/stable/InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Package ia32-libs is not available, but is referred to by another package.
+This may mean that the package is missing, has been obsoleted, or
+is only available from another source
+However the following packages replace it:
+  lib32z1
+
+E: Package 'ia32-libs' has no installation candidate
+dpkg -x mfcj6920dwlpr-3.0.0-1.i386.deb /
+dpkg -x mfcj6920dwcupswrapper-3.0.0-1.i386.deb /
+(Reading database ... 600126 files and directories currently installed.)
+Removing mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Restarting cups (via systemctl): cups.service.
+Purging configuration files for mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+dpkg-deb: building package 'mfcj6920dwlpr' in 'mfcj6920dwlpr-3.0.0-1a.i386.deb'.
+dpkg -b ./brother_driver_packdir mfcj6920dwlpr-3.0.0-1a.i386.deb
+dpkg-deb: building package 'mfcj6920dwcupswrapper' in 'mfcj6920dwcupswrapper-3.0.0-1a.i386.deb'.
+dpkg -b ./brother_driver_packdir mfcj6920dwcupswrapper-3.0.0-1a.i386.deb
+dpkg -i --force-all mfcj6920dwlpr-3.0.0-1a.i386.deb
+(Reading database ... 600126 files and directories currently installed.)
+Preparing to unpack mfcj6920dwlpr-3.0.0-1a.i386.deb ...
+Unpacking mfcj6920dwlpr:i386 (3.0.0-1) over (3.0.0-1) ...
+Setting up mfcj6920dwlpr:i386 (3.0.0-1) ...
+dpkg -i --force-all mfcj6920dwcupswrapper-3.0.0-1a.i386.deb
+Selecting previously unselected package mfcj6920dwcupswrapper:i386.
+(Reading database ... 600126 files and directories currently installed.)
+Preparing to unpack mfcj6920dwcupswrapper-3.0.0-1a.i386.deb ...
+Unpacking mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Setting up mfcj6920dwcupswrapper:i386 (3.0.0-1) ...
+Restarting cups (via systemctl): cups.service.
+lpadmin -p MFCJ6920DW -E -v usb:/dev/usb/lp0 -P /usr/share/cups/model/Brother/brother_mfcj6920dw_printer_en.ppd
+lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS.
+#
+Will you specify the Device URI? [Y/n] ->192.168.8.99
+
+
+0: beh
+1: lpd
+2: ipp
+3: http
+4: ipps
+5: cups-brf:/
+6: https
+7: socket
+8: serial:/dev/ttyS4?baud=115200
+9: hp
+10: smb
+11: hpfax
+12: lpd://BRN30055CC6FE93/BINARY_P1
+13 (I): Specify IP address.
+14 (A): Auto. (usb://dev/usblp0)
+
+select the number of destination Device URI. ->i
+
+ enter IP address ->192.168.8.99
+lpadmin -p MFCJ6920DW -v socket://192.168.8.99 -E
+Test Print? [y/N] ->y
