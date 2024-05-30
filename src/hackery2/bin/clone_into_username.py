@@ -87,7 +87,7 @@ def magic(lookie, **kwargs):
 	except:
 		url = None
 
-	if url:
+	if url and url.scheme:
 		clone(lookie, **kwargs)
 
 	elif lookie.isdigit():

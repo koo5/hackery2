@@ -88,8 +88,9 @@ else:
 				if len(other) < len(sans_first):
 					print ("...")
 			try:
-				print ("Cloning " + res[0][1] + "...")
-				cmd = "git clone https://github.com/"+res[0][1]+".git"
+				repo = res[0][1]
+				print ("Cloning " + repo + "...")
+				cmd = "git clone https://github.com/"+repo+".git"
 				print (cmd)
 				os.system(cmd)
 			except Exception as e:
