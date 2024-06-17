@@ -863,6 +863,9 @@ misc, todo, more research needed:
 
 
 	graphql, etc
+		https://comunica.dev/docs/query/advanced/graphql_ld/
+		https://franz.com/agraph/support/documentation/current/graphql.html
+		https://docs.stardog.com/query-stardog/graphql#graphql
 		https://www.hypergraphql.org/documentation/
 		http://vos.openlinksw.com/owiki/wiki/VOS/VirtGenerateR2RMLLinkedDataView
 

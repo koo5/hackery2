@@ -1,0 +1,6 @@
+https://trpc.io/docs/quickstart
+
+| To implement the userById procedure, we need to accept input from the client. tRPC lets you define input parsers to validate and parse the input. You can define your own input parser or use a validation library of your choice, like zod, yup, or superstruct.
+
+
+

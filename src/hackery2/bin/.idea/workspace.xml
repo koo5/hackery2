@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../../../notes2/printers" beforeDir="false" afterPath="$PROJECT_DIR$/../../../notes2/printers" afterDir="false" />
-    </list>
+    <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -158,6 +156,7 @@
       <workItem from="1714747498309" duration="9000" />
       <workItem from="1715766023197" duration="10184000" />
       <workItem from="1716408662475" duration="21000" />
+      <workItem from="1717089647378" duration="384000" />
     </task>
     <servers />
   </component>
