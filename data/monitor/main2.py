@@ -31,7 +31,7 @@ def create_window():
 	return window_id
 	
 	
-w = ''#create_window()
+w = create_window()
 
 seen = []
 
@@ -50,11 +50,11 @@ def print_hi(name):
 						cmd = f'mplayer -wid {w} "{f}"'
 						print(cmd)
 						
-						#os.system(cmd)
+						os.system(cmd)
 						
 						seen.append(f)
 
-		#time.sleep(1)
+		time.sleep(0.1)
 		print('---')
 	
 
