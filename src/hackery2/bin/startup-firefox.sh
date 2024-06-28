@@ -1,11 +1,13 @@
-#!/usr/bin/env bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-{
-#bash -v "$DIR/startup2.sh" && 
-sudo snap refresh &&
-#sudo bash "$DIR/update-yum" &&
-security_updates.sh &&
-firefox
-}
+#!/usr/bin/env python3
 
+import subprocess, shlex, os
+
+f = subprocess.check_output(['/usr/bin/which', 'firefox'], text=True)
+if f.startswith('/usr/bin/'):
+	print('firefox is from apt')
+	subprocess.check_call(['security_updates.sh'])
+else:
+	print('firefox is from snap, i think')
+	subprocess.check_call(shlex.split('sudo snap refresh firefox'))
+os.system('firefox')
 
