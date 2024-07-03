@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-import sys
+import sys,os
 
 ll = '#'.encode('utf-8')
 
-tty = '/dev/ttyUSB0'
+tty = os.environ.get('USB', '/dev/ttyUSB0')
 
 import os
 

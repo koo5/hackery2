@@ -147,10 +147,10 @@ sensor:
     file: wetness.yaml
     vars:
       n: 1
-  - !include
-    file: action_sensor.yaml
-    vars:
-      n: 1
+#  - !include
+#    file: action_sensor.yaml
+#    vars:
+#      n: 1
 
   - !include
     file: wetness_raw.yaml
