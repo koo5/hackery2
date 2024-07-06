@@ -87,6 +87,8 @@ def magic(lookie, **kwargs):
 	except:
 		url = None
 
+	logger.info(url)
+
 	if url and url.scheme:
 		clone(lookie, **kwargs)
 
@@ -120,10 +122,6 @@ def magic(lookie, **kwargs):
 		o = open(last_search, "w")
 		json.dump(res, o, indent = 4)
 		o.close()
-
-
-	
-	
 
 
 def clone(url, optional_clone_args):
