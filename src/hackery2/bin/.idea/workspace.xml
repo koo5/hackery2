@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45c6337b-6638-4bdd-94a7-e728b64f1fed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/startup-firefox.sh" beforeDir="false" afterPath="$PROJECT_DIR$/startup-firefox.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clone_into_username.py" beforeDir="false" afterPath="$PROJECT_DIR$/clone_into_username.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,7 +159,8 @@
       <workItem from="1715766023197" duration="10184000" />
       <workItem from="1716408662475" duration="21000" />
       <workItem from="1717089647378" duration="384000" />
-      <workItem from="1719610975472" duration="318000" />
+      <workItem from="1719610975472" duration="989000" />
+      <workItem from="1719781486867" duration="1384000" />
     </task>
     <servers />
   </component>
