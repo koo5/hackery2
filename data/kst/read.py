@@ -48,6 +48,6 @@ with open(tty, 'rb') as f:
 		if l[0] == 33:
 			continue
 		#print('>>>')
-		print(l.decode('utf-8').strip().rstrip(','))
+		sys.stdout.write(l.decode('utf-8').strip().rstrip(','))
 		
 				
