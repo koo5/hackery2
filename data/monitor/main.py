@@ -9,46 +9,55 @@ from pathlib import Path
 import pygame
 import requests
 
-pygame.init()
 
 
-
-FALL = os.environ.get('FALL', '0') != '0'
-
-if FALL:
-	from inference_sdk import InferenceHTTPClient
-
-	CLIENT = InferenceHTTPClient(
-		#api_url="http://localhost:9001",
-		api_url="https://detect.roboflow.com",
-		api_key=os.environ['INFERENCE_API_KEY']
-	)
+import fire
 
 
-def create_window():
+def main(path, lookback=50, speak=True):
 
-	# create an empty window
-	#pygame.display.set_mode((1800, 1000))
-	pygame.display.set_mode((1000, 700))
-	pygame.display.set_caption('KOOMVCR')
-	pygame.display.flip()
+
 	
-
-	# get the window id
-	time.sleep(1)
-	window_id = subprocess.check_output(['xwininfo', '-name', 'KOOMVCR']).decode()
-	window_id = re.search('Window id: (0x[0-9a-f]+)', window_id).group(1)
-
-	print(f'Window id: {window_id}')
-
-	return window_id
+	FALL = os.environ.get('FALL', '0') != '0'
 	
 	
-w = create_window()
+	if FALL:
+		from inference_sdk import InferenceHTTPClient
+	
+		CLIENT = InferenceHTTPClient(
+			#api_url="http://localhost:9001",
+			api_url="https://detect.roboflow.com",
+			api_key=os.environ['INFERENCE_API_KEY']
+		)
+	
+	
+	def create_window():
+	
+		title = f'KOOMVCR{time.time()}'
+	
+		# create an empty window, sized to the screen resolution - 200 but not fullscreen
+		pygame.display.set_mode((pygame.display.Info().current_w - 200, pygame.display.Info().current_h - 200))
+		#pygame.display.set_mode((1000, 700))
+		pygame.display.set_caption(title)
+		pygame.display.flip()
+		
+	
+		# get the window id
+		time.sleep(1)
+		window_id = subprocess.check_output(['xwininfo', '-name', title]).decode()
+		window_id = re.search('Window id: (0x[0-9a-f]+)', window_id).group(1)
+	
+		print(f'Window id: {window_id}')
+	
+		return window_id
+	
+	seen = []
 
-seen = []
 
-def print_hi(name):
+	pygame.init()
+	w = create_window()
+
+	
 	rootdirs = sys.argv[1:]
 	allfiles = {}
 	
@@ -74,25 +83,28 @@ def print_hi(name):
 		
 		#print('play..')
 		
-		for f in list(allfiles.keys())[-1:]:
+		for f in list(allfiles.keys())[-lookback:]:
 			if f not in seen:
 				seen.append(f)
 				#print(f)
 				#print()
 				#print()
 			# 	
-			# 	print(f'File: {f}')				
+				if not FALL:
+					print(f'File: {f}')
+				subprocess.check_call(['notify-send --expire-time=3000 -i /usr/share/icons/gnome/48x48/status/dialog-information.png "Playing" "' + f + '"'], shell=True)  				
 		
 				#print(f'play file: {f}')				
 				#cmd = f'MPLAYER_VERBOSE=-1 mplayer -msglevel all=0 -noautosub -wid {w} "{f}"'
 				cmd = f'mpv --really-quiet --wid={w} "{f}"'
 				#print(cmd)
-
-				os.system(cmd)
+				
+				subprocess.check_call(cmd, shell=True)
 
 				found = False
 
 				if FALL:
+
 					# fall-detection-real/2
 					# human-fall/2
 					
@@ -112,13 +124,13 @@ def print_hi(name):
 							print(x)
 							subprocess.check_call(['espeak', x])				
 							found = True
-						
-				if not found:
+							
+				if not found and speak:
 					subprocess.check_call(['espeak', 'motion!'])
-
+					
 		time.sleep(0.1)
-		#print('---')
+		print('---')
 	
 
 if __name__ == '__main__':
-	print_hi('PyCharm')
+	fire.Fire(main)

@@ -49,7 +49,7 @@ def safe_move(src, dst):
 			os.rename(tmp_dst, dst)
 			os.unlink(src)
 		else:
-			raise
+			pass
 
 
 

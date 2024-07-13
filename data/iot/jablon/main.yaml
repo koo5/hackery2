@@ -60,7 +60,7 @@ mqtt:
 
 ota:
   password: ""
-
+  platform: esphome
     
 logger:
   level: DEBUG
@@ -137,7 +137,7 @@ climate:
     preset:
       - name: Home
         mode: COOL
-        default_target_temperature_high: 16.3 °C
+        default_target_temperature_high: 20 °C
 
 
 
