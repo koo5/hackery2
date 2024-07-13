@@ -58,7 +58,7 @@ def main(path, lookback=50, speak=True):
 	w = create_window()
 
 	
-	rootdirs = sys.argv[1:]
+	rootdirs = [path]
 	allfiles = {}
 	
 	while True:
@@ -99,7 +99,7 @@ def main(path, lookback=50, speak=True):
 				cmd = f'mpv --really-quiet --wid={w} "{f}"'
 				#print(cmd)
 				
-				subprocess.check_call(cmd, shell=True)
+				subprocess.Popen(cmd, shell=True)
 
 				found = False
 
