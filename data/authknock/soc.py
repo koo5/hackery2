@@ -36,7 +36,7 @@ while(True):
 			if re.match(r'^[0-9a-fA-F:]+$', remote_ip):
 				print("Valid IPv6 address")
 
-			subprocess.run([os.expanduser('~/magic_gate.py'), remote_ip])
+			subprocess.run([os.path.expanduser('~/magic_gate.py'), remote_ip])
 
 
 	fileObject.close()
