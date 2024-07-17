@@ -78,7 +78,12 @@ def main(path, lookback=50, speak=True):
 		
 		#print('sort by ctime...')
 		#allfiles.sort(key=lambda python_sucks: python_sucks[0])
-		allfiles = dict(sorted(allfiles.items(), key=lambda item: item[1]))
+		hh = sorted(allfiles.items(), key=lambda item: item[1])
+		
+		# sort files by name within directories
+		#hh = sorted(hh, key=lambda item: Path(item[0]).name)
+
+		allfiles = dict(hh)
 		#print('len(allfiles):', len(allfiles))
 		
 		#print('play..')
