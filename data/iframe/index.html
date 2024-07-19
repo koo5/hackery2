@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parent Page</title>
+</head>
+<body>
+    <iframe id="iframe_id" src="child.html"></iframe>
+    <script>
+        // Listen for custom event from the iframe
+        window.addEventListener('myCustomEvent', function(e) {
+            console.log('Received from iframe:', e.detail);
+        }, false);
+
+        // Function to send a custom event to the iframe
+        function sendEventToIframe() {
+            var data = { foo: 'zzzzzzz' };
+            var event = new CustomEvent('myCustomEvent', { detail: data });
+            document.querySelector('#iframe_id').contentWindow.dispatchEvent(event);
+        }
+
+        // Example: Send an event to the iframe after 2 seconds
+        setTimeout(sendEventToIframe, 2000);
+    </script>
+</body>
+</html>

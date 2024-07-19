@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iframe Content</title>
+</head>
+<body>
+    <script>
+        // Listen for custom event from the parent
+        window.addEventListener('myCustomEvent', function(e) {
+            console.log('Received from parent:', e.detail);
+        }, false);
+
+        // Function to send a custom event back to the parent
+        function sendEventToParent() {
+            var data = { message: 'Hello from iframe!' };
+            var event = new CustomEvent('myCustomEvent', { detail: data });
+            window.parent.document.dispatchEvent(event);
+        }
+
+        // Example: Send an event to the parent after 3 seconds
+        setTimeout(sendEventToParent, 3000);
+    </script>
+</body>
+</html>

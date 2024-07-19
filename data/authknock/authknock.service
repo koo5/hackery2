@@ -1,0 +1,9 @@
+[Unit]
+Description=authknock
+
+[Service]
+ExecStart=/home/userhackery2/data/authknock/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
