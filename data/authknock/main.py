@@ -27,7 +27,7 @@ def check_ip(ip):
 	if re.match(r'^[0-9a-fA-F:]+$', remote_ip):
 		print("Valid IPv6 address")
 		return True
-	print("Invalid IP address")
+	log.warning("Invalid IP address")
 	return False
 
 
@@ -42,7 +42,7 @@ svr = socket.socket(socket.AF_INET)
 # Bind to an IP & port
 svr.bind(("127.0.0.1",11112))
 
-print('Enter into listening state')
+log.info('Enter into listening state')
 svr.listen()
 
 
@@ -51,7 +51,7 @@ stuff = 'X-Forwarded-For: '
 
 # Accepting client connections
 while(True):
-	print("srv.accept:")
+	log.info("srv.accept:")
 
 	clientSocket, clientAddress = svr.accept()
 
@@ -59,7 +59,7 @@ while(True):
 	
 	for line in fileObject:
 		line = line.decode("utf-8").strip()
-		print(line)
+		log.debug(line)
 		if line.startswith(stuff):
 			remote_ip = line[len(stuff):]
 			if not check_ip(remote_ip):
@@ -67,7 +67,7 @@ while(True):
 
 			for port in [44, 2222, 9192]:
 				cmd = ['sudo', 'ufw', 'allow', 'from', remote_ip, 'to', 'any', 'port', str(port)]
-				print(shlex.join(cmd))
+				log.info(shlex.join(cmd))
 				subprocess.run(cmd)
 			break
 
