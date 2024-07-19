@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 
 import re, os, time, shlex
-import socket
+import socket, logging
 import subprocess, pathlib
+
+
+
+
+logging.basicConfig(level=logging.DEBUG)
+
+
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+log.info("info from main.py")
+log.debug("debug from main.py")
+log.warning("warning from main.py")
 
 
 
@@ -20,13 +33,16 @@ def check_ip(ip):
 
 
 
+time.sleep(5)
+
+
 # Create server socket
 svr = socket.socket(socket.AF_INET)
 
 # Bind to an IP & port
 svr.bind(("127.0.0.1",11112))
 
-# Enter into listening state
+print('Enter into listening state')
 svr.listen()
 
 
@@ -35,11 +51,9 @@ stuff = 'X-Forwarded-For: '
 
 # Accepting client connections
 while(True):
-	print("Listening for incoming connections:")
+	print("srv.accept:")
 
 	clientSocket, clientAddress = svr.accept()
-
-	
 
 	fileObject = clientSocket.makefile("rb", buffering=0)
 	

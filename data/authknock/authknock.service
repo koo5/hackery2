@@ -2,7 +2,7 @@
 Description=authknock
 
 [Service]
-ExecStart=/home/userhackery2/data/authknock/main.py
+ExecStart=/home/user/hackery2/data/authknock/main.py
 Restart=always
 
 [Install]
