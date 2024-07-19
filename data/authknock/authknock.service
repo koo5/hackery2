@@ -2,8 +2,10 @@
 Description=authknock
 
 [Service]
-ExecStart=/home/user/hackery2/data/authknock/main.py
+ExecStart=/home/user/hackery2/data/authknock/main.py | systemd-cat -t authknock
 Restart=always
+RestartSec=10
+User=user
 
 [Install]
 WantedBy=multi-user.target
