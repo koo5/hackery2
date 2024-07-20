@@ -24,5 +24,4 @@
                 root["message"] = "value";
                 root["priority"] = 5;
                 root["title"] = "mas ve sklepe akvarko";
-              verify_ssl: false
 
