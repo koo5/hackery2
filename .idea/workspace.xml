@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/airmaster/README.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/airmaster/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/airmaster/test.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/data/airmaster/test.cpp" afterDir="false" />
-    </list>
+    <list default="true" id="2e8e4faf-ea64-4474-a0bb-8cac77824604" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,8 +54,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PY-241.14494.241" />
-        <option value="bundled-python-sdk-0509580d9d50-28c9f5db9ffe-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.14494.241" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.18034.82" />
+        <option value="bundled-python-sdk-975db3bf15a3-2767605e8bc2-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.18034.82" />
       </set>
     </attachedChunks>
   </component>
@@ -77,6 +73,7 @@
       <workItem from="1706871929785" duration="1035000" />
       <workItem from="1712602127891" duration="6008000" />
       <workItem from="1712620939895" duration="96000" />
+      <workItem from="1721425766131" duration="2761000" />
     </task>
     <servers />
   </component>
