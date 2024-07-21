@@ -21,7 +21,8 @@ logger:
 
 
 ota:
-  password: ""
+  - platform: esphome
+    password: ""
 
 
 wifi:
@@ -71,9 +72,20 @@ sensor:
     vars:
       pin: A0
 
+  - platform: dht
+    pin: D4
+    temperature:
+      name: "temp"
+    humidity:
+      name: "hum"
+    update_interval: 3s
+
 #
 http_request:
+  verify_ssl: false
+
 #  timeout: 100s
+
 
 #
 #script:

@@ -29,7 +29,9 @@ logger:
 #            effect: !lambda 'return my_effect;'
 
 ota:
-  password: ""
+  - platform: esphome
+    password: ""
+  
 
 wifi:
   ssid: !secret ssid
