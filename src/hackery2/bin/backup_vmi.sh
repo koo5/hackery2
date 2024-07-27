@@ -16,6 +16,7 @@ rsync -av --progress -h   -e 'hpnssh -p 44' -r \
   --exclude 'site-packages'  \
   --exclude 'node_modules'   \
   --exclude '/var/lib/docker/overlay2/'  \
+  --exclude '/var/lib/docker/btrfs/subvolumes/'  \
   --exclude '/var/snap/docker/common/var-lib-docker/overlay2/'  \
   --exclude '/home/*/go/'  \
   --exclude '/home/*/.gradle/'  \
