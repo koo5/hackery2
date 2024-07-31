@@ -139,10 +139,10 @@ def main(path, lookback=50, speak=True):
 						try:
 							emergency = reply.get('emergency')
 						except Exception as e:
-							emergency = "json error"
+							emergency = "API error"
 	
 						if emergency != "none":
-							subprocess.check_call(['espeak', f'Emergency: {reply["emergency"]}'])
+							subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {reply["image_contents"]}, Explanation: {reply["explanation"]}'])
 							found = True
 					
 							

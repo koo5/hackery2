@@ -2,7 +2,7 @@
 
 
 ## supporting functions
-import base64, textwrap, time, openai, os, io
+import base64, textwrap, time, openai, os, io, json
 from PIL import Image  # Pillow image library
 
 def resize_image(image, max_dimension):
@@ -106,6 +106,8 @@ def set_user_message(user_msg_str,
 
 def oai(image_paths):
 
+	print(f'oai({image_paths})')
+
 	system_msg = """
 	You are VisionPal, an AI assistant powered by GPT-4 with computer vision.
 	AI knowledge cutoff: April 2023
@@ -118,13 +120,17 @@ def oai(image_paths):
 	""".strip()
 	
 	# The user message
+	# 	Describe the quality.
+	# 	Repeat back the file names sent.
 	user_msg = """
 	How many images were received?
 	Describe the contents.
-	Describe the quality.
-	Repeat back the file names sent.
-	Respond in JSON format. Include a field named "emergency", containing one of possible values:
-	"fallen_person", "fire", "medical_emergency", "other", "none".
+	Respond in JSON format.
+	Include field named "image_contents".
+	Include a field named "emergency", containing one of possible values:
+	"fallen_person", "fire", "medical_emergency", "other", "none". Use "none" if the image seems to depict a situation that is not an actual emergency, use appropriate value otherwise.
+	If "emergency" is not "none", include "explanation" field with a detailed explanation.
+	
 	""".strip()
 	
 	# user images file list, and max dimension limit
@@ -170,7 +176,14 @@ def oai(image_paths):
 			print(f"Error during receive/parsing: {e}")
 	
 	print(f"\n[elapsed: {time.perf_counter()-start:.2f} seconds]")
-	return reply
+	
+	try:
+		j = json.loads(reply)
+	except Exception as e:
+		print(f"Error during JSON parsing: {e}")
+		j = None
+	
+	return j
 
 
 
