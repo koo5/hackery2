@@ -5,12 +5,8 @@ import subprocess
 import re
 import time, json, subprocess
 from pathlib import Path
-
 import pygame
 import requests
-
-
-
 import fire
 
 
@@ -19,6 +15,7 @@ def main(path, lookback=50, speak=True):
 
 	
 	FALL = os.environ.get('FALL', '0') != '0'
+	CHATGPT = os.environ.get('CHATGPT', '0') != '0'
 	
 	
 	if FALL:
@@ -30,6 +27,8 @@ def main(path, lookback=50, speak=True):
 			api_key=os.environ['INFERENCE_API_KEY']
 		)
 	
+	elif CHATGPT:
+		from oai import oai
 	
 	def create_window():
 	
@@ -88,15 +87,18 @@ def main(path, lookback=50, speak=True):
 		
 		#print('play..')
 		
-		for f in list(allfiles.keys())[-lookback:]:
+		latest = list(allfiles.keys())[-lookback:]
+		
+		for f in latest:
 			if f not in seen:
 				seen.append(f)
 				#print(f)
 				#print()
 				#print()
 			# 	
-				if not FALL:
-					print(f'File: {f}')
+				#if not FALL:
+				print(f'File: {f}')
+				
 				subprocess.check_call(['notify-send --expire-time=3000 -i /usr/share/icons/gnome/48x48/status/dialog-information.png "Playing" "' + f + '"'], shell=True)  				
 		
 				#print(f'play file: {f}')				
@@ -108,27 +110,41 @@ def main(path, lookback=50, speak=True):
 
 				found = False
 
-				if FALL:
-
-					# fall-detection-real/2
-					# human-fall/2
-					
-					inference = None
-					try:
-						inference = CLIENT.infer(f, model_id="fall_detection-vjdfb/2")
-					except requests.exceptions.ConnectionError:
-						subprocess.check_call(['espeak', 'connection error!'])
-					except Exception as e:
-						subprocess.check_call(['espeak', e])
-					
-					if inference:
-							
-						#print(json.dumps(inference, indent=2))
-						for pr in inference.get('predictions', []):
-							x = f'class {pr["class"]} {round(pr["confidence"]*100)}'
-							print(x)
-							subprocess.check_call(['espeak', x])				
+				if f is latest[-1]:
+	
+					if FALL:
+						
+						inference = None
+						try:
+							# tried:
+							# fall-detection-real/2
+							# human-fall/2
+							inference = CLIENT.infer(f, model_id="fall_detection-vjdfb/2")
+						except requests.exceptions.ConnectionError:
+							subprocess.check_call(['espeak', 'connection error!'])
+						except Exception as e:
+							subprocess.check_call(['espeak', e])
+						
+						if inference:
+								
+							#print(json.dumps(inference, indent=2))
+							for pr in inference.get('predictions', []):
+								x = f'class {pr["class"]} {round(pr["confidence"]*100)}'
+								print(x)
+								subprocess.check_call(['espeak', x])				
+								found = True
+	
+					elif CHATGPT:
+						reply = oai([f])
+						try:
+							emergency = reply.get('emergency')
+						except Exception as e:
+							emergency = "json error"
+	
+						if emergency != "none":
+							subprocess.check_call(['espeak', f'Emergency: {reply["emergency"]}'])
 							found = True
+					
 							
 				if not found and speak:
 					subprocess.check_call(['espeak', 'motion!'])

@@ -4,4 +4,4 @@ setuptools~=70.0.0
 pygame
 requests
 fire
-
+openai
