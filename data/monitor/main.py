@@ -135,15 +135,16 @@ def main(path, lookback=50, speak=True):
 								found = True
 	
 					elif CHATGPT:
-						reply = oai([f])
+						reply = {}
 						try:
+							reply = oai([f])
 							emergency = reply.get('emergency')
 						except Exception as e:
-							emergency = "API error"
-	
-						if emergency != "none":
-							subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {reply["image_contents"]}, Explanation: {reply["explanation"]}'])
-							found = True
+							subprocess.check_call(['espeak', f'Error: {e}'])
+						else:
+							if emergency != "none":
+								subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {reply.get("image_contents")}, Explanation: {reply.get("explanation")}'])
+								found = True
 					
 							
 				if not found and speak:

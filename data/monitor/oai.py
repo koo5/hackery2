@@ -34,19 +34,23 @@ def convert_to_png(image):
         return output.getvalue()
 
 def process_image(path, max_size):
-    with Image.open(path) as image:
-        width, height = image.size
-        mimetype = image.get_format_mimetype()
-        if mimetype == "image/png" and width <= max_size and height <= max_size:
-            with open(path, "rb") as f:
-                encoded_image = base64.b64encode(f.read()).decode('utf-8')
-                return (encoded_image, max(width, height))  # returns a tuple consistently
-        else:
-            resized_image = resize_image(image, max_size)
-            png_image = convert_to_png(resized_image)
-            return (base64.b64encode(png_image).decode('utf-8'),
-                    max(width, height)  # same tuple metadata
-                   )  
+	try:
+		with Image.open(path) as image:
+			width, height = image.size
+			mimetype = image.get_format_mimetype()
+			if mimetype == "image/png" and width <= max_size and height <= max_size:
+				with open(path, "rb") as f:
+					encoded_image = base64.b64encode(f.read()).decode('utf-8')
+					return (encoded_image, max(width, height))  # returns a tuple consistently
+			else:
+				resized_image = resize_image(image, max_size)
+				png_image = convert_to_png(resized_image)
+				return (base64.b64encode(png_image).decode('utf-8'),
+						max(width, height)  # same tuple metadata
+					   )
+	except Exception as e:
+		print(f"Error processing image: {e}")
+		return None  
 
 def create_image_content(image, maxdim, detail_threshold):
     detail = "low" if maxdim < detail_threshold else "high"
@@ -83,6 +87,7 @@ def set_user_message(user_msg_str,
         file_names = [os.path.basename(path) for path in file_path_list]
 
     base64_images = [process_image(path, max_size_px) for path in file_path_list]
+    base64_images = [image for image in base64_images if image]  # remove None results
 
     uploaded_images_text = ""
     if file_names:
@@ -109,14 +114,7 @@ def oai(image_paths):
 	print(f'oai({image_paths})')
 
 	system_msg = """
-	You are VisionPal, an AI assistant powered by GPT-4 with computer vision.
-	AI knowledge cutoff: April 2023
-	
-	Built-in vision capabilities:
-	- extract text from image
-	- describe images
-	- analyze image contents
-	- logical problem-solving requiring machine vision
+	"emergency" is defined as a situation that poses an immediate threat to the life of a person and whose assistance cannot be delayed.
 	""".strip()
 	
 	# The user message
