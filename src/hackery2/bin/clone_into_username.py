@@ -89,7 +89,7 @@ def magic(lookie, **kwargs):
 
 	logger.info(url)
 
-	if url and url.scheme:
+	if url and url.path:
 		clone(lookie, **kwargs)
 
 	elif lookie.isdigit():

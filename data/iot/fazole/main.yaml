@@ -63,8 +63,8 @@ wifi:
   use_address: "$name.local"
 
 
-network:
-  enable_ipv6: true
+#network:
+#  enable_ipv6: true
 
 
 ota:
@@ -82,27 +82,27 @@ web_server:
   #js_url: "https://raw.githubusercontent.com/emilioaray-dev/esphome_static_webserver/main/webserver-v2.min.js"
 
 
-sun:
-  latitude: 50.0755°
-  longitude: 14.4378°
-
-  on_sunrise:
-    - then:
-        - logger.log: Good morning!
-  on_sunset:
-    - then:
-        - logger.log: Good evening!
+#sun:
+#  latitude: 50.0755°
+#  longitude: 14.4378°
+#
+#  on_sunrise:
+#    - then:
+#        - logger.log: Good morning!
+#  on_sunset:
+#    - then:
+#        - logger.log: Good evening!
 
 
 
 
 text_sensor:
-  - platform: sun
-    name: Next Sunrise
-    type: sunrise
-  - platform: sun
-    name: Next Sunset
-    type: sunset
+#  - platform: sun
+#    name: Next Sunrise
+#    type: sunrise
+#  - platform: sun
+#    name: Next Sunset
+#    type: sunset
   - platform: template
     name: "Time NTP"
     lambda: |-
@@ -165,17 +165,17 @@ time:
 
 
 sensor:
-  - platform: wifi_signal
-    name: "Irrigation Wifi"
-    update_interval: 1s
+#  - platform: wifi_signal
+#    name: "Irrigation Wifi"
+#    update_interval: 1s
   - platform: uptime
     name: Uptime Sensor
-  - platform: sun
-    name: Sun Elevation
-    type: elevation
-  - platform: sun
-    name: Sun Azimuth
-    type: azimuth
+#  - platform: sun
+#    name: Sun Elevation
+#    type: elevation
+#  - platform: sun
+#    name: Sun Azimuth
+#    type: azimuth
 
 
 
@@ -254,9 +254,9 @@ spi:
 
 
 switch:
-  - platform: restart
-    id: manual_restart
-    name: "Living Room Restart"
+#  - platform: restart
+#    id: manual_restart
+#    name: "Living Room Restart"
 
   - !include
     file: switch.yaml
