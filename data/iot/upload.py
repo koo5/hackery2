@@ -34,14 +34,16 @@ def run(dir: pathlib.Path, bid=0, cmd='run', usb=''):
 	if usb != '':
 		usb = f'--device {usb}'			
 	
+		
 	# what to upload
 
 	os.chdir(dir)
 	name = str(dir).strip('/')
 	
+	
 	# instantiate templates
 	
-	instdir = f'inst/{bid}'
+	instdir = pathlib.Path(f'inst/{bid}')
 	os.makedirs(instdir, exist_ok=True)	
 	
 	yaml_files = list(pathlib.Path('.').glob('*.yaml'))
@@ -56,6 +58,19 @@ def run(dir: pathlib.Path, bid=0, cmd='run', usb=''):
 		with open(out, 'w') as f:
 			f.write(yaml)
 		subprocess.call(['diff', yaml_file, out])
+		
+	
+	# reuse previous esphome build dir
+		
+	if not (instdir / '.esphome').exists():
+		if int(bid) > 0:
+			subprocess.call(['rsync', '-r', '-a', '-v', 
+				'--include', 'platformio',
+				'--exclude', '*',
+				f'inst/{str(int(bid)-1)}/.esphome/',
+				instdir / '.esphome'
+			])
+	
 	
 	# upload
 	
