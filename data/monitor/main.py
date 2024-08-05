@@ -10,13 +10,7 @@ import requests
 import fire
 
 
-def main(path, lookback=50, speak=True):
-
-
-	
-	FALL = os.environ.get('FALL', '0') != '0'
-	CHATGPT = os.environ.get('CHATGPT', '0') != '0'
-	
+def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 	
 	if FALL:
 		from inference_sdk import InferenceHTTPClient
@@ -29,6 +23,7 @@ def main(path, lookback=50, speak=True):
 	
 	elif CHATGPT:
 		from oai import oai
+	
 	
 	def create_window():
 	
@@ -108,7 +103,8 @@ def main(path, lookback=50, speak=True):
 				
 				subprocess.Popen(cmd, shell=True)
 
-				found = False
+				# did we indicate (through espeak) that we found/processed the image
+				indicated = False
 
 				if f is latest[-1]:
 	
@@ -125,6 +121,7 @@ def main(path, lookback=50, speak=True):
 						except Exception as e:
 							subprocess.check_call(['espeak', e])
 						
+						
 						if inference:
 								
 							#print(json.dumps(inference, indent=2))
@@ -132,22 +129,22 @@ def main(path, lookback=50, speak=True):
 								x = f'class {pr["class"]} {round(pr["confidence"]*100)}'
 								print(x)
 								subprocess.check_call(['espeak', x])				
-								found = True
-	
-					elif CHATGPT:
-						reply = {}
+								indicated = True
+
+					if CHATGPT:
+						
 						try:
-							reply = oai([f])
+							reply = oai([f], prompt)
 							emergency = reply.get('emergency')
 						except Exception as e:
 							subprocess.check_call(['espeak', f'Error: {e}'])
 						else:
 							if emergency != "none":
 								subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {reply.get("image_contents")}, Explanation: {reply.get("explanation")}'])
-								found = True
-					
-							
-				if not found and speak:
+								indicated = True
+
+
+				if not indicated and speak:
 					subprocess.check_call(['espeak', 'motion!'])
 					
 		time.sleep(0.1)

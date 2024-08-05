@@ -109,7 +109,7 @@ def set_user_message(user_msg_str,
 
 
 
-def oai(image_paths):
+def oai(image_paths, extra_prompt):
 
 	print(f'oai({image_paths})')
 
@@ -120,7 +120,7 @@ def oai(image_paths):
 	# The user message
 	# 	Describe the quality.
 	# 	Repeat back the file names sent.
-	user_msg = """
+	user_msg = ("""
 	How many images were received?
 	Describe the contents.
 	Respond in JSON format.
@@ -129,7 +129,9 @@ def oai(image_paths):
 	"fallen_person", "fire", "medical_emergency", "other", "none". Use "none" if the image seems to depict a situation that is not an actual emergency, use appropriate value otherwise.
 	If "emergency" is not "none", include "explanation" field with a detailed explanation.
 	
-	""".strip()
+	If you had a robotic arm that could reach the location, what would you do? Answer in JSON format, field "action".
+
+	""" + extra_prompt).strip()
 	
 	# user images file list, and max dimension limit
 	max_size = 1024  # downsizes if any dimension above this
