@@ -1,6 +1,9 @@
 #!/usr/bin/env fish
 set -x
+
 sudo umount -f /home/koom/snap/firefox/common/.mozilla/firefox/hpp
+sudo umount -f /home/koom/mnt/mnt3
+
 set DISPLAY :0 
 screen_off.sh
 sudo rmmod -vvvv aquantia;
