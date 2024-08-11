@@ -83,6 +83,7 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 		#print('play..')
 		
 		latest = list(allfiles.keys())[-lookback:]
+		latest_imgs = [f for f in latest if f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')]
 		
 		for f in latest:
 			if f not in seen:
@@ -98,15 +99,20 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 		
 				#print(f'play file: {f}')				
 				#cmd = f'MPLAYER_VERBOSE=-1 mplayer -msglevel all=0 -noautosub -wid {w} "{f}"'
-				cmd = f'mpv --really-quiet --wid={w} "{f}"'
+				#cmd = f'mpv --really-quiet --wid={w} "{f}"'
+				cmd = f'mpv --wid={w} "{f}"'
 				#print(cmd)
 				
-				subprocess.Popen(cmd, shell=True)
+				#subprocess.Popen(cmd, shell=True)
+				subprocess.call(cmd, shell=True)
 
 				# did we indicate (through espeak) that we found/processed the image
 				indicated = False
+				inference_service_used = False
 
-				if f is latest[-1]:
+				if len(latest_imgs) and (f is latest_imgs[-1]):
+	
+					inference_service_used = True
 	
 					if FALL:
 						
@@ -146,6 +152,11 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 
 				if not indicated and speak:
 					subprocess.check_call(['espeak', 'motion!'])
+					
+				if inference_service_used:
+					print('sleeping...')
+					time.sleep(5)
+
 					
 		time.sleep(0.1)
 		print('---')
