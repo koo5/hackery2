@@ -10,9 +10,9 @@ import requests
 import fire
 
 
-def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
+def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False):
 	
-	if FALL:
+	if ROBOFLOW:
 		from inference_sdk import InferenceHTTPClient
 	
 		CLIENT = InferenceHTTPClient(
@@ -83,7 +83,7 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 		#print('play..')
 		
 		latest = list(allfiles.keys())[-lookback:]
-		latest_imgs = [f for f in latest if f.endswith('.jpg') or f.endswith('.jpeg') or f.endswith('.png')]
+		latest_imgs = [f for f in latest if any([f.endswith(ext) for ext in 'jpg;webp;avif;jpeg;png'.split(';')])]
 		
 		for f in latest:
 			if f not in seen:
@@ -112,9 +112,10 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 
 				if len(latest_imgs) and (f is latest_imgs[-1]):
 	
-					inference_service_used = True
+					if ROBOFLOW or CHATGPT:
+						inference_service_used = True
 	
-					if FALL:
+					if ROBOFLOW:
 						
 						inference = None
 						try:
@@ -138,11 +139,24 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 								indicated = True
 
 					if CHATGPT:
+						print('chatgpt')
 						
 						try:
-							reply = oai([f], prompt)
+							reel = []
+							if len(latest_imgs) > 19:
+								reel.append(latest_imgs[-19])
+							if len(latest_imgs) > 9:
+								reel.append(latest_imgs[-9])
+							elif len(latest_imgs) > 4:
+								reel.append(latest_imgs[-4])
+							reel.append(f)
+							
+							print('reel:', reel)
+							
+							reply = oai(reel, prompt)
 							emergency = reply.get('emergency')
 						except Exception as e:
+							print(e)
 							subprocess.check_call(['espeak', f'Error: {e}'])
 						else:
 							if emergency != "none":
@@ -154,8 +168,11 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, FALL=False):
 					subprocess.check_call(['espeak', 'motion!'])
 					
 				if inference_service_used:
-					print('sleeping...')
-					time.sleep(5)
+					sleep_remaining_secs = 60
+					while sleep_remaining_secs > 0:
+						print(f'sleeping... {sleep_remaining_secs}')
+						time.sleep(1)
+						sleep_remaining_secs -= 1
 
 					
 		time.sleep(0.1)
