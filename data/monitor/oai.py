@@ -71,27 +71,16 @@ def set_system_message(sysmsg):
 def set_user_message(user_msg_str,
                      file_path_list=[],      # A list of file paths to images.
                      max_size_px=1024,       # Shrink images for lower expense
-                     file_names_list=None,   # You can set original upload names to show AI
                      tiled=False,            # True is the API Reference method
                      detail_threshold=700):  # any images below this get 512px "low" mode
 
-    if not isinstance(file_path_list, list):  # create empty list for weird input
-        file_path_list = []
-
     if not file_path_list:  # no files, no tiles
         tiled = False
-
-    if file_names_list and len(file_names_list) == len(file_path_list):
-        file_names = file_names_list
-    else:
-        file_names = [os.path.basename(path) for path in file_path_list]
 
     base64_images = [process_image(path, max_size_px) for path in file_path_list]
     base64_images = [image for image in base64_images if image]  # remove None results
 
     uploaded_images_text = ""
-    if file_names:
-        uploaded_images_text = "\n\n---\n\nUploaded images:\n" + '\n'.join(file_names)
 
     if tiled:
         content = [{"type": "text", "text": user_msg_str + uploaded_images_text}]
@@ -109,27 +98,40 @@ def set_user_message(user_msg_str,
 
 
 
-def oai(image_paths):
+def oai(image_paths, extra_prompt):
 
 	print(f'oai({image_paths})')
 
 	system_msg = """
-	"emergency" is defined as a situation that poses an immediate threat to the life of a person and whose assistance cannot be delayed.
 	""".strip()
 	
 	# The user message
 	# 	Describe the quality.
 	# 	Repeat back the file names sent.
-	user_msg = """
+	user_msg = ("""
+	Respond in JSON format:
+
 	How many images were received?
-	Describe the contents.
-	Respond in JSON format.
-	Include field named "image_contents".
+	Describe the contents in field named "image_contents".
+	
+	"emergency" is defined as a situation that poses an immediate threat to the life or health of a person or people, or property, and requires urgent intervention to prevent a worsening of the situation.
 	Include a field named "emergency", containing one of possible values:
-	"fallen_person", "fire", "medical_emergency", "other", "none". Use "none" if the image seems to depict a situation that is not an actual emergency, use appropriate value otherwise.
+	"fallen_person", "fire", "medical_emergency", "other", "none". Use "none" if the image seems to depict a situation that is not an immediate emergency.
+	
+	An elderly person fallen on the floor, not moving or unable to get up, is an example of "fallen_person" emergency.
+	An image of a person on fire is an example of "fire" emergency.
+	An image of a person with a visible injury or life-threatening medical condition is an example of "medical_emergency".
+	A child falling on the floor but getting back up unharmed is an example of "none".
+	A candle burning in a room safely is an example of "none".
+	An apparent accident or crime scene with no visible injuries or immediate threats is an example of "other".
+	
 	If "emergency" is not "none", include "explanation" field with a detailed explanation.
 	
-	""".strip()
+	Use field "help_needed" to indicate if the situation calls for immediate attention or intervention from an observer. "help_needed" is false if the people in the image are not in immediate danger or appear to be handling the situation themselves.
+	
+	If you had a robotic arm that could reach the location, what would you do to help solve or improve the situation? Answer in JSON format, field "action".
+
+	""" + extra_prompt).strip()
 	
 	# user images file list, and max dimension limit
 	max_size = 1024  # downsizes if any dimension above this
@@ -141,7 +143,7 @@ def oai(image_paths):
 	# Assemble the request parameters (all are dictionaries)
 	system = set_system_message(system_msg)
 	chat_hist = []  # list of more user/assistant items
-	user = set_user_message(user_msg, image_paths, max_size, file_names_list=true_files)
+	user = set_user_message(user_msg, image_paths, max_size)
 	
 	params = {  # dictionary format for ** unpacking
 	  "model": "gpt-4o-mini", "temperature": 0.0, "user": "my_customer",

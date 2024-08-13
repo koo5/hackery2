@@ -10,15 +10,9 @@ import requests
 import fire
 
 
-def main(path, lookback=50, speak=True):
-
-
+def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False):
 	
-	FALL = os.environ.get('FALL', '0') != '0'
-	CHATGPT = os.environ.get('CHATGPT', '0') != '0'
-	
-	
-	if FALL:
+	if ROBOFLOW:
 		from inference_sdk import InferenceHTTPClient
 	
 		CLIENT = InferenceHTTPClient(
@@ -29,6 +23,7 @@ def main(path, lookback=50, speak=True):
 	
 	elif CHATGPT:
 		from oai import oai
+	
 	
 	def create_window():
 	
@@ -88,6 +83,7 @@ def main(path, lookback=50, speak=True):
 		#print('play..')
 		
 		latest = list(allfiles.keys())[-lookback:]
+		latest_imgs = [f for f in latest if any([f.endswith(ext) for ext in 'jpg;webp;avif;jpeg;png'.split(';')])]
 		
 		for f in latest:
 			if f not in seen:
@@ -103,16 +99,23 @@ def main(path, lookback=50, speak=True):
 		
 				#print(f'play file: {f}')				
 				#cmd = f'MPLAYER_VERBOSE=-1 mplayer -msglevel all=0 -noautosub -wid {w} "{f}"'
-				cmd = f'mpv --really-quiet --wid={w} "{f}"'
+				#cmd = f'mpv --really-quiet --wid={w} "{f}"'
+				cmd = f'mpv --wid={w} "{f}"'
 				#print(cmd)
 				
-				subprocess.Popen(cmd, shell=True)
+				#subprocess.Popen(cmd, shell=True)
+				subprocess.call(cmd, shell=True)
 
-				found = False
+				# did we indicate (through espeak) that we found/processed the image
+				indicated = False
+				inference_service_used = False
 
-				if f is latest[-1]:
+				if len(latest_imgs) and (f is latest_imgs[-1]):
 	
-					if FALL:
+					if ROBOFLOW or CHATGPT:
+						inference_service_used = True
+	
+					if ROBOFLOW:
 						
 						inference = None
 						try:
@@ -125,6 +128,7 @@ def main(path, lookback=50, speak=True):
 						except Exception as e:
 							subprocess.check_call(['espeak', e])
 						
+						
 						if inference:
 								
 							#print(json.dumps(inference, indent=2))
@@ -132,23 +136,44 @@ def main(path, lookback=50, speak=True):
 								x = f'class {pr["class"]} {round(pr["confidence"]*100)}'
 								print(x)
 								subprocess.check_call(['espeak', x])				
-								found = True
-	
-					elif CHATGPT:
-						reply = {}
+								indicated = True
+
+					if CHATGPT:
+						print('chatgpt')
+						
 						try:
-							reply = oai([f])
+							reel = []
+							if len(latest_imgs) > 19:
+								reel.append(latest_imgs[-19])
+							if len(latest_imgs) > 9:
+								reel.append(latest_imgs[-9])
+							elif len(latest_imgs) > 4:
+								reel.append(latest_imgs[-4])
+							reel.append(f)
+							
+							print('reel:', reel)
+							
+							reply = oai(reel, prompt)
 							emergency = reply.get('emergency')
 						except Exception as e:
+							print(e)
 							subprocess.check_call(['espeak', f'Error: {e}'])
 						else:
 							if emergency != "none":
 								subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {reply.get("image_contents")}, Explanation: {reply.get("explanation")}'])
-								found = True
-					
-							
-				if not found and speak:
+								indicated = True
+
+
+				if not indicated and speak:
 					subprocess.check_call(['espeak', 'motion!'])
+					
+				if inference_service_used:
+					sleep_remaining_secs = 60
+					while sleep_remaining_secs > 0:
+						print(f'sleeping... {sleep_remaining_secs}')
+						time.sleep(1)
+						sleep_remaining_secs -= 1
+
 					
 		time.sleep(0.1)
 		print('---')
