@@ -160,6 +160,7 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 							subprocess.check_call(['espeak', f'Error: {e}'])
 						else:
 							if emergency != "none":
+								mqtt_pub('chatgpt/emergency')
 								subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {reply.get("image_contents")}, Explanation: {reply.get("explanation")}'])
 								indicated = True
 
@@ -177,7 +178,20 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 					
 		time.sleep(0.1)
 		print('---')
+
+def mqtt_pub(topic):
+	topic = '/fall/' + topic
+	value = 1
+	h = os.environ.get('MQTT_HOST', None)
+	if h is None:
+		return
+	p = os.environ.get('MQTT_PORT', 1883)
+	import paho.mqtt.publish as publish
+	publish.single(topic, value, hostname=h, port=p, auth={'username': os.environ['MQTT_USER'], 'password': os.environ['MQTT_PASS']}, qos=1, retain=True)
+	print(f'Published {value} to {topic} on {h}:{p}')
 	
+
+
 
 if __name__ == '__main__':
 	fire.Fire(main)

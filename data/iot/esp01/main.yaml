@@ -149,7 +149,7 @@ sensor:
 #    type: azimuth
 
   - platform: dht
-    model: AM2302
+    #model: AM2302
     pin: 2
     temperature:
       name: "temp"
