@@ -15,11 +15,6 @@ graph TD;
     C --> D[Publish results to Mosquitto]
     D --> E[Store data points in InfluxDB]
     E --> F[Alerting via Grafana Cloud]
-    
-    A -->|https://motion-project.github.io/
-    D -->|https://mosquitto.org/
-    E -->|https://github.com/koo5/iot2/
-    F -->|https://grafana.com/products/cloud/
 ```
 
 * https://motion-project.github.io/ collects images from cameras
