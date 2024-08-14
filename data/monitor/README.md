@@ -31,12 +31,10 @@ graph TD;
 
 ## Todo
 * systemd unit template, for one unit for each camera.
-
+* add a switch to disable the lame GUI and run headless
 
 ## Pricing
 i have zero idea about local models. As on OpenAI... i've burned through $0.22 for my testing so far .. so i'm imagining, one might run let's say 5 cameras, but first there is `motion` where you configure what constitutes an event, and then you add some delays and sleeps .. so i'm thinking some hundreds of images per day, maybe going into a couple dollars a day, but i imagine things will get significantly cheaper over time?
-
-
 
 ## Requirements
 
@@ -50,10 +48,9 @@ i have zero idea about local models. As on OpenAI... i've burned through $0.22 f
 
 ## Installation
 
-1. Clone the repository:
+1. Setup venv:
     ```sh
-    git clone https://github.com/koo5/emergency-detection-system.git
-    cd emergency-detection-system
+ virtualenv -p /usr/bin/python3.10 venv; . venv/bin/activate;
     ```
 
 2. Install the required Python packages:
