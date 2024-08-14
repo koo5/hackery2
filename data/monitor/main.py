@@ -57,8 +57,6 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 	
 	while True:
 	
-		sequence = False
-	
 		#print('list dirs and files...')
 		for dir in rootdirs:
 			#print(dir)
@@ -92,118 +90,113 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 
 		mqtt_pub('loop', 1) 
 
+
+		latests = [f for f in latest if f not in seen]
 		
-		for f in latest:
-			if f not in seen:
-				
-				if not sequence:
-					sequence = True
-					time.sleep(6)
-					break
-				
-				seen.append(f)
-
-				#print(f)
-				#print()
-				#print()
-
-				#if not FALL:
-				print(f'File: {f}')
-				
-				subprocess.check_call(['notify-send --expire-time=3000 -i /usr/share/icons/gnome/48x48/status/dialog-information.png "Playing" "' + f + '"'], shell=True)  				
-				#print(f'play file: {f}')				
-				#cmd = f'MPLAYER_VERBOSE=-1 mplayer -msglevel all=0 -noautosub -wid {w} "{f}"'
-				#cmd = f'mpv --really-quiet --wid={w} "{f}"'
-				cmd = f'mpv --vo=x11 --wid={w} "{f}"'
-				#print(cmd)
-				
-				#subprocess.Popen(cmd, shell=True)
-				subprocess.call(cmd, shell=True)
-
-				# did we indicate (through espeak) that we found/processed the image
-				indicated = False
-				inference_service_used = False
-
-				mqtt_pub('motion', 1) 
-
-				if len(latest_imgs) and (f is latest_imgs[-1]):
-
-					if ROBOFLOW or CHATGPT:
-						inference_service_used = True
-	
-					if ROBOFLOW:
+		if len(latests):
+			print('sleep to accumulate more images ..')
+			time.sleep(5)
+		
+		for f in latests:
 						
-						inference = None
-						try:
-							# tried:
-							# fall-detection-real/2
-							# human-fall/2
-							inference = CLIENT.infer(f, model_id="fall_detection-vjdfb/2")
-						except requests.exceptions.ConnectionError:
-							subprocess.check_call(['espeak', 'connection error!'])
-						except Exception as e:
-							subprocess.check_call(['espeak', e])
-						
-						
-						if inference:
-								
-							#print(json.dumps(inference, indent=2))
-							for pr in inference.get('predictions', []):
-								x = f'class {pr["class"]} {round(pr["confidence"]*100)}'
-								print(x)
-								subprocess.check_call(['espeak', x])				
-								indicated = True
+			seen.append(f)
 
-					if CHATGPT:
-						print('chatgpt')
-						
-						try:
-							reel = []
-							if len(latest_imgs) > 9:
-								reel.append(latest_imgs[-9])
-							if len(latest_imgs) > 5:
-								reel.append(latest_imgs[-5])
-							elif len(latest_imgs) > 2:
-								reel.append(latest_imgs[-2])
-							reel.append(f)
-							
-							print('reel:', reel)
-							
-							reply = oai(reel, prompt)
-							emergency = reply.get('emergency')
-						except Exception as e:
-							print(e)
-							subprocess.check_call(['espeak', f'Error: {e}'])
-						else:
-							print('emergency:', emergency.__repr__())
-							mqtt_pub('chatgpt/emergency', 0 if emergency == 'none' else 1)
-							description = reply.get("image_contents")
-							description_localized = reply.get("image_contents_localized")
-							if emergency != "none":
-								mqtt_pub('chatgpt/description', description) 
-								indicated = True
-							 
-							subprocess.check_call(['espeak', f'Emergency: {emergency}'])
-							subprocess.check_call(['espeak', '-v', 'czech', f'Popis: {description_localized}'])
-							subprocess.check_call(['espeak', f'Explanation: {reply.get("explanation")}'])
+			print(f'File: {f}')
+			
+			subprocess.check_call(['notify-send --expire-time=3000 -i /usr/share/icons/gnome/48x48/status/dialog-information.png "Playing" "' + f + '"'], shell=True)  				
+			#print(f'play file: {f}')				
+			#cmd = f'MPLAYER_VERBOSE=-1 mplayer -msglevel all=0 -noautosub -wid {w} "{f}"'
+			#cmd = f'mpv --really-quiet --wid={w} "{f}"'
+			cmd = f'mpv --vo=x11 --wid={w} "{f}"'
+			#print(cmd)
+			
+			#subprocess.Popen(cmd, shell=True)
+			subprocess.call(cmd, shell=True)
 
+			# did we indicate (through espeak) that we found/processed the image
+			indicated = False
+			inference_service_used = False
 
-				if not indicated and speak:
-					subprocess.check_call(['espeak', 'motion!'])
+			mqtt_pub('motion', 1) 
+
+			if len(latest_imgs) and (f is latest_imgs[-1]):
+
+				if ROBOFLOW or CHATGPT:
+					inference_service_used = True
+
+				if ROBOFLOW:
 					
-				if inference_service_used:
-					sleep_remaining_secs = 60
-					while sleep_remaining_secs > 0:
-						print(f'sleeping... {sleep_remaining_secs}')
-						time.sleep(1)
-						sleep_remaining_secs -= 1
+					inference = None
+					try:
+						# tried:
+						# fall-detection-real/2
+						# human-fall/2
+						inference = CLIENT.infer(f, model_id="fall_detection-vjdfb/2")
+					except requests.exceptions.ConnectionError:
+						subprocess.check_call(['espeak', 'connection error!'])
+					except Exception as e:
+						subprocess.check_call(['espeak', e])
+					
+					
+					if inference:
+							
+						#print(json.dumps(inference, indent=2))
+						for pr in inference.get('predictions', []):
+							x = f'class {pr["class"]} {round(pr["confidence"]*100)}'
+							print(x)
+							subprocess.check_call(['espeak', x])				
+							indicated = True
+
+				if CHATGPT:
+					print('chatgpt')
+					
+					try:
+						reel = []
+						if len(latest_imgs) > 9:
+							reel.append(latest_imgs[-9])
+						if len(latest_imgs) > 5:
+							reel.append(latest_imgs[-5])
+						elif len(latest_imgs) > 2:
+							reel.append(latest_imgs[-2])
+						reel.append(f)
+						
+						print('reel:', reel)
+						
+						reply = oai(reel, prompt)
+						emergency = reply.get('emergency')
+					except Exception as e:
+						print(e)
+						subprocess.check_call(['espeak', f'Error: {e}'])
+					else:
+						print('emergency:', emergency.__repr__())
+						mqtt_pub('chatgpt/emergency', 0 if emergency == 'none' else 1)
+						description = reply.get("image_contents")
+						description_localized = reply.get("image_contents_localized")
+						if emergency != "none":
+							mqtt_pub('chatgpt/description', description) 
+							indicated = True
+						 
+						subprocess.check_call(['espeak', f'Emergency: {emergency}'])
+						subprocess.check_call(['espeak', '-v', 'czech', f'Popis: {description_localized}'])
+						subprocess.check_call(['espeak', f'Explanation: {reply.get("explanation")}'])
+
+
+			if not indicated and speak:
+				subprocess.check_call(['espeak', 'motion!'])
+				
+			if inference_service_used:
+				sleep_remaining_secs = 60
+				while sleep_remaining_secs > 0:
+					print(f'sleeping... {sleep_remaining_secs}')
+					time.sleep(1)
+					sleep_remaining_secs -= 1
 
 					
 		time.sleep(0.1)
 		print('---')
 
 def mqtt_pub(topic, value):
-	topic = 'fall/' + topic
+	topic = 'fall/' + topic + '/state'
 	h = os.environ.get('MQTT_HOST', None)
 	if h is None:
 		print('MQTT_HOST not set')

@@ -74,8 +74,8 @@ ota:
 
 web_server:
   port: 80
-  css_include: "web/webserver-v2.css"
-  css_url: ""
+  #css_include: "web/webserver-v2.css"
+  #css_url: ""
   #js_include: "web/webserver-v2.js"
   #js_url: ""
   #css_url: "https://raw.githubusercontent.com/emilioaray-dev/esphome_static_webserver/main/webserver-v2.min.css"
@@ -243,6 +243,23 @@ sensor:
     name: "Living Room Temperature"
     cs_pin: 18
     update_interval: 1s
+
+  - platform: dallas_temp
+    name: outdoor
+    update_interval: 1s
+
+
+
+
+
+one_wire:
+  - platform: gpio
+    pin: GPIO33
+
+
+
+
+
 
 
 spi:

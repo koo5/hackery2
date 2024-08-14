@@ -3,6 +3,6 @@
     id: wetness_raw${n}
     name: "wetness_raw${n}"
     update_interval: 1s
-    attenuation: 11db
+    attenuation: 12db
     filters:
       - lambda: return 30 - (x * 10);
