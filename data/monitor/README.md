@@ -2,7 +2,11 @@
 
 # Emergency Detection System
 
-This is a part of a setup where https://motion-project.github.io/ collects images from cameras and this script, originally created just to display the images, has evolved to submit them to OpenAI for analysis and then publish the results to an MQTT broker. From there, https://github.com/koo5/iot2/ stores the data points in InfluxDB, and https://grafana.com/products/cloud/ alerting is used to ping my phone when an emergency is detected.
+* https://motion-project.github.io/ collects images from cameras 
+* this script, originally created just to display the images, has evolved to submit them to OpenAI for analysis 
+* then publish the results to https://mosquitto.org/
+* https://github.com/koo5/iot2/ stores the data points in InfluxDB
+* https://grafana.com/products/cloud/ alerting is used to ping my phone when an emergency is detected.
 
 ## Features
 
