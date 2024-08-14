@@ -2,11 +2,28 @@
 
 # Emergency Detection System
 
-* https://motion-project.github.io/ collects images from cameras 
+```mermaid
+graph TD;
+    A[Collects images from cameras] --> B[Displays images]
+    B --> C[Submits to OpenAI for analysis]
+    C --> D[Publishes results to Mosquitto]
+    D --> E[Stores data points in InfluxDB]
+    E --> F[Alerting via Grafana]
+    
+    A -->|https://motion-project.github.io/| A
+    D -->|https://mosquitto.org/| D
+    E -->|https://github.com/koo5/iot2/| E
+    F -->|https://grafana.com/products/cloud/| F
+```
+
+* https://motion-project.github.io/ collects images from cameras
 * this script, originally created just to display the images, has evolved to submit them to OpenAI for analysis 
 * then publish the results to https://mosquitto.org/
 * https://github.com/koo5/iot2/ stores the data points in InfluxDB
 * https://grafana.com/products/cloud/ alerting is used to ping my phone when an emergency is detected.
+
+## Todo
+* systemd unit template, for one unit for each camera.
 
 ## Features
 
