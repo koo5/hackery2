@@ -30,7 +30,7 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 		title = f'KOOMVCR{time.time()}'
 	
 		# create an empty window, sized to the screen resolution - 200 but not fullscreen
-		pygame.display.set_mode((pygame.display.Info().current_w - 200, pygame.display.Info().current_h - 200))
+		pygame.display.set_mode((pygame.display.Info().current_w - 400, pygame.display.Info().current_h - 200))
 		#pygame.display.set_mode((1000, 700))
 		pygame.display.set_caption(title)
 		pygame.display.flip()
@@ -82,25 +82,31 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 		
 		#print('play..')
 		
-		latest = list(allfiles.keys())[-lookback:]
-		latest_imgs = [f for f in latest if any([f.endswith(ext) for ext in 'jpg;webp;avif;jpeg;png'.split(';')])]
+		all = list(allfiles.keys())
+		tail = all[-1000:]
+		latest = all[-lookback:]
+		latest_imgs = [f for f in tail if any([f.endswith(ext) for ext in 'jpg;webp;avif;jpeg;png'.split(';')])]
+
+
+		mqtt_pub('loop', 1) 
+
 		
 		for f in latest:
 			if f not in seen:
 				seen.append(f)
+
 				#print(f)
 				#print()
 				#print()
-			# 	
+
 				#if not FALL:
 				print(f'File: {f}')
 				
 				subprocess.check_call(['notify-send --expire-time=3000 -i /usr/share/icons/gnome/48x48/status/dialog-information.png "Playing" "' + f + '"'], shell=True)  				
-		
 				#print(f'play file: {f}')				
 				#cmd = f'MPLAYER_VERBOSE=-1 mplayer -msglevel all=0 -noautosub -wid {w} "{f}"'
 				#cmd = f'mpv --really-quiet --wid={w} "{f}"'
-				cmd = f'mpv --wid={w} "{f}"'
+				cmd = f'mpv --vo=x11 --wid={w} "{f}"'
 				#print(cmd)
 				
 				#subprocess.Popen(cmd, shell=True)
@@ -110,8 +116,10 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 				indicated = False
 				inference_service_used = False
 
+				mqtt_pub('motion', 1) 
+
 				if len(latest_imgs) and (f is latest_imgs[-1]):
-	
+
 					if ROBOFLOW or CHATGPT:
 						inference_service_used = True
 	
@@ -159,10 +167,13 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 							print(e)
 							subprocess.check_call(['espeak', f'Error: {e}'])
 						else:
+							print('emergency:', emergency.__repr__())
+							mqtt_pub('chatgpt/emergency', 0 if emergency == 'none' else 1)
+							description = reply.get("image_contents")
 							if emergency != "none":
-								mqtt_pub('chatgpt/emergency')
-								subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {reply.get("image_contents")}, Explanation: {reply.get("explanation")}'])
+								mqtt_pub('chatgpt/description', description) 
 								indicated = True
+							subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {description}, Explanation: {reply.get("explanation")}'])
 
 
 				if not indicated and speak:
@@ -179,15 +190,20 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 		time.sleep(0.1)
 		print('---')
 
-def mqtt_pub(topic):
-	topic = '/fall/' + topic
-	value = 1
+def mqtt_pub(topic, value):
+	topic = 'fall/' + topic
 	h = os.environ.get('MQTT_HOST', None)
 	if h is None:
+		print('MQTT_HOST not set')
 		return
-	p = os.environ.get('MQTT_PORT', 1883)
+	p = int(os.environ.get('MQTT_PORT', 1883))
 	import paho.mqtt.publish as publish
-	publish.single(topic, value, hostname=h, port=p, auth={'username': os.environ['MQTT_USER'], 'password': os.environ['MQTT_PASS']}, qos=1, retain=True)
+	auth = {}
+	if os.environ.get('MQTT_USER', None):
+		auth['username'] = os.environ.get('MQTT_USER')
+	if os.environ.get('MQTT_PASS', None):
+		auth['password'] = os.environ.get('MQTT_PASS')
+	publish.single(topic, str(value), hostname=h, port=p, auth=auth, qos=1, retain=True)
 	print(f'Published {value} to {topic} on {h}:{p}')
 	
 
