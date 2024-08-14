@@ -14,7 +14,7 @@ graph TD;
     A[Collect images from cameras] --> C[Submit to OpenAI for analysis]
     C --> D[Publish results to Mosquitto]
     D --> E[Store data points in InfluxDB]
-    E --> F[Alerting via Grafana Cloud (free)]
+    E --> F[Alerting via Grafana Cloud \(free\)]
     
     A -->|https://motion-project.github.io/
     D -->|https://mosquitto.org/
