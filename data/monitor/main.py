@@ -57,6 +57,8 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 	
 	while True:
 	
+		sequence = False
+	
 		#print('list dirs and files...')
 		for dir in rootdirs:
 			#print(dir)
@@ -93,6 +95,12 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 		
 		for f in latest:
 			if f not in seen:
+				
+				if not sequence:
+					sequence = True
+					time.sleep(6)
+					break
+				
 				seen.append(f)
 
 				#print(f)
@@ -151,12 +159,12 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 						
 						try:
 							reel = []
-							if len(latest_imgs) > 19:
-								reel.append(latest_imgs[-19])
 							if len(latest_imgs) > 9:
 								reel.append(latest_imgs[-9])
-							elif len(latest_imgs) > 4:
-								reel.append(latest_imgs[-4])
+							if len(latest_imgs) > 5:
+								reel.append(latest_imgs[-5])
+							elif len(latest_imgs) > 2:
+								reel.append(latest_imgs[-2])
 							reel.append(f)
 							
 							print('reel:', reel)
@@ -170,10 +178,14 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 							print('emergency:', emergency.__repr__())
 							mqtt_pub('chatgpt/emergency', 0 if emergency == 'none' else 1)
 							description = reply.get("image_contents")
+							description_localized = reply.get("image_contents_localized")
 							if emergency != "none":
 								mqtt_pub('chatgpt/description', description) 
 								indicated = True
-							subprocess.check_call(['espeak', f'Emergency: {emergency}. Description: {description}, Explanation: {reply.get("explanation")}'])
+							 
+							subprocess.check_call(['espeak', f'Emergency: {emergency}'])
+							subprocess.check_call(['espeak', '-v', 'czech', f'Popis: {description_localized}'])
+							subprocess.check_call(['espeak', f'Explanation: {reply.get("explanation")}'])
 
 
 				if not indicated and speak:

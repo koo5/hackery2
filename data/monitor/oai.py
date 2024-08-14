@@ -113,6 +113,7 @@ def oai(image_paths, extra_prompt):
 
 	How many images were received?
 	Describe the contents in field named "image_contents".
+	Describe the contents in czech language in "image_contents_localized".	
 	
 	"emergency" is defined as a situation that poses an immediate threat to the life or health of a person or people, or property, and requires urgent intervention to prevent a worsening of the situation.
 	Include a field named "emergency", containing one of possible values:
