@@ -29,6 +29,9 @@ graph TD;
 * https://github.com/koo5/iot2/ stores the data points in InfluxDB
 * https://grafana.com/products/cloud/ alerting is used to ping my phone when an emergency is detected.
 
+### MQTT
+https://github.com/emqx/blog/blob/main/en/202111/popular-online-public-mqtt-brokers.md
+
 ## Todo
 * systemd unit template, for one unit for each camera.
 * add a switch to disable the lame GUI and run headless
