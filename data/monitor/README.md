@@ -11,16 +11,15 @@
 
 ```mermaid
 graph TD;
-    A[Collects images from cameras] --> B[Displays images]
-    B --> C[Submits to OpenAI for analysis]
-    C --> D[Publishes results to Mosquitto]
-    D --> E[Stores data points in InfluxDB]
-    E --> F[Alerting via Grafana]
+    A[Collect images from cameras] --> C[Submit to OpenAI for analysis]
+    C --> D[Publish results to Mosquitto]
+    D --> E[Store data points in InfluxDB]
+    E --> F[Alerting via Grafana Cloud (free)]
     
-    A -->|https://motion-project.github.io/| A
-    D -->|https://mosquitto.org/| D
-    E -->|https://github.com/koo5/iot2/| E
-    F -->|https://grafana.com/products/cloud/| F
+    A -->|https://motion-project.github.io/
+    D -->|https://mosquitto.org/
+    E -->|https://github.com/koo5/iot2/
+    F -->|https://grafana.com/products/cloud/
 ```
 
 * https://motion-project.github.io/ collects images from cameras
