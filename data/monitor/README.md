@@ -2,6 +2,13 @@
 
 # Emergency Detection System
 
+## Features
+
+- **Image Analysis**: Analyzes images to detect emergencies.
+- **Emergency Classification**: Classifies emergencies into categories like fallen person, fire, medical emergency, etc.
+- **Integration with MQTT**: Publishes emergency states to an MQTT broker.
+
+
 ```mermaid
 graph TD;
     A[Collects images from cameras] --> B[Displays images]
@@ -25,11 +32,11 @@ graph TD;
 ## Todo
 * systemd unit template, for one unit for each camera.
 
-## Features
 
-- **Image Analysis**: Analyzes images to detect emergencies.
-- **Emergency Classification**: Classifies emergencies into categories like fallen person, fire, medical emergency, etc.
-- **Integration with MQTT**: Publishes emergency states to an MQTT broker.
+## Pricing
+i have zero idea about local models. As on OpenAI... i've burned through $0.22 for my testing so far .. so i'm imagining, one might run let's say 5 cameras, but first there is `motion` where you configure what constitutes an event, and then you add some delays and sleeps .. so i'm thinking some hundreds of images per day, maybe going into a couple dollars a day, but i imagine things will get significantly cheaper over time?
+
+
 
 ## Requirements
 
