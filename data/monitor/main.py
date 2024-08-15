@@ -10,7 +10,12 @@ import requests
 import fire
 
 
-def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False):
+_camera_id = 0
+
+def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False, camera_id=0):
+	
+	global _camera_id
+	_camera_id = camera_id
 	
 	if ROBOFLOW:
 		from inference_sdk import InferenceHTTPClient
@@ -195,8 +200,11 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 		time.sleep(0.1)
 		print('---')
 
+
+hostname = subprocess.check_output(['hostname']).decode().strip() 
+
 def mqtt_pub(topic, value):
-	topic = 'fall/' + topic + '/state'
+	topic = hostname + str(_camera_id) + '/' + topic + '/state'
 	h = os.environ.get('MQTT_HOST', None)
 	if h is None:
 		print('MQTT_HOST not set')
