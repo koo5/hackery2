@@ -1,6 +1,6 @@
 ## README.md
 
-# Emergency Detection System
+# Emergency Alert System
 
 ## Features
 

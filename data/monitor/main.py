@@ -12,7 +12,7 @@ import fire
 _camera_id = 0
 
 
-def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False, camera_id=0):
+def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False, camera_id=0, localization=False):
 	global _camera_id
 	_camera_id = camera_id
 
@@ -102,8 +102,8 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 			print(f'File: {f}')
 
 			subprocess.check_call([
-									  'notify-send --expire-time=3000 -i /usr/share/icons/gnome/48x48/status/dialog-information.png "Playing" "' + f + '"'],
-								  shell=True)
+				'notify-send --expire-time=3000 -i /usr/share/icons/gnome/48x48/status/dialog-information.png "Playing" "' + f + '"'],
+				shell=True)
 			# print(f'play file: {f}')
 			# cmd = f'MPLAYER_VERBOSE=-1 mplayer -msglevel all=0 -noautosub -wid {w} "{f}"'
 			# cmd = f'mpv --really-quiet --wid={w} "{f}"'
@@ -175,8 +175,12 @@ def main(path, lookback=50, speak=True, prompt='', CHATGPT=False, ROBOFLOW=False
 							mqtt_pub('chatgpt/description', description)
 							indicated = True
 
-						subprocess.check_call(['espeak', f'Emergency: {emergency}'])
-						subprocess.check_call(['espeak', '-v', 'czech', f'Popis: {description_localized}'])
+						if speak:
+							subprocess.check_call(['espeak', f'Emergency: {emergency}'])
+							if localization:
+								subprocess.check_call(['espeak', '-v', 'czech', f'Popis: {description_localized}'])
+							else:
+								subprocess.check_call(['espeak', f'Description: {description}'])
 						subprocess.check_call(['espeak', f'Explanation: {reply.get("explanation")}'])
 
 			if not indicated and speak:
