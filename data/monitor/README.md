@@ -40,12 +40,13 @@ i have zero idea about local models. As on OpenAI... i've burned through $0.22 f
 ## Requirements
 
 - Python 3.x
-- Pip
 - Pygame
 - OpenAI API
-- Roboflow API
-- Paho MQTT
-- Fire
+- (not really) Roboflow API
+- Paho MQTT client
+- Fire (CLI)
+- mpv
+- espeak
 
 ## Installation
 
