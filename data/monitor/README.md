@@ -77,7 +77,7 @@ i have zero idea about local models. As on OpenAI... i've burned through $0.22 f
 
 Run the main script with the desired options:
 ```sh
-python main.py /path/to/images --lookback=50 --speak=True --CHATGPT=True
+ MQTT_PORT=1883 MQTT_HOST=broker.hivemq.com OPENAI_API_KEY=`cat ~/secrets/OPENAI_API_KEY` ./main.py  /var/lib/motion --lookback=5 --speak=True --CHATGPT=True
 ```
 
 ### Options
