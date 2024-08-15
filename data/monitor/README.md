@@ -15,6 +15,9 @@ graph TD;
     C --> D[Publish results to Mosquitto]
     D --> E[Store data points in InfluxDB]
     E --> F[Alerting via Grafana Cloud]
+    F --> G0[Grafana OnCall app]
+    F --> G1[any phone number]
+    F --> G2[instant messaging, email, webhooks, etc.]
 ```
 
 * https://motion-project.github.io/ collects images from cameras
