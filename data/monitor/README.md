@@ -8,6 +8,7 @@
 - **Emergency Classification**: Classifies emergencies into categories like fallen person, fire, medical emergency, etc.
 - **Integration with MQTT**: Publishes emergency states to an MQTT broker.
 
+## Integrations
 
 ```mermaid
 graph TD;
