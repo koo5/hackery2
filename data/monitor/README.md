@@ -55,7 +55,7 @@ i have zero idea about local models. As on OpenAI... i've burned through $0.22 f
 
 1. Setup venv:
     ```sh
- virtualenv -p /usr/bin/python3.10 venv; . venv/bin/activate;
+    virtualenv -p /usr/bin/python3.10 venv; . venv/bin/activate;
     ```
 
 2. Install the required Python packages:
@@ -63,21 +63,11 @@ i have zero idea about local models. As on OpenAI... i've burned through $0.22 f
     pip install -r requirements.txt
     ```
 
-3. Set up environment variables for API keys and MQTT:
-    ```sh
-    export OPENAI_API_KEY=your_openai_api_key
-    export INFERENCE_API_KEY=your_roboflow_api_key
-    export MQTT_HOST=your_mqtt_host
-    export MQTT_PORT=your_mqtt_port
-    export MQTT_USER=your_mqtt_username
-    export MQTT_PASS=your_mqtt_password
-    ```
-
 ## Usage
 
 Run the main script with the desired options:
 ```sh
- MQTT_PORT=1883 MQTT_HOST=broker.hivemq.com OPENAI_API_KEY=`cat ~/secrets/OPENAI_API_KEY` ./main.py  /var/lib/motion --lookback=5 --speak=True --CHATGPT=True
+ MQTT_PORT=1883 MQTT_HOST=broker.hivemq.com OPENAI_API_KEY=`cat ~/secrets/OPENAI_API_KEY` ./main.py /var/lib/motion --lookback=5 --speak=True --CHATGPT=True
 ```
 
 ### Options
@@ -88,7 +78,8 @@ Run the main script with the desired options:
 - `prompt`: Additional prompt for the AI model.
 - `CHATGPT`: Enable or disable ChatGPT integration.
 - `ROBOFLOW`: Enable or disable Roboflow integration.
-
+- `camera_id`: Camera ID for the MQTT topic.
+- 
 
 ## File Structure
 
