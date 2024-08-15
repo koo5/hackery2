@@ -30,6 +30,9 @@ graph TD;
 ### MQTT
 https://github.com/emqx/blog/blob/main/en/202111/popular-online-public-mqtt-brokers.md
 
+### Grafana Cloud
+Grafana Cloud is super-complex, we need to add support for some easier alerting services, like Twilio, Telegram, which will not probably even integrate through MQTT anyway.
+
 ## Todo
 * systemd unit template, for one unit for each camera.
 * add a switch to disable the lame GUI and run headless
@@ -40,13 +43,13 @@ i have zero idea about local models. As on OpenAI... i've burned through $0.22 f
 ## Requirements
 
 - Python 3.x
-- Pygame
-- OpenAI API
-- (not really) Roboflow API
+- OpenAI API (optional, but works great)
+- Roboflow API (optional, experimental, disused)
 - Paho MQTT client
 - Fire (CLI)
-- mpv
-- espeak
+- Pygame (GUI)
+- mpv (GUI)
+- espeak (AUI :-) )
 
 ## Installation
 
