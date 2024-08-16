@@ -1,10 +1,5 @@
 # https://pajenicko.cz/wemos-s2-mini-wifi-esp32-s2
 
-substitutions:
-  name: $name
-
-
-
 ota:
   - platform: esphome
     password: !secret otapass
@@ -36,9 +31,19 @@ wifi:
       dns1: !secret gateway2
       dns2: 8.8.8.8
 
-  use_address: "$name.local"
-#  use_address: "10.0.0.48"
+  - ssid: !secret ssid3
+    password: !secret password3
+    manual_ip:
+      static_ip: !secret ip3
+      gateway: !secret gateway3
+      subnet: 255.255.255.0
+      dns1: !secret gateway3
+      dns2: 8.8.8.8
 
+  - ssid: !secret ssid4
+    password: !secret password4
+
+  use_address: "{{ dirbid }}.local"
 
 network:
   enable_ipv6: true
@@ -46,7 +51,6 @@ network:
 
 logger:
   level: DEBUG
-
 
 
 web_server:
@@ -58,10 +62,10 @@ esp32:
 
 
 esphome:
-  name: $name
+  name: {{ dirbid }}
   on_boot:
     then:
-      - logger.log: 'boOoOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOooOoOooOOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
+      - logger.log: 'bOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
 
 
 
@@ -74,36 +78,7 @@ mqtt:
   password: !secret mqtt_password
 
 
-sun:
-  latitude: 50.0755°
-  longitude: 14.4378°
-
-  on_sunrise:
-    - then:
-        - logger.log: Good morning!
-  on_sunset:
-    - then:
-        - logger.log: Good evening!
-
-
-
 text_sensor:
-  - platform: sun
-    name: Next Sunrise
-    type: sunrise
-  - platform: sun
-    name: Next Sunset
-    type: sunset
-  - platform: template
-    name: "Time NTP"
-    lambda: |-
-      char str[30];
-      if (!id(ntp).now().is_valid()) { return { "----" }; }
-      time_t currTime = id(ntp).now().timestamp;
-      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
-      //strftime(str, sizeof(str), "%c", localtime(&currTime));
-      return  { str };
-    update_interval: 1s
   - platform: wifi_info
     ip_address:
       name: ESPIPAddress
@@ -130,6 +105,19 @@ text_sensor:
 
 
 
+sun:
+  latitude: 50.0755°
+  longitude: 14.4378°
+
+  on_sunrise:
+    - then:
+        - logger.log: Good morning!
+  on_sunset:
+    - then:
+        - logger.log: Good evening!
+
+
+
 time:
   - platform: sntp
     id: ntp
@@ -139,7 +127,7 @@ time:
 
 sensor:
   - platform: wifi_signal
-    name: "Irrigation Wifi"
+    name: "Wifi"
     update_interval: 1s
   - platform: uptime
     name: Uptime Sensor
@@ -155,13 +143,15 @@ sensor:
 
   - platform: max6675
     name: "max6675"
-    cs_pin: 37
+    cs_pin: 39
     update_interval: 1s
+    data_rate: 200kHz
+
 
 spi:
   miso_pin: 35
-  clk_pin: 39
-
+  clk_pin: 37
+  interface: software
 
 
 switch:

@@ -157,10 +157,13 @@ sensor:
     name: "max6675"
     cs_pin: 39
     update_interval: 1s
+    data_rate: 200kHz
+
 
 spi:
-  miso_pin: 37
-  clk_pin: 33
+  miso_pin: 35
+  clk_pin: 37
+  interface: software
 
 
 
