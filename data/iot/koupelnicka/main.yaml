@@ -160,4 +160,10 @@ switch:
     name: "Living Room Restart"
 
 
+# https://github.com/adafruit/MAX6675-library/blob/master/max6675.cpp#L65
+# My MAX31855 output is really unstable and noisy - If I touch or move the probe the temperature output goes crazy
+#The MAX31855 is surprisingly sensitive, we've found a good way to fix this is to place a 0.01uF to 0.1uF capacitor across the thermocouple leads (that is, place the capacitor into the blue terminal block, or solder to the bottom as shown below).
+#temperature_ThermocoupleCap.jpg
+# - https://learn.adafruit.com/thermocouple?view=all
+# https://esphome.io/components/spi
 
