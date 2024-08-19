@@ -1,4 +1,18 @@
-# https://pajenicko.cz/wemos-s2-mini-wifi-esp32-s2
+
+
+esphome:
+  name: {{ dirbid }}
+  comment: "https://pajenicko.cz/wemos-s2-mini-wifi-esp32-s2 | https://github.com/koo5/hackery2/tree/master/data/iot/ds"
+  on_boot:
+    then:
+      - logger.log: 'bOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
+
+esp32:
+  board: lolin_s2_mini
+
+logger:
+  level: DEBUG
+
 
 ota:
   - platform: esphome
@@ -49,23 +63,9 @@ network:
   enable_ipv6: true
 
 
-logger:
-  level: DEBUG
-
 
 web_server:
   port: 80
-
-
-esp32:
-  board: lolin_s2_mini
-
-
-esphome:
-  name: {{ dirbid }}
-  on_boot:
-    then:
-      - logger.log: 'bOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
 
 
 
