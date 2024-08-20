@@ -538,3 +538,11 @@ for tun in tun0 tun1
 sudo apt install snapd
 
 ```
+
+
+
+## git
+```
+git config --global push.default current
+
+```

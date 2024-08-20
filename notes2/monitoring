@@ -1,5 +1,6 @@
 meta
 	https://prometheus.io/docs/introduction/comparison/
+	https://news.ycombinator.com/item?id=41240379
 
 guides
 	https://apuravchauhan.medium.com/app-monitoring-and-alerting-a-practical-prometheus-spring-boot-tutorial-d79449b9278d	
