@@ -178,6 +178,9 @@ sensor:
 #    type: azimuth
 
 
+  - platform: internal_temperature
+    name: "Internal Temperature"
+
 
   - !include
     file: wetness_raw.yaml

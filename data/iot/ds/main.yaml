@@ -1,4 +1,18 @@
-# https://pajenicko.cz/wemos-s2-mini-wifi-esp32-s2
+
+
+esphome:
+  name: {{ dirbid }}
+  comment: "https://pajenicko.cz/wemos-s2-mini-wifi-esp32-s2 | https://github.com/koo5/hackery2/tree/master/data/iot/ds"
+  on_boot:
+    then:
+      - logger.log: 'bOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
+
+esp32:
+  board: lolin_s2_mini
+
+logger:
+  level: DEBUG
+
 
 ota:
   - platform: esphome
@@ -49,23 +63,9 @@ network:
   enable_ipv6: true
 
 
-logger:
-  level: DEBUG
-
 
 web_server:
   port: 80
-
-
-esp32:
-  board: lolin_s2_mini
-
-
-esphome:
-  name: {{ dirbid }}
-  on_boot:
-    then:
-      - logger.log: 'bOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
 
 
 
@@ -76,6 +76,58 @@ mqtt:
   port: !secret mqtt_port
   username: !secret mqtt_user
   password: !secret mqtt_password
+
+
+
+sun:
+  latitude: 50.0755°
+  longitude: 14.4378°
+
+  on_sunrise:
+    - then:
+        - logger.log: Good morning!
+  on_sunset:
+    - then:
+        - logger.log: Good evening!
+
+
+
+time:
+  - platform: sntp
+    id: ntp
+    timezone: Europe/Prague
+
+debug:
+  update_interval: 50s
+
+
+sensor:
+  - platform: wifi_signal
+    name: "Wifi"
+    update_interval: 1s
+  - platform: uptime
+    name: Uptime
+  - platform: sun
+    name: Sun Elevation
+    type: elevation
+  - platform: sun
+    name: Sun Azimuth
+    type: azimuth
+  - platform: internal_temperature
+    name: "Internal_temperature"
+
+  - platform: debug
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
+
+
+  - platform: dallas_temp
+    name: probe_temperature
+    update_interval: 1s
+
+
 
 
 text_sensor:
@@ -103,67 +155,23 @@ text_sensor:
     dns_address:
       name: ESP DNS Address
 
-
-
-sun:
-  latitude: 50.0755°
-  longitude: 14.4378°
-
-  on_sunrise:
-    - then:
-        - logger.log: Good morning!
-  on_sunset:
-    - then:
-        - logger.log: Good evening!
-
-
-
-time:
-  - platform: sntp
-    id: ntp
-    timezone: Europe/Prague
-
-
-
-sensor:
-  - platform: wifi_signal
-    name: "Wifi"
-    update_interval: 1s
-  - platform: uptime
-    name: Uptime Sensor
-  - platform: sun
-    name: Sun Elevation
-    type: elevation
-  - platform: sun
-    name: Sun Azimuth
-    type: azimuth
+  - platform: debug
+    device:
+      name: "Device Info"
+#    reset_reason:
+#      name: "Reset Reason"
 
 
 
 
-  - platform: max6675
-    name: "max6675"
-    cs_pin: 39
-    update_interval: 1s
-    data_rate: 200kHz
+one_wire:
+  - platform: gpio
+    pin: GPIO33
 
 
-spi:
-  miso_pin: 35
-  clk_pin: 37
-  interface: software
 
 
 switch:
   - platform: restart
     id: manual_restart
-    name: "Living Room Restart"
-
-
-# https://github.com/adafruit/MAX6675-library/blob/master/max6675.cpp#L65
-# My MAX31855 output is really unstable and noisy - If I touch or move the probe the temperature output goes crazy
-#The MAX31855 is surprisingly sensitive, we've found a good way to fix this is to place a 0.01uF to 0.1uF capacitor across the thermocouple leads (that is, place the capacitor into the blue terminal block, or solder to the bottom as shown below).
-#temperature_ThermocoupleCap.jpg
-# - https://learn.adafruit.com/thermocouple?view=all
-# https://esphome.io/components/spi
-
+    name: "Restart"
