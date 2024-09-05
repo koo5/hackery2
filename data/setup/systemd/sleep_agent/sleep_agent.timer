@@ -1,0 +1,12 @@
+[Unit]
+Description="sleep_agent"
+
+[Timer]
+AccuracySec=5s
+#OnCalendar=minutely
+OnCalendar=*:*:00/30 
+Unit=sleep_agent.service
+
+
+[Install]
+WantedBy=multi-user.target
