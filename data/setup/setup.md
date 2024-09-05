@@ -133,8 +133,11 @@ sudo ufw allow $NEW_SSH_PORT
 sudo ufw enable
 sudo ufw status
 
-echo """PasswordAuthentication no
+echo """
 Port $NEW_SSH_PORT """ | sudo tee /etc/ssh/sshd_config.d/1.conf
+
+cp ~/hackery2/data/setup/data/sshd_config.d/nopass.conf /etc/ssh/sshd_config.d/
+
 sudo systemctl restart sshd.service
 
 ```
