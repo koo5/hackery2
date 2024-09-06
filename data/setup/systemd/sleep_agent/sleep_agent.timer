@@ -4,7 +4,7 @@ Description="sleep_agent"
 [Timer]
 AccuracySec=5s
 #OnCalendar=minutely
-OnCalendar=*:*:00/30 
+OnCalendar=*:*:00/15
 Unit=sleep_agent.service
 
 
