@@ -1,0 +1,6 @@
+sounddevice 
+openai-whisper
+
+
+
+

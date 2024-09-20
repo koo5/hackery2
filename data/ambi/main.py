@@ -7,8 +7,9 @@ import sounddevice as sd
 
 class AmbientAgent:
 	def __init__(self):
-		print("Ambient Agent initialized and ready to listen.")
+		print("Ambient Agent loading.")
 		self.model = whisper.load_model("large")
+		print("Ambient Agent initialized and ready to listen.")
 
 	def record_audio(self, duration=5, sample_rate=16000):
 		print("Recording...")
