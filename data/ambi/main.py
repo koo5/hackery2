@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import spacy
 from datetime import datetime, timedelta
 import time
