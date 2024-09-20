@@ -10,11 +10,7 @@ python3 -m venv ambi_env
 source ambi_env/bin/activate
 
 # Install required Python packages
-pip install spacy whisper numpy sounddevice
-
-# Download and install spaCy model
-python -m spacy download en_core_web_sm
-python -m spacy download en_core_web_sm
+pip install -r requirements.txt
 
 # Set up the systemd service
 sudo ln -s /home/koom/hackery2/data/ambi/ambient-agent.service /etc/systemd/system/ambient-agent.service
