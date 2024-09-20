@@ -12,7 +12,8 @@ source ambi_env/bin/activate
 # Install required Python packages
 pip install spacy whisper numpy sounddevice
 
-# Download spaCy model
+# Download and install spaCy model
+python -m spacy download en_core_web_sm
 python -m spacy download en_core_web_sm
 
 # Set up the systemd service
