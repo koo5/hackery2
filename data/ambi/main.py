@@ -30,7 +30,7 @@ class AmbientAgent:
 
 	def execute_command(self, command):
 		
-		print("Command received: " + command)
+		print("Command received: " + str(command))
 		# 
 		# intent, entities = self.parse_user_input(command)
 		# if intent == "set_reminder":
