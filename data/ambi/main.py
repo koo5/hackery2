@@ -24,7 +24,7 @@ class AmbientAgent:
     def listen_for_command(self):
         try:
             audio_data = self.record_audio()
-            result = self.whisper_model.transcribe(audio_data)
+            result = self.whisper_model.transcribe(audio_data, fp16=False)
             transcribed_text = result["text"].strip()
             print(f"Transcribed: {transcribed_text}")
             return transcribed_text
