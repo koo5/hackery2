@@ -1,10 +1,17 @@
-import argparse
 import spacy
 from datetime import datetime, timedelta
+import time
+import sys
 
 class AmbientAgent:
     def __init__(self):
         self.nlp = spacy.load('en_core_web_sm')
+        print("Ambient Agent initialized and ready to listen.")
+
+    def listen_for_command(self):
+        # In a real scenario, this would use a speech recognition library
+        # For now, we'll just use input() to simulate voice input
+        return input("Listening for command: ")
 
     def parse_user_input(self, user_input):
         doc = self.nlp(user_input)
@@ -59,9 +66,15 @@ class AmbientAgent:
             print("Command not recognized.")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Personal agent app to parse natural language commands.')
-    parser.add_argument('command', type=str, help='The natural language command to process')
-    args = parser.parse_args()
-
-    agent = PersonalAgent()
-    agent.execute_command(args.command)
+    agent = AmbientAgent()
+    
+    print("Ambient Agent is running. Use Ctrl+C to exit.")
+    
+    try:
+        while True:
+            command = agent.listen_for_command()
+            agent.execute_command(command)
+            time.sleep(1)  # Small delay to prevent high CPU usage
+    except KeyboardInterrupt:
+        print("\nAmbient Agent shutting down.")
+        sys.exit(0)
