@@ -89,7 +89,7 @@ def magic(lookie, **kwargs):
 
 	logger.info(url)
 
-	if url and url.path:
+	if url and url.path and (url.path.startswith('git@') or url.scheme):
 		clone(lookie, **kwargs)
 
 	elif lookie.isdigit():

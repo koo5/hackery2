@@ -87,20 +87,20 @@ sudo apt install -y mc htop tmux screen iotop jnettop net-tools ufw openssh-serv
 
 git clone https://github.com/koo5/hackery2.git
 bash ~/hackery2/src/hackery2/install.sh
-sudo ~/hackery2/data/setup/data/mc/setup.sh
+sudo ~/hackery2/setup/data/mc/setup.sh
 sudo apt install python3-virtualenv
 
 
 
 set -U fish_user_paths $fish_user_paths  ~/hackery2/src/hackery2/bin/ ~/.local/bin/
-set -U fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path #-U?
-#? set -e fish_function_path; set -U fish_function_path ~/hackery2/data/setup/data/fish/functions $fish_function_path
+set -U fish_function_path ~/hackery2/setup/data/fish/functions $fish_function_path #-U?
+#? set -e fish_function_path; set -U fish_function_path ~/hackery2/setup/data/fish/functions $fish_function_path
 
 sudo chown -R root:root ~/hackery2/src/hackery2/bin/update-yum
 sudo chmod ug+s ~/hackery2/src/hackery2/bin/update-yum
 sudo chmod +x ~/hackery2/src/hackery2/bin/update-yum
 
-ln -snf ~/hackery2/data/setup/data/autorandr/ ~/.config/autorandr
+ln -snf ~/hackery2/setup/data/autorandr/ ~/.config/autorandr
 
 abbr --add kw kwrite
 abbr --add untar tar -xvf
@@ -136,7 +136,7 @@ sudo ufw status
 echo """
 Port $NEW_SSH_PORT """ | sudo tee /etc/ssh/sshd_config.d/1.conf
 
-cp ~/hackery2/data/setup/data/sshd_config.d/nopass.conf /etc/ssh/sshd_config.d/
+cp ~/hackery2/setup/data/sshd_config.d/nopass.conf /etc/ssh/sshd_config.d/
 
 sudo systemctl restart sshd.service
 
@@ -245,115 +245,10 @@ RUN dpkg-reconfigure --frontend=noninteractive locales  && update-locale LANG=$L
 ```
 
 
+## misc
 
 
-## mptcp
-### ubuntu 20.04 / mptcpd compilation ..
-
-
-#### release
-wget https://github.com/intel/mptcpd/releases/download/v0.9/mptcpd-0.9.tar.gz
-tar xvzf mptcpd-0.9.tar.gz
-cd mptcpd-0.9
-#### git
-
-
-```
-
-
-(
-	sudo apt-get install autoconf-archive
-	sudo apt install libell-dev 
-	sudo apt install libelf-dev
-
-	wget https://cz.archive.ubuntu.com/ubuntu/pool/main/i/iproute2/iproute2_5.10.0-4ubuntu1.debian.tar.xz https://cz.archive.ubuntu.com/ubuntu/pool/main/i/iproute2/iproute2_5.10.0-4ubuntu1.dsc https://cz.archive.ubuntu.com/ubuntu/pool/main/i/iproute2/iproute2_5.10.0.orig.tar.xz
-	wget https://cz.archive.ubuntu.com/ubuntu/pool/main/libb/libbpf/libbpf-dev_0.3-2ubuntu1_amd64.deb https://cz.archive.ubuntu.com/ubuntu/pool/main/libb/libbpf/libbpf0_0.3-2ubuntu1_amd64.deb
-	sudo dpkg -i libbpf0_0.3-2ubuntu1_amd64.deb libbpf-dev_0.3-2ubuntu1_amd64.deb
-
-
-	wget 'https://cz.archive.ubuntu.com/ubuntu/pool/universe/e/ell/libell-dev_0.36-1_amd64.deb' 'https://cz.archive.ubuntu.com/ubuntu/pool/universe/e/ell/libell0_0.36-1_amd64.deb'
-	sudo dpkg -i libell-dev_0.36-1_amd64.deb
-
-
-	sudo apt install bison debhelper-compat flex libxtables-dev libatm1-dev libbsd-dev libdb-dev libmnl-dev
-	sudo apt install debhelper
-
-	dpkg-source -x iproute2_5.10.0-4ubuntu1.dsc
-	cd iproute2-5.10.0
-	dpkg-buildpackage -d
-	sudo dpkg -i ../iproute2_5.10.0-4ubuntu1_amd64.deb
-)
-
-
-
-
-./configure
-make
-sudo make install
-
-sudo systemctl enable mptcp
-sudo systemctl start  mptcp
-sudo systemctl status mptcp
-
-```
-### setup
-```
-dmesg | grep MPTCP
-
-ip mptcp limits set subflow 4 add_addr_accepted 4
-
-set MY_IP (dig +short myip.opendns.com @resolver1.opendns.com)
-sudo ip mptcp endpoint add et $MY_IP dev eth0 subflow
-
-```
-
-#### home
-```
-sudo ip rule add from 192.168.8.16 table 1
-sudo ip rule add from 192.168.10.100 table 2
-ip route add 192.168.10.0/24 dev enp10s0 scope link table 2
-ip route add 192.168.8.0/24 dev enp5s0 scope link table 1
-sudo ip route add default via 192.168.10.1 dev enp10s0 table 2
-sudo ip route add default via 192.168.8.1 dev enp5s0 table 1
-ip rule show
-ip route show table 1
-ip route show table 2
-ip mptcp endpoint add 192.168.10.100 dev enp10s0 subflow
-ip mptcp endpoint add 192.168.8.16 dev enp5s0 subflow
-
-
-```
-#### vps
-```
-sudo ip mptcp endpoint add 154.12.236.185 dev eth0 subflow
-
-```
-
-### monitor
-```
-journalctl -f -u mptcp.service
-```
-(but these MPTCP_EVENT_SUB_... are not a big deal, see ...
-
-
-```
-import os
-while True:
-	os.system('nstat "MPTcp*"')
-```
-
-### does it work?
-
-server:
-```
-cat hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh | mptcpize run -d nc -l 8080
-```
-
-client:
-```
-mptcpize run -d nc 154.12.236.185 8080 | wc -c
-```
-
+continue on to data/mptcp/setup.md
 
 
 
@@ -517,7 +412,7 @@ hpnssh -o NoneEnabled=yes -o NoneSwitch=yes -C -L 8888:localhost:8888 -p2222  us
 sudo apt-get build-dep xfwm4
 apt source xfwm4
 cd xfwm4-4.16.1/src
-patch < ~/hackery2/data/setup/data/xfwm4/fullscreenfix+patch2-xfwm4.16.1
+patch < ~/hackery2/setup/data/xfwm4/fullscreenfix+patch2-xfwm4.16.1
 dpkg-buildpackage  -rfakeroot -b
 sudo dpkg -i ../xfwm4
 nohup xfwm4 --replace

@@ -37,7 +37,7 @@ venv in a centralized location in you home, as the various wrapper libraries mak
 
 If you're copying your sources directory(repo) around, you have to make an embedded venv relocatable anyway..
 
-Anyway, here's a fish script to source in your `.config/fish/config.fish` for some semi-reasonable automatic local venv activation: `hackery2/data/setup/data/fish/functions/auto_venv.fish`
+Anyway, here's a fish script to source in your `.config/fish/config.fish` for some semi-reasonable automatic local venv activation: `hackery2/setup/data/fish/functions/auto_venv.fish`
 
 
 
@@ -57,7 +57,7 @@ pip-compile --resolver=backtracking
 nope, for some magical unexplained reason, this wants to manage only virtualenvs 
  stored away in some special directory, rather than where they're used.
 
-? hackery2/data/setup/data/fish/functions/auto_venv.fish
+? hackery2/setup/data/fish/functions/auto_venv.fish
 
 
 

@@ -7,7 +7,7 @@ or
 ### set up keys
 ?
 ### add jumps
-sudo cp ~/hackery2/data/setup/machines/jj/hp_vms.conf /etc/ssh/ssh_config.d/hp_vms.conf
+sudo cp ~/hackery2/setup/machines/jj/hp_vms.conf /etc/ssh/ssh_config.d/hp_vms.conf
 ### keep access details from inventory files
 sudo mcedit /etc/ssh/ssh_config.d/machines.conf ...
 

@@ -3,3 +3,4 @@ __pycache__
 *.kate-swp
 .secrets
 **/nohup.out
+.aider*

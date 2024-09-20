@@ -74,4 +74,4 @@ while(True):
 	fileObject.close()
 	clientSocket.close()
 
-	time.sleep(5)
+	time.sleep(15)
