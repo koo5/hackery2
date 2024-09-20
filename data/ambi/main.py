@@ -2,12 +2,13 @@
 
 import time
 import sys
-from whisper_transcribe import transcribe
+import whisper
 import sounddevice as sd
 
 class AmbientAgent:
 	def __init__(self):
 		print("Ambient Agent initialized and ready to listen.")
+		self.model = whisper.load_model("large")
 
 	def record_audio(self, duration=5, sample_rate=16000):
 		print("Recording...")
@@ -19,7 +20,7 @@ class AmbientAgent:
 	def listen_for_command(self):
 		try:
 			audio_data = self.record_audio()
-			transcribed_text = transcribe(self.whisper_model, audio_data, fp16=False)["text"].strip()
+			transcribed_text = self.model.transcribe(audio_data)
 			print(f"Transcribed: {transcribed_text}")
 			return transcribed_text
 		except Exception as e:
