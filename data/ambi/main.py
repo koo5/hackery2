@@ -4,10 +4,9 @@ import spacy
 from datetime import datetime, timedelta
 import time
 import sys
-import pyaudio
-import wave
 import numpy as np
 import whisper
+import sounddevice as sd
 
 class AmbientAgent:
     def __init__(self):
@@ -16,33 +15,22 @@ class AmbientAgent:
         print("Ambient Agent initialized and ready to listen.")
 
     def record_audio(self, duration=5, sample_rate=16000):
-        p = pyaudio.PyAudio()
-        stream = p.open(format=pyaudio.paInt16,
-                        channels=1,
-                        rate=sample_rate,
-                        input=True,
-                        frames_per_buffer=1024)
-
         print("Recording...")
-        frames = []
-        for _ in range(0, int(sample_rate / 1024 * duration)):
-            data = stream.read(1024)
-            frames.append(data)
+        audio_data = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1)
+        sd.wait()
         print("Recording finished.")
-
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
-
-        audio_data = np.frombuffer(b''.join(frames), dtype=np.int16)
-        return audio_data
+        return audio_data.flatten()
 
     def listen_for_command(self):
-        audio_data = self.record_audio()
-        result = self.whisper_model.transcribe(audio_data)
-        transcribed_text = result["text"].strip()
-        print(f"Transcribed: {transcribed_text}")
-        return transcribed_text
+        try:
+            audio_data = self.record_audio()
+            result = self.whisper_model.transcribe(audio_data)
+            transcribed_text = result["text"].strip()
+            print(f"Transcribed: {transcribed_text}")
+            return transcribed_text
+        except Exception as e:
+            print(f"Error during transcription: {e}")
+            return ""
 
     def parse_user_input(self, user_input):
         doc = self.nlp(user_input)

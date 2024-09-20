@@ -3,7 +3,8 @@ Description=Ambient Agent Service
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/koom/hackery2/data/ambi/main.py
+ExecStart=/home/koom/hackery2/data/ambi/ambi_env/bin/python /home/koom/hackery2/data/ambi/main.py
+WorkingDirectory=/home/koom/hackery2/data/ambi
 Restart=always
 User=koom
 Group=koom
