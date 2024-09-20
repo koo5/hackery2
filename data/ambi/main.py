@@ -2,7 +2,7 @@ import argparse
 import spacy
 from datetime import datetime, timedelta
 
-class PersonalAgent:
+class AmbientAgent:
     def __init__(self):
         self.nlp = spacy.load('en_core_web_sm')
 

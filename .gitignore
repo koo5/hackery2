@@ -1,5 +1,6 @@
 __pycache__
 .idea
+**/.idea
 *.kate-swp
 .secrets
 **/nohup.out
