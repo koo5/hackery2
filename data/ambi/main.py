@@ -2,7 +2,7 @@
 
 import time
 import sys
-import whisper
+from whisper_transcribe import transcribe
 import sounddevice as sd
 
 class AmbientAgent:
@@ -19,7 +19,7 @@ class AmbientAgent:
 	def listen_for_command(self):
 		try:
 			audio_data = self.record_audio()
-			transcribed_text = whisper.transcribe(self.whisper_model, audio_data, fp16=False)["text"].strip()
+			transcribed_text = transcribe(self.whisper_model, audio_data, fp16=False)["text"].strip()
 			print(f"Transcribed: {transcribed_text}")
 			return transcribed_text
 		except Exception as e:
