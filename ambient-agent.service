@@ -1,0 +1,12 @@
+[Unit]
+Description=Ambient Agent Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/koom/hackery2/data/ambi/main.py
+Restart=always
+User=koom
+Group=koom
+
+[Install]
+WantedBy=multi-user.target
