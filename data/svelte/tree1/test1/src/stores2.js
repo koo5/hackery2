@@ -2,8 +2,14 @@ import {derived, writable, get } from "svelte/store";
 
 
 export let accounts = writable([
-    writable({id:0, module_data: {messages: {messagesArray: writable([{text: 'ahoj'},{text: 'mami'}])}}}),
-    writable({id:1, module_data: {messages: {messagesArray: writable([{text: 'cau'},{text: 'vole'}])}}}),
+    writable({id:0, module_data: {messages: {
+        messagesArray: writable([{text: 'ahoj'},{text: 'mami'}]),
+                conversationsArray: writable([{address:"mamka"}, {address:"tatka"}]),
+            }}}),
+    writable({id:1, module_data: {messages: {
+        messagesArray: writable([{text: 'cau'},{text: 'vole'}]),
+                conversationsArray: writable([{address:"nakej otrapa"}, {address:"jinej otrapa"}]),
+            }}}),
 ]);
 
 let active_account_id = null;
@@ -59,6 +65,10 @@ md.subscribe(v => {
 
 
 
+
+/// ============
+
+
 export let messagesArray = writable([]);
 let messagesArrayset = messagesArray.set;
 
@@ -80,5 +90,44 @@ messagesArray.subscribe(v => {
     console.log('messagesArray:', v);
 });
 
+
+export function relay(data_name) {
+    let result = writable();
+    let setter = result.set;
+
+    md.subscribe(value => {
+        console.log('MD: ', value);
+        if (value) {
+            setter(get(value[data_name]));
+        } else {
+            setter(null);
+        }
+    });
+
+    result.set = (v) => {
+        get(active_account)?.module_data[data_name].set(v);
+    };
+    result.subscribe(v => {
+        console.log(data_name, ':', v);
+    });
+    return result;
+}
+
+export let conversationsArray = relay('conversationsArray');
+
+
+/// ============
+
+
+/*
+export let conversationsArray = derived(md, ($md, set) => {
+    console.log('messagesArray update, $md:', $md);
+    if ($md) {
+        set(get($md.conversationsArray));
+        if($md.conversationsArray)
+            $md.conversationsArray.subscribe(set);
+    }
+}, null);
+*/
 
 

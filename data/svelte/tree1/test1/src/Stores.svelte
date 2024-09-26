@@ -1,6 +1,6 @@
 <script>
 
-    import {switchAccount, active_account, messagesArray} from './stores2.js';
+    import { switchAccount, active_account, messagesArray, conversationsArray } from './stores2.js';
 
 
     messagesArray.subscribe(value => {
@@ -17,7 +17,31 @@ active_account: { JSON.stringify($active_account) },
 
 {#if $messagesArray}
  messages: { JSON.stringify($messagesArray) }
+  <br>
+
+<ul>
+  {#each $messagesArray as message (message.text)}
+    <li>{message.text}</li>
+  {/each}
+</ul>
+  
 {:else}
   no data, no messages
   
 {/if}
+
+<hr>
+
+conversationsArray: { JSON.stringify($conversationsArray) }
+<br>
+{#if $conversationsArray}
+  <br>
+  <ul>
+    {#each $conversationsArray as conversation (conversation.address)}
+      <li>{conversation.address}</li>
+    {/each}
+  </ul>
+{:else}
+  no data, no conversations
+{/if}
+<hr>
