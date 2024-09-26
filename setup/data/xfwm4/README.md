@@ -1,3 +1,33 @@
+
+```
+sudo apt install intltool libepoxy-dev libgtk-3-dev libstartup-notification0-dev libwnck-3-dev libxcomposite-dev libxdamage-dev libxfce4ui-2-dev libxfce4util-dev libxfconf-0-dev libxft-dev libxpresent-dev libxres-dev xfce4-dev-tools
+
+
+apt source xfwm4
+
+cd ..../src
+
+git apply ~/hackery2/data/setup/data/xfwm4/0001-patch.patch
+
+cd ..
+
+dpkg-source --commit
+
+dpkg-buildpackage -us -uc
+
+cd ..
+
+sudo dpkg -i xfwm4_4.18.0-1build3_amd64.deb
+
+
+
+```
+
+
+
+
+
+
 these are multiple versions differing only in the version of xfwm4 source code that they're applicable to. Both files contain two set of changes: 
 * commenting out clientAdjustFullscreenLayer (three lines) causes reasonable behavior with fullscreen windows
 * cursorInMonitor stuff causes the window switcher to only show windows that are on the screen that the cursor is on
