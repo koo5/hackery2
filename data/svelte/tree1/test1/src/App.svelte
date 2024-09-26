@@ -2,6 +2,7 @@
 
     import Tree from "svelte-tree";
     import Stores from "./Stores.svelte";
+    import PageReloadClock from "./PageReloadClock.svelte";
     
     export let name;
 
@@ -43,6 +44,8 @@
 
 <main>
 
+  <PageReloadClock/>
+  <br>
   <Stores />
   
 	<Tree {tree} let:node>
