@@ -7,6 +7,13 @@
         console.log('messagesArray changed', value);
     });
 
+    function addMessage() {
+        messagesArray.update(messages => {
+            messages.push({ text: 'New message' + Math.random() });
+            return messages;
+        });
+    }
+
 </script>
 
 active_account: { JSON.stringify($active_account) },
@@ -45,3 +52,4 @@ conversationsArray: { JSON.stringify($conversationsArray) }
   no data, no conversations
 {/if}
 <hr>
+<button on:click={addMessage}>Add Message</button>
