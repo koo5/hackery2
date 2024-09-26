@@ -1,6 +1,7 @@
 <script>
 
     import Tree from "svelte-tree";
+    import Stores from "./Stores.svelte";
     
     export let name;
 
@@ -42,6 +43,8 @@
 
 <main>
 
+  <Stores />
+  
 	<Tree {tree} let:node>
 		<div class="name">{node.name}</div>
 	</Tree>
