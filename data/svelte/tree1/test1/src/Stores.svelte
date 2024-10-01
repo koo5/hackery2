@@ -14,6 +14,15 @@
         });
     }
 
+
+/*
+ import { md } from '../messages.js';
+ let messagesArray;
+ $: messagesArray = $md.messagesArray;
+*/
+
+
+
 </script>
 
 active_account: { JSON.stringify($active_account) },
