@@ -16,7 +16,7 @@ def set_cores(num):
 
 
 svr = socket.socket(socket.AF_INET)
-svr.bind(("127.0.0.1",1111))
+svr.bind(("0.0.0.0",1111))
 svr.listen()
 
 
