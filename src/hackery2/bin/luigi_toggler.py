@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import subprocess, requests
+import subprocess, requests, logging
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -11,7 +11,10 @@ log.setLevel(logging.DEBUG)
 
 # control luigi and core_control
 
-on = int(subprocess.check_output(['xprintidle'])) > 1000*60*2
+out = subprocess.check_output(['xprintidle'], env={'DISPLAY':':0'})
+log.info(out)
+
+on = int(out) > 1000*60*2
 
 log.info(f'fun is {on}')
 
