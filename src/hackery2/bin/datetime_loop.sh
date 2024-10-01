@@ -7,7 +7,7 @@ do
 	#date --utc "+%Y-%m-%dT%H-%M-%S Z" > datetime.txt.tmp
 	date "+%Y-%m-%d T %H-%M-%S" > datetime.txt.tmp
 	cat datetime.txt.tmp > datetime.txt
-	sleep 1
+	sleep 0.1
 	#logger -p user.error xxxx
 	#echo '<4>message at log level 4'
 done
