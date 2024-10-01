@@ -2,12 +2,22 @@
 
 import subprocess, requests
 
+
+logging.basicConfig(level=logging.DEBUG)
+
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+
 # control luigi and core_control
 
 on = int(subprocess.check_output(['xprintidle'])) > 1000*60*2
+
+log.info(f'fun is {on}')
+
 un = ('un' if on else '')
 cmd = f'http://localhost:8082/api/{un}pause'
-print(f'{cmd}')
+log.info(f'{cmd}')
 try:
     requests.get(cmd, timeout=3)
 except:
@@ -15,7 +25,7 @@ except:
 
 cores = 24 if on else 10
 cmd = 'http://192.168.122.128:1111/set_cores={}'.format(cores)
-print(f'{cmd}')
+log.info(f'{cmd}')
 try:
     requests.get(cmd, timeout=3)
 except:
