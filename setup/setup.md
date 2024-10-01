@@ -442,5 +442,6 @@ sudo apt install snapd
 ## git
 ```
 git config --global push.default current
+git config --global push.autoSetupRemote true
 
 ```

@@ -17,3 +17,8 @@ https://www.chmibrno.org/mapa/
 
 ---
 https://chmibrno.org/blog/2018/08/01/neni-ozon-jako-ozon/
+
+https://news.ycombinator.com/item?id=41611965
+
+https://forum.root.cz/index.php?topic=29386.msg408665;topicseen#new
+

@@ -1,6 +1,8 @@
 <script>
 
     import Tree from "svelte-tree";
+    import Stores from "./Stores.svelte";
+    import PageReloadClock from "./PageReloadClock.svelte";
     
     export let name;
 
@@ -42,6 +44,10 @@
 
 <main>
 
+  <PageReloadClock/>
+  <br>
+  <Stores />
+<hr>  
 	<Tree {tree} let:node>
 		<div class="name">{node.name}</div>
 	</Tree>
@@ -50,7 +56,6 @@
 
 <style>
 	main {
-		text-align: center;
 		padding: 1em;
 		max-width: 240px;
 		margin: 0 auto;

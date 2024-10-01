@@ -1,0 +1,79 @@
+
+ota:
+  - platform: esphome
+    password: !secret otapass
+
+
+wifi:
+  power_save_mode: none
+
+
+  networks:
+  
+  - ssid: !secret ssid1
+    password: !secret password1
+    manual_ip:
+      static_ip: !secret ip1
+      gateway: !secret gateway1
+      subnet: 255.255.255.0
+      dns1: !secret gateway1
+      dns2: 8.8.8.8
+
+  - ssid: !secret ssid2
+    password: !secret password2
+    manual_ip:
+      static_ip: !secret ip2
+      gateway: !secret gateway2
+      subnet: 255.255.255.0
+      dns1: !secret gateway2
+      dns2: 8.8.8.8
+
+  - ssid: !secret ssid3
+    password: !secret password3
+
+  use_address: "{{ dirbid }}.local"
+
+
+
+logger:
+  level: DEBUG
+
+
+web_server:
+  port: 80
+
+
+esp8266:
+  board: esp01_1m
+
+
+esphome:
+  name: {{ dirbid }}
+
+
+mqtt:
+  #keepalive: 2s
+  #reboot_timeout: 145min
+  broker: !secret mqtt_host
+  port: !secret mqtt_port
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+
+
+sensor:
+  - platform: wifi_signal
+    name: "wifi"
+    update_interval: 1s
+  - platform: uptime
+    name: Uptime Sensor
+
+
+  - platform: dallas_temp
+    name: probe_temperature
+    update_interval: 1s
+
+
+
+one_wire:
+  - platform: gpio
+    pin: GPIO2

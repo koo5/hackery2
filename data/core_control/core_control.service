@@ -1,0 +1,11 @@
+[Unit]
+Description=core_control
+
+[Service]
+ExecStart=/home/user/hackery2/data/core_control/main.py | systemd-cat -t core_control
+Restart=always
+RestartSec=10
+User=user
+
+[Install]
+WantedBy=multi-user.target
