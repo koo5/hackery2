@@ -1,5 +1,12 @@
 import {derived, writable, get } from "svelte/store";
 
+import { arr } from "./test.js";
+
+console.log('arr:', JSON.stringify(arr));
+
+arr.push('hello');
+
+console.log('arr:', JSON.stringify(arr));
 
 export let accounts = writable([
     writable({id:0, module_data: {messages: {

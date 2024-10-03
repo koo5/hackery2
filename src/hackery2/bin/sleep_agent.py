@@ -24,6 +24,7 @@ def get_lid_state():
     return "cannot detect state"
 
 lid_state = get_lid_state()
+print(lid_state)
 
 state_messages = {
     "closed": "The lid is closed.",
