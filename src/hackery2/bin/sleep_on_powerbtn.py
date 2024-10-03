@@ -14,7 +14,7 @@ while True:
 			print(line.__repr__())
 			log.info(line)
 			line = line.strip()
-			if 'Power key pressed' in line:
+			if line.endswith('Power key pressed.') or line.endswith('Power key pressed short.'):
 				log.info('sleep..')
 				print('sleep..')
 				os.system('/home/koom/hackery2/src/hackery2/bin/sleep.sh&')
