@@ -1,0 +1,15 @@
+[Unit]
+Description="hdparm"
+StartLimitIntervalSec=600
+StartLimitBurst=40
+
+[Service]
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/koom/hackery2/src/hackery2/bin/hdparm.py
+Restart=on-failure
+RestartSec=100
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true

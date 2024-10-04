@@ -1,0 +1,11 @@
+[Unit]
+Description="hdparm"
+
+[Timer]
+AccuracySec=50s
+OnBootSec=100
+OnUnitActiveSec=150
+Unit=luigi_toggler.service
+
+[Install]
+WantedBy=multi-user.target

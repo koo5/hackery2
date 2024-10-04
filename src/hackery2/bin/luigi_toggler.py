@@ -26,7 +26,7 @@ try:
 except:
     pass
 
-cores = 24 if on else 10
+cores = 24 if on else 5
 cmd = 'http://192.168.122.128:1111/set_cores={}'.format(cores)
 log.info(f'{cmd}')
 try:
