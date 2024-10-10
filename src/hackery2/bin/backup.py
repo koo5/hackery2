@@ -38,7 +38,8 @@ else:
 
 
 def check_if_mounted(sshstr, target_fs):
-	for line in co(shlex.split(f'{sshstr} cat /etc/mtab')).split('\n'):
+	for line in co(shlex.split(f'{sshstr} cat /etc/mtab')).strip().split('\n'):
+		print(line)
 		items = line.split()
 		if items[1] +'/' == target_fs:
 			return
