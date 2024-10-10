@@ -17,6 +17,7 @@ ss = shlex.split
 
 
 def co(cmd):
+	log.debug((cmd))
 	return subprocess.check_output(cmd, text=True, universal_newlines=True)
 
 

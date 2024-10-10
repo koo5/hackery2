@@ -37,27 +37,29 @@ else:
 	default_target_fs='/bac4/'
 
 
-def check_if_mounted(target_fs):
-	for line in open('/etc/mtab'):
+def check_if_mounted(sshstr, target_fs):
+	for line in co(shlex.split(f'{sshstr} cat /etc/mtab')).split('\n'):
 		items = line.split()
 		if items[1] +'/' == target_fs:
 			return
 	raise Exception(f'{target_fs} not mounted')
 
 
-def run(target_machine=default_target_machine, target_fs=default_target_fs):
+def run(target_machine=default_target_machine, target_fs=default_target_fs, local=False):
 	"""back up the machine that this script runs on"""
-
-	check_if_mounted(target_fs)
 
 	if target_machine == '':
 		print('target_machine = None')
 		target_machine = None
-	print(f'target_machine = {target_machine}')	  
-	  
-	sshstr = set_up_target(target_machine)
+	print(f'target_machine = {target_machine}')
+
+	sshstr,sshstr2 = set_up_target(target_machine)
+
+	if not local:
+		check_if_mounted(sshstr, target_fs)
 
 	# grab whatever info would not be transferred from ext4 partitions
+	#srun('sudo snap save')
 	srun('snap list | sudo tee /root/snap_list')
 	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
 	#anything else? 
@@ -69,8 +71,11 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs):
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
 
-	add_backup_subvols(fss[0])
-	transfer_btrfs_subvolumes(sshstr, fss, target_fs)
+	if not local:
+		"""no point in snapshotting backup subvols if we're not going to transfer them"""
+		add_backup_subvols(fss[0])
+
+	transfer_btrfs_subvolumes(sshstr2, fss, target_fs, local)
 
 
 
@@ -79,6 +84,7 @@ def set_up_target(target_machine):
 	if target_machine is None:
 		ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
 		sshstr = ''
+		sshstr2 = ''
 	elif target_machine == 'r64':
 		r64_ip = get_r64_ip()
 		ssh = get_hpnssh_executable()
@@ -86,10 +92,11 @@ def set_up_target(target_machine):
 			insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
 		else:
 			insecure_speedups = ''
-		sshstr = f'--sshstr="{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups}  koom@{r64_ip}"'
+		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups}  koom@{r64_ip}'
+		sshstr2 = '--sshstr="' + sshstr + '"'
 	else:
 		raise Exception('unsupported')
-	return sshstr
+	return sshstr, sshstr2
 
 
 
@@ -121,7 +128,7 @@ def get_filesystems():
 	return fss
 
 
-def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
+def transfer_btrfs_subvolumes(sshstr, fss, target_fs, local):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
@@ -134,7 +141,10 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 			target_subvol_name = name if name != '/' else '_root'
 
 			ccs(f"""date""")
-			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout --SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
+			if local:
+				ccs(f"""bfg --YES=true --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} local_commit --SUBVOLUME={toplevel}/{source_path}{name}/ """)
+			else:
+				ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout --SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
 			ccs(f"""date""")
 			print('', file = sys.stderr)
 
