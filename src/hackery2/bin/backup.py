@@ -2,6 +2,12 @@
 
 
 """
+install:
+ pip install fire ptyprocess
+
+
+notes:
+
 --local
 "it seems that this would be preferred to snapper or similar, as it would also backup ext4 filesystems, cloud machines, etc, and do everything from the same confguration used for actual remote backups.
 it's just needed to set this up with cron.
@@ -29,14 +35,6 @@ from pathlib import Path
 from infra import *
 
 
-if hostname == 'r64':
-	default_target_machine = None
-	default_target_fs='/bac17/'
-else:
-	default_target_machine = 'r64'
-	default_target_fs='/bac4/'
-
-
 def check_if_mounted(sshstr, target_fs):
 	for line in co(shlex.split(f'{sshstr} cat /etc/mtab')).strip().split('\n'):
 		print(line)
@@ -49,7 +47,16 @@ def check_if_mounted(sshstr, target_fs):
 def run(source='host', target_machine=None, target_fs=None, local=False):
 	"""back up the source (host or clouds)"""
 
-	if source==='clouds':
+
+	if hostname == 'r64':
+		default_target_machine = None
+		default_target_fs='/bac17/'
+	else:
+		default_target_machine = 'r64'
+		default_target_fs='/bac4/'
+
+
+	if source == 'clouds':
 		default_target_fs='/bac4/'
 
 	if target_machine is None:
@@ -67,7 +74,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	if not local:
 		check_if_mounted(sshstr, target_fs)
 
-	if not clouds:
+	if source != 'clouds':
 		# grab whatever info would not be transferred from ext4 partitions
 		#srun('sudo snap save')
 		srun('snap list | sudo tee /root/snap_list')
@@ -76,7 +83,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 		#pause firefox? pause some vms?
 		fss = get_filesystems()
 
-	if clouds and hostname == 'r64':
+	if source == 'clouds' and hostname == 'r64':
 		backup_vpss(fss[0]['toplevel'])
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
