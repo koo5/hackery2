@@ -37,8 +37,18 @@ else:
 	default_target_fs='/bac4/'
 
 
+def check_if_mounted(target_fs):
+	for line in open('/etc/mtab'):
+		items = line.split()
+		if items[1] +'/' == target_fs:
+			return
+	raise Exception(f'{target_fs} not mounted')
+
+
 def run(target_machine=default_target_machine, target_fs=default_target_fs):
 	"""back up the machine that this script runs on"""
+
+	check_if_mounted(target_fs)
 
 	if target_machine == '':
 		print('target_machine = None')
@@ -124,7 +134,7 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs):
 			target_subvol_name = name if name != '/' else '_root'
 
 			ccs(f"""date""")
-			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout 			--SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
+			ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout --SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
 			ccs(f"""date""")
 			print('', file = sys.stderr)
 

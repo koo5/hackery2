@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+
+# control luigi and core_control
+
+
 import subprocess, requests, logging
 
 
@@ -9,16 +13,18 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
-# control luigi and core_control
-
-out = subprocess.check_output(['xprintidle'], env={'DISPLAY':':0'})
+out = subprocess.check_output(['uptime'])
 log.info(out)
 
-on = int(out) > 1000*60*2
+out = subprocess.check_output(['xprintidle'], env={'DISPLAY':':0'})
+out = int(out)
+log.info('xprintidle: ' + str(out) + 'ms')
 
-log.info(f'fun is {on}')
+fun_on = out > 1000*60*2
 
-un = ('un' if on else '')
+log.info(f'fun is {fun_on}')
+
+un = ('un' if fun_on else '')
 cmd = f'http://localhost:8082/api/{un}pause'
 log.info(f'{cmd}')
 try:
@@ -26,7 +32,7 @@ try:
 except:
     pass
 
-cores = 24 if on else 5
+cores = 48 if fun_on else 5
 cmd = 'http://192.168.122.128:1111/set_cores={}'.format(cores)
 log.info(f'{cmd}')
 try:
