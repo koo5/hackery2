@@ -81,7 +81,8 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
 		#anything else?
 		#pause firefox? pause some vms?
-		fss = get_filesystems()
+
+	fss = get_filesystems()
 
 	if source == 'clouds' and hostname == 'r64':
 		backup_vpss(fss[0]['toplevel'])
