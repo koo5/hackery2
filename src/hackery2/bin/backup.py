@@ -228,7 +228,7 @@ def add_backup_subvols(fs):
 
 	d = fs['toplevel'] + '/backups/'
 	print('looking for backup subvols in ' + d)
-	os.chdir()
+	os.chdir(d)
 	for host in glob.glob('*'):
 		print('found ' + host)
 		os.chdir(fs['toplevel'] + '/backups/' + host)
