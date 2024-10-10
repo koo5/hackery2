@@ -67,9 +67,13 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	if target_machine == '':
 		print('target_machine = None')
 		target_machine = None
-	print(f'target_machine = {target_machine}')
 
-	sshstr,sshstr2 = set_up_target(target_machine)
+	if not local:
+		print(f'target_machine = {target_machine}')
+		sshstr,sshstr2 = set_up_target(target_machine)
+	else:
+		sshstr = ''
+		sshstr2 = ''
 
 	if not local:
 		check_if_mounted(sshstr, target_fs)
@@ -89,9 +93,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
 
-	if not local:
-		"""no point in snapshotting backup subvols if we're not going to transfer them"""
-		add_backup_subvols(fss[0])
+	add_backup_subvols(fss[0])
 
 	transfer_btrfs_subvolumes(sshstr2, fss, target_fs, local)
 
@@ -223,9 +225,12 @@ def add_backup_subvols(fs):
 	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is no inherent need to only support a flat structure.
 	# gotta do something like sudo btrfs subvolume list -q -t -R -u -a $fsroot | grep live | grep -v ".bfg_snapshots"
 	# but preferably using bfg's facilities.	
-	
-	os.chdir(fs['toplevel'] + '/backups/')
+
+	d = fs['toplevel'] + '/backups/'
+	print('looking for backup subvols in ' + d)
+	os.chdir()
 	for host in glob.glob('*'):
+		print('found ' + host)
 		os.chdir(fs['toplevel'] + '/backups/' + host)
 		fs['subvols'] += [{'target_dir': host,
 						  'name': name[:-1],
