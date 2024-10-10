@@ -46,8 +46,16 @@ def check_if_mounted(sshstr, target_fs):
 	raise Exception(f'{target_fs} not mounted')
 
 
-def run(target_machine=default_target_machine, target_fs=default_target_fs, local=False):
-	"""back up the machine that this script runs on"""
+def run(source='host', target_machine=None, target_fs=None, local=False):
+	"""back up the source (host or clouds)"""
+
+	if source==='clouds':
+		default_target_fs='/bac4/'
+
+	if target_machine is None:
+		target_machine = default_target_machine
+	if target_fs is None:
+		target_fs = default_target_fs
 
 	if target_machine == '':
 		print('target_machine = None')
@@ -59,15 +67,16 @@ def run(target_machine=default_target_machine, target_fs=default_target_fs, loca
 	if not local:
 		check_if_mounted(sshstr, target_fs)
 
-	# grab whatever info would not be transferred from ext4 partitions
-	#srun('sudo snap save')
-	srun('snap list | sudo tee /root/snap_list')
-	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
-	#anything else? 
-	#pause firefox? pause some vms?
-	fss = get_filesystems()
+	if not clouds:
+		# grab whatever info would not be transferred from ext4 partitions
+		#srun('sudo snap save')
+		srun('snap list | sudo tee /root/snap_list')
+		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
+		#anything else?
+		#pause firefox? pause some vms?
+		fss = get_filesystems()
 
-	if hostname == 'r64':
+	if clouds and hostname == 'r64':
 		backup_vpss(fss[0]['toplevel'])
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
@@ -120,7 +129,7 @@ def get_filesystems():
 	elif hostname == 'r64':
 		fss = [{
 			'toplevel': '/bac4',
-			'subvols': m(['cold', 'images_win', 'images/win10-chrome-colemak-acrobat-qt-accrip0.raw'])
+			'subvols': m(['cold', 'images_win'])
 		},
 		{
 			'toplevel': '/',

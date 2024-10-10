@@ -16,8 +16,9 @@ rsync -av --progress -h -e hpnssh -r \
   --exclude '.npm'  \
   --exclude 'site-packages'  \
   --exclude 'node_modules'   \
-  --exclude '/var/lib/docker/overlay2/'  \
-  --exclude '/var/snap/docker/common/var-lib-docker/overlay2/'  \
+  --exclude '/var/cache/'  \
+  --exclude '/var/lib/'  \
+  --include '/var/lib/docker/volumes/***'  \
   --exclude '/home/*/go/'  \
   --exclude '/home/*/.gradle/'  \
   --include '/var/***' \
