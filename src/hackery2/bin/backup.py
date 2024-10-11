@@ -88,15 +88,22 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	fss = get_filesystems()
 
-	if source == 'clouds' and hostname == 'r64':
-		backup_vpss(fss[0]['toplevel'])
-
-	rsync_ext4_filesystems_into_backup_folder(fss)
-
+	import_noncows(source, hostname, fss)
+	# todo: then there's no need to add_backup_subvols if local==True
 	add_backup_subvols(fss[0])
 
 	transfer_btrfs_subvolumes(sshstr2, fss, target_fs, local)
 
+
+def import_noncows(source, hostname, fss):
+	"""
+	todo: we should make a snapshot of each subvol right after the transfer is finished. This will parallel how btrfs snapshots are "imported".
+	"""
+
+	if source == 'clouds' and hostname == 'r64':
+		backup_vpss(fss[0]['toplevel'])
+
+	rsync_ext4_filesystems_into_backup_folder(fss)
 
 
 def set_up_target(target_machine):
