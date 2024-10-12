@@ -128,7 +128,6 @@ def set_up_target(target_machine):
 		raise Exception('unsupported')
 
 
-
 	sshstr2 = '--sshstr="' + sshstr + '"'
 	return sshstr, sshstr2
 
@@ -157,6 +156,15 @@ def get_filesystems():
 		},
 		{
 			'toplevel': '/',
+			'subvols': m(['/']),
+		}]
+	elif hostname == 't14':
+		fss = [{
+			'toplevel': '/',
+			'subvols': m(['/'])
+		},
+		{
+			'toplevel': '/data',
 			'subvols': m(['/']),
 		}]
 	return fss
@@ -222,13 +230,13 @@ def backup_vps(toplevel, cloud_host):
 
 	#os.makedirs(where.parent, exist_ok=True)
 	ccs(f'sudo mkdir -p {where.parent}')
-	
+
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
-	
+
 	username = getpass.getuser()
 	group_name = grp.getgrgid(os.getgid()).gr_name
-	
+
 	ccs(f'sudo chown {username}:{group_name} {where}')
 
 	ccs(f'backup_vps.sh {cloud_host} {where}; true')
@@ -242,6 +250,9 @@ def add_backup_subvols(fs):
 
 	d = fs['toplevel'] + '/backups/'
 	print('looking for backup subvols in ' + d)
+	if not Path(d).exists():
+		print('no backups folder')
+		return
 	os.chdir(d)
 	for host in glob.glob('*'):
 		print('found ' + host)
