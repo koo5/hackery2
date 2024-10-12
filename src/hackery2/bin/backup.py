@@ -110,19 +110,26 @@ def set_up_target(target_machine):
 
 	if target_machine is None:
 		ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
-		sshstr = ''
-		sshstr2 = ''
+		return  '', ''
+
+	insecure_speedups = ''
+	ssh = get_hpnssh_executable()
+
+	if target_machine == 'r64.internal':
+		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes koom@r64.internal'
+
 	elif target_machine == 'r64':
 		r64_ip = get_r64_ip()
-		ssh = get_hpnssh_executable()
 		if r64_ip.startswith('10.'):
 			insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
-		else:
-			insecure_speedups = ''
 		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups}  koom@{r64_ip}'
-		sshstr2 = '--sshstr="' + sshstr + '"'
+
 	else:
 		raise Exception('unsupported')
+
+
+
+	sshstr2 = '--sshstr="' + sshstr + '"'
 	return sshstr, sshstr2
 
 
