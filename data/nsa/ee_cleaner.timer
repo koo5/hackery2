@@ -1,0 +1,11 @@
+[Unit]
+Description="ee_cleaner"
+
+[Timer]
+AccuracySec=15s
+OnBootSec=100
+OnUnitActiveSec=150
+Unit=ee_cleaner.service
+
+[Install]
+WantedBy=multi-user.target

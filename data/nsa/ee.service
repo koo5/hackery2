@@ -1,0 +1,19 @@
+[Unit]
+Description="ee"
+StartLimitIntervalSec=60
+StartLimitBurst=40
+
+[Service]
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/koom/ee.sh
+Restart=always
+RestartSec=100
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+
