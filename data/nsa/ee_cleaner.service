@@ -1,0 +1,16 @@
+[Unit]
+Description="ee_cleaner"
+StartLimitIntervalSec=60
+StartLimitBurst=40
+
+[Service]
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/koom/hackery2/data/nsa/ee_cleaner.py
+Restart=always
+RestartSec=100
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
