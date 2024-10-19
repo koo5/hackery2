@@ -117,6 +117,7 @@ def set_up_target(target_machine):
 
 	if target_machine == 'r64.internal':
 		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes koom@r64.internal'
+		insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
 
 	elif target_machine == 'r64':
 		r64_ip = get_r64_ip()
