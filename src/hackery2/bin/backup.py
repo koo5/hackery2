@@ -116,14 +116,15 @@ def set_up_target(target_machine):
 	ssh = get_hpnssh_executable()
 
 	if target_machine == 'r64.internal':
-		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes koom@r64.internal'
 		insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
+		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups} koom@r64.internal'
+
 
 	elif target_machine == 'r64':
 		r64_ip = get_r64_ip()
 		if r64_ip.startswith('10.'):
 			insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
-		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups}  koom@{r64_ip}'
+		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups} koom@{r64_ip}'
 
 	else:
 		raise Exception('unsupported')
