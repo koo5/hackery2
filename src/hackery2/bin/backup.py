@@ -117,7 +117,8 @@ def set_up_target(target_machine):
 
 	if target_machine == 'r64.internal':
 		insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
-		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups} koom@r64.internal'
+		long_ssh = ' -o ServerAliveInterval=600 -o ServerAliveCountMax=999999  -o TCPKeepAlive=no  '
+		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {long_ssh} {insecure_speedups} koom@r64.internal'
 
 
 	elif target_machine == 'r64':
