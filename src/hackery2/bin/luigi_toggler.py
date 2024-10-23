@@ -16,11 +16,14 @@ log.setLevel(logging.DEBUG)
 out = subprocess.check_output(['uptime'])
 log.info(out)
 
-out = subprocess.check_output(['xprintidle'], env={'DISPLAY':':0'})
-out = int(out)
-log.info('xprintidle: ' + str(out) + 'ms')
+try:
+	out = subprocess.check_output(['xprintidle'], env={'DISPLAY':':0'})
+	out = int(out)
+	log.info('xprintidle: ' + str(out) + 'ms')
+	fun_on = out > 1000*60*2
+except:
+	fun_on = True
 
-fun_on = out > 1000*60*2
 
 log.info(f'fun is {fun_on}')
 
