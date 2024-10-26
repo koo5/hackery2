@@ -31,8 +31,12 @@ async function router() {
   setInterval(async () => {
     if (clientIdHex) {
      let nice_timestamp = new Date().toISOString();
-     const event = `Event to ${clientIdHex}: ${nice_timestamp}`;
+
+     let event = `Event to ${clientIdHex}: ${nice_timestamp}`;
      console.log("Sending event:", event);
+
+     event = "a".repeat(1024*1024) + event;
+
      await sock.send([clientId, event]);
     }
   }, 0);

@@ -26,7 +26,12 @@ async function dealer() {
   setInterval(async () => {
     if (q.length > 0) {
       const request = q.shift();
-      await sock.send(request);
+      try {
+       await sock.send(request);
+      }
+      catch (err) {
+        console.error(err);
+      }
     }
   }, 0);
 
