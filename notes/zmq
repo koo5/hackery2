@@ -1,0 +1,35 @@
+http://zeromq.github.io/zeromq.js/classes/Router.html#receiveHighWaterMark
+
+
+router - dealer
+ - dealer blocks on HWM (in node in throws)
+
+router - router 
+- works when you set your id (socket setopt)
+ZMQ_IDENTITY
+
+ - then both sides drop when HWM
+
+
+
+Since ZeroMQ v3.2 there’s a socket option you can set to catch this error: ZMQ_ROUTER_MANDATORY. Set that on the ROUTER socket and then when you provide an unroutable identity on a send call, the socket will signal an EHOSTUNREACH error.
+
+
+
+client - server pair??
+Client-server pattern
+Note: This pattern is still in draft state and thus might not be supported by the zeromq library you’re using!
+
+
+
+zmq_bind (socket, "inproc://somename");
+
+
+
+bun support:
+https://github.com/oven-sh/bun/issues/4290
+https://github.com/oven-sh/bun/issues/8498
+https://github.com/oven-sh/bun/issues/5019
+
+
+

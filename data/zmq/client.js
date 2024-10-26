@@ -1,16 +1,18 @@
 const zmq = require("zeromq");
 
 let q = [];
+let replyCount = 0;
 
 async function dealer() {
   const sock = new zmq.Dealer();
 
-  sock.receiveHighWaterMark = 1;
-  sock.sendHighWaterMark = 1;
+  sock.receiveHighWaterMark = 100;
+  sock.sendHighWaterMark = 100;
 
-  sock.connect("tcp://127.0.0.1:5555");
+ sock.connect("tcp://127.0.0.1:5555");
+ //sock.connect("ipc:///tmp/test.ipc");
 
-  console.log("Dealer connected to port 5555");
+ console.log("Dealer connected to port 5555");
 
   // Send a request
   const request = "Hello, Server!";
@@ -37,12 +39,15 @@ async function dealer() {
 
   while (true) {
     const [reply] = await sock.receive();
-    console.log("Received:", reply.toString());
+    replyCount++;
+    if (replyCount % 1000 === 0)
+     console.log("Reply count:", replyCount);
+    //console.log("Received.");//, reply.toString());
 
-    if (Math.random() < 0.1) {
+    /*if (Math.random() < 0.1) {
       console.log("client is busy...");
       await new Promise(resolve => setTimeout(resolve, 3000));
-    }
+    }*/
   }
 }
 
