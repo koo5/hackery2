@@ -35,7 +35,7 @@ async function router() {
      console.log("Sending event:", event);
      await sock.send([clientId, event]);
     }
-  }, 100);
+  }, 0);
 
   handleMessages(sock);
 }
