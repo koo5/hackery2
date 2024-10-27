@@ -1,0 +1,32 @@
+#!/usr/bin/fish
+
+set cmd (string join ' ' $argv)
+
+#echo "do" $cmd "in all subdirectories"
+
+for dir in */
+
+	#echo "in" $dir
+
+    if test -e "$dir/.git"
+        cd "$dir"
+        pwd
+		fish -c "$cmd"
+        if test $status -eq 0
+            echo "ok"
+        else
+            echo "failed"
+        end
+        echo
+        echo
+        echo
+        echo
+        echo
+        echo
+        echo
+        echo
+        echo
+        echo
+        cd ..
+    end
+end
