@@ -16,9 +16,9 @@ Since ZeroMQ v3.2 there’s a socket option you can set to catch this error: ZMQ
 
 
 
-client - server pair??
 Client-server pattern
 Note: This pattern is still in draft state and thus might not be supported by the zeromq library you’re using!
+https://zeromq.org/socket-api/#client-server-pattern
 
 
 
