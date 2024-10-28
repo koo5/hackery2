@@ -18,14 +18,7 @@ for dir in */
             echo "failed"
         end
         echo
-        echo
-        echo
-        echo
-        echo
-        echo
-        echo
-        echo
-        echo
+        echo =========================================================================
         echo
         cd ..
     end
