@@ -16,7 +16,7 @@ def git_log(directory):
             'timestamp': datetime.fromtimestamp(commit.committed_date),
             'committer': commit.committer.name,
             'email': commit.committer.email,
-            'message': commit.message.strip(),
+            'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
             'directory': directory
         })
     return commits
