@@ -7,36 +7,36 @@ import git
 
 
 def git_log(directory):
-    """ get git log of a directory """
-    repo = git.Repo(directory)
-    commits = []
-    for commit in repo.iter_commits():
-        commits.append({
-            'hash': commit.hexsha,
-            'timestamp': datetime.fromtimestamp(commit.committed_date),
-            'committer': commit.committer.name,
-            'email': commit.committer.email,
-            'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
-            'directory': directory
-        })
-    return commits
+	""" get git log of a directory """
+	repo = git.Repo(directory)
+	commits = []
+	for commit in repo.iter_commits():
+		commits.append({'hash': commit.hexsha, 'timestamp': datetime.fromtimestamp(commit.committed_date), 'committer': commit.committer.name, 'email': commit.committer.email, 'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
+			'directory': directory})
+	return commits
 
 
 def get_all_commits():
-    """ get all commits from current directory and subdirectories """
-    commits = []
-    directories = [Path('.')] + [d for d in Path('.').iterdir() if d.is_dir() and (d / '.git').exists()]
-    for directory in directories:
-        commits.extend(git_log(directory))
-    return commits
+	""" get all commits from current directory and subdirectories """
+	commits = []
+	directories = [Path('.')] + [d for d in Path('.').iterdir() if d.is_dir() and (d / '.git').exists()]
+	for directory in directories:
+		commits.extend(git_log(directory))
+	return commits
 
 
 def main():
-    commits = get_all_commits()
-    commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
-    for commit in commits:
-        print(f"{commit['timestamp']} {commit['hash']} c: {commit['committer']} e: {commit['email']} m: {commit['message']} {commit['directory']}")
+	commits = get_all_commits()
+	commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
+	for commit in commits:
+		email = commit['email']
+		if email in ['you@example.com', 'kolman.jindrich@gmail.com']:
+			print(f"{commit['timestamp']} {commit['hash']} {commit['email']} {commit['message']} {commit['directory']}")
+		else:
+			print(f".............................................................{commit['email']} {commit['message']} {commit['directory']}")
 
+
+# c: {commit['committer']}
 
 if __name__ == "__main__":
-    main()
+	main()
