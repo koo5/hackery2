@@ -1,42 +1,41 @@
 #!/usr/bin/env python3
 
 """ print interleaved git history of current directory and subdirectories """
-import os
-import shlex
-import subprocess
 from datetime import datetime
 from pathlib import Path
+import git
 
 
 def git_log(directory):
     """ get git log of a directory """
-    cmd = ['git', 'log', '--pretty=format:%H %ct %cn %ce %s']
-    print(shlex.join(cmd))
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, cwd=directory)
-    r = result.stdout.decode('utf-8').splitlines()
-    print(r)
-    return r
+    repo = git.Repo(directory)
+    commits = []
+    for commit in repo.iter_commits():
+        commits.append({
+            'hash': commit.hexsha,
+            'timestamp': datetime.fromtimestamp(commit.committed_date),
+            'committer': commit.committer.name,
+            'email': commit.committer.email,
+            'message': commit.message.strip(),
+            'directory': directory
+        })
+    return commits
 
 
 def get_all_commits():
     """ get all commits from current directory and subdirectories """
     commits = []
     directories = [Path('.')] + [d for d in Path('.').iterdir() if d.is_dir() and (d / '.git').exists()]
-    print(directories)
     for directory in directories:
-        print(directory)
-        for line in git_log(directory):
-            commit_hash, commit_time, committer, committer_email, *message = line.split(maxsplit=4)
-            message = ' '.join(message)
-            commits.append((commit_hash, datetime.fromtimestamp(int(commit_time)), committer, committer_email, message, directory))
+        commits.extend(git_log(directory))
     return commits
 
 
 def main():
     commits = get_all_commits()
-    commits.sort(key=lambda x: x[1])  # sort by commit time
-    for commit_hash, commit_time, committer, committer_email, message, directory in commits:
-        print(f"{commit_time} {commit_hash} c: {committer} m: {message} {directory}")
+    commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
+    for commit in commits:
+        print(f"{commit['timestamp']} {commit['hash']} c: {commit['committer']} e: {commit['email']} m: {commit['message']} {commit['directory']}")
 
 
 if __name__ == "__main__":
