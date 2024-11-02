@@ -3,8 +3,10 @@ Description="sleep_agent"
 
 [Timer]
 AccuracySec=5s
-#OnCalendar=minutely
-OnCalendar=*:*:00/15
+OnBootSec=10
+OnUnitActiveSec=5
+
+
 Unit=sleep_agent.service
 
 
