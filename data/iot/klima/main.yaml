@@ -1,14 +1,25 @@
 
+substitutions:
+  ip: 10.0.0.57
+  clock: ntp
+
 
 esphome:
-  name: {{ dirbid }}
-  comment: "https://pajenicko.cz/wemos-s2-mini-wifi-esp32-s2 | https://github.com/koo5/hackery2/tree/master/data/iot/ds"
+  name: $name
   on_boot:
     then:
-      - logger.log: 'bOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
+      - logger.log: 'boOoOoOoOt'
+
+
+debug:
+  update_interval: 50s
+
+
 
 esp32:
   board: lolin_s2_mini
+
+
 
 logger:
   level: DEBUG
@@ -16,16 +27,12 @@ logger:
 
 ota:
   - platform: esphome
-    password: !secret otapass
+    password: ""
+
 
 
 wifi:
   power_save_mode: none
-
-  #ap:
-  #  ssid: !secret apssid
-  #  password: !secret appass
-
   networks:
   - ssid: !secret ssid1
     password: !secret password1
@@ -35,7 +42,6 @@ wifi:
       subnet: 255.255.255.0
       dns1: !secret gateway1
       dns2: 8.8.8.8
-
   - ssid: !secret ssid2
     password: !secret password2
     manual_ip:
@@ -47,85 +53,59 @@ wifi:
 
   - ssid: !secret ssid3
     password: !secret password3
-    manual_ip:
-      static_ip: !secret ip3
-      gateway: !secret gateway3
-      subnet: 255.255.255.0
-      dns1: !secret gateway3
-      dns2: 8.8.8.8
-
-  - ssid: !secret ssid4
-    password: !secret password4
 
   use_address: "{{ dirbid }}.local"
+
 
 network:
   enable_ipv6: true
 
 
-
 web_server:
   port: 80
-
+  ota: true
 
 
 mqtt:
-  #keepalive: 2s
-  #reboot_timeout: 145min
   broker: !secret mqtt_host
   port: !secret mqtt_port
   username: !secret mqtt_user
   password: !secret mqtt_password
+#  keepalive: 10s
+#  reboot_timeout: 50min
 
-
-
-sun:
-  latitude: 50.0755°
-  longitude: 14.4378°
-
-  on_sunrise:
-    - then:
-        - logger.log: Good morning!
-  on_sunset:
-    - then:
-        - logger.log: Good evening!
-
-
-
-time:
-  - platform: sntp
-    id: ntp
-    timezone: Europe/Prague
-
-debug:
-  update_interval: 50s
 
 
 sensor:
-  - platform: wifi_signal
-    name: "Wifi"
-    update_interval: 1s
   - platform: uptime
-    name: Uptime
-  - platform: sun
-    name: Sun Elevation
-    type: elevation
-  - platform: sun
-    name: Sun Azimuth
-    type: azimuth
-  - platform: internal_temperature
-    name: "Internal_temperature"
+    name: Uptime Sensor
 
-  - platform: debug
-    block:
-      name: "Heap Max Block"
-    loop_time:
-      name: "Loop Time"
+  - platform: wifi_signal
+    name: "Irrigation Wifi"
+    update_interval: 10s
 
+  - !include
+    file: adc.yaml
+    vars:
+      pin: 3
+
+  - platform: dht
+    pin: 18
+    temperature:
+      name: "temp"
+    humidity:
+      name: "hum"
+    update_interval: 3s
 
   - platform: dallas_temp
     name: probe_temperature
     update_interval: 1s
+
+one_wire:
+  - platform: gpio
+    pin: GPIO39
+
+
 
 
 
@@ -164,14 +144,43 @@ text_sensor:
 
 
 
-one_wire:
-  - platform: gpio
-    pin: 3
-
-
-
 
 switch:
   - platform: restart
     id: manual_restart
     name: "Restart"
+
+
+
+
+http_request:
+  verify_ssl: false
+  timeout: 33s
+
+
+
+script:
+  - id: vodaaa
+    mode: parallel
+    max_runs: 1
+    then:
+      - http_request.post:
+          url: !secret webhook1
+          headers:
+            Content-Type: "application/json"
+          #https://esphome.io/components/http_request.html#post-body-in-json-format-syntax-1
+          json: |-
+            root["message"] = "value";
+            root["priority"] = 5;
+            root["title"] = "mas ve rezii jezirko";
+      - delay: 15s
+#        verify_ssl: false
+
+
+remote_transmitter:
+  pin: 7
+  carrier_duty_percent: 50%
+
+climate:
+  - platform: toshiba
+    name: "AC"
