@@ -1,0 +1,2 @@
+ yt-dlp  -f bestaudio -x --audio-format 240p-0  'https://peertube.debian.social/w/bzetGNaTAoK4EkDKgif5zx'
+
