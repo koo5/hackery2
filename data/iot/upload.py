@@ -49,7 +49,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 	esphome_cache = pathlib.Path(os.environ.get('ESPHOME_CACHE', '.'))
 
 	inst = pathlib.Path(bid)
-	instdir = pathlib.Path('iot') / name / inst
+	instdir = pathlib.Path('inst') / name / inst
 	instpath = esphome_cache / instdir
 	os.makedirs(instdir, exist_ok=True)
 

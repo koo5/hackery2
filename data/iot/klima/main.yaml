@@ -66,6 +66,14 @@ web_server:
   ota: true
 
 
+
+
+api:
+  reboot_timeout: 4h
+
+
+
+
 mqtt:
   broker: !secret mqtt_host
   port: !secret mqtt_port
