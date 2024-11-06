@@ -172,6 +172,8 @@ script:
     max_runs: 1
     then:
       - logger.log: 'VODA'
+      - logger.log: 'VODA'
+      - logger.log: 'VODA'
       - climate.control:
           id: "AC"
           mode: 'OFF'
