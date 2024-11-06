@@ -11,6 +11,11 @@ esphome:
       - logger.log: 'boOoOoOoOt'
 
 
+
+api:
+  reboot_timeout: 1h # 0s # The amount of time to wait before rebooting when no WiFi connection exists. Can be disabled by setting this to 0s, but note that the low level IP stack currently
+
+
 debug:
   update_interval: 50s
 
@@ -178,8 +183,10 @@ script:
 
 
 remote_transmitter:
-  pin: 7
   carrier_duty_percent: 50%
+  pin:
+    number: 7
+    #inverted: True
 
 climate:
   - platform: toshiba

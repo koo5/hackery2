@@ -49,9 +49,9 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 	esphome_cache = pathlib.Path(os.environ.get('ESPHOME_CACHE', '.'))
 
 	inst = pathlib.Path(bid)
-	instdir = pathlib.Path('iot') / name / inst
-	instpath = esphome_cache / instdir
-	os.makedirs(instdir, exist_ok=True)
+	instdir =  'inst' / inst
+	instpath = instdir
+	os.makedirs(instpath, exist_ok=True)
 
 	config = {}
 	config['dir'] = name
@@ -72,7 +72,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 			step = jinja2.Template(yaml, autoescape=False, keep_trailing_newline=True)
 			#tmpl = step.Template(TEMPLATE_STRING, strip=False, escape=False)
 			yaml = step.render(**config)
-		out = instdir/yaml_file
+		out = instpath/yaml_file
 		with open(out, 'w') as f:
 			f.write(yaml)
 		subprocess.call(['diff', yaml_file, out])
@@ -91,8 +91,12 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 	
 	
 	# upload
-	cmd = f"docker run --rm --network host -v /var/run/dbus:/var/run/dbus -v {esphome_cache}:/cache -v (pwd):/config {usb} -it esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
+	print(instdir)
+	pwd = os.getcwd()
+	print(pwd)
+	cmd = f"podman run --rm --network host -v /var/run/dbus:/var/run/dbus -v {pwd}:/config {usb} -it esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
 	print(cmd)
+	os.system('pwd')
 	os.system(f'fish -c "{cmd}"')
 	
 
