@@ -172,21 +172,18 @@ script:
     mode: parallel
     max_runs: 1
     then:
-      - http_request.post:
-          url: !secret webhook1
-          headers:
-            Content-Type: "application/json"
-          #https://esphome.io/components/http_request.html#post-body-in-json-format-syntax-1
-          json: |-
-            root["message"] = "value";
-            root["priority"] = 5;
-            root["title"] = "mas ve rezii jezirko";
-      - delay: 15s
-#        verify_ssl: false
+      - logger.log: 'VODA'
+      - climate.control:
+          id: AC
+          mode: OFF
+          send_now: true
 
 
 remote_transmitter:
-  pin: 7
+  pin:
+    number: 7
+    #inverted: True
+
   carrier_duty_percent: 50%
 
 climate:

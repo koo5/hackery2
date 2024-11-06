@@ -49,6 +49,9 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 	esphome_cache = pathlib.Path(os.environ.get('ESPHOME_CACHE', '.'))
 
 	inst = pathlib.Path(bid)
+	# instdir =  'inst' / inst
+	# instpath = instdir
+	# os.makedirs(instpath, exist_ok=True)
 	instdir = pathlib.Path('inst') / name / inst
 	instpath = esphome_cache / instdir
 	os.makedirs(instdir, exist_ok=True)
@@ -72,6 +75,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 			step = jinja2.Template(yaml, autoescape=False, keep_trailing_newline=True)
 			#tmpl = step.Template(TEMPLATE_STRING, strip=False, escape=False)
 			yaml = step.render(**config)
+		#out = instpath/yaml_file
 		out = instdir/yaml_file
 		with open(out, 'w') as f:
 			f.write(yaml)
@@ -91,6 +95,8 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 	
 	
 	# upload
+
+#   cmd = f"podman run --rm --network host -v /var/run/dbus:/var/run/dbus -v {pwd}:/config {usb} -it esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
 	cmd = f"docker run --rm --network host -v /var/run/dbus:/var/run/dbus -v {esphome_cache}:/cache -v (pwd):/config {usb} -it ghcr.io/esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
 	print(cmd)
 	os.system(f'fish -c "{cmd}"')
