@@ -166,7 +166,6 @@ http_request:
   timeout: 33s
 
 
-
 script:
   - id: vodaaa
     mode: parallel
@@ -174,9 +173,9 @@ script:
     then:
       - logger.log: 'VODA'
       - climate.control:
-          id: AC
-          mode: OFF
-          send_now: true
+          id: "AC"
+          mode: 'OFF'
+
 
 
 remote_transmitter:
@@ -188,4 +187,5 @@ remote_transmitter:
 
 climate:
   - platform: toshiba
+    id: "AC"
     name: "AC"
