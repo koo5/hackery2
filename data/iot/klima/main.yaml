@@ -191,7 +191,7 @@ interval:
       - if:
           condition:
             lambda: |-
-              return id(emergency).state ;
+              return id(emergency);
           then:
             - climate.control:
                 id: "AC"

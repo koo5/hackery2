@@ -80,8 +80,15 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 		with open(out, 'w') as f:
 			f.write(yaml)
 		subprocess.call(['diff', yaml_file, out])
-		
-	
+
+	for other_file in list(pathlib.Path('.').glob('fonts/*')):
+		print(other_file)
+		out = instdir/other_file
+		os.makedirs(out.parent, exist_ok=True)
+		subprocess.call(['cp', other_file, out])
+
+
+
 	# reuse previous esphome build dir
 		
 	# if not (instdir / '.esphome').exists():

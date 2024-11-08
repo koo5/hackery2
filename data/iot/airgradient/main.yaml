@@ -15,7 +15,8 @@ substitutions:
 
 
 ota:
-  password: !secret otapass
+  - platform: esphome
+    password: !secret otapass
 
 
 wifi:
