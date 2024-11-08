@@ -174,10 +174,29 @@ script:
       - logger.log: 'VODA'
       - logger.log: 'VODA'
       - logger.log: 'VODA'
-      - climate.control:
-          id: "AC"
-          mode: 'OFF'
+      - globals.set:
+          id: emergency
+          value: true
 
+global:
+  id: emergency
+  type: bool
+  restore_value: true
+  initial_value: false
+  update_interval: 3s
+
+
+interval:
+  - interval: 3s
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return id(emergency).state ;
+          then:
+            - climate.control:
+                id: "AC"
+                mode: 'OFF'
 
 
 remote_transmitter:
