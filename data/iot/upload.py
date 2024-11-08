@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-
+import json
 import os
 import pathlib
+import shlex
 import subprocess
 import sys
 #import click
@@ -38,36 +39,35 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 			usb = f'--device {device}'
 		device = f'--device {device}'
 
+
+	os.system('podman volume create esphome_cache')
+	os.system('podman volume create esphome_build')
+
 	# what to upload
 
-	os.chdir(dir)
-	name = str(dir).strip('/')
-	
-	
+	name = pathlib.Path(str(dir).strip('/'))
+
 	# instantiate templates
 
-	esphome_cache = pathlib.Path(os.environ.get('ESPHOME_CACHE', '.'))
-
 	inst = pathlib.Path(bid)
-	# instdir =  'inst' / inst
-	# instpath = instdir
-	# os.makedirs(instpath, exist_ok=True)
 	instdir = pathlib.Path('inst') / name / inst
-	instpath = esphome_cache / instdir
-	os.makedirs(instdir, exist_ok=True)
+	build = json.loads(subprocess.check_output(shlex.split('podman volume inspect esphome_build')))[0]['Mountpoint']
+	instpath = build / instdir
+	os.makedirs(instpath, exist_ok=True)
+
 
 	config = {}
 	config['dir'] = name
 	config['bid'] = bid
 	config['dirbid'] = f'{name}{bid}'
 
-	config_file = pathlib.Path('config.py')
+	config_file = pathlib.Path(name / 'config.py')
 	if config_file.exists():
-		sys.path.append('.')
+		sys.path.append(name)
 		import config as config_module
 		config = config_module.config(config)
 
-	yaml_files = list(pathlib.Path('.').glob('*.yaml'))
+	yaml_files = list(pathlib.Path('.').glob(str(name) + '/*.yaml'))
 	print(yaml_files)
 	for yaml_file in yaml_files:
 		with open(yaml_file) as f:
@@ -75,38 +75,25 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 			step = jinja2.Template(yaml, autoescape=False, keep_trailing_newline=True)
 			#tmpl = step.Template(TEMPLATE_STRING, strip=False, escape=False)
 			yaml = step.render(**config)
-		#out = instpath/yaml_file
-		out = instdir/yaml_file
+		outdir = build / instdir
+		out = outdir / pathlib.Path(yaml_file).name
+		print(out)
 		with open(out, 'w') as f:
 			f.write(yaml)
 		subprocess.call(['diff', yaml_file, out])
 
-	for other_file in list(pathlib.Path('.').glob('fonts/*')):
+	other_files = list(name.rglob('fonts/*'))
+	for other_file in other_files:
 		print(other_file)
-		out = instdir/other_file
+		out = build/instdir/ (other_file.relative_to(name))
 		os.makedirs(out.parent, exist_ok=True)
+		print(out)
 		subprocess.call(['cp', other_file, out])
 
-
-
-	# reuse previous esphome build dir
-		
-	# if not (instdir / '.esphome').exists():
-	# 	if int(bid) > 0:
-	# 		subprocess.call(['rsync', '-r', '-a', '-v',
-	# 			'--include', 'platformio',
-	# 			'--exclude', '*',
-	# 			f'inst/{str(int(bid)-1)}/.esphome/',
-	# 			instdir / '.esphome'
-	# 		])
-	
-	
 	# upload
-
-#   cmd = f"podman run --rm --network host -v /var/run/dbus:/var/run/dbus -v {pwd}:/config {usb} -it esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
-	cmd = f"docker run --rm --network host -v /var/run/dbus:/var/run/dbus -v {esphome_cache}:/cache -v (pwd):/config {usb} -it ghcr.io/esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
+	cmd = f"podman run --rm --network host -v /var/run/dbus:/var/run/dbus -v esphome_cache:/cache -v esphome_build:/config {usb} -it ghcr.io/esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
 	print(cmd)
-	os.system(f'fish -c "{cmd}"')
+	os.system(f'{cmd}')
 	
 
 if __name__ == '__main__':

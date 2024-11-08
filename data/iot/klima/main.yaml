@@ -27,7 +27,7 @@ logger:
 
 ota:
   - platform: esphome
-    password: ""
+    password: !secret otapass
 
 
 
@@ -174,15 +174,21 @@ script:
       - logger.log: 'VODA'
       - logger.log: 'VODA'
       - logger.log: 'VODA'
-      - globals.set:
+      - number.set:
           id: emergency
-          value: 'true'
+          value: 1
 
-globals:
-  id: emergency
-  type: bool
-  restore_value: true
-  initial_value: 'false'
+
+number:
+  - id: emergency
+    name: emergency
+    platform: template
+    min_value: 0
+    max_value: 1
+    step: 1
+    optimistic: true
+    restore_value: true
+    initial_value: 0
 
 
 interval:

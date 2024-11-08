@@ -167,7 +167,7 @@ number:
     name: last_interaction
     optimistic: true
     on_value:
-      - logger.log: 'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS'
+      - logger.log: 'set last_interaction: !lambda | return id(last_interaction).state;'
     
 
   - platform: template
