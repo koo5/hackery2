@@ -176,14 +176,13 @@ script:
       - logger.log: 'VODA'
       - globals.set:
           id: emergency
-          value: true
+          value: 'true'
 
-global:
+globals:
   id: emergency
   type: bool
   restore_value: true
-  initial_value: false
-  update_interval: 3s
+  initial_value: 'false'
 
 
 interval:
