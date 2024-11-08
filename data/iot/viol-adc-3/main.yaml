@@ -14,9 +14,18 @@ logger:
   level: DEBUG
 
 
+
+update:
+  - platform: http_request
+    name: Firmware Update
+    source: https://iot.ueueeu.eu:8888/manifest.json
+
 ota:
   - platform: esphome
     password: !secret otapass
+  - platform: http_request
+
+http_request:
 
 
 wifi:

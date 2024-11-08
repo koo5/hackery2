@@ -63,7 +63,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 
 	config_file = pathlib.Path(name / 'config.py')
 	if config_file.exists():
-		sys.path.append(name)
+		sys.path.append(str(name))
 		import config as config_module
 		config = config_module.config(config)
 
