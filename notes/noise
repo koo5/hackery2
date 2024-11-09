@@ -1,0 +1,14 @@
+https://flathub.org/apps/me.timschneeberger.jdsp4linux
+
+ flatpak run me.timschneeberger.jdsp4linux
+
+
+data/setup/noise
+
+
+ PIPEWIRE_LATENCY="2/48000" pw-jack jamulus --showallservers -c 192.168.8.20
+
+
+
+https://flathub.org/apps/com.github.wwmm.easyeffects
+ GDK_SCALE=1 flatpak run com.github.wwmm.easyeffects
