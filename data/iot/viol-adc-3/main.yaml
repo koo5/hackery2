@@ -15,17 +15,17 @@ logger:
 
 
 
-update:
-  - platform: http_request
-    name: Firmware Update
-    source: https://iot.ueueeu.eu:8888/manifest.json
+#update:
+#  - platform: http_request
+#    name: Firmware Update
+#    source: https://iot.ueueeu.eu:8888/manifest.json
 
 ota:
   - platform: esphome
     password: !secret otapass
-  - platform: http_request
+#  - platform: http_request
 
-http_request:
+#http_request:
 
 
 wifi:
@@ -177,4 +177,8 @@ switch:
   - platform: restart
     id: manual_restart
     name: "Restart"
-
+  - platform: template
+    name: "My Boolean Switch"
+    id: my_boolean_switch
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF

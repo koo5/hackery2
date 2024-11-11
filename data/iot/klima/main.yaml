@@ -157,8 +157,11 @@ switch:
   - platform: restart
     id: manual_restart
     name: "Restart"
-
-
+  - platform: template
+    name: "emergency"
+    id: emergency
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
 
 
 http_request:
@@ -174,21 +177,7 @@ script:
       - logger.log: 'VODA'
       - logger.log: 'VODA'
       - logger.log: 'VODA'
-      - number.set:
-          id: emergency
-          value: 1
-
-
-number:
-  - id: emergency
-    name: emergency
-    platform: template
-    min_value: 0
-    max_value: 1
-    step: 1
-    optimistic: true
-    restore_value: true
-    initial_value: 0
+      - switch.turn_on: emergency
 
 
 interval:
@@ -196,8 +185,7 @@ interval:
     then:
       - if:
           condition:
-            lambda: |-
-              return id(emergency);
+            - switch.is_on: emergency
           then:
             - climate.control:
                 id: "AC"
@@ -207,9 +195,8 @@ interval:
 remote_transmitter:
   pin:
     number: 7
-    #inverted: True
-
   carrier_duty_percent: 50%
+
 
 climate:
   - platform: toshiba
