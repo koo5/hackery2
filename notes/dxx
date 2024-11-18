@@ -3,3 +3,6 @@ gclur https://github.com/dxx-rebirth/dxx-rebirth
 git checkout 77a590e3aeefceda9624192e4a9d735d7fc7c900
 
 sudo apt-get install build-essential scons libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libphysfs-dev clang libstdc++-12-dev
+
+ ./build/d2x-rebirth/d2x-rebirth -hogdir ~/g/d2demo/data -window
+
