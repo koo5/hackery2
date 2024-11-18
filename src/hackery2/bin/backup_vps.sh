@@ -21,6 +21,7 @@ rsync -av --progress -h -e hpnssh -r $argv[3] \
   --include '/var/lib/docker/'  \
   --include '/var/lib/docker/volumes/'  \
   --include '/var/lib/docker/volumes/***'  \
+  --exclude '/var/log/***' \
   --exclude '/var/lib/***'  \
   --include '/var/snap/'  \
   --include '/var/snap/docker/'  \
