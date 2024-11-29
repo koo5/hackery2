@@ -33,6 +33,8 @@ rsync -av --progress -h -e hpnssh -r $argv[3] \
   --include '/root/***'  \
   --exclude '/home/*/go/'  \
   --exclude '/home/*/.gradle/'  \
+  --exclude '/home/*/.cargo/'  \
+  --exclude '/home/*/.bun/'  \
   --include '/home/***'   \
   --exclude '*'  \
   root@$MACHINE:// $DSTDIR/
