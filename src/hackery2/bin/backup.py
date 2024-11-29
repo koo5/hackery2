@@ -42,7 +42,7 @@ default_target_fs='/bac18/'
 def run(source='host', target_machine=None, target_fs=None, local=False):
 	"""back up the source (host or clouds)"""
 
-	if source === 'clouds':
+	if source == 'clouds':
 		local = True
 
 	if hostname == 'r64':
