@@ -35,12 +35,12 @@ from pathlib import Path
 from infra import *
 
 
-default_target_machine = 'r64'
-default_target_fs='/bac18/'
-
 
 def run(source='host', target_machine=None, target_fs=None, local=False):
 	"""back up the source (host or clouds)"""
+
+	default_target_machine = 'r64'
+	default_target_fs='/bac18/'
 
 	if source == 'clouds':
 		local = True
@@ -77,14 +77,14 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	fss = get_filesystems()
 
-	import_noncows(source, hostname, target_fs)
+	import_noncows(source, hostname, target_fs, fss)
 	# todo: then there's no need to add_backup_subvols if local==True
 	add_backup_subvols(fss[0])
 
 	transfer_btrfs_subvolumes(sshstr2, fss, target_fs, local)
 
 
-def import_noncows(source, hostname, target_fs):
+def import_noncows(source, hostname, target_fs, fss):
 	"""
 	todo: we should make a snapshot of each subvol right after the transfer is finished. This will parallel how btrfs snapshots are "imported".
 	"""
@@ -149,7 +149,7 @@ def get_filesystems():
 		{
 			'toplevel': '/home/koom/Sync',
 			'subvols': m(['/'])
-		}
+		},
 		{
 			'toplevel': '/',
 			'subvols': m(['/']),
