@@ -36,6 +36,8 @@ rsync -av --progress -h -e hpnssh -r $argv[3] \
   --exclude '/home/*/.cargo/'  \
   --exclude '/home/*/.rustup/'  \
   --exclude '/home/*/iot2/html/'  \
+  --exclude '/home/*/.config/syncthing'  \
+   
   --exclude '/home/*/.bun/'  \
   --include '/home/***'   \
   --exclude '*'  \
