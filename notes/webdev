@@ -24,6 +24,13 @@ svelte sortable table
 
 		frameworks
 
+			https://framework7.io/
+				mmmm, interesting, at least for new projects?
+
+
+			https://ui.shadcn.com/docs/installation/manual
+
+
 			https://sveltematerialui.com/demo/data-table/
 				seems very nice, but doesn't play with snowpack
 				works in build, only breaks in dev
@@ -36,6 +43,8 @@ svelte sortable table
 				looks usable, but not as polished
 				issue
 					https://github.com/matyunya/smelte/issues/235
+					menu/button click problems
+					menu not intelligently placed
 				snowpack maybe possible, is supposed to work
 				https://github.com/matyunya/smelte/issues/193
 					https://github.com/khanguyen88/smelte-typescript-snowpack
@@ -264,3 +273,6 @@ node version management
 
 https://twinspark.js.org/
 
+
+
+https://www.reddit.com/r/sveltejs/comments/1h0c3r5/the_age_old_question_of_i18n_but_with_a_twist_no/

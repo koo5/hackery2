@@ -3,8 +3,8 @@ Description="sleep_agent"
 
 [Timer]
 AccuracySec=5s
-OnBootSec=10
-OnUnitActiveSec=5
+OnBootSec=10s
+OnUnitActiveSec=5s
 
 
 Unit=sleep_agent.service

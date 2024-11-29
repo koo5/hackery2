@@ -12,3 +12,8 @@ data/setup/noise
 
 https://flathub.org/apps/com.github.wwmm.easyeffects
  GDK_SCALE=1 flatpak run com.github.wwmm.easyeffects
+
+
+
+ killall jamesdsp easyeffects
+ flatpak remove me.timschneeberger.jdsp4linux jamesdsp
