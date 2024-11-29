@@ -34,6 +34,7 @@ rsync -av --progress -h -e hpnssh -r $argv[3] \
   --exclude '/home/*/go/'  \
   --exclude '/home/*/.gradle/'  \
   --exclude '/home/*/.cargo/'  \
+  --exclude '/home/*/.rustup/'  \
   --exclude '/home/*/.bun/'  \
   --include '/home/***'   \
   --exclude '*'  \
