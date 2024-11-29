@@ -35,30 +35,16 @@ from pathlib import Path
 from infra import *
 
 
-def check_if_mounted(sshstr, target_fs):
-	for line in co(shlex.split(f'{sshstr} cat /etc/mtab')).strip().split('\n'):
-		print(line)
-		items = line.split()
-		if items[1] +'/' == target_fs:
-			return
-	raise Exception(f'{target_fs} not mounted')
+default_target_machine = 'r64'
+default_target_fs='/bac18/'
 
 
 def run(source='host', target_machine=None, target_fs=None, local=False):
 	"""back up the source (host or clouds)"""
 
-
 	if hostname == 'r64':
 		default_target_machine = None
-		default_target_fs='/bac17/'
-	else:
-		default_target_machine = 'r64'
-		default_target_fs='/bac4/'
-
-
-	if source == 'clouds':
-		default_target_fs='/bac4/'
-
+	
 	if target_machine is None:
 		target_machine = default_target_machine
 	if target_fs is None:
@@ -88,20 +74,20 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	fss = get_filesystems()
 
-	import_noncows(source, hostname, fss)
+	import_noncows(source, hostname, target_fs)
 	# todo: then there's no need to add_backup_subvols if local==True
 	add_backup_subvols(fss[0])
 
 	transfer_btrfs_subvolumes(sshstr2, fss, target_fs, local)
 
 
-def import_noncows(source, hostname, fss):
+def import_noncows(source, hostname, target_fs):
 	"""
 	todo: we should make a snapshot of each subvol right after the transfer is finished. This will parallel how btrfs snapshots are "imported".
 	"""
 
 	if source == 'clouds' and hostname == 'r64':
-		backup_vpss(fss[0]['toplevel'])
+		backup_vpss(target_fs)
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
 
@@ -221,15 +207,15 @@ import grp
 
 
 
-def backup_vpss(toplevel='/bac4'):
+def backup_vpss(target_fs):
 	for cloud_host in json.load(open(os.path.expanduser('~/secrets.json')))['cloud_servers']:
-		backup_vps(toplevel, cloud_host)
+		backup_vps(target_fs, cloud_host)
 
 
 
-def backup_vps(toplevel, cloud_host):
+def backup_vps(target_fs, cloud_host):
 
-	where = pathlib.Path(f"{toplevel}/backups/{cloud_host}/root")
+	where = pathlib.Path(f"{target_fs}/backups/{cloud_host}/root")
 
 	#os.makedirs(where.parent, exist_ok=True)
 	ccs(f'sudo mkdir -p {where.parent}')
@@ -241,9 +227,8 @@ def backup_vps(toplevel, cloud_host):
 	group_name = grp.getgrgid(os.getgid()).gr_name
 
 	ccs(f'sudo chown {username}:{group_name} {where}')
-
 	ccs(f'backup_vps.sh {cloud_host} {where}; true')
-
+	ccs(f'bfg local_commit --SUBVOLUME={where}')
 
 
 def add_backup_subvols(fs):
@@ -272,6 +257,16 @@ def m(subvols):
 	return [{'target_dir': hostname,
 			'name':subvol,
 			'source_path':''} for subvol in subvols]
+
+
+
+def check_if_mounted(sshstr, target_fs):
+	for line in co(shlex.split(f'{sshstr} cat /etc/mtab')).strip().split('\n'):
+		print(line)
+		items = line.split()
+		if items[1] +'/' == target_fs:
+			return
+	raise Exception(f'{target_fs} not mounted')
 
 
 
