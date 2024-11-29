@@ -42,6 +42,9 @@ default_target_fs='/bac18/'
 def run(source='host', target_machine=None, target_fs=None, local=False):
 	"""back up the source (host or clouds)"""
 
+	if source === 'clouds':
+		local = True
+
 	if hostname == 'r64':
 		default_target_machine = None
 	
@@ -141,8 +144,12 @@ def get_filesystems():
 	elif hostname == 'r64':
 		fss = [{
 			'toplevel': '/bac4',
-			'subvols': m(['cold', 'images_win'])
+			'subvols': m(['cold'])
 		},
+		{
+			'toplevel': '/home/koom/Sync',
+			'subvols': m(['/'])
+		}
 		{
 			'toplevel': '/',
 			'subvols': m(['/']),
