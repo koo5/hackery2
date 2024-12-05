@@ -3,10 +3,13 @@ function fish_prompt --description 'Informative prompt'
     set -l last_pipestatus $pipestatus
     set -lx __fish_last_status $status # Export for __fish_print_pipestatus.
 
-    set -l git_commit (git rev-parse --short HEAD)
-    if test -n "$git_commit"
-        echo -n (set_color green)"[$git_commit] "(set_color normal)
-    end
+	git rev-parse --short HEAD 2&> /dev/null
+	if test $status -eq 0
+	    set -l git_commit (git rev-parse --short HEAD)
+    	if test -n "$git_commit"
+        	echo -n (set_color green)"[$git_commit] "(set_color normal)
+    	end
+	end
 
 # set -U __fish_git_prompt_show_informative_status 1
 # set -U __fish_git_prompt_showupstream "informative"
