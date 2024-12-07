@@ -516,3 +516,8 @@ But repid definitely looks nice, being "inspired by dramatiq and arq", and with 
 
 Some of these options are more "down to the metal", some with "middlewares" that offer AOP-style extensions/abstraction. You need to make you own choice in that regard. And maybe one day we can have a cross-task-queue monitoring solution.....
 ---
+
+
+https://tkte.ch/chancy/#similar-projects
+
+
