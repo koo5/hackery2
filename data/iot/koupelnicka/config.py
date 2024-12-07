@@ -1,4 +1,4 @@
 def config(config):
-    config['ipbase'] = 60
+    config['ipbase'] = 40
     return config
 
