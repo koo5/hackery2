@@ -424,3 +424,15 @@ The technique does not pin certificates, but public key hashes. This means that 
 Due to HPKP mechanism complexity and possibility of accidental misuse (potentially causing a lockout condition by system administrators), in 2017 browsers deprecated HPKP and in 2018 removed its support in favor of Certificate Transparency.[2][3]
 ```
 
+
+
+
+
+
+
+
+https://www.prisma.io/docs/orm/prisma-client/queries/crud
+https://www.prisma.io/docs/orm/prisma-client/queries/pagination
+https://semantic-ui.com/modules/dropdown.html
+
+
