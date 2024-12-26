@@ -1,0 +1,6 @@
+    platform: adc
+    attenuation: auto
+    pin: ${pin}
+    id: adc${pin}
+    name: "adc${pin}"
+    update_interval: 0.3s
