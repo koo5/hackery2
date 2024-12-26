@@ -137,10 +137,17 @@ def get_filesystems():
 			'subvols': m(['home', 'lean','leanpriv', 'dev3']),
 		}]
 	elif hostname == 'jj':
-		fss = [{
-			'toplevel': '/d2',
-			'subvols': m(['u', 'dev3', 'home', '/']),
-		}]
+		fss = [
+			{
+				'toplevel': '/d2',
+				'subvols': m(['u', 'dev3', 'home', '/']),
+			},
+			{
+			'toplevel': '/var',
+			'subvols': m(['/']),
+		},
+		]
+
 	elif hostname == 'r64':
 		fss = [{
 			'toplevel': '/bac4',
