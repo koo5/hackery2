@@ -187,7 +187,7 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs, local):
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
 
-			target_subvol_name = name if name != '/' else '_root'
+			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 
 			ccs(f"""date""")
 			if local:
