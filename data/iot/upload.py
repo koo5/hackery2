@@ -82,7 +82,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 			f.write(yaml)
 		subprocess.call(['diff', yaml_file, out])
 
-	other_files = list(name.rglob('fonts/*'))
+	other_files = list(name.rglob('fonts/*')) + list(name.rglob('*.h'))
 	for other_file in other_files:
 		print(other_file)
 		out = build/instdir/ (other_file.relative_to(name))
