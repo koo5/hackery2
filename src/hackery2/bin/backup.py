@@ -43,6 +43,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	if hostname == 'r64':
 		default_target_machine = None
+		default_target_fs = '/bac19/'
 	
 	if target_machine is None:
 		target_machine = default_target_machine
