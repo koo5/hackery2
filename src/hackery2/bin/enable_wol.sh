@@ -7,12 +7,13 @@ os.system('ethtool -s enp5s0 wol g')
 os.system('ethtool -s enx00e081391d14 wol g')
 
 while True:
-	print('sleep....')
-	time.sleep(50)
-	try:
-		subprocess.check_call(shlex.split(' ping -qq -c 1 8.8.8.8'))
-	except:
-		os.system('nmtui c down ppp')
-		time.sleep(5)
-		os.system('nmtui c up ppp')
 
+	try:
+		subprocess.check_call(shlex.split('ping -qq -c 1 8.8.8.8'))
+	except:
+		os.system('nmcli c down ppp')
+		time.sleep(5)
+		os.system('nmcli c up ppp')
+
+	print('sleep....')
+	time.sleep(60)

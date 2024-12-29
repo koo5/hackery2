@@ -37,13 +37,9 @@ from infra import *
 
 
 def run(source='host', target_machine=None, target_fs=None, local=False):
-	"""back up the source (host or clouds)"""
 
 	default_target_machine = 'r64'
 	default_target_fs='/bac18/'
-
-	if source == 'clouds':
-		local = True
 
 	if hostname == 'r64':
 		default_target_machine = None
@@ -67,13 +63,12 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	if not local:
 		check_if_mounted(sshstr, target_fs)
 
-	if source != 'clouds':
-		# grab whatever info would not be transferred from ext4 partitions
-		#srun('sudo snap save')
-		srun('snap list | sudo tee /root/snap_list')
-		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
-		#anything else?
-		#pause firefox? pause some vms?
+	# grab whatever info would not be transferred from ext4 partitions
+	#srun('sudo snap save')
+	srun('snap list | sudo tee /root/snap_list')
+	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
+	#anything else?
+	#pause firefox? pause some vms?
 
 	fss = get_filesystems()
 
@@ -89,7 +84,7 @@ def import_noncows(source, hostname, target_fs, fss):
 	todo: we should make a snapshot of each subvol right after the transfer is finished. This will parallel how btrfs snapshots are "imported".
 	"""
 
-	if source == 'clouds' and hostname == 'r64':
+	if hostname == 'r64':
 		backup_vpss(target_fs)
 
 	rsync_ext4_filesystems_into_backup_folder(fss)
@@ -160,6 +155,10 @@ def get_filesystems():
 		{
 			'toplevel': '/',
 			'subvols': m(['/']),
+		},
+		{
+			'toplevel': '/bac18',
+			'subvols': m(['/']),
 		}]
 	elif hostname == 't14':
 		fss = [{
@@ -183,7 +182,7 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs, local):
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
 
-			target_subvol_name = name if name != '/' else '_root'
+			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 
 			ccs(f"""date""")
 			if local:
