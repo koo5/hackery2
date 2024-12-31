@@ -75,7 +75,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	import_noncows(source, hostname, target_fs, fss)
 	# todo: then there's no need to add_backup_subvols if local==True
-	add_backup_subvols(fss[0])
+	add_backup_subvols(fss[-1])
 
 	transfer_btrfs_subvolumes(sshstr2, fss, target_fs, local)
 
@@ -135,13 +135,13 @@ def get_filesystems():
 	elif hostname == 'jj':
 		fss = [
 			{
+				'toplevel': '/var',
+				'subvols': m(['/']),
+			},
+			{
 				'toplevel': '/d2',
 				'subvols': m(['u', 'dev3', 'home', '/']),
 			},
-			{
-			'toplevel': '/var',
-			'subvols': m(['/']),
-		},
 		]
 
 	elif hostname == 'r64':
