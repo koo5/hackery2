@@ -206,7 +206,7 @@ def rsync_ext4_filesystems_into_backup_folder(fss):
 
 def rsync(fss, what, name='root_ext4'):
 	# this path corresponds to the structure expected by add_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
-	where = f"{fss[0]['toplevel']}/backups/{hostname}/{name}"
+	where = f"{fss[-1]['toplevel']}/backups/{hostname}/{name}"
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
 	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its results
