@@ -191,6 +191,7 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs, local):
 			else:
 				ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout --SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
 			ccs(f"""date""")
+			# todo: run prune on fss and on target
 			print('', file = sys.stderr)
 
 
