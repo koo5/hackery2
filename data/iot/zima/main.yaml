@@ -127,7 +127,7 @@ sensor:
       name: "onboard temp 2"
     humidity:
       name: "onboard hum 2"
-    update_interval: 3s
+    update_interval: 10s
 
   - platform: dht
     pin: D7
@@ -135,22 +135,22 @@ sensor:
       name: "onboard temp 1"
     humidity:
       name: "onboard hum 1"
-    update_interval: 3s
+    update_interval: 10s
 
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0x6d011453b48eaa28
     id: "bed_air_temp"
     name: "air temp"
 
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xea00000a4c49d628
     id: venky
     name: venky
 
 
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xed40d8271e64ff28
     id: radiator
     name: radiator
@@ -166,7 +166,7 @@ climate:
     min_cooling_run_time: 3s
     min_heating_off_time: 3s
     min_heating_run_time: 3s
-    min_idle_time: 3s
+    min_idle_time: 6s
     
     cool_action:
       - switch.turn_on: vetrak
@@ -191,7 +191,7 @@ climate:
 
 
 interval:
-  - interval: 5s
+  - interval: 10s
     then:
       - lambda: |-
           if (id(heating_global_bool)) {
@@ -212,9 +212,9 @@ web_server:
 
 
 
-dallas:
+one_wire:
   - pin: D6
-    update_interval: 15s
+    platform: gpio
 
 
 # Only pins that support both input & output have integrated pull-up and pull-down resistors. Input-only GPIOs 34-39 do not.
