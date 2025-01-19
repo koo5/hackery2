@@ -56,7 +56,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	if not local:
 		print(f'target_machine = {target_machine}')
-		sshstr,sshstr2 = set_up_target(target_machine)
+		sshstr, sshstr2 = set_up_target(target_machine)
 	else:
 		sshstr = ''
 		sshstr2 = ''
@@ -77,7 +77,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	# todo: then there's no need to add_backup_subvols if local==True
 	add_backup_subvols(fss[-1])
 
-	transfer_btrfs_subvolumes(sshstr2, fss, target_fs, local)
+	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local)
 
 
 def import_noncows(source, hostname, target_fs, fss):
@@ -173,7 +173,7 @@ def get_filesystems():
 	return fss
 
 
-def transfer_btrfs_subvolumes(sshstr, fss, target_fs, local):
+def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
@@ -182,17 +182,33 @@ def transfer_btrfs_subvolumes(sshstr, fss, target_fs, local):
 			name = subvol['name']
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
-
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
-
+			subvol_path = f"{toplevel}/{source_path}{name}"
 			ccs(f"""date""")
 			if local:
-				ccs(f"""bfg --YES=true --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} local_commit --SUBVOLUME={toplevel}/{source_path}{name}/ """)
+				ccs(f"""bfg --YES=true local_commit --SUBVOL={subvol_path}/ """)
 			else:
-				ccs(f"""bfg --YES=true {sshstr} --LOCAL_FS_TOP_LEVEL_SUBVOL_MOUNT_POINT={toplevel} commit_and_push_and_checkout --SUBVOLUME={toplevel}/{source_path}{name}/ --REMOTE_SUBVOLUME=/{target_fs}/backups/{target_dir}/{target_subvol_name}""")
+				remote_subvol_path = f"/{target_fs}/backups/{target_dir}/{target_subvol_name}"
+				ccs(f"""bfg --YES=true {sshstr2} commit_and_push --SUBVOL={subvol_path}/ --REMOTE_SUBVOL={remote_subvol_path} """)
 			ccs(f"""date""")
-			# todo: run prune on fss and on target
 			print('', file = sys.stderr)
+
+		ccs(f"""bfg --YES=true --FS={toplevel} update_db """)
+		if not local:
+			ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
+
+		for subvol in fs['subvols']:
+			print(subvol)
+			name = subvol['name']
+			source_path = subvol['source_path']
+			target_dir = subvol['target_dir']
+			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
+			subvol_path = f"{toplevel}/{source_path}{name}"
+			ccs(f"""bfg --YES=true prune --SUBVOL={subvol_path}/ """)
+			if not local:
+				ccs(f"""{sshstr} bfg --YES=true prune --SUBVOL={target_fs}/ """)
+
+		print('', file = sys.stderr)
 
 
 
@@ -243,7 +259,7 @@ def backup_vps(target_fs, cloud_host):
 
 	ccs(f'sudo chown {username}:{group_name} {where}')
 	ccs(f'backup_vps.sh {cloud_host} {where}; true')
-	ccs(f'bfg local_commit --SUBVOLUME={where}')
+	ccs(f'bfg local_commit --SUBVOL={where}')
 
 
 def add_backup_subvols(fs):
