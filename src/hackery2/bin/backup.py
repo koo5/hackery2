@@ -183,13 +183,13 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
-			subvol_path = f"{toplevel}/{source_path}{name}"
+			subvol_path = Path(f"{toplevel}/{source_path}{name}")
 			ccs(f"""date""")
 			if local:
-				ccs(f"""bfg --YES=true local_commit --SUBVOL={subvol_path}/ """)
+				ccs(f"""bfg --YES=true local_commit --SUBVOL={subvol_path} """)
 			else:
-				remote_subvol_path = f"/{target_fs}/backups/{target_dir}/{target_subvol_name}"
-				ccs(f"""bfg --YES=true {sshstr2} commit_and_push --SUBVOL={subvol_path}/ --REMOTE_SUBVOL={remote_subvol_path} """)
+				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
+				ccs(f"""bfg --YES=true {sshstr2} commit_and_push --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
 			ccs(f"""date""")
 			print('', file = sys.stderr)
 
@@ -203,10 +203,10 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
-			subvol_path = f"{toplevel}/{source_path}{name}"
-			ccs(f"""bfg --YES=true prune --SUBVOL={subvol_path}/ """)
+			subvol_path = Path(f"{toplevel}/{source_path}{name}")
+			ccs(f"""bfg --YES=true prune --SUBVOL={subvol_path} """)
 			if not local:
-				ccs(f"""{sshstr} bfg --YES=true prune --SUBVOL={target_fs}/ """)
+				ccs(f"""{sshstr} bfg --YES=true prune --SUBVOL={target_fs} """)
 
 		print('', file = sys.stderr)
 
