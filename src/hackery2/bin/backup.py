@@ -204,10 +204,10 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 			target_dir = subvol['target_dir']
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 			subvol_path = Path(f"{toplevel}/{source_path}{name}")
-			ccs(f"""bfg --YES=true prune_local --SUBVOL={subvol_path} """)
+			ccs(f"""bfg prune_local --SUBVOL={subvol_path} """)
 			if not local:
 				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
-				ccs(f"""bfg {sshstr2} --YES=true prune_remote --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path}""")
+				ccs(f"""bfg {sshstr2} prune_remote --LOCAL_SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path}""")
 
 		print('', file = sys.stderr)
 
