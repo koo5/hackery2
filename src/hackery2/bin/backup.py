@@ -106,6 +106,11 @@ def set_up_target(target_machine):
 		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {long_ssh} {insecure_speedups} koom@r64.internal'
 
 
+	elif target_machine == 'jj':
+		long_ssh = ' -o ServerAliveInterval=600 -o ServerAliveCountMax=999999  -o TCPKeepAlive=no  '
+		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {long_ssh} {insecure_speedups} koom@jj'
+
+
 	elif target_machine == 'r64':
 		r64_ip = get_r64_ip()
 		if r64_ip.startswith('10.'):
