@@ -437,3 +437,17 @@ https://semantic-ui.com/modules/dropdown.html
 
 
 https://github.com/BelledonneCommunications/lime
+
+
+
+
+MLS
+When a client is part of a Group, it is called a Member. A group in MLS is defined as the set of clients that have knowledge of the shared group secret established in the group key establishment phase. Note that until a client has been added to the group and contributed to the group secret in a manner verifiable by other members of the group, other members cannot assume that the client is a member of the group; for instance, the newly added member might not have received the Welcome message or been unable to decrypt it for some reason.
+---
+Upon joining the system, each client stores its initial cryptographic key material with the Delivery Service. This key material, called a KeyPackage, advertises the functional abilities of the client such as supported protocol versions, supported extensions, and the following cryptographic information:
+* A credential from the Authentication Service attesting to the binding between the identity and the client's signature key.
+* The client's asymmetric encryption public key.
+---
+RECOMMENDATION: Use credentials uncorrellated with specific users to help prevent DoS attacks, in a privacy preserving manner. Note that the privacy of these mechanisms has to be adjusted in accordance with the privacy expected from secure transport links. (See more discussion in the next section.)
+---
+
