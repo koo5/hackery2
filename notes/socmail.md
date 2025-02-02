@@ -436,6 +436,11 @@ https://www.prisma.io/docs/orm/prisma-client/queries/pagination
 https://semantic-ui.com/modules/dropdown.html
 
 
+
+https://solid.github.io/chat/
+https://forum.solidproject.org/t/exploring-a-hybrid-protocol-stack-solid-at-protocol-activitypub/8252/7
+
+
 https://github.com/BelledonneCommunications/lime
 
 
@@ -456,8 +461,16 @@ Update messages SHOULD be sent at regular intervals of time as long as the group
 
 
 
-https://solid.github.io/chat/
-https://forum.solidproject.org/t/exploring-a-hybrid-protocol-stack-solid-at-protocol-activitypub/8252/7
-
-
 https://code.briarproject.org/briar/briar-mailbox
+https://code.briarproject.org/briar/briar/-/wikis/A-Quick-Overview-of-the-Protocol-Stack
+https://code.briarproject.org/briar/briar-spec/blob/master/protocols/BTP.md
+https://code.briarproject.org/briar/briar/-/wikis/threat-model
+---
+Bramble Transport Protocol (BTP) is a transport layer security protocol suitable for delay-tolerant networks. It provides a secure channel between two peers, ensuring the confidentiality, integrity, authenticity and forward secrecy of their communication across a wide range of underlying transports.
+BTP's main components are a time-based key management protocol and a wire protocol for securely carrying streams of data.
+BTP can operate over any transport that can deliver a stream of bytes from one device to another on a best-effort basis, meaning that streams may be delayed, lost, reordered or duplicated. The underlying transport is not required to provide any security properties.
+The BTP wire protocol includes optional padding and does not use any timeouts, handshakes or plaintext headers. This makes BTP compatible with traffic analysis prevention techniques such as traffic morphing, with the goal of making it difficult to distinguish BTP from other protocols.
+BTP does not attempt to conceal the identities of the communicating parties or the fact that they are communicating - in other words, it does not provide anonymity, unlinkability or unobservability. If such properties are required, BTP can use an anonymity system such as Tor as the underlying transport.
+Forward secrecy is achieved by establishing an initial root key between two peers and using a one-way key derivation function to derive a series of temporary keys from the root key. Once both peers have deleted a given key, it cannot be re-derived if the peer devices are later compromised.
+---
+
