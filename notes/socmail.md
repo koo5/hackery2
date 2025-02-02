@@ -450,4 +450,14 @@ Upon joining the system, each client stores its initial cryptographic key materi
 ---
 RECOMMENDATION: Use credentials uncorrellated with specific users to help prevent DoS attacks, in a privacy preserving manner. Note that the privacy of these mechanisms has to be adjusted in accordance with the privacy expected from secure transport links. (See more discussion in the next section.)
 ---
+Update messages SHOULD be sent at regular intervals of time as long as the group is active, and members that don't update SHOULD eventually be removed from the group. It's left to the application to determine an appropriate amount of time between Updates. Since the purpose of sending an Update is to proactively constrain a compromise window, the right frequency is usually on the order of hours or days, not milliseconds. For example, an application might send an Update each time a member sends an application message after receiving any message from another member, or daily if no application messages are sent.
+---
 
+
+
+
+https://solid.github.io/chat/
+https://forum.solidproject.org/t/exploring-a-hybrid-protocol-stack-solid-at-protocol-activitypub/8252/7
+
+
+https://code.briarproject.org/briar/briar-mailbox
