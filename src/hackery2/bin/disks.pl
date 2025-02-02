@@ -20,6 +20,7 @@ start(I) :-
 start(I, Exit_status1, Exit_status2) :-
 	shell2(['cryptdisks_start bac', I], Exit_status1),
 	shell2(['cryptdisks_start bac', I, '_2'], Exit_status1_2),
+	shell2(['partprobe'], _),
 	shell2(['mount /bac', I], Exit_status2).
 
 start_or_fail(I) :-
