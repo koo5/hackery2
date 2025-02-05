@@ -207,6 +207,8 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 		if not local:
 			ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
 
+		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
+
 		for subvol in fs['subvols']:
 			print(subvol)
 			name = subvol['name']

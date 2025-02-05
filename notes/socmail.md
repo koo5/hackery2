@@ -457,6 +457,8 @@ RECOMMENDATION: Use credentials uncorrellated with specific users to help preven
 ---
 Update messages SHOULD be sent at regular intervals of time as long as the group is active, and members that don't update SHOULD eventually be removed from the group. It's left to the application to determine an appropriate amount of time between Updates. Since the purpose of sending an Update is to proactively constrain a compromise window, the right frequency is usually on the order of hours or days, not milliseconds. For example, an application might send an Update each time a member sends an application message after receiving any message from another member, or daily if no application messages are sent.
 ---
+https://github.com/openmls/oscw24
+
 
 
 
@@ -473,4 +475,17 @@ The BTP wire protocol includes optional padding and does not use any timeouts, h
 BTP does not attempt to conceal the identities of the communicating parties or the fact that they are communicating - in other words, it does not provide anonymity, unlinkability or unobservability. If such properties are required, BTP can use an anonymity system such as Tor as the underlying transport.
 Forward secrecy is achieved by establishing an initial root key between two peers and using a one-way key derivation function to derive a series of temporary keys from the root key. Once both peers have deleted a given key, it cannot be re-derived if the peer devices are later compromised.
 ---
+
+
+
+
+
+
+
+https://soatok.blog/2022/02/09/using-rsa-securely-in-2022/
+---
+If you can’t avoid RSA, and you’re encrypting messages, at least make sure you’re not encrypting messages with RSA directly. (RSA signatures are significantly less scary than RSA encryption.) Also, don’t use the same RSA keypair for both operations.
+---
+
+
 
