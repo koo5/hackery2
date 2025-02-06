@@ -489,3 +489,22 @@ If you can’t avoid RSA, and you’re encrypting messages, at least make sure y
 
 
 
+
+https://core.telegram.org/api/end-to-end
+---
+https://github.com/automerge/autosurgeon
+https://github.com/yjs/yjs
+---
+https://www.nccgroup.com/media/ntnlvysa/ncc_group_ephemera_e018021_xmtp_public_report_2024-12-09_v10.pdf
+https://xmtp.org/
+https://docs.xmtp.org/
+https://xmtp.org/identity
+---
+https://github.com/phnx-im/infra
+---
+
+
+https://noiseprotocol.org/noise_rev34.html
+
+--
+
