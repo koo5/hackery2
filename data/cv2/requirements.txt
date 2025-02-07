@@ -1,0 +1,7 @@
+mlx>=0.0.8
+mlx-vlm==0.0.1
+mlx-lm>=0.0.3
+torch>=2.0.0
+transformers>=4.36.0
+pillow>=10.0.0
+requests>=2.31.0

@@ -6,3 +6,4 @@ __pycache__
 **/nohup.out
 .aider*
 **/node_modules
+**/.#*
