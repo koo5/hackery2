@@ -64,20 +64,33 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	if not local:
 		check_if_mounted(sshstr, target_fs)
 
+
+	sync_stuff(hostname)
+
 	# grab whatever info would not be transferred from ext4 partitions
 	#srun('sudo snap save')
 	srun('snap list | sudo tee /root/snap_list')
 	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
+
 	#anything else?
 	#pause firefox? pause some vms?
 
 	fss = get_filesystems()
+
 
 	import_noncows(source, hostname, target_fs, fss)
 	# todo: then there's no need to add_backup_subvols if local==True
 	add_backup_subvols(fss[-1])
 
 	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local)
+
+
+def sync_stuff(hostname):
+	where = f'/d/sync/jj/host/{hostname}/'
+	what = f'/home/koom/.local/share/fish/fish_history'
+	cc(ss(f'mkdir -p {where}'))
+
+	srun(f'rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
 
 
 def import_noncows(source, hostname, target_fs, fss):
