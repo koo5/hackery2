@@ -34,7 +34,7 @@ from pathlib import Path
 
 from infra import *
 
-
+_use_db = True
 
 def run(source='host', target_machine=None, target_fs=None, local=False):
 
@@ -150,6 +150,8 @@ def get_filesystems():
 	# we rsync ext4 disks into a subvolume on the btrfs disk, and then use bfg to transfer the btrfs subvolumes
 	# but maybe in future we should just rsync them to the target btrfs filesystem directly
 
+	global _use_db
+
 	if hostname == 'hp':
 		fss = [{
 			'toplevel': '/mx500data',
@@ -193,6 +195,16 @@ def get_filesystems():
 			'toplevel': '/data',
 			'subvols': m(['/']),
 		}]
+	elif hostname == 'c1':
+		_use_db = False
+		fss = [{
+			'toplevel': '/',
+			'subvols': m(['/'])
+		},
+		{
+			'toplevel': '/home/koom',
+			'subvols': m(['/']),
+		}]
 	return fss
 
 
@@ -215,10 +227,10 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 				ccs(f"""bfg --YES=true {sshstr2} commit_and_push_and_checkout --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
 			ccs(f"""date""")
 			print('', file = sys.stderr)
-
-		ccs(f"""bfg --YES=true --FS={toplevel} update_db """)
-		if not local:
-			ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
+		if _use_db:
+			ccs(f"""bfg --YES=true --FS={toplevel} update_db """)
+			if not local:
+				ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
 
 		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
 
@@ -229,7 +241,7 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 			target_dir = subvol['target_dir']
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 			subvol_path = Path(f"{toplevel}/{source_path}{name}")
-			ccs(f"""bfg prune_local  --YES=true  --SUBVOL={subvol_path} """)
+			ccs(f"""bfg prune_local --DB={_use_db} --YES=true  --SUBVOL={subvol_path} """)
 			if not local:
 				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
 				ccs(f"""bfg {sshstr2} prune_remote  --YES=true  --LOCAL_SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path}""")
