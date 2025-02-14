@@ -5,7 +5,8 @@
 ## Developing
 ```bash
 nvm use 20
-npm run dev -- --open
+bun i
+bun run dev -- --open
 ```
 
 ## Building
