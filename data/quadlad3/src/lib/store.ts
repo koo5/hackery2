@@ -62,23 +62,23 @@ class Store {
         this.iqs = new Map();
     }
 
+    /* if we want to support non-hashable values:
+
+    add(s: any, p: any, o: any, q: any)
+    {
+        if (typeof s === 'object')
+            let ref = this.add_ref(s);
+            ....
+
     gc()
     {
-        let vals_clean = new ValMap();
-        for (let [_, v: Quad] of this.iqs[[q]])
-        {
-            vals_clean.set(v.s, this.vals.get(v.s));
-            vals_clean.set(v.p, this.vals.get(v.p));
-            vals_clean.set(v.o, this.vals.get(v.o));
-            vals_clean.set(v.q, this.vals.get(v.q));
-        }
-        this.vals = vals_clean;
-        /* if we want to support non-hashable values:
-
-
-
-         */
+        ...
     }
+    */
+
+
+
+     */
 
     add(s: Ref, p: Ref, o: Ref, q: Ref)
     /* add a quad to the store. Add  */
