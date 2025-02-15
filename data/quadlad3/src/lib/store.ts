@@ -106,24 +106,6 @@ class Store {
 }
 
 
-class LiveQuery {
-    store: Store;
-    query: any;
-
-    constructor(store: Store, query: any, callback: any) {
-        this.store = store;
-        this.query = query;
-        this.callback = callback;
-        this.store.add_live_query(this);
-        this.refresh();
-    }
-
-    refresh() {
-        let results = this.store.query(this.query);
-        this.callback(results);
-    }
-}
-
 /*
 a query could be one of:
 materialize (object)
@@ -131,4 +113,29 @@ construct (graph)
 select (array of quads)
 ask (boolean)
 */
+
+
+class Query {
+    store: Store;
+    query: any;
+
+    constructor(store: Store, query: any, callback: any) {
+        this.store = store;
+        this.query = query;
+        this.callback = callback;
+    }
+
+    value() {
+        let result = this.store.query(this.query.s, this.query.p, this.query.o, this.query.q);
+        return result;
+    }
+
+    subscribe(callback: any) {
+        this.callback = callback;
+        this.store.subscribe(() => {
+            this.callback(this.value());
+        }
+    }
+}
+
 
