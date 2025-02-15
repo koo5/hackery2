@@ -1,7 +1,6 @@
-import { Store, Query } from './store.ts';
+import { Store, Query, Quad } from './store.ts';
 
-
-class Store {
+export class Store {
     constructor() {
         this._store = new Store();
     }

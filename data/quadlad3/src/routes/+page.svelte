@@ -1,8 +1,42 @@
 <script>
 
+    import { rooms, add_room } from 'falcon.svelte.ts';
+    import Messages from './Messages.svelte';
+    import MessageBar from './MessageBar.svelte';
+
+    let room_id = $state();
+    let room = $derived(rooms.get(room_id));
+
+
 </script>
 
-{#each [0, 1, 2, 3, 4, 5, 6, 7] as number}
-    <a href="/{number}/">{number}</a>&nbsp;
-{/each}
 
+<div class="content">
+
+    <div class="sidebar">
+
+        <ul>
+            {#each $rooms as room}
+                <li>
+
+                    <div onclick={room_id = room.id}>
+                        {room.name}
+                    </div>
+
+                </li>
+            {/each}
+        </ul>
+        <button on:click={() => {room_id = add_room()}>Add Room</button>
+
+    </div>
+
+    <div class="main">
+
+        <h1>Room {room_id}</h1>
+
+        <Messages room_id={room_id} />
+
+        <MessageBar room_id={room_id} />
+
+    </div>
+</div>
