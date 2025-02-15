@@ -29,9 +29,6 @@ class Chunk {
 }
 
 
-/* a map of domain-specific materializations */
-type MatMap = Map<Val, any>;
-
 
 type IndexKey = Val | readonly [Val, Val] | readonly [Val, Val, Val] | readonly [Val, Val, Val, Val];
 type IndexedQuads = Map<IndexKey, Quad | Quad[]>;
@@ -139,15 +136,3 @@ class _Query {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
