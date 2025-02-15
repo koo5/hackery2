@@ -1,7 +1,5 @@
 
 type Val = any;
-type Ref = number;
-type ValMap = Map<Ref, Val>;
 
 class Quad {
     /* subject */
@@ -26,8 +24,8 @@ class Quad {
 *  */
 class Chunk {
     offset: number;
-    graph: Ref;
-    quads: Ref[];
+    graph: Val;
+    quads: Val[];
 }
 
 
@@ -47,11 +45,8 @@ enum IndexItem {
 
 type IndexingStrategy = IndexItem | readonly [IndexItem, IndexItem] | readonly [IndexItem, IndexItem, IndexItem] | readonly [IndexItem, IndexItem, IndexItem, IndexItem];
 
+
 class Store {
-    /* a Map of Materialization Maps.  */
-    mats: MatMap;
-    /* a Mapping from Refs to actual values.*/
-    //vals: ValMap;
     /* bookkeeping */
     chunks: Chunk[];
     /* indexes/quads */
@@ -70,7 +65,8 @@ class Store {
     }
 
     add(s: Val, p: Val, o: Val, q: Val)
-    /* add a quad to the store. Add  */ {
+    {
+        /* add a quad to the store. Add  */
         let quad = new Quad(s, p, o, q);
         let iqs = this.iqs.get(IndexItem.q);
         if (iqs === undefined) {
@@ -82,7 +78,7 @@ class Store {
         /* todo add to local chunk? */
     }
 
-    *query(s: Val | null, p: Val | null, o: Val | null, q: Val | null) {
+    *_query(s: Val | null, p: Val | null, o: Val | null, q: Val | null) {
         let iqs = this.iqs.get(IndexItem.q);
         for (let [key, quad] of iqs) {
             if (s !== null && quad.s !== s) {
@@ -101,6 +97,9 @@ class Store {
         }
     }
 
+    query(query: readonly [Val, Val, Val, Val], transform: (quad: Quad) => any) {
+        return new Query(this, query, transform);
+    }
 
 
 }
@@ -115,7 +114,10 @@ ask (boolean)
 */
 
 
-class Query {
+
+type Query = tuple<Val, Val, Val, Val>;
+
+class _Query {
     store: Store;
     query: any;
 
@@ -137,5 +139,15 @@ class Query {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 
