@@ -12,21 +12,6 @@ let store = new Store();
 
 export let rooms = store.query(null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "https://koo5.github.com/falcon/v0/falcon#room");
 
-
-export function messages(room_id: string) {
-    let result = $state();
-    store.query_all([room_id, ROOM + '#message', null], (quad: Quad[]) => {
-        result = [];
-        for (let q of quad) {
-            result.push({
-                id: q.o,
-                text: store.query([q.o, MESSAGE + '#text']),
-                author: store.query([q.o, MESSAGE + '#author']),
-            })
-        }
-    });
-}
-
 export let add_room()
 {
     let room_id = store.id(ROOM + '/');

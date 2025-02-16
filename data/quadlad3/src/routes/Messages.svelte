@@ -1,10 +1,21 @@
 <script>
 
     import { rooms } from 'falcon.svelte.ts';
-
+    import {MESSAGE, ROOM} from "$lib/falcon.svelte.js";
 
     let {room_id}= $props();
-    let messages = $derived(rooms.get(room_id).messages);
+
+    let messages = $derived.by(() => {
+        let result = [];
+        for let q of store.query_all([room_id, ROOM + '#message', null]){
+            result.push({
+                id: q.o,
+                text: store.query([q.o, MESSAGE + '#text']),
+                author: store.query([q.o, MESSAGE + '#author']),
+            });
+        }
+        return result;
+    });
 
 </script>
 
