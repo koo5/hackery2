@@ -142,3 +142,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+update the app to read an initial list of files from this address:
+https://iot.ueueeu.eu:10101/geo/pics/files.json
+it contains a list where each item is like this:
+    {
+        "file": "2024-09-29-17-29-52 (1).jpg",
+        "latitude": "[50, 9, 45331/1000]",
+        "longitude": "[14, 26, 7249/1000]",
+        "bearing": "96",
+        "altitude": "345"
+    },
