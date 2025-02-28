@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+# sudo apt install jpegoptim imagemagick-6.q16
+
 import os
 import shutil
 from pathlib import Path
 import json
-
+import file
 import exifread
 
 
@@ -130,27 +132,54 @@ def compile_json_database(directory):
         json.dump(database, f, indent=4)
 
 
-def main():
-    # Example usage:
-    source_directory = "/d/sync"
-    destination_directory = "/d/sync/jj/geo/pics"
+class Geo:
+    @staticmethod
+    def collect(source_directory = "/d/sync", destination_directory = "/d/sync/jj/geo/pics"):
 
-    copy_photos_with_bearing_and_gps(source_directory, destination_directory)
-    os.system('fdupes -S -r --delete --noprompt ' + destination_directory)
-    compile_json_database(destination_directory)
+        copy_photos_with_bearing_and_gps(source_directory, destination_directory)
+        os.system('fdupes -S -r --delete --noprompt ' + destination_directory)
+        compile_json_database(destination_directory)
+
+
+    @staticmethod
+    def optimize(directory):
+        f = open(directory + '/files.json')
+        files = json.load(f)
+        f.close()
+
+        for file in files:
+            file['sizes'] = {}
+
+            print('file:', file['file'])
+            # get the width of the image
+            width = int(os.popen('identify -format %w ' + output_file_path).read().strip())
+            print('width:', width)
+
+            for size in ['full', 320, 640, 1024, 1600, 2048, 2560, 3072]:
+                input_file_path = directory + '/' + file['file']
+                size_path = size + '/' + file['file']
+                output_file_path = directory + '/' + size_path
+                os.makedirs(directory + '/' + size, exist_ok=True)
+                shutil.copy2(input_file_path, output_file_path)
+
+                if size == 'full':
+                    pass
+                else:
+                    if size > width:
+                        break
+                    else:
+                        os.system('mogrify -resize ' + size + ' ' + output_file_path)
+
+                os.system('jpegoptim --all-progressive --overwrite --totals ' + output_file_path)
+
+                file['sizes'][size] = size_path
+
+        f = open(directory + '/files.json', 'w')
+        json.dump(files, f, indent=4)
+        f.close()
+
 
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(Geo)
 
-
-update the app to read an initial list of files from this address:
-https://iot.ueueeu.eu:10101/geo/pics/files.json
-it contains a list where each item is like this:
-    {
-        "file": "2024-09-29-17-29-52 (1).jpg",
-        "latitude": "[50, 9, 45331/1000]",
-        "longitude": "[14, 26, 7249/1000]",
-        "bearing": "96",
-        "altitude": "345"
-    },
