@@ -170,22 +170,23 @@ class Geo:
                 os.makedirs(directory + '/' + str(size), exist_ok=True)
 
                 if os.path.exists(output_file_path):
+                    file['sizes'][size] = size_path
                     continue
 
                 if width is None:
                     width = int(subprocess.check_output(cmd).decode('utf-8'))
                     print('width:', width)
 
-
-
                 if size == 'full':
                     shutil.copy2(input_file_path, output_file_path)
+                    file['sizes'][size] = size_path
                 else:
                     if size > width:
                         shutil.rmtree(output_file_path, ignore_errors=True)
                         break
                     else:
                         shutil.copy2(input_file_path, output_file_path)
+                        file['sizes'][size] = size_path
                         cmd = ['mogrify', '-resize', str(size), output_file_path]
                         print('cmd:', shlex.join(cmd))
                         subprocess.run(cmd)
@@ -194,7 +195,7 @@ class Geo:
                 print('cmd:', shlex.join(cmd))
                 subprocess.run(cmd)
 
-                file['sizes'][size] = size_path
+
 
         files.sort(key=lambda x: x['bearing'])
 
