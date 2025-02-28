@@ -176,14 +176,16 @@ class Geo:
                     width = int(subprocess.check_output(cmd).decode('utf-8'))
                     print('width:', width)
 
-                shutil.copy2(input_file_path, output_file_path)
+
 
                 if size == 'full':
-                    pass
+                    shutil.copy2(input_file_path, output_file_path)
                 else:
                     if size > width:
+                        shutil.rmtree(output_file_path, ignore_errors=True)
                         break
                     else:
+                        shutil.copy2(input_file_path, output_file_path)
                         cmd = ['mogrify', '-resize', str(size), output_file_path]
                         print('cmd:', shlex.join(cmd))
                         subprocess.run(cmd)
