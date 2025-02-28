@@ -122,7 +122,7 @@ class Geo:
         """iterate all files and create a json list of files with geo and bearing exif data"""
 
         database = []
-        for root, dirs, files in os.walk(directory):
+        for root, dirs, files in os.walk(destination_directory):
             for file in files:
                 if is_pic(file):
                     filepath = os.path.join(root, file)
