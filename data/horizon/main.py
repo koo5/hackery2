@@ -118,11 +118,11 @@ class Geo:
         os.system('fdupes -S -r --delete --noprompt ' + destination_directory)
 
     @staticmethod
-    def index(destination_directory):
+    def index(directory):
         """iterate all files and create a json list of files with geo and bearing exif data"""
 
         database = []
-        for root, dirs, files in os.walk(destination_directory):
+        for root, dirs, files in os.walk(directory):
             for file in files:
                 if is_pic(file):
                     filepath = os.path.join(root, file)
@@ -136,6 +136,7 @@ class Geo:
                             'bearing': str(bearing),
                             'altitude': str(altitude)
                         })
+                        print(f'Added "{file}" ({len(database)} entries..)')
                     else:
                         print(f'Skipping non-geo "{file}"')
                 else:
