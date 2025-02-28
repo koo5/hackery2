@@ -196,10 +196,10 @@ class Geo:
 
                 file['sizes'][size] = size_path
 
-        f = open(directory + '/files.json', 'w')
         files.sort(key=lambda x: x['bearing'])
-        json.dump(files, f, indent=4)
-        f.close()
+
+        with open(directory + '/files.json', 'w') as f:
+            json.dump(files, f, indent=4)
 
 
 
