@@ -149,14 +149,15 @@ class Geo:
 
         for file in files:
             file['sizes'] = {}
+            input_file_path = directory + '/' + file['file']
 
             print('file:', file['file'])
             # get the width of the image
-            width = int(os.popen('identify -format %w ' + output_file_path).read().strip())
+            width = int(os.popen('identify -format %w ' + input_file_path).read().strip())
             print('width:', width)
 
             for size in ['full', 320, 640, 1024, 1600, 2048, 2560, 3072]:
-                input_file_path = directory + '/' + file['file']
+
                 size_path = size + '/' + file['file']
                 output_file_path = directory + '/' + size_path
                 os.makedirs(directory + '/' + size, exist_ok=True)
