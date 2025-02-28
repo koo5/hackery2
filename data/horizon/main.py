@@ -153,7 +153,9 @@ class Geo:
 
             print('file:', file['file'])
             # get the width of the image
-            width = int(os.popen('identify -format %w ' + input_file_path).read().strip())
+            cmd = 'identify -format %w ' + input_file_path
+            print('cmd:', cmd)
+            width = int(os.popen(cmd).read().strip())
             print('width:', width)
 
             for size in ['full', 320, 640, 1024, 1600, 2048, 2560, 3072]:
