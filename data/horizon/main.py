@@ -6,7 +6,7 @@ import os
 import shutil
 from pathlib import Path
 import json
-import file
+import fire
 import exifread
 
 
