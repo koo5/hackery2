@@ -8,6 +8,8 @@ from pathlib import Path
 import json
 import fire
 import exifread
+import shlex
+import subprocess
 
 
 extensions = ['.jpg', '.jpeg', '.tiff', '.png', '.heic', '.heif']
@@ -153,9 +155,9 @@ class Geo:
 
             print('file:', file['file'])
             # get the width of the image
-            cmd = 'identify -format %w ' + input_file_path
-            print('cmd:', cmd)
-            width = int(os.popen(cmd).read().strip())
+            cmd = ['identify', '-format', '%w', input_file_path]
+            print('cmd:', shlex.join(cmd))
+            width = int(subprocess.check_output(cmd).decode('utf-8'))
             print('width:', width)
 
             for size in ['full', 320, 640, 1024, 1600, 2048, 2560, 3072]:
@@ -171,10 +173,13 @@ class Geo:
                     if size > width:
                         break
                     else:
-                        os.system('mogrify -resize ' + size + ' ' + output_file_path)
+                        cmd = ['mogrify', '-resize', str(size), output_file_path]
+                        print('cmd:', shlex.join(cmd))
+                        subprocess.run(cmd)
 
-                os.system('jpegoptim --all-progressive --overwrite --totals ' + output_file_path)
-
+                #os.system('jpegoptim --all-progressive --overwrite --totals ' + output_file_path)
+                subprocess.run(['jpegoptim', '--all-progressive', '--overwrite', '--totals', output_file_path])
+                
                 file['sizes'][size] = size_path
 
         f = open(directory + '/files.json', 'w')
