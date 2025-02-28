@@ -107,44 +107,48 @@ def is_pic(file):
     file_lower = file.lower()
     return any(file_lower.endswith(ext) for ext in extensions)
 
-def compile_json_database(directory):
-    """iterate all files and create a json file with the exif data"""
-
-    database = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if is_pic(file):
-                filepath = os.path.join(root, file)
-                tags = geo_and_bearing_exif(filepath)
-                if tags:
-                    latitude, longitude, bearing, altitude = tags
-                    database.append({
-                        'file': file,
-                        'latitude': str(latitude),
-                        'longitude': str(longitude),
-                        'bearing': str(bearing),
-                        'altitude': str(altitude)
-                    })
-                else:
-                    print(f"Skipping non-geo {file}")
-            else:
-                print(f"Skipping non-pic {file}")
-    json_file = os.path.join(directory, 'files.json')
-    with open(json_file, 'w') as f:
-        json.dump(database, f, indent=4)
 
 
 class Geo:
     @staticmethod
     def collect(source_directory = "/d/sync", destination_directory = "/d/sync/jj/geo/pics"):
+        """collect all photos with geo and bearing exif data"""
 
         copy_photos_with_bearing_and_gps(source_directory, destination_directory)
         os.system('fdupes -S -r --delete --noprompt ' + destination_directory)
-        compile_json_database(destination_directory)
+
+    @staticmethod
+    def index(destination_directory):
+        """iterate all files and create a json list of files with geo and bearing exif data"""
+
+        database = []
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if is_pic(file):
+                    filepath = os.path.join(root, file)
+                    tags = geo_and_bearing_exif(filepath)
+                    if tags:
+                        latitude, longitude, bearing, altitude = tags
+                        database.append({
+                            'file': file,
+                            'latitude': str(latitude),
+                            'longitude': str(longitude),
+                            'bearing': str(bearing),
+                            'altitude': str(altitude)
+                        })
+                    else:
+                        print(f"Skipping non-geo {file}")
+                else:
+                    print(f"Skipping non-pic {file}")
+        json_file = os.path.join(directory, 'files.json')
+        with open(json_file, 'w') as f:
+            json.dump(database, f, indent=4)
 
 
     @staticmethod
     def optimize(directory):
+        """generate different sizes of the images and optimize them"""
+
         f = open(directory + '/files.json')
         files = json.load(f)
         f.close()
