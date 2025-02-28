@@ -177,7 +177,7 @@ class Geo:
                         print('cmd:', shlex.join(cmd))
                         subprocess.run(cmd)
 
-                cmd = ['jpegoptim', '--all-progressive', '--overwrite', '--totals', output_file_path]
+                cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
                 print('cmd:', shlex.join(cmd))
                 subprocess.run(cmd)
 
