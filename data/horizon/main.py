@@ -162,9 +162,9 @@ class Geo:
 
             for size in ['full', 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
-                size_path = size + '/' + file['file']
+                size_path = str(size) + '/' + file['file']
                 output_file_path = directory + '/' + size_path
-                os.makedirs(directory + '/' + size, exist_ok=True)
+                os.makedirs(directory + '/' + str(size), exist_ok=True)
                 shutil.copy2(input_file_path, output_file_path)
 
                 if size == 'full':
@@ -177,9 +177,10 @@ class Geo:
                         print('cmd:', shlex.join(cmd))
                         subprocess.run(cmd)
 
-                #os.system('jpegoptim --all-progressive --overwrite --totals ' + output_file_path)
-                subprocess.run(['jpegoptim', '--all-progressive', '--overwrite', '--totals', output_file_path])
-                
+                cmd = ['jpegoptim', '--all-progressive', '--overwrite', '--totals', output_file_path]
+                print('cmd:', shlex.join(cmd))
+                subprocess.run(cmd)
+
                 file['sizes'][size] = size_path
 
         f = open(directory + '/files.json', 'w')
