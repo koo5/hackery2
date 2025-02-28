@@ -165,6 +165,10 @@ class Geo:
                 size_path = str(size) + '/' + file['file']
                 output_file_path = directory + '/' + size_path
                 os.makedirs(directory + '/' + str(size), exist_ok=True)
+                
+                if os.path.exists(output_file_path):
+                    continue
+
                 shutil.copy2(input_file_path, output_file_path)
 
                 if size == 'full':
@@ -184,6 +188,7 @@ class Geo:
                 file['sizes'][size] = size_path
 
         f = open(directory + '/files.json', 'w')
+        files.sort(lambda f: f['bearing'])
         json.dump(files, f, indent=4)
         f.close()
 
