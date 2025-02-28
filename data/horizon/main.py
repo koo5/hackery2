@@ -122,25 +122,24 @@ class Geo:
         """iterate all files and create a json list of files with geo and bearing exif data"""
 
         database = []
-        for root, dirs, files in os.walk(directory):
-            for file in files:
-                if is_pic(file):
-                    filepath = os.path.join(root, file)
-                    tags = geo_and_bearing_exif(filepath)
-                    if tags:
-                        latitude, longitude, bearing, altitude = tags
-                        database.append({
-                            'file': file,
-                            'latitude': str(latitude),
-                            'longitude': str(longitude),
-                            'bearing': str(bearing),
-                            'altitude': str(altitude)
-                        })
-                        print(f'Added "{file}" ({len(database)} entries..)')
-                    else:
-                        print(f'Skipping non-geo "{file}"')
+        for file in os.listdir(directory):
+            if is_pic(file):
+                filepath = os.path.join(directory, file)
+                tags = geo_and_bearing_exif(filepath)
+                if tags:
+                    latitude, longitude, bearing, altitude = tags
+                    database.append({
+                        'file': file,
+                        'latitude': str(latitude),
+                        'longitude': str(longitude),
+                        'bearing': str(bearing),
+                        'altitude': str(altitude)
+                    })
+                    print(f'Added "{file}" ({len(database)} entries..)')
                 else:
-                    print(f'Skipping non-pic "{file}"')
+                    print(f'Skipping non-geo "{file}"')
+            else:
+                print(f'Skipping non-pic "{file}"')
         json_file = os.path.join(directory, 'files.json')
         with open(json_file, 'w') as f:
             json.dump(database, f, indent=4)
