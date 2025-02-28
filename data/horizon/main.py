@@ -137,9 +137,9 @@ class Geo:
                             'altitude': str(altitude)
                         })
                     else:
-                        print(f"Skipping non-geo {file}")
+                        print(f'Skipping non-geo "{file}"')
                 else:
-                    print(f"Skipping non-pic {file}")
+                    print(f'Skipping non-pic "{file}"')
         json_file = os.path.join(directory, 'files.json')
         with open(json_file, 'w') as f:
             json.dump(database, f, indent=4)
