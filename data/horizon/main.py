@@ -157,17 +157,20 @@ class Geo:
             # get the width of the image
             cmd = ['identify', '-format', '%w', input_file_path]
             print('cmd:', shlex.join(cmd))
-            width = int(subprocess.check_output(cmd).decode('utf-8'))
-            print('width:', width)
+            width = None
 
             for size in ['full', 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
                 size_path = str(size) + '/' + file['file']
                 output_file_path = directory + '/' + size_path
                 os.makedirs(directory + '/' + str(size), exist_ok=True)
-                
+
                 if os.path.exists(output_file_path):
                     continue
+
+                if width is None:
+                    width = int(subprocess.check_output(cmd).decode('utf-8'))
+                    print('width:', width)
 
                 shutil.copy2(input_file_path, output_file_path)
 
