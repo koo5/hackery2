@@ -155,7 +155,7 @@ class Geo:
 
 
     @staticmethod
-    def optimize(directory):
+    def optimize(directory, overwrite=False):
         """generate different sizes of the images and optimize them"""
 
         f = open(directory + '/files0.json')
@@ -184,19 +184,17 @@ class Geo:
                     size_path = size_dir + '/' + file['file']# + '.webp'
                     output_file_path = directory + '/' + size_path
                     os.makedirs(directory + '/' + size_dir, exist_ok=True)
-
-                    exists = False
-                    #exists = os.path.exists(output_file_path)
+                    exists = os.path.exists(output_file_path)
 
                     if size == 'full':
-                        if not exists:
+                        if overwrite or not exists:
                             shutil.copy2(input_file_path, output_file_path)
                         file['sizes'][size] = {'width': width, 'height': height, 'path': size_path}
                     else:
                         if size > width:
                             break
                         else:
-                            if not exists:
+                            if overwrite or not exists:
                                 shutil.copy2(input_file_path, output_file_path)
                                 cmd = ['mogrify', '-resize', str(size), output_file_path]
                                 print('cmd:', shlex.join(cmd))
@@ -204,7 +202,7 @@ class Geo:
                             w,h = imgsize(output_file_path)
                             file['sizes'][size] = {'width': w, 'height': h, 'path': size_path}
 
-                    if not exists:
+                    if overwrite or not exists:
                         cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
                         print('cmd:', shlex.join(cmd))
                         subprocess.run(cmd)

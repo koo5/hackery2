@@ -17,6 +17,8 @@
         return result;
     });
 
+    let messages = $derived
+
 </script>
 
 <div class="messages">
