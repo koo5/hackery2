@@ -162,6 +162,7 @@ class Geo:
             file['sizes'] = {}
             input_file_path = directory + '/' + file['file']
 
+            print()
             print('file:', file['file'])
             # get the width of the image
             width = None
@@ -201,6 +202,7 @@ class Geo:
                 cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
                 print('cmd:', shlex.join(cmd))
                 subprocess.run(cmd)
+            print('db:', file)
 
         files.sort(key=lambda x: x['bearing'])
 
