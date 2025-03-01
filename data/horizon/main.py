@@ -108,6 +108,11 @@ def is_pic(file):
     return any(file_lower.endswith(ext) for ext in extensions)
 
 
+def imgsize(file):
+    cmd = ['identify', '-format', '%w %h', file]
+    #print('cmd:', shlex.join(cmd))
+    return [int(x) for x in subprocess.check_output(cmd).decode('utf-8').split()]
+
 
 class Geo:
     @staticmethod
@@ -159,9 +164,8 @@ class Geo:
 
             print('file:', file['file'])
             # get the width of the image
-            cmd = ['identify', '-format', '%w', input_file_path]
-            #print('cmd:', shlex.join(cmd))
             width = None
+            height = None
 
             for size in ['full', 50, 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
@@ -175,31 +179,29 @@ class Geo:
                     continue
 
                 if width is None:
-                    width = int(subprocess.check_output(cmd).decode('utf-8'))
-                    print('width:', width)
+                    width, height = imgsize(input_file_path)
+                    print('width:', width, 'height:', height)
 
                 if size == 'full':
                     shutil.copy2(input_file_path, output_file_path)
                     print('cmd:', shlex.join(cmd))
                     subprocess.run(cmd)                    
-                    file['sizes'][size] = size_path
+                    file['sizes'][size] = {'width': width, 'height': height, 'path': size_path}
                 else:
                     if size > width:
-                        shutil.rmtree(output_file_path, ignore_errors=True)
                         break
                     else:
                         shutil.copy2(input_file_path, output_file_path)
-                        file['sizes'][size] = size_path
                         #cmd = ['mogrify', '-format', 'webp', '-resize', str(size), output_file_path]
                         cmd = ['mogrify', '-resize', str(size), output_file_path]
                         print('cmd:', shlex.join(cmd))
                         subprocess.run(cmd)
+                        w,h = imgsize(output_file_path)
+                        file['sizes'][size] = {'width': w, 'height': h, 'path': size_path}
 
                 cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
                 print('cmd:', shlex.join(cmd))
                 subprocess.run(cmd)
-
-
 
         files.sort(key=lambda x: x['bearing'])
 
