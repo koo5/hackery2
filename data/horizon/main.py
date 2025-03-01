@@ -110,9 +110,9 @@ def is_pic(file):
 
 def imgsize(file):
     cmd = ['identify', '-format', '%w %h', file]
-    print('imgsize cmd:', shlex.join(cmd))
+    #print('imgsize cmd:', shlex.join(cmd))
     o = subprocess.check_output(cmd).decode('utf-8')
-    print('imgsize o:', o)
+    #print('imgsize o:', o)
     r = [int(x) for x in o.split()]
     print('imgsize r:', r)
     return r
