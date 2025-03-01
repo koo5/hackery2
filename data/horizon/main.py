@@ -170,9 +170,10 @@ class Geo:
             for size in ['full', 50, 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
                 input_path = directory + '/' + file['file']
-                size_path = 'opt/' + str(size) + '/' + file['file']# + '.webp'
+                size_dir = 'opt/' + str(size)
+                size_path = size_dir + '/' + file['file']# + '.webp'
                 output_file_path = directory + '/' + size_path
-                os.makedirs(directory + '/' + str(size), exist_ok=True)
+                os.makedirs(directory + '/' + size_dir, exist_ok=True)
 
                 if os.path.exists(output_file_path):
                     file['sizes'][size] = size_path
