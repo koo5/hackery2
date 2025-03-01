@@ -166,54 +166,61 @@ class Geo:
             file['sizes'] = {}
 
         result = []
+        errors = []
 
         for file in files:
-            result.append(file)
+            try:
+                input_file_path = directory + '/' + file['file']
 
-            input_file_path = directory + '/' + file['file']
+                print()
+                print('file:', file['file'])
+                width, height = imgsize(input_file_path)
+                print('width:', width, 'height:', height)
 
-            print()
-            print('file:', file['file'])
-            width, height = imgsize(input_file_path)
-            print('width:', width, 'height:', height)
+                for size in ['full', 50, 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
-            for size in ['full', 50, 320, 640, 1024, 1600, 2048, 2560, 3072]:
+                    input_path = directory + '/' + file['file']
+                    size_dir = 'opt/' + str(size)
+                    size_path = size_dir + '/' + file['file']# + '.webp'
+                    output_file_path = directory + '/' + size_path
+                    os.makedirs(directory + '/' + size_dir, exist_ok=True)
 
-                input_path = directory + '/' + file['file']
-                size_dir = 'opt/' + str(size)
-                size_path = size_dir + '/' + file['file']# + '.webp'
-                output_file_path = directory + '/' + size_path
-                os.makedirs(directory + '/' + size_dir, exist_ok=True)
+                    exists = os.path.exists(output_file_path)
 
-                exists = os.path.exists(output_file_path)
-
-                if size == 'full':
-                    if not exists:
-                        shutil.copy2(input_file_path, output_file_path)
-                    file['sizes'][size] = {'width': width, 'height': height, 'path': size_path}
-                else:
-                    if size > width:
-                        break
-                    else:
+                    if size == 'full':
                         if not exists:
                             shutil.copy2(input_file_path, output_file_path)
-                            cmd = ['mogrify', '-resize', str(size), output_file_path]
-                            print('cmd:', shlex.join(cmd))
-                            subprocess.run(cmd)
-                        w,h = imgsize(output_file_path)
-                        file['sizes'][size] = {'width': w, 'height': h, 'path': size_path}
+                        file['sizes'][size] = {'width': width, 'height': height, 'path': size_path}
+                    else:
+                        if size > width:
+                            break
+                        else:
+                            if not exists:
+                                shutil.copy2(input_file_path, output_file_path)
+                                cmd = ['mogrify', '-resize', str(size), output_file_path]
+                                print('cmd:', shlex.join(cmd))
+                                subprocess.run(cmd)
+                            w,h = imgsize(output_file_path)
+                            file['sizes'][size] = {'width': w, 'height': h, 'path': size_path}
 
-                if not exists:
-                    cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
-                    print('cmd:', shlex.join(cmd))
-                    subprocess.run(cmd)
-            print('db:', file)
+                    if not exists:
+                        cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
+                        print('cmd:', shlex.join(cmd))
+                        subprocess.run(cmd)
+                print('db:', file)
+            except:
+                errors.append(file)
+                print('error:', file)
 
+            result.append(file)
             result.sort(key=lambda x: x['bearing'])
 
             with open(directory + '/files.json', 'w') as f:
                 json.dump(result, f, indent=4)
 
+            with open(directory + '/errors.json', 'w') as f:
+                json.dump(errors, f, indent=4)
+                
 
 
 if __name__ == "__main__":
