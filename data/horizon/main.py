@@ -178,7 +178,10 @@ class Geo:
                     print('width:', width)
 
                 if size == 'full':
-                    shutil.copy2(input_file_path, output_file_path)
+                    #shutil.copy2(input_file_path, output_file_path)
+                    cmd = ['mogrify', '-format', 'webp', output_file_path]
+                    print('cmd:', shlex.join(cmd))
+                    subprocess.run(cmd)                    
                     file['sizes'][size] = size_path
                 else:
                     if size > width:
