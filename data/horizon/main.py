@@ -185,7 +185,8 @@ class Geo:
                     output_file_path = directory + '/' + size_path
                     os.makedirs(directory + '/' + size_dir, exist_ok=True)
 
-                    exists = os.path.exists(output_file_path)
+                    exists = False
+                    #exists = os.path.exists(output_file_path)
 
                     if size == 'full':
                         if not exists:
@@ -220,7 +221,7 @@ class Geo:
 
             with open(directory + '/errors.json', 'w') as f:
                 json.dump(errors, f, indent=4)
-                
+
 
 
 if __name__ == "__main__":
