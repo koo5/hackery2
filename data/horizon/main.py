@@ -170,9 +170,8 @@ class Geo:
 
             print()
             print('file:', file['file'])
-            # get the width of the image
-            width = None
-            height = None
+            width, height = imgsize(input_file_path)
+            print('width:', width, 'height:', height)
 
             for size in ['full', 50, 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
@@ -182,32 +181,28 @@ class Geo:
                 output_file_path = directory + '/' + size_path
                 os.makedirs(directory + '/' + size_dir, exist_ok=True)
 
-                if os.path.exists(output_file_path):
-                    file['sizes'][size] = size_path
-                    continue
-
-                if width is None:
-                    width, height = imgsize(input_file_path)
-                    print('width:', width, 'height:', height)
+                exists = os.path.exists(output_file_path)
 
                 if size == 'full':
-                    shutil.copy2(input_file_path, output_file_path)
+                    if not exists:
+                        shutil.copy2(input_file_path, output_file_path)
                     file['sizes'][size] = {'width': width, 'height': height, 'path': size_path}
                 else:
                     if size > width:
                         break
                     else:
-                        shutil.copy2(input_file_path, output_file_path)
-                        #cmd = ['mogrify', '-format', 'webp', '-resize', str(size), output_file_path]
-                        cmd = ['mogrify', '-resize', str(size), output_file_path]
-                        print('cmd:', shlex.join(cmd))
-                        subprocess.run(cmd)
+                        if not exists:
+                            shutil.copy2(input_file_path, output_file_path)
+                            cmd = ['mogrify', '-resize', str(size), output_file_path]
+                            print('cmd:', shlex.join(cmd))
+                            subprocess.run(cmd)
                         w,h = imgsize(output_file_path)
                         file['sizes'][size] = {'width': w, 'height': h, 'path': size_path}
 
-                cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
-                print('cmd:', shlex.join(cmd))
-                subprocess.run(cmd)
+                if not exists:
+                    cmd = ['jpegoptim', '--all-progressive', '--overwrite', output_file_path]
+                    print('cmd:', shlex.join(cmd))
+                    subprocess.run(cmd)
             print('db:', file)
 
             result.sort(key=lambda x: x['bearing'])
