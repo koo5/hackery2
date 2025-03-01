@@ -127,13 +127,13 @@ class Geo:
         os.system('fdupes -S -r --delete --noprompt ' + destination_directory)
 
     @staticmethod
-    def index(directory):
+    def index(source_directory, directory):
         """iterate all files and create a json list of files with geo and bearing exif data"""
 
         database = []
-        for file in sorted(os.listdir(directory)):
+        for file in sorted(os.listdir(source_directory)):
             if is_pic(file):
-                filepath = os.path.join(directory, file)
+                filepath = os.path.join(source_directory, file)
                 tags = geo_and_bearing_exif(filepath)
                 if tags:
                     latitude, longitude, bearing, altitude = tags
@@ -155,7 +155,7 @@ class Geo:
 
 
     @staticmethod
-    def optimize(directory, overwrite=False):
+    def optimize(source_directory, directory, overwrite=False):
         """generate different sizes of the images and optimize them"""
 
         f = open(directory + '/files0.json')
@@ -170,7 +170,7 @@ class Geo:
 
         for file in files:
             try:
-                input_file_path = directory + '/' + file['file']
+                input_file_path = source_directory + '/' + file['file']
 
                 print()
                 print('file:', file['file'])
@@ -179,7 +179,6 @@ class Geo:
 
                 for size in ['full', 50, 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
-                    input_path = directory + '/' + file['file']
                     size_dir = 'opt/' + str(size)
                     size_path = size_dir + '/' + file['file']# + '.webp'
                     output_file_path = directory + '/' + size_path
