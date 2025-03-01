@@ -131,7 +131,7 @@ class Geo:
         """iterate all files and create a json list of files with geo and bearing exif data"""
 
         database = []
-        for file in os.listdir(directory):
+        for file in sorted(os.listdir(directory)):
             if is_pic(file):
                 filepath = os.path.join(directory, file)
                 tags = geo_and_bearing_exif(filepath)
