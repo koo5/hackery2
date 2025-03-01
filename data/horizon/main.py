@@ -145,7 +145,7 @@ class Geo:
                     print(f'Skipping non-geo "{file}"')
             else:
                 print(f'Skipping non-pic "{file}"')
-        json_file = os.path.join(directory, 'files.json')
+        json_file = os.path.join(directory, 'files0.json')
         with open(json_file, 'w') as f:
             json.dump(database, f, indent=4)
 
@@ -154,14 +154,18 @@ class Geo:
     def optimize(directory):
         """generate different sizes of the images and optimize them"""
 
-        f = open(directory + '/files.json')
+        f = open(directory + '/files0.json')
         files = json.load(f)
         f.close()
 
         for file in files:
             file['sizes'] = {}
 
+        result = []
+
         for file in files:
+            result.append(file)
+
             input_file_path = directory + '/' + file['file']
 
             print()
@@ -206,10 +210,10 @@ class Geo:
                 subprocess.run(cmd)
             print('db:', file)
 
-            files.sort(key=lambda x: x['bearing'])
+            result.sort(key=lambda x: x['bearing'])
 
             with open(directory + '/files.json', 'w') as f:
-                json.dump(files, f, indent=4)
+                json.dump(result, f, indent=4)
 
 
 
