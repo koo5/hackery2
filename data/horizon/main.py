@@ -160,6 +160,8 @@ class Geo:
 
         for file in files:
             file['sizes'] = {}
+
+        for file in files:
             input_file_path = directory + '/' + file['file']
 
             print()
