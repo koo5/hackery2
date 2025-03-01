@@ -163,9 +163,10 @@ class Geo:
             print('cmd:', shlex.join(cmd))
             width = None
 
-            for size in ['full', 320, 640, 1024, 1600, 2048, 2560, 3072]:
+            for size in ['full', 50, 320, 640, 1024, 1600, 2048, 2560, 3072]:
 
-                size_path = str(size) + '/' + file['file'] + '.webp'
+                input_path = directory + '/' + file['file']
+                size_path = str(size) + '/' + file['file']# + '.webp'
                 output_file_path = directory + '/' + size_path
                 os.makedirs(directory + '/' + str(size), exist_ok=True)
 
@@ -178,8 +179,7 @@ class Geo:
                     print('width:', width)
 
                 if size == 'full':
-                    #shutil.copy2(input_file_path, output_file_path)
-                    cmd = ['mogrify', '-format', 'webp', output_file_path]
+                    shutil.copy2(input_file_path, output_file_path)
                     print('cmd:', shlex.join(cmd))
                     subprocess.run(cmd)                    
                     file['sizes'][size] = size_path
