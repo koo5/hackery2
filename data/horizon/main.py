@@ -204,10 +204,10 @@ class Geo:
                 subprocess.run(cmd)
             print('db:', file)
 
-        files.sort(key=lambda x: x['bearing'])
+            files.sort(key=lambda x: x['bearing'])
 
-        with open(directory + '/files.json', 'w') as f:
-            json.dump(files, f, indent=4)
+            with open(directory + '/files.json', 'w') as f:
+                json.dump(files, f, indent=4)
 
 
 
