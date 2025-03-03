@@ -213,11 +213,13 @@ class Geo:
             result.append(file)
             result.sort(key=lambda x: x['bearing'])
 
-            with open(directory + '/files.json', 'w') as f:
+            with open(directory + '/files1.json', 'w') as f:
                 json.dump(result, f, indent=4)
 
-            with open(directory + '/errors.json', 'w') as f:
+            with open(directory + '/errors1.json', 'w') as f:
                 json.dump(errors, f, indent=4)
+
+        shutil.copy2(directory + '/files1.json', directory + '/files.json')
 
 
 
