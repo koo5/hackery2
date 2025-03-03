@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  fastapi:
+    image: tiangolo/uvicorn-gunicorn-fastapi:python3.9
+    container_name: fastapi_container
+    network_mode: host
+    volumes:
+      - .:/app
+      - ./secrets:/secrets:ro
+    environment:
+      - MAPILLARY_CLIENT_TOKEN_FILE=/secrets/MAPILLARY_CLIENT_TOKEN
+    command: uvicorn api:app --host 0.0.0.0 --port 8089 --reload
+    
