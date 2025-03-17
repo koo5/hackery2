@@ -81,10 +81,13 @@ again with a number"""
 @click.argument('lookie', nargs=1)
 @click.argument('optional_clone_args', nargs=-1)
 def magic(lookie, **kwargs):
-	xx = 'git clone'
-	if lookie.startswith(xx):
-		lookie = lookie[len(xx):]
+	for xx in ['git clone', '$ git clone', '$git clone']:
+		if lookie.startswith(xx):
+			lookie = lookie[len(xx):]
+			break
+
 	lookie.trim()
+
 	try:
 		url = urllib.parse.urlparse(lookie)
 	except:
