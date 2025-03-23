@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-#xrandr --output DP-2 --above DP-0
-xrandr --setmonitor SomeName4 auto DP-1,DP-0
-nohup xfwm4 --replace # disown?
+#xrandr --output DisplayPort-1 --above DisplayPort-0
+xrandr --delmonitor SomeName4
+xrandr --setmonitor SomeName4 auto DisplayPort-1,DisplayPort-0
+cd ~
+#nohup xfwm4 --replace # disown?
+#nohup kwin --replace # disown?
 
