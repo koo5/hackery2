@@ -151,7 +151,7 @@ sudo apt install build-essential zram-config swi-prolog
 
 ### graphical stuff
 ```
-sudo apt install -y arandr terminator geany xfce4-terminal kwrite
+sudo apt install -y arandr terminator xfce4-terminal kwrite
 ```
 
 ### vm stuff
@@ -294,7 +294,7 @@ killall Xorg
 ssh-keygen -t ed25519 -a 100
 cat ~/.ssh/id_ed25519.pub 
 
-sudo apt install -y gitsome aha kdiff 
+sudo apt install -y gitsome aha kdiff3
 
 npm i -g diff-so-fancy
 
