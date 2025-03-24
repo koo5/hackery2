@@ -84,9 +84,11 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	print()
 	print('---done import_noncows---')
 	print()
-	# todo: then there's no need to add_backup_subvols if local==True
-	add_backup_subvols(fss[-1])
-
+	# todo: then there's no need to find_backup_subvols if local==True
+	find_backup_subvols(fss[-1])
+	print()
+	print('---done find_backup_subvols---')
+	print()
 	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local)
 
 
@@ -217,7 +219,7 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
-			print('backup ' + toplevel + ' ' + subvol['name'])
+			print('backup ' + toplevel + '/' + subvol['name'])
 
 			name = subvol['name']
 			source_path = subvol['source_path']
@@ -265,7 +267,7 @@ def rsync_ext4_filesystems_into_backup_folder(fss):
 
 
 def rsync(fss, what, name='root_ext4'):
-	# this path corresponds to the structure expected by add_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
+	# this path corresponds to the structure expected by find_backup_subvols and also created by transfer_btrfs_subvolumes, that is, /mountpoint/backups/hostname/subvol
 	where = f"{fss[-1]['toplevel']}/backups/{hostname}/{name}"
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
@@ -305,7 +307,7 @@ def backup_vps(target_fs, cloud_host):
 	ccs(f'bfg local_commit --SUBVOL={where}')
 
 
-def add_backup_subvols(fs):
+def find_backup_subvols(fs):
 	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is no inherent need to only support a flat structure.
 	# gotta do something like sudo btrfs subvolume list -q -t -R -u -a $fsroot | grep live | grep -v ".bfg_snapshots"
 	# but preferably using bfg's facilities.	
