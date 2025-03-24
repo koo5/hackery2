@@ -86,7 +86,7 @@ def magic(lookie, **kwargs):
 			lookie = lookie[len(xx):]
 			break
 
-	lookie.trim()
+	lookie.strip()
 
 	try:
 		url = urllib.parse.urlparse(lookie)

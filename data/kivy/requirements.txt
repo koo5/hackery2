@@ -1,4 +1,0 @@
-kivy_garden.mapview
-kivy
-av
-

@@ -1,4 +1,0 @@
-influxdb-client
-paho-mqtt
-
-
