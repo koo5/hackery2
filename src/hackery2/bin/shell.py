@@ -6,10 +6,10 @@ import os,subprocess,time,shlex,logging, fire, ptyprocess
 from ptyprocess import PtyProcess
 
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.INFO)
 hhh = logging.StreamHandler()
 log.addHandler(hhh)
-hhh.setFormatter(logging.Formatter("%(asctime)s;%(levelname)s;%(message)s","%Y-%m-%d %H:%M:%S"))
+#hhh.setFormatter(logging.Formatter("%(asctime)s;%(levelname)s;%(message)s","%Y-%m-%d %H:%M:%S"))
 
 
 sq = shlex.quote

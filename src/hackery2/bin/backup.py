@@ -31,8 +31,10 @@ send all snapshots in succession.
 import glob
 import pathlib
 from pathlib import Path
-
 from infra import *
+import logging
+log = logging.getLogger()
+log.setLevel(logging.INFO)
 
 _use_db = True
 
@@ -79,6 +81,9 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 
 	import_noncows(source, hostname, target_fs, fss)
+	print()
+	print('---done import_noncows---')
+	print()
 	# todo: then there's no need to add_backup_subvols if local==True
 	add_backup_subvols(fss[-1])
 
@@ -212,20 +217,20 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
-			print(subvol)
+			print('backup ' + toplevel + ' ' + subvol['name'])
 
 			name = subvol['name']
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 			subvol_path = Path(f"{toplevel}/{source_path}{name}")
-			ccs(f"""date""")
+			#ccs(f"""date""")
 			if local:
 				ccs(f"""bfg --YES=true local_commit --SUBVOL={subvol_path} """)
 			else:
 				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
 				ccs(f"""bfg --YES=true {sshstr2} commit_and_push_and_checkout --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
-			ccs(f"""date""")
+			#ccs(f"""date""")
 			print('', file = sys.stderr)
 		if _use_db:
 			ccs(f"""bfg --YES=true --FS={toplevel} update_db """)
@@ -235,7 +240,7 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
 
 		for subvol in fs['subvols']:
-			print(subvol)
+			log.debug(f'pruning {subvol=}')
 			name = subvol['name']
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
@@ -312,7 +317,7 @@ def add_backup_subvols(fs):
 		return
 	os.chdir(d)
 	for host in glob.glob('*'):
-		print('found ' + host)
+		print('found backup subvol ' + host)
 		os.chdir(fs['toplevel'] + '/backups/' + host)
 		fs['subvols'] += [{'target_dir': host,
 						  'name': name[:-1],
