@@ -78,14 +78,24 @@ again with a number"""
 
 
 @click.command()
-@click.argument('lookie', nargs=1)
-@click.argument('optional_clone_args', nargs=-1)
-def magic(lookie, **kwargs):
-	for xx in ['git clone', '$ git clone', '$git clone']:
-		if lookie.startswith(xx):
-			lookie = lookie[len(xx):]
-			break
+@click.argument('args', nargs=-1)
+def gclur(**kwargs):
 
+	args = list(kwargs.pop('args'))
+	if len(args) > 0 and args[0] == '$':
+		args = args[1:]
+	if len(args) > 0 and args[0] == 'git':
+		args = args[1:]
+	if len(args) > 0 and args[0] == '$git':
+		args = args[1:]
+	if len(args) > 0 and args[0] == 'clone':
+		args = args[1:]
+
+	if len(args) == 0:
+		logger.info("Please provide a search term or a number.")
+		return
+
+	lookie = args.pop(0)
 	lookie.strip()
 
 	try:
@@ -96,7 +106,7 @@ def magic(lookie, **kwargs):
 	logger.info(url)
 
 	if url and url.path and (url.path.startswith('git@') or url.scheme):
-		clone(lookie, **kwargs)
+		clone(lookie, args)
 
 	elif lookie.isdigit():
 		name = num_search(lookie)
@@ -171,4 +181,4 @@ def clone(url, optional_clone_args):
 
 if __name__ == '__main__':
 	logging.basicConfig(level="INFO")
-	magic()
+	gclur()
