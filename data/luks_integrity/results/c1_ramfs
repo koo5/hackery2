@@ -1,0 +1,332 @@
+ sudo ./benchmark-ramfs.sh
+suggested BC: 27193673
+cleanup:
+Device luks_integrity_benchmark1 is not active.
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi        25Gi       158Gi       136Mi       4.1Gi       160Gi
+
+
+
+raw write:
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=27193673 of=/run/luks_integrity_benchmark/ramfs/image.raw
+104907350016 bytes (105 GB, 98 GiB) copied, 16 s, 6.6 GB/s111385284608 bytes (111 GB, 104 GiB) copied, 16.9894 s, 6.6 GB/s
+
+27193673+0 records in
+27193673+0 records out
+111385284608 bytes (111 GB, 104 GiB) copied, 16.9894 s, 6.6 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:45:20 up 5 days, 19:53,  9 users,  load average: 6.37, 13.06, 21.00
+
+
+
+
+raw read:
++ dd if=/run/luks_integrity_benchmark/ramfs/image.raw bs=4096 count=27193673 of=/dev/null
+27193673+0 records in
+27193673+0 records out
+111385284608 bytes (111 GB, 104 GiB) copied, 8.31815 s, 13.4 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:45:30 up 5 days, 19:53,  9 users,  load average: 6.61, 12.90, 20.86
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       129Gi        55Gi       136Mi       107Gi        56Gi
+DM-INTEGRITY
+
+
+
+
+
+
+dm-integrity ...
+Formatted with tag size 4, internal integrity crc32c.
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 00m19s,  102 GiB written, speed   5.3 GiB/s
++ integritysetup open /run/luks_integrity_benchmark/ramfs/image.raw luks_integrity_benchmark1
+
+writing...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark1
+88419065856 bytes (88 GB, 82 GiB) copied, 57 s, 1.6 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 57.4991 s, 1.5 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 67.272 s, 1.3 GB/s
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:46:58 up 5 days, 19:54,  9 users,  load average: 10.04, 12.45, 20.00
+
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark1 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 29.0193 s, 3.1 GB/s
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:47:34 up 5 days, 19:55,  9 users,  load average: 9.25, 11.95, 19.51
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       129Gi        55Gi       136Mi       107Gi        56Gi
+
+
+
+
+
+
+dm-integrity ...
+Formatted with tag size 20, internal integrity sha1.
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 01m03s,   99 GiB written, speed   1.6 GiB/s
++ integritysetup open /run/luks_integrity_benchmark/ramfs/image.raw luks_integrity_benchmark1
+
+writing...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark1
+87907209216 bytes (88 GB, 82 GiB) copied, 64 s, 1.4 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 64.894 s, 1.4 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 75.2569 s, 1.2 GB/s
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:49:59 up 5 days, 19:57,  9 users,  load average: 8.97, 10.71, 17.94
+
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark1 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 29.651 s, 3.0 GB/s
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:50:36 up 5 days, 19:58,  9 users,  load average: 8.78, 10.46, 17.59
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       129Gi        54Gi       154Mi       107Gi        56Gi
+
+
+
+
+
+
+dm-integrity ...
+Formatted with tag size 32, internal integrity sha256.
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 01m04s,   97 GiB written, speed   1.5 GiB/s
++ integritysetup open /run/luks_integrity_benchmark/ramfs/image.raw luks_integrity_benchmark1
+
+writing...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark1
+87872675840 bytes (88 GB, 82 GiB) copied, 61 s, 1.4 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 61.9644 s, 1.4 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 72.9419 s, 1.2 GB/s
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:53:00 up 5 days, 20:00,  9 users,  load average: 9.15, 9.87, 16.32
+
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark1 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 29.9581 s, 3.0 GB/s
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:53:38 up 5 days, 20:01,  9 users,  load average: 8.06, 9.51, 15.96
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       127Gi        57Gi       208Mi       107Gi        59Gi
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       127Gi        57Gi       208Mi       107Gi        59Gi
+LUKS2
+
+
+
+
+
+
+luks2    ...
+
++ cryptsetup --key-file key luksFormat --type luks2 /run/luks_integrity_benchmark/ramfs/image.raw
+writing  ...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark1
+88642478080 bytes (89 GB, 83 GiB) copied, 35 s, 2.5 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 35.219 s, 2.5 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 42.2554 s, 2.1 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:54:37 up 5 days, 20:02,  9 users,  load average: 49.68, 20.49, 19.27
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark1 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 20.9764 s, 4.2 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:55:04 up 5 days, 20:02,  9 users,  load average: 34.64, 19.29, 18.91
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       126Gi        57Gi       207Mi       107Gi        59Gi
+
+
+
+
+
+
+luks2  --integrity hmac-sha1  ...
+
++ cryptsetup --key-file key luksFormat --type luks2 --integrity hmac-sha1 /run/luks_integrity_benchmark/ramfs/image.raw
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 01m13s,  103 GiB written, speed   1.4 GiB/s
+writing  ...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark1
+88227782656 bytes (88 GB, 82 GiB) copied, 61 s, 1.4 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 61.6979 s, 1.4 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 72.3433 s, 1.2 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:57:42 up 5 days, 20:05,  9 users,  load average: 49.64, 27.08, 21.53
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark1 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 40.6447 s, 2.2 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 18:58:28 up 5 days, 20:06,  9 users,  load average: 26.53, 24.10, 20.78
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       127Gi        57Gi       207Mi       107Gi        59Gi
+
+
+
+
+
+
+luks2  --integrity hmac-sha256  ...
+
++ cryptsetup --key-file key luksFormat --type luks2 --integrity hmac-sha256 /run/luks_integrity_benchmark/ramfs/image.raw
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 01m15s,  102 GiB written, speed   1.4 GiB/s
+writing  ...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark1
+88581607424 bytes (89 GB, 82 GiB) copied, 63 s, 1.4 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 63.4317 s, 1.4 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 74.24 s, 1.2 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 19:01:10 up 5 days, 20:08,  9 users,  load average: 57.27, 34.15, 24.72
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark1 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 41.5438 s, 2.1 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 19:01:58 up 5 days, 20:09,  9 users,  load average: 30.82, 30.38, 23.89
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       127Gi        57Gi       207Mi       107Gi        59Gi
+
+
+
+
+
+
+luks2   --cipher=chacha20-random  --integrity=poly1305  ...
+
++ cryptsetup --key-file key luksFormat --type luks2 --cipher=chacha20-random --integrity=poly1305 /run/luks_integrity_benchmark/ramfs/image.raw
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 00m52s,  102 GiB written, speed   2.0 GiB/s
+writing  ...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark1
+87924334592 bytes (88 GB, 82 GiB) copied, 61 s, 1.4 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 61.9226 s, 1.4 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 73.2302 s, 1.2 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 19:04:17 up 5 days, 20:11,  9 users,  load average: 54.42, 36.30, 26.68
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark1 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 32.5439 s, 2.7 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 19:04:56 up 5 days, 20:12,  9 users,  load average: 31.34, 32.61, 25.85
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       127Gi        57Gi       207Mi       107Gi        59Gi
+LUKS INSIDE DM-INTEGRITY
+
+
+
+
+
+
+luks inside dm-integrity ...
+Formatted with tag size 4, internal integrity crc32c.
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 00m18s,  102 GiB written, speed   5.5 GiB/s
++ integritysetup open /run/luks_integrity_benchmark/ramfs/image.raw luks_integrity_benchmark1
+
+formatting with luks2    ...
++ cryptsetup --key-file key luksFormat --type luks2 /dev/mapper/luks_integrity_benchmark1
+writing...
++ dd conv=fsync status=progress if=/dev/zero bs=4096 count=21754938 of=/dev/mapper/luks_integrity_benchmark2
+88927801344 bytes (89 GB, 83 GiB) copied, 82 s, 1.1 GB/s89108226048 bytes (89 GB, 83 GiB) copied, 82.1937 s, 1.1 GB/s
+
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 94.2604 s, 945 MB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 19:07:02 up 5 days, 20:14,  9 users,  load average: 64.18, 46.25, 31.71
+
+reading it back:
++ dd if=/dev/mapper/luks_integrity_benchmark2 bs=4096 count=21754938 of=/dev/null
+21754938+0 records in
+21754938+0 records out
+89108226048 bytes (89 GB, 83 GiB) copied, 38.0741 s, 2.3 GB/s
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 19:07:44 up 5 days, 20:15,  9 users,  load average: 35.95, 41.23, 30.63
+
+
+               total        used        free      shared  buff/cache   available
+Mem:           186Gi       127Gi        56Gi       207Mi       107Gi        58Gi
+
+
+
+
+
+
+luks inside dm-integrity ...
+Formatted with tag size 20, internal integrity sha1.
+Wiping device to initialize integrity checksum.
+You can interrupt this by pressing CTRL+c (rest of not wiped device will contain invalid checksum).
+Finished, time 01m03s,   99 GiB written, speed   1.6 GiB/s
++ integritysetup open /run/luks_integrity_benchmark/ramfs/image.raw luks_integrity_benchmark1
+
+formatting with luks2    ...
++ cryptsetup --key-file key luksFormat --type luks2 /dev/mapper/luks_integrity_benchmark1
+Blkid scan failed for /dev/mapper/luks_integrity_benchmark1.
