@@ -17,7 +17,7 @@ export DD="$DD status=progress "
 
 # sleep
 export SLEEP=sleep
-export UPTIME_DELAY=sleep 1
+export UPTIME_DELAY="sleep 1"
 # sleep 10
 
 # block size that we will write/read
