@@ -25,8 +25,8 @@ export BS=4096
 
 # block count for image file
 export BC=$(python3 -c "import os;print(int(round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') / 3 * 2 / int(os.environ['BS']))))")
+echo "suggested BC: $BC"
 #export BC=20000000
-export  BC=20000000
 
 # how much data should we actually try to read and write, this is better to be lower than the image size
 export BCDATA=$(python3 -c "import os;print(int(round(int(os.environ['BC']) / 5 * 4)))")

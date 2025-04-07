@@ -36,4 +36,10 @@ root@r6 ~# dd if=/dev/disk/by-id/nvme-Apacer_AS2280Q4_2000GB_03F107150D441943236
 ```
 
 
-..
+
+## use for preparing or testing a real device:
+. settings.sh
+sudo DEV=/dev/disk/by-id/usb-Seagate_Expansion_NA8ZJLXY-0:0-part2  KEY=/keyfile1   DD="dd status=progress"  CYP="--cipher=chacha20-random  --integrity=poly1305  --sector-size 4096 "   ./try_cyp.sh
+
+
+

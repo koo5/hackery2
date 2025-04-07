@@ -3,6 +3,9 @@
 echo
 echo
 echo
+echo
+echo
+echo
 echo "dm-integrity ..."
 
 # clean the header

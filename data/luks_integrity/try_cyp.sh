@@ -4,6 +4,9 @@ set -e
 echo
 echo
 echo
+echo
+echo
+echo
 echo "luks2  $CYP  ..."
 
 # clean the header

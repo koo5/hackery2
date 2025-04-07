@@ -28,7 +28,7 @@ $UPTIME
 echo
 free -h | grep -v Swap || true
 
-
+echo "DM-INTEGRITY"
 
 export CYP="--integrity crc32c"
 ./dm-integrity.sh
@@ -44,7 +44,7 @@ export CYP="--integrity sha256"
 echo
 free -h | grep -v Swap || true
 
-
+echo "LUKS2"
 
 export CYP=""
 ./try_cyp.sh
@@ -57,6 +57,9 @@ export CYP="--integrity hmac-sha256"
 
 export CYP=" --cipher=chacha20-random  --integrity=poly1305"
 ./try_cyp.sh
+
+
+echo "LUKS INSIDE DM-INTEGRITY"
 
 
 export CYP=""
