@@ -24,7 +24,7 @@ export UPTIME_DELAY="sleep 1"
 export BS=4096
 
 # block count for image file
-export BC=$(python3 -c "import os;print(int(round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / 3 * 2 / int(os.environ['BS']))))")
+export BC=$(python3 -c "import os;print(int(round(os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') / 3 * 2 / int(os.environ['BS']))))")
 #export BC=20000000
 export  BC=20000000
 
