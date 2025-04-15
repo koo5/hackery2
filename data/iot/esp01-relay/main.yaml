@@ -1,15 +1,17 @@
 
-ota:
-  - platform: esphome
-    password: !secret otapass
+esphome:
+  name: {{ dirbid }}
+  comment: "https://github.com/koo5/hackery2/tree/master/data/iot/"
 
+
+http_request:
+  verify_ssl: false
 
 wifi:
   power_save_mode: none
 
 
   networks:
-  
   - ssid: !secret ssid1
     password: !secret password1
     manual_ip:
@@ -47,25 +49,48 @@ esp8266:
   board: esp01_1m
 
 
-esphome:
-  name: {{ dirbid }}
+script:
+  - id: ota_http
+    parameters:
+      md5: std::string
+    then:
+      - ota.http_request.flash:
+          url: "https://iot.ueueeu.eu:10101/fw/jahody-esp01-relay_61176761817668746546113/firmware.bin"
+          md5: !lambda 'return md5;'
+          #md5: !lambda 'return id(firmware_md5).c_str();'
+
+ota:
+  - platform: esphome
+    password: !secret otapass
+  - platform: http_request
 
 
 mqtt:
   #keepalive: 2s
-  #reboot_timeout: 145min
+  reboot_timeout: 0s
   broker: !secret mqtt_host
   port: !secret mqtt_port
   username: !secret mqtt_user
   password: !secret mqtt_password
 
 
+
+  on_json_message:
+    topic: jahody-esp01-relay/ota
+    then:
+      - script.execute:
+          id: ota_http
+          md5: !lambda |-
+            return x["md5"];
+
+
 sensor:
   - platform: wifi_signal
     name: "wifi"
-    update_interval: 1s
+    update_interval: 60s
   - platform: uptime
     name: Uptime Sensor
+
 
 switch:
   - platform: gpio
@@ -73,6 +98,115 @@ switch:
     id: relay
     pin: GPIO0
     on_turn_on:
-      - delay: 3s
+      - delay: 180s
       - switch.turn_off: relay
+  - platform: restart
+    id: manual_restart
+    name: "Restart"
 
+
+time:
+  - platform: sntp
+    id: ntp
+    #timezone: Europe/Prague
+
+    #debug!
+#    servers:
+#      - rstrtrtart.eu
+
+    on_time_sync:
+      then:
+        - logger.log: "Synchronized clock."
+
+
+number:
+  - platform: template
+    id: hour
+    name: "pump hour"
+    min_value: -1
+    max_value: 23
+    step: 1
+    restore_value: true
+    initial_value: 20
+    optimistic: true
+
+  - platform: template
+    id: last_pump_ts
+    #name: "last_pump_ts"
+    min_value: -1
+    max_value: 3360287004
+    step: 86400
+    restore_value: true
+    initial_value: 0
+    optimistic: true
+
+
+#sun:
+#  latitude: 50.0755°
+#  longitude: 14.4378°
+#
+#  on_sunrise:
+#    - then:
+#        - logger.log: Good morning!
+#  on_sunset:
+#    - then:
+#        - logger.log: Good evening!
+
+
+interval:
+      #debug!
+    - interval: 1h
+#    - interval: 1min
+      then:
+        - logger.log: "Interval 1min"
+        - if:
+            condition:
+              lambda: |-
+                return (id(hour).state == -1);
+            then:
+              - logger.log: "pump is disabled"
+            else:
+              - if:
+                  condition:
+                    #debug!
+#                    lambda: |-
+#                     return (id(ntp).utcnow().minute == id(hour).state);
+                    lambda: |-
+                      return (id(ntp).utcnow().hour == id(hour).state);
+                  then:
+                    - number.set:
+                        id: last_pump_ts
+                        value: !lambda |-
+                          return id(ntp).utcnow().timestamp;
+                    - logger.log: "start pump"
+                    - switch.turn_on: relay
+
+
+text_sensor:
+#  - platform: sun
+#    name: Next Sunrise
+#    type: sunrise
+#  - platform: sun
+#    name: Next Sunset
+#    type: sunset
+  - platform: template
+    name: "Time NTP"
+    lambda: |-
+      char str[30];
+      //if (!id(ntp).now().is_valid()) { return { "----" }; }
+      time_t currTime = id(ntp).now().timestamp;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 60s
+
+  - platform: template
+    id: last_pump_ts_text
+    name: "last_pump_ts_text"
+    lambda: |-
+      char str[30];
+      time_t currTime = id(last_pump_ts).state;
+      strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", localtime(&currTime));
+      //strftime(str, sizeof(str), "%c", localtime(&currTime));
+      return  { str };
+    update_interval: 15s

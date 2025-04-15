@@ -84,8 +84,8 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	print()
 	print('---done import_noncows---')
 	print()
-	# todo: then there's no need to find_backup_subvols if local==True
-	find_backup_subvols(fss[-1])
+	if not local:
+		find_backup_subvols(fss[-1])
 	print()
 	print('---done find_backup_subvols---')
 	print()
@@ -172,7 +172,7 @@ def get_filesystems():
 			},
 			{
 				'toplevel': '/d2',
-				'subvols': m(['u', 'dev3', 'home', '/']),
+				'subvols': m(['u/sync', 'u', 'dev3', 'home', '/']),
 			},
 		]
 
@@ -231,7 +231,7 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 				ccs(f"""bfg --YES=true local_commit --SUBVOL={subvol_path} """)
 			else:
 				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
-				ccs(f"""bfg --YES=true {sshstr2} commit_and_push_and_checkout --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
+				ccs(f"""bfg --YES=true {sshstr2} commit_and_push --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
 			#ccs(f"""date""")
 			print('', file = sys.stderr)
 		if _use_db:
@@ -307,10 +307,24 @@ def backup_vps(target_fs, cloud_host):
 	ccs(f'bfg local_commit --SUBVOL={where}')
 
 
+def parse_snapshot_name(dname):
+	# Typical pattern might be:
+	#   <subvol>_bfg_snapshots_<timestamp>_<tag>
+	#   <subvol>_<timestamp>_<tag>
+	# We'll attempt to capture all via two regex tries:
+
+	m = re.match(r'(.+)_bfg_snapshots_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})_(.*)', dname)
+	if m is None:
+		m = re.match(r'(.+)_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})_(.*)', dname)
+	if m is None:
+		raise Exception(f'could not parse snapshot folder: {dname}')
+	return (
+		{'name': m.group(1),
+		 'dt': datetime.strptime(m.group(2), "%Y-%m-%d_%H-%M-%S"),
+		 'tags': m.group(3)})
+
+
 def find_backup_subvols(fs):
-	# this could be replaced with a recursive search that stops at subvolumes (and yields them). There is no inherent need to only support a flat structure.
-	# gotta do something like sudo btrfs subvolume list -q -t -R -u -a $fsroot | grep live | grep -v ".bfg_snapshots"
-	# but preferably using bfg's facilities.	
 
 	d = fs['toplevel'] + '/backups/'
 	print('looking for backup subvols in ' + d)
@@ -319,14 +333,23 @@ def find_backup_subvols(fs):
 		return
 	os.chdir(d)
 	for host in glob.glob('*'):
-		print('found backup subvol ' + host)
+		print('found backup host ' + host)
 		os.chdir(fs['toplevel'] + '/backups/' + host)
-		fs['subvols'] += [{'target_dir': host,
-						  'name': name[:-1],
-						  'source_path': '/backups/' + host + '/'} for name in
+
+		print('FIXME, this should backup snapshots, not the checked-out subvols.')
+		# it should walk the tree, and for each snapshot as (d / path / .bfg_snapshots / xxx_timestamp_tags),
+		# use parse_snapshot_name and accumulate the most recent snapshot, (represent this as a dict from (toplevel/name) to the full path).
+
+		fs['subvols'] += [
+						{
+							'target_dir': host,
+						  	'name': name[:-1],
+							# source_path is everything between the toplevel and the name
+						  	'source_path': '/backups/' + host + '/'
+							} for name in
 						  glob.glob('*/')]
 
-
+	print('found backup subvols:' + repr(fs['subvols']))
 
 def m(subvols):
 	"""return subvol specifications for a machine's filesystem"""
