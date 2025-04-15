@@ -32,6 +32,7 @@ import glob
 import pathlib
 import re
 import os
+import shlex # Added for splitting command output
 from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
@@ -333,65 +334,69 @@ def find_backup_subvols(fs):
 	Walks the backup directory structure for a given filesystem `fs` to find
 	the latest snapshot for each backed-up subvolume.
 
-	The expected structure is: <toplevel>/backups/<host>/<subvol_name>/.bfg_snapshots/<snapshot_name>
+	Uses `btrfs subvolume list` to find snapshots within the backup structure.
+	The expected path structure relative to the filesystem root is:
+	backups/<host>/<original_subvol_path>/.bfg_snapshots/<snapshot_name>
 	"""
-	backup_root_dir = Path(fs['toplevel']) / 'backups'
-	print(f'Looking for backup snapshots in: {backup_root_dir}')
-	if not backup_root_dir.is_dir():
-		print('No backups folder found.')
+	toplevel = fs['toplevel']
+	print(f'Looking for backup snapshots using btrfs subvolume list on: {toplevel}')
+
+	latest_snapshots = defaultdict(lambda: {'dt': datetime.min, 'path': None, 'rel_path': None})
+
+	try:
+		# Execute the btrfs command
+		cmd = f"sudo btrfs subvolume list -q -t -R -u -a {toplevel}"
+		output = co(shlex.split(cmd))
+	except Exception as e:
+		log.error(f"Failed to execute btrfs command: {cmd}\nError: {e}")
 		return
 
-	latest_snapshots = defaultdict(lambda: {'dt': datetime.min, 'path': None})
+	lines = output.strip().split('\n')
+	if len(lines) <= 2:
+		print("No subvolume information found or only header present.")
+		return
 
-	for root, dirs, files in os.walk(backup_root_dir, topdown=True):
-		root_path = Path(root)
-		if root_path.name == '.bfg_snapshots':
-			# Prune further walking inside .bfg_snapshots
-			dirs[:] = []
+	# Skip header lines (first 2)
+	for line in lines[2:]:
+		try:
+			parts = line.split()
+			if len(parts) < 7:
+				log.warning(f"Skipping malformed line: {line}")
+				continue
 
-			try:
-				# Example root: /bac18/backups/jj/d2_root/.bfg_snapshots
-				# Relative path: jj/d2_root/.bfg_snapshots
-				relative_path = root_path.relative_to(backup_root_dir)
-				# Parts: ('jj', 'd2_root', '.bfg_snapshots')
-				parts = relative_path.parts
-				if len(parts) < 3:
-					log.warning(f"Unexpected path structure found: {root_path}")
-					continue
+			# 7th column (index 6) is the relative path
+			rel_path_str = parts[6]
+			path_parts = Path(rel_path_str).parts
 
-				host = parts[0]
-				# Reconstruct the original subvolume path relative to the host directory
-				# Example: ('jj', 'some', 'nested', 'path', '.bfg_snapshots') -> 'some/nested/path'
-				original_subvol_path_parts = parts[1:-1]
-				original_subvol_rel_path = os.path.join(*original_subvol_path_parts)
+			# Check structure: backups/<host>/.../.bfg_snapshots/<snapshot_name>
+			if len(path_parts) >= 4 and path_parts[0] == 'backups' and path_parts[-2] == '.bfg_snapshots':
+				host = path_parts[1]
+				original_subvol_parts = path_parts[2:-2]
+				original_subvol_rel_path = os.path.join(*original_subvol_parts)
+				snapshot_name = path_parts[-1]
 				key = (host, original_subvol_rel_path)
 
-				# Iterate through potential snapshot directories within .bfg_snapshots
-				for snap_dir_name in os.listdir(root_path):
-					snap_dir_path = root_path / snap_dir_name
-					if snap_dir_path.is_dir():
-						try:
-							parsed = parse_snapshot_name(snap_dir_name)
-							if parsed['dt'] > latest_snapshots[key]['dt']:
-								latest_snapshots[key] = {'dt': parsed['dt'], 'path': snap_dir_path}
-						except Exception as e:
-							log.debug(f"Could not parse potential snapshot name '{snap_dir_name}' in {root_path}: {e}")
+				try:
+					parsed = parse_snapshot_name(snapshot_name)
+					if parsed['dt'] > latest_snapshots[key]['dt']:
+						# Store both relative and absolute path for potential use
+						absolute_path = Path(toplevel) / rel_path_str
+						latest_snapshots[key] = {'dt': parsed['dt'], 'path': absolute_path, 'rel_path': rel_path_str}
+				except Exception as e:
+					log.debug(f"Could not parse potential snapshot name '{snapshot_name}' from path '{rel_path_str}': {e}")
 
-			except ValueError:
-				log.warning(f"Could not determine relative path for: {root_path}")
-			except IndexError:
-				log.warning(f"Unexpected path structure found: {root_path}")
+		except Exception as e:
+			log.warning(f"Error processing line: {line}\nError: {e}")
 
 
 	print('Found latest snapshots:')
 	if latest_snapshots:
 		for (host, subvol_path), data in latest_snapshots.items():
-			print(f"  Host: {host}, Subvol Path: {subvol_path}, Latest: {data['dt']}, Path: {data['path']}")
+			print(f"  Host: {host}, Subvol Path: {subvol_path}, Latest: {data['dt']}, Path: {data['path']} (Rel: {data['rel_path']})")
 	else:
 		print("  No snapshots found.")
 
-	# NOTE: The original code appended findings to fs['subvols'], which drives the backup *source* selection.
-	# This function now only identifies the latest *existing* snapshots in the backup location.
+	# This function identifies the latest *existing* snapshots in the backup location.
 	# The information gathered here (latest_snapshots) is not currently used by the rest of the script
 	# but could be used in the future, e.g., to determine the parent for incremental sends.
 	# Removing the incorrect modification of fs['subvols']:
