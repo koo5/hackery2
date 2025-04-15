@@ -360,9 +360,11 @@ def find_backup_subvols(fs):
 					continue
 
 				host = parts[0]
-				# Handle potential nested subvol paths if necessary in the future
-				original_subvol_name = parts[-2] # The directory containing .bfg_snapshots
-				key = (host, original_subvol_name)
+				# Reconstruct the original subvolume path relative to the host directory
+				# Example: ('jj', 'some', 'nested', 'path', '.bfg_snapshots') -> 'some/nested/path'
+				original_subvol_path_parts = parts[1:-1]
+				original_subvol_rel_path = os.path.join(*original_subvol_path_parts)
+				key = (host, original_subvol_rel_path)
 
 				# Iterate through potential snapshot directories within .bfg_snapshots
 				for snap_dir_name in os.listdir(root_path):
@@ -383,8 +385,8 @@ def find_backup_subvols(fs):
 
 	print('Found latest snapshots:')
 	if latest_snapshots:
-		for (host, subvol), data in latest_snapshots.items():
-			print(f"  Host: {host}, Subvol: {subvol}, Latest: {data['dt']}, Path: {data['path']}")
+		for (host, subvol_path), data in latest_snapshots.items():
+			print(f"  Host: {host}, Subvol Path: {subvol_path}, Latest: {data['dt']}, Path: {data['path']}")
 	else:
 		print("  No snapshots found.")
 
