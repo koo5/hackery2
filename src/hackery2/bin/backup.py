@@ -30,7 +30,11 @@ send all snapshots in succession.
 
 import glob
 import pathlib
+import re
+import os
 from pathlib import Path
+from datetime import datetime
+from collections import defaultdict
 from infra import *
 import logging
 log = logging.getLogger()
@@ -321,35 +325,75 @@ def parse_snapshot_name(dname):
 	return (
 		{'name': m.group(1),
 		 'dt': datetime.strptime(m.group(2), "%Y-%m-%d_%H-%M-%S"),
-		 'tags': m.group(3)})
+		 'tags': m.group(3)}) # type: ignore
 
 
 def find_backup_subvols(fs):
+	"""
+	Walks the backup directory structure for a given filesystem `fs` to find
+	the latest snapshot for each backed-up subvolume.
 
-	d = fs['toplevel'] + '/backups/'
-	print('looking for backup subvols in ' + d)
-	if not Path(d).exists():
-		print('no backups folder')
+	The expected structure is: <toplevel>/backups/<host>/<subvol_name>/.bfg_snapshots/<snapshot_name>
+	"""
+	backup_root_dir = Path(fs['toplevel']) / 'backups'
+	print(f'Looking for backup snapshots in: {backup_root_dir}')
+	if not backup_root_dir.is_dir():
+		print('No backups folder found.')
 		return
-	os.chdir(d)
-	for host in glob.glob('*'):
-		print('found backup host ' + host)
-		os.chdir(fs['toplevel'] + '/backups/' + host)
 
-		print('FIXME, this should backup snapshots, not the checked-out subvols.')
-		# it should walk the tree, and for each snapshot as (d / path / .bfg_snapshots / xxx_timestamp_tags),
-		# use parse_snapshot_name and accumulate the most recent snapshot, (represent this as a dict from (toplevel/name) to the full path).
+	latest_snapshots = defaultdict(lambda: {'dt': datetime.min, 'path': None})
 
-		fs['subvols'] += [
-						{
-							'target_dir': host,
-						  	'name': name[:-1],
-							# source_path is everything between the toplevel and the name
-						  	'source_path': '/backups/' + host + '/'
-							} for name in
-						  glob.glob('*/')]
+	for root, dirs, files in os.walk(backup_root_dir, topdown=True):
+		root_path = Path(root)
+		if root_path.name == '.bfg_snapshots':
+			# Prune further walking inside .bfg_snapshots
+			dirs[:] = []
 
-	print('found backup subvols:' + repr(fs['subvols']))
+			try:
+				# Example root: /bac18/backups/jj/d2_root/.bfg_snapshots
+				# Relative path: jj/d2_root/.bfg_snapshots
+				relative_path = root_path.relative_to(backup_root_dir)
+				# Parts: ('jj', 'd2_root', '.bfg_snapshots')
+				parts = relative_path.parts
+				if len(parts) < 3:
+					log.warning(f"Unexpected path structure found: {root_path}")
+					continue
+
+				host = parts[0]
+				# Handle potential nested subvol paths if necessary in the future
+				original_subvol_name = parts[-2] # The directory containing .bfg_snapshots
+				key = (host, original_subvol_name)
+
+				# Iterate through potential snapshot directories within .bfg_snapshots
+				for snap_dir_name in os.listdir(root_path):
+					snap_dir_path = root_path / snap_dir_name
+					if snap_dir_path.is_dir():
+						try:
+							parsed = parse_snapshot_name(snap_dir_name)
+							if parsed['dt'] > latest_snapshots[key]['dt']:
+								latest_snapshots[key] = {'dt': parsed['dt'], 'path': snap_dir_path}
+						except Exception as e:
+							log.debug(f"Could not parse potential snapshot name '{snap_dir_name}' in {root_path}: {e}")
+
+			except ValueError:
+				log.warning(f"Could not determine relative path for: {root_path}")
+			except IndexError:
+				log.warning(f"Unexpected path structure found: {root_path}")
+
+
+	print('Found latest snapshots:')
+	if latest_snapshots:
+		for (host, subvol), data in latest_snapshots.items():
+			print(f"  Host: {host}, Subvol: {subvol}, Latest: {data['dt']}, Path: {data['path']}")
+	else:
+		print("  No snapshots found.")
+
+	# NOTE: The original code appended findings to fs['subvols'], which drives the backup *source* selection.
+	# This function now only identifies the latest *existing* snapshots in the backup location.
+	# The information gathered here (latest_snapshots) is not currently used by the rest of the script
+	# but could be used in the future, e.g., to determine the parent for incremental sends.
+	# Removing the incorrect modification of fs['subvols']:
+	# fs['subvols'] += [...]
 
 def m(subvols):
 	"""return subvol specifications for a machine's filesystem"""
