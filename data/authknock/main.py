@@ -66,7 +66,7 @@ while(True):
 				break
 
 			for port in [44, 2222, 9192]:
-				cmd = ['sudo', 'ufw', 'allow', 'from', remote_ip, 'to', 'any', 'port', str(port)]
+				cmd = ['sudo', 'ufw', 'allow', 'from', remote_ip, 'to', 'any', 'port', str(port), 'comment', 'authknock']
 				log.info(shlex.join(cmd))
 				subprocess.run(cmd)
 			break

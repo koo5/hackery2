@@ -41,9 +41,11 @@ import logging
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
+
 _use_db = True
 
-def run(source='host', target_machine=None, target_fs=None, local=False):
+
+def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=False):
 
 	default_target_machine = 'r64'
 	default_target_fs='/bac18/'
@@ -63,7 +65,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 
 	if not local:
 		print(f'target_machine = {target_machine}')
-		sshstr, sshstr2 = set_up_target(target_machine)
+		sshstr, sshstr2 = set_up_target(target_machine, QUICK)
 	else:
 		sshstr = ''
 		sshstr2 = ''
@@ -71,21 +73,20 @@ def run(source='host', target_machine=None, target_fs=None, local=False):
 	if not local:
 		check_if_mounted(sshstr, target_fs)
 
+	fss = get_filesystems()
 
 	sync_stuff(hostname)
 
 	# grab whatever info would not be transferred from ext4 partitions
 	#srun('sudo snap save')
-	srun('snap list | sudo tee /root/snap_list')
-	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
 
-	#anything else?
-	#pause firefox? pause some vms?
+	if not QUICK:
+		srun('snap list | sudo tee /root/snap_list')
+		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
+		#anything else?
+		#pause firefox? pause some vms?
+		import_noncows(source, hostname, target_fs, fss)
 
-	fss = get_filesystems()
-
-
-	import_noncows(source, hostname, target_fs, fss)
 	print()
 	print('---done import_noncows---')
 	print()
@@ -116,10 +117,11 @@ def import_noncows(source, hostname, target_fs, fss):
 	rsync_ext4_filesystems_into_backup_folder(fss)
 
 
-def set_up_target(target_machine):
+def set_up_target(target_machine, QUICK):
 
 	if target_machine is None:
-		ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
+		if not QUICK:
+			ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
 		return  '', ''
 
 	insecure_speedups = ''
@@ -349,20 +351,20 @@ def find_backup_subvols(fs):
 		output = co(shlex.split(cmd))
 	except Exception as e:
 		log.error(f"Failed to execute btrfs command: {cmd}\nError: {e}")
-		return
+		sys.exit(1)
 
 	lines = output.strip().split('\n')
 	if len(lines) <= 2:
 		print("No subvolume information found or only header present.")
-		return
+		return []
 
 	# Skip header lines (first 2)
 	for line in lines[2:]:
 		try:
 			parts = line.split()
 			if len(parts) < 7:
-				log.warning(f"Skipping malformed line: {line}")
-				continue
+				log.warning(f"malformed line: {line}")
+				sys.exit(1)
 
 			# 7th column (index 6) is the relative path
 			rel_path_str = parts[6]
@@ -370,14 +372,15 @@ def find_backup_subvols(fs):
 
 			# Check structure: backups/<host>/.../.bfg_snapshots/<snapshot_name>
 			if len(path_parts) >= 4 and path_parts[0] == 'backups' and path_parts[-2] == '.bfg_snapshots':
-				host = path_parts[1]
-				original_subvol_parts = path_parts[2:-2]
+				original_subvol_parts = path_parts[1:]
+				print(f'original_subvol_parts: {original_subvol_parts}')
 				original_subvol_rel_path = os.path.join(*original_subvol_parts)
 				snapshot_name = path_parts[-1]
-				key = (host, original_subvol_rel_path)
 
 				try:
 					parsed = parse_snapshot_name(snapshot_name)
+					name = parsed['name']
+					key = os.path.join(os.path.join(*original_subvol_parts[:-1]), name)
 					if parsed['dt'] > latest_snapshots[key]['dt']:
 						# Store both relative and absolute path for potential use
 						absolute_path = Path(toplevel) / rel_path_str
@@ -391,16 +394,13 @@ def find_backup_subvols(fs):
 
 	print('Found latest snapshots:')
 	if latest_snapshots:
-		for (host, subvol_path), data in latest_snapshots.items():
-			print(f"  Host: {host}, Subvol Path: {subvol_path}, Latest: {data['dt']}, Path: {data['path']} (Rel: {data['rel_path']})")
+		for key, data in latest_snapshots.items():
+			print(f"  Key: {key}, Latest: {data['dt']}, Rel: {data['rel_path']}")
 	else:
 		print("  No snapshots found.")
 
-	# This function identifies the latest *existing* snapshots in the backup location.
-	# The information gathered here (latest_snapshots) is not currently used by the rest of the script
-	# but could be used in the future, e.g., to determine the parent for incremental sends.
-	# Removing the incorrect modification of fs['subvols']:
-	# fs['subvols'] += [...]
+	return []
+
 
 def m(subvols):
 	"""return subvol specifications for a machine's filesystem"""
