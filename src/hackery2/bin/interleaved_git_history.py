@@ -4,6 +4,9 @@
 from datetime import datetime
 from pathlib import Path
 import git
+import click
+import logging
+logger = logging.getLogger()
 
 
 def git_log(directory):
@@ -25,13 +28,18 @@ def get_all_commits():
 	return commits
 
 
-def main():
+@click.command()
+@click.option('--reverse', is_flag=True, help='Sort commits in reverse order')
+def main(reverse):
+	""" main function """
 	commits = get_all_commits()
 	commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
+	if reverse:
+		commits.reverse()
 	for commit in commits:
 		email = commit['email']
 		if True:#email in ['you@example.com', 'kolman.jindrich@gmail.com']:
-			print(f"{commit['timestamp']} {commit['hash'][:6]} | {commit['email']} | {commit['directory']} | {commit['message']}")
+			print(f"{commit['timestamp']} \t {commit['hash'][:6]} .. \t {commit['email']} \t {commit['directory']} \t {commit['message']}")
 		else:
 			print(f".............................................................{commit['email']} {commit['message']} {commit['directory']}")
 
@@ -39,4 +47,5 @@ def main():
 # c: {commit['committer']}
 
 if __name__ == "__main__":
+	logging.basicConfig(level="INFO")
 	main()

@@ -91,7 +91,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=F
 	print('---done import_noncows---')
 	print()
 	if not local:
-		find_backup_subvols(fss[-1])
+		fss[-1]['subvols'].extend(find_backup_subvols(fss[-1]))
 	print()
 	print('---done find_backup_subvols---')
 	print()
@@ -226,9 +226,15 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
-			print('backup ' + toplevel + '/' + subvol['name'])
-
+			if subvol.get('just_push'):
+				if not local:
+					print('PUSH ' + toplevel + '/' + subvol['path'])
+					subvol_path = Path(toplevel)/subvol['path']
+					remote_subvol_path = Path(target_fs)/subvol['path']
+					ccs(f"""bfg --YES=true {sshstr2} push --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
+				continue
 			name = subvol['name']
+			print('BACKUP ' + toplevel + '/' + name)
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
@@ -249,6 +255,9 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
 
 		for subvol in fs['subvols']:
+			if subvol.get('just_push'):
+				# todo pruning
+				continue
 			log.debug(f'pruning {subvol=}')
 			name = subvol['name']
 			source_path = subvol['source_path']
@@ -392,14 +401,19 @@ def find_backup_subvols(fs):
 			log.warning(f"Error processing line: {line}\nError: {e}")
 
 
-	print('Found latest snapshots:')
 	if latest_snapshots:
+		print('Found latest snapshots:')
 		for key, data in latest_snapshots.items():
 			print(f"  Key: {key}, Latest: {data['dt']}, Rel: {data['rel_path']}")
 	else:
 		print("  No snapshots found.")
 
-	return []
+	return [{
+		'just_push': True,
+		'path': data['rel_path']
+	}]
+
+
 
 
 def m(subvols):
