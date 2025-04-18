@@ -30,8 +30,8 @@ def main():
 	commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
 	for commit in commits:
 		email = commit['email']
-		if email in ['you@example.com', 'kolman.jindrich@gmail.com']:
-			print(f"{commit['timestamp']} {commit['hash']} {commit['email']} {commit['message']} {commit['directory']}")
+		if True:#email in ['you@example.com', 'kolman.jindrich@gmail.com']:
+			print(f"{commit['timestamp']} {commit['hash'][:6]} | {commit['email']} | {commit['directory']} | {commit['message']}")
 		else:
 			print(f".............................................................{commit['email']} {commit['message']} {commit['directory']}")
 
