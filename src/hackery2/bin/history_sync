@@ -1,0 +1,10 @@
+#!/usr/bin/fish
+
+set D /d/sync/jj/host/(hostname)
+mkdir -p $D
+
+cp ~/.local/share/fish/fish_history $D
+echo ok
+ 
+
+

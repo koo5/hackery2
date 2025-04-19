@@ -45,7 +45,7 @@ log.setLevel(logging.INFO)
 _use_db = True
 
 
-def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=False):
+def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=False, prune=True):
 
 	default_target_machine = 'r64'
 	default_target_fs='/bac18/'
@@ -95,7 +95,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=F
 	print()
 	print('---done find_backup_subvols---')
 	print()
-	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local)
+	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune)
 
 
 def sync_stuff(hostname):
@@ -222,7 +222,7 @@ def get_filesystems():
 	return fss
 
 
-def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
+def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
@@ -254,20 +254,21 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local):
 
 		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
 
-		for subvol in fs['subvols']:
-			if subvol.get('just_push'):
-				# todo pruning
-				continue
-			log.debug(f'pruning {subvol=}')
-			name = subvol['name']
-			source_path = subvol['source_path']
-			target_dir = subvol['target_dir']
-			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
-			subvol_path = Path(f"{toplevel}/{source_path}{name}")
-			ccs(f"""bfg prune_local --DB={_use_db} --YES=true  --SUBVOL={subvol_path} """)
-			if not local:
-				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
-				ccs(f"""bfg {sshstr2} prune_remote  --YES=true  --LOCAL_SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path}""")
+		if prune:
+			for subvol in fs['subvols']:
+				if subvol.get('just_push'):
+					# todo pruning
+					continue
+				log.debug(f'pruning {subvol=}')
+				name = subvol['name']
+				source_path = subvol['source_path']
+				target_dir = subvol['target_dir']
+				target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
+				subvol_path = Path(f"{toplevel}/{source_path}{name}")
+				ccs(f"""bfg prune_local --DB={_use_db} --YES=true  --SUBVOL={subvol_path} """)
+				if not local:
+					remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
+					ccs(f"""bfg {sshstr2} prune_remote  --YES=true  --LOCAL_SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path}""")
 
 		print('', file = sys.stderr)
 

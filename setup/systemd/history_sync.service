@@ -1,0 +1,18 @@
+[Unit]
+Description="history_sync"
+StartLimitIntervalSec=60
+StartLimitBurst=40
+
+[Service]
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/koom/hackery2/src/hackery2/bin/history_sync
+Restart=on-failure
+RestartSec=10
+User=koom
+Type=simple
+
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true

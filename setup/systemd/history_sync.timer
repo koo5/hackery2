@@ -1,0 +1,11 @@
+[Unit]
+Description="history_sync"
+
+[Timer]
+AccuracySec=5s
+OnBootSec=10
+OnUnitActiveSec=15
+Unit=history_sync.service
+
+[Install]
+WantedBy=multi-user.target
