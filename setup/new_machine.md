@@ -445,6 +445,7 @@ git config --global push.default current
 git config --global push.autoSetupRemote true
 
 pipx install llm
+llm keys set openai
 
 
 ```
