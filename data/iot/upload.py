@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+
+#  sudo apt install python3-typer
+
+
+
 import json
 import os
 import pathlib
@@ -9,6 +15,9 @@ import sys
 #import fire
 import typer
 import jinja2
+
+
+
 
 
 # @click.command()
@@ -22,7 +31,7 @@ import jinja2
 app = typer.Typer()
 
 @app.command()
-def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
+def run(dir: pathlib.Path, bid=0, cmd='run', device='', podman='docker'):
 
 	# where to upload
 
@@ -40,8 +49,8 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 		device = f'--device {device}'
 
 
-	os.system('podman volume create esphome_cache')
-	os.system('podman volume create esphome_build')
+	os.system(f'{podman} volume create esphome_cache')
+	os.system(f'{podman} volume create esphome_build')
 
 	# what to upload
 
@@ -51,7 +60,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 
 	inst = pathlib.Path(bid)
 	instdir = pathlib.Path('inst') / name / inst
-	build = json.loads(subprocess.check_output(shlex.split('podman volume inspect esphome_build')))[0]['Mountpoint']
+	build = json.loads(subprocess.check_output(shlex.split(f'{podman} volume inspect esphome_build')))[0]['Mountpoint']
 	instpath = build / instdir
 	os.makedirs(instpath, exist_ok=True)
 
@@ -91,7 +100,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 		subprocess.call(['cp', other_file, out])
 
 	# upload
-	cmd = f"podman run --rm --network host -v /var/run/dbus:/var/run/dbus -v esphome_cache:/cache -v esphome_build:/config {usb} --security-opt label=type:unconfined_t --privileged -it ghcr.io/esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
+	cmd = f"{podman} run --rm --network host -v /var/run/dbus:/var/run/dbus -v esphome_cache:/cache -v esphome_build:/config {usb} --security-opt label=type:unconfined_t --privileged -it ghcr.io/esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
 	print(cmd)
 	os.system(f'{cmd}')
 	

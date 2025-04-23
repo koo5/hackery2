@@ -9,22 +9,24 @@ import logging
 logger = logging.getLogger()
 
 
-def git_log(directory):
-	""" get git log of a directory """
-	repo = git.Repo(directory)
-	commits = []
-	for commit in repo.iter_commits():
-		commits.append({'hash': commit.hexsha, 'timestamp': datetime.fromtimestamp(commit.committed_date), 'committer': commit.committer.name, 'email': commit.committer.email, 'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
-			'directory': directory})
-	return commits
+def git_log(repo):
+	for branch in repo.branches:
+		logger.info(f"Branch: {branch.name}")
+		for commit in repo.iter_commits(branch):
+			yield {'hash': commit.hexsha, 'timestamp': datetime.fromtimestamp(commit.committed_date), 'committer': commit.committer.name, 'email': commit.committer.email, 'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
+				'directory': repo.working_tree_dir, 'branch': branch.name}
 
 
 def get_all_commits():
 	""" get all commits from current directory and subdirectories """
 	commits = []
-	directories = [Path('.')] + [d for d in Path('.').iterdir() if d.is_dir() and (d / '.git').exists()]
-	for directory in directories:
-		commits.extend(git_log(directory))
+	root = git.Repo('.')
+	repos = [root] + [x.module() for x in root.iter_submodules()]
+	for repo in repos:
+		commits.extend(git_log(repo))
+	# drop duplicates
+	commits = list({commit['hash']: commit for commit in commits}.values())
+	commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
 	return commits
 
 
@@ -33,13 +35,12 @@ def get_all_commits():
 def main(reverse):
 	""" main function """
 	commits = get_all_commits()
-	commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
 	if reverse:
 		commits.reverse()
 	for commit in commits:
 		email = commit['email']
 		if True:#email in ['you@example.com', 'kolman.jindrich@gmail.com']:
-			print(f"{commit['timestamp']} \t {commit['hash'][:6]} .. \t {commit['email']} \t {commit['directory']} \t {commit['message']}")
+			print(f"{commit['timestamp']} \t {commit['hash'][:8]} \t {commit['email']} \t{commit['branch']} \t {commit['directory']} \t {commit['message']}")
 		else:
 			print(f".............................................................{commit['email']} {commit['message']} {commit['directory']}")
 
