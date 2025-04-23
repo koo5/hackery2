@@ -10,11 +10,30 @@ logger = logging.getLogger()
 
 
 def git_log(repo):
+	logger.info(f"Repo: {repo.working_tree_dir}")
+
+	# for head in repo.heads:
+	# 	logger.info(f"Head: {head.name}")
+
+	logger.info("Branches:")
 	for branch in repo.branches:
 		logger.info(f"Branch: {branch.name}")
-		for commit in repo.iter_commits(branch):
-			yield {'hash': commit.hexsha, 'timestamp': datetime.fromtimestamp(commit.committed_date), 'committer': commit.committer.name, 'email': commit.committer.email, 'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
-				'directory': repo.working_tree_dir, 'branch': branch.name}
+		yield from commits(repo, branch)
+
+	logger.info("Remote branches:")
+	for remote in repo.remotes:
+		for branch in remote.refs:
+			logger.info(f"Remote: {branch.name}")
+			yield from commits(repo, branch)
+
+			# for commit in repo.iter_commits(remotes='*'):
+			# 	logger.info(f"Commit: {commit.hexsha}")
+
+
+def commits(repo, branch):
+	for commit in repo.iter_commits(branch):
+		yield {'hash': commit.hexsha, 'timestamp': datetime.fromtimestamp(commit.committed_date), 'committer': commit.committer.name, 'email': commit.committer.email, 'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
+					'directory': repo.working_tree_dir, 'branch': branch.name}
 
 
 def get_all_commits():
