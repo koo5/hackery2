@@ -2,8 +2,10 @@
 
 substitutions:
   name: $name
+
 ota:
-  password: !secret otapass
+  - platform: esphome
+    password: !secret otapass
 
 
 wifi:
@@ -22,22 +24,22 @@ wifi:
       subnet: 255.255.255.0
       dns1: !secret gateway1
       dns2: 8.8.8.8
-
-  - ssid: !secret ssid2
-    password: !secret password2
-    manual_ip:
-      static_ip: !secret ip2
-      gateway: !secret gateway2
-      subnet: 255.255.255.0
-      dns1: !secret gateway2
-      dns2: 8.8.8.8
+#
+#  - ssid: !secret ssid2
+#    password: !secret password2
+#    manual_ip:
+#      static_ip: !secret ip2
+#      gateway: !secret gateway2
+#      subnet: 255.255.255.0
+#      dns1: !secret gateway2
+#      dns2: 8.8.8.8
 
   use_address: "wolviol.local"
-#  use_address: "10.0.0.48"
+  #use_address: "10.0.0.46"
 
 
-#network:
-#  enable_ipv6: true
+network:
+  enable_ipv6: true
 
 
 logger:
@@ -57,7 +59,7 @@ esphome:
   name: $name
   on_boot:
     then:
-      - logger.log: 'boOoOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOooOoOooOOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
+      - logger.log: 'boOoOot'
 
 
 

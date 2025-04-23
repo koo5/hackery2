@@ -91,7 +91,7 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device=''):
 		subprocess.call(['cp', other_file, out])
 
 	# upload
-	cmd = f"podman run --rm --network host -v /var/run/dbus:/var/run/dbus -v esphome_cache:/cache -v esphome_build:/config {usb} -it ghcr.io/esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
+	cmd = f"podman run --rm --network host -v /var/run/dbus:/var/run/dbus -v esphome_cache:/cache -v esphome_build:/config {usb} --security-opt label=type:unconfined_t --privileged -it ghcr.io/esphome/esphome -s name {name} {cmd} /config/{instdir}/main.yaml {device}"
 	print(cmd)
 	os.system(f'{cmd}')
 	

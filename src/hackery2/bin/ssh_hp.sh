@@ -1,4 +1,4 @@
 #!/usr/bin/env fish
-ssh 192.168.8.8 -t "tmux $argv"
+ssh hp.internal -t "tmux $argv"
 echo end
 cat
