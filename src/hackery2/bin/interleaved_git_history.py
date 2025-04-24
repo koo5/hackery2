@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-""" print interleaved git history of current directory and subdirectories """
+""" print CSV of interleaved git history of current repo and submodules """
 from datetime import datetime
 from pathlib import Path
 import git
@@ -11,9 +11,6 @@ logger = logging.getLogger()
 
 def git_log(commits, repo):
 	logger.info(f"Repo: {repo.working_tree_dir}")
-
-	# for head in repo.heads:
-	# 	logger.info(f"Head: {head.name}")
 
 	logger.info("Branches:")
 	for branch in repo.branches:
