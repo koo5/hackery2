@@ -26,9 +26,6 @@ def git_log(commits, repo):
 			logger.info(f"Remote: {branch.name}")
 			get_commits(commits, repo, branch)
 
-			# for commit in repo.iter_commits(remotes='*'):
-			# 	logger.info(f"Commit: {commit.hexsha}")
-
 
 def get_commits(commits, repo, branch):
 	for commit in repo.iter_commits(branch):
