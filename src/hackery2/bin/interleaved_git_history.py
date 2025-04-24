@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger()
 
 
-def git_log(repo):
+def git_log(commits, repo):
 	logger.info(f"Repo: {repo.working_tree_dir}")
 
 	# for head in repo.heads:
@@ -18,33 +18,45 @@ def git_log(repo):
 	logger.info("Branches:")
 	for branch in repo.branches:
 		logger.info(f"Branch: {branch.name}")
-		yield from commits(repo, branch)
+		get_commits(commits, repo, branch)
 
 	logger.info("Remote branches:")
 	for remote in repo.remotes:
 		for branch in remote.refs:
 			logger.info(f"Remote: {branch.name}")
-			yield from commits(repo, branch)
+			get_commits(commits, repo, branch)
 
 			# for commit in repo.iter_commits(remotes='*'):
 			# 	logger.info(f"Commit: {commit.hexsha}")
 
 
-def commits(repo, branch):
+def get_commits(commits, repo, branch):
 	for commit in repo.iter_commits(branch):
-		yield {'hash': commit.hexsha, 'timestamp': datetime.fromtimestamp(commit.committed_date), 'committer': commit.committer.name, 'email': commit.committer.email, 'message': commit.message.split('\n')[0],  # Only take the first line of the commit message
-					'directory': repo.working_tree_dir, 'branch': branch.name}
+		if commit.hexsha in commits:
+			commits[commit.hexsha]['branches'].add(branch.name)
+		else:
+			commits[commit.hexsha] = {
+				'branches': set([branch.name]),
+				'hash': commit.hexsha,
+				'timestamp': datetime.fromtimestamp(commit.committed_date),
+				'committer': commit.committer.name,
+				'author': commit.author.name,
+				'email': commit.author.email,
+				'message': commit.message.strip().replace('\n\n', ' | ').replace('\n\r', ' | ').replace('\r\n', ' | ').replace('\n', ' | ').replace('\r', ' | ').replace('\t', ' '),
+				'directory': Path(repo.working_dir).relative_to(Path('.').absolute()),
+				'branch': branch.name
+			}
 
 
 def get_all_commits():
 	""" get all commits from current directory and subdirectories """
-	commits = []
+	commits = {}
 	root = git.Repo('.')
 	repos = [root] + [x.module() for x in root.iter_submodules()]
 	for repo in repos:
-		commits.extend(git_log(repo))
+		git_log(commits, repo)
 	# drop duplicates
-	commits = list({commit['hash']: commit for commit in commits}.values())
+	commits = list(commits.values())
 	commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
 	return commits
 
@@ -59,12 +71,44 @@ def main(reverse):
 	for commit in commits:
 		email = commit['email']
 		if True:#email in ['you@example.com', 'kolman.jindrich@gmail.com']:
-			print(f"{commit['timestamp']} \t {commit['hash'][:8]} \t {commit['email']} \t{commit['branch']} \t {commit['directory']} \t {commit['message']}")
+			print(f"{commit['hash'][:8]} ..\t{commit['timestamp']} \t {shorten(commit['email'])} \t{branches_presentation(commit['branches'])} \t {commit['directory']} \t {commit['message']}")
 		else:
 			print(f".............................................................{commit['email']} {commit['message']} {commit['directory']}")
 
 
 # c: {commit['committer']}
+
+def branches_presentation(branches):
+	""" get branches presentation """
+
+	branches2 = []
+	for branch in list(branches):
+		parts = branch.split('/')
+		if len(parts) > 1:
+			branches2.append(parts[1])
+		else:
+			branches2.append(branch)
+	branches2 = list(set(branches2))
+
+	if len(branches2) > 1:
+		if 'HEAD' in branches2:
+			branches2.remove('HEAD')
+
+	branches2.sort(key=branch_sort_key)
+	return shorten(', '.join(list(map(shorten, branches2))[:3]), 30)
+
+def shorten(branch, l=20):
+	if len(branch) > l:
+		return branch[:l] + '..'
+	return branch
+
+def branch_sort_key(branch):
+	if branch == 'HEAD':
+		return (5, branch)
+	if branch in ['master', 'main']:
+		return (0, branch)
+	return (1, branch)
+
 
 if __name__ == "__main__":
 	logging.basicConfig(level="INFO")
