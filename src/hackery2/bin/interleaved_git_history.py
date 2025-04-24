@@ -43,7 +43,6 @@ def get_commits(commits, repo, branch):
 
 
 def get_all_commits():
-	""" get all commits from current directory and subdirectories """
 	commits = {}
 	root = git.Repo('.')
 	repos = [root] + [x.module() for x in root.iter_submodules()]
@@ -58,7 +57,6 @@ def get_all_commits():
 @click.command()
 @click.option('--reverse', is_flag=True, help='Sort commits in reverse order')
 def main(reverse):
-	""" main function """
 	commits = get_all_commits()
 	if reverse:
 		commits.reverse()
