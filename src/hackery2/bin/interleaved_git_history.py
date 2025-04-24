@@ -62,17 +62,10 @@ def main(reverse):
 		commits.reverse()
 	for commit in commits:
 		email = commit['email']
-		if True:#email in ['you@example.com', 'kolman.jindrich@gmail.com']:
-			print(f"{commit['hash'][:8]} ..\t{commit['timestamp']} \t {shorten(commit['email'])} \t{branches_presentation(commit['branches'])} \t {commit['directory']} \t {commit['message']}")
-		else:
-			print(f".............................................................{commit['email']} {commit['message']} {commit['directory']}")
+		print(f"{commit['hash'][:8]} ..\t{commit['timestamp']} \t {shorten(commit['email'])} \t{branches_presentation(commit['branches'])} \t {commit['directory']} \t {commit['message']}")
 
-
-# c: {commit['committer']}
 
 def branches_presentation(branches):
-	""" get branches presentation """
-
 	branches2 = []
 	for branch in list(branches):
 		parts = branch.split('/')
