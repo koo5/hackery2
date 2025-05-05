@@ -45,7 +45,10 @@ def get_commits(commits, repo, branch):
 def get_all_commits():
 	commits = {}
 	root = git.Repo('.')
-	repos = [root] + [x.module() for x in root.iter_submodules()]
+	repos = [root]
+	for x in root.iter_submodules():
+		if x.module_exists():
+			repos.append(git.Repo(x.path))
 	for repo in repos:
 		git_log(commits, repo)
 	# drop duplicates

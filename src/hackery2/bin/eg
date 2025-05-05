@@ -1,25 +1,54 @@
-#!/usr/bin/fish
+#!/usr/bin/env python3
 
-set cmd (string join ' ' $argv)
+import os
+import sys
+import subprocess
+import shlex
 
-#echo "do" $cmd "in all subdirectories"
 
-for dir in */
+def main():
+	# Ensure a command is provided
+	if len(sys.argv) < 2:
+		print(f'Usage: {sys.argv[0]} <command> [args...]', file=sys.stderr)
+		sys.exit(1)
 
-	#echo "in" $dir
+	# Join all arguments into a single command string
+	cmd_str = ' '.join(sys.argv[1:])
+	print(f'command: {cmd_str}')
 
-    if test -e "$dir/.git"
-        cd "$dir"
-        pwd
-		fish -c "$cmd"
-        if test $status -eq 0
-            echo "ok"
-        else
-            echo "failed"
-        end
-        echo
-        echo =========================================================================
-        echo
-        cd ..
-    end
-end
+	# List immediate subdirectories
+	dirs = [d for d in os.listdir('.') if os.path.isdir(d)]
+	dirs.sort()
+
+	# Directories containing 'common' go first
+	common_dirs = [d for d in dirs if 'common' in d]
+	other_dirs = [d for d in dirs if 'common' not in d]
+	ordered_dirs = common_dirs + other_dirs
+
+#	print('Directories:')
+#	for d in ordered_dirs:
+#		print(f'  {d}')
+
+	for d in ordered_dirs:
+		git_dir = os.path.join(d, '.git')
+		if os.path.exists(git_dir):
+			print(f'Entering {d}')
+			os.chdir(d)
+			# Print current directory
+			print(os.getcwd())
+			# Execute the command
+			result = subprocess.run('fish -c ' + shlex.quote(cmd_str), shell=True)
+			if result.returncode == 0:
+				print('ok')
+			else:
+				print('failed')
+			print()  # blank line
+			print('=' * 72)
+			print()  # blank line
+			# Return to parent directory
+			os.chdir('..')
+#		else:
+#			print(f'Skipping {d} (no .git directory)')
+
+if __name__ == '__main__':
+	main()
