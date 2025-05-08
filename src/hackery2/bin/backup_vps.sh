@@ -7,6 +7,7 @@ set DSTDIR $argv[2]
 
 mkdir -p $DSTDIR; e
 sleep 5; e
+echo start
 
 rsync -av --progress -h -e hpnssh -r $argv[3] \
   --exclude 'dont_backup'  \
