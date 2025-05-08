@@ -5,13 +5,16 @@ function e; or status --is-interactive; or exit 1; end
 set MACHINE $argv[1]
 set DSTDIR $argv[2]
 
-mkdir -p $DSTDIR; e
-sleep 5; e
+sudo mkdir -p $DSTDIR; e
+sudo chown -R koom:koom $DSTDIR; e
+echo sleep
+sleep 1; e
 echo start
 
 rsync -av --progress -h -e hpnssh -r $argv[3] \
   --exclude 'dont_backup'  \
   --exclude 'venv' \
+  --exclude '.venv' \
   --exclude '.cache'  \
   --exclude '__pycache__'  \
   --exclude '.npm'  \
@@ -40,6 +43,7 @@ rsync -av --progress -h -e hpnssh -r $argv[3] \
   --exclude '/home/*/iot2/html/'  \
   --exclude '/home/*/.config/syncthing'  \
   --exclude '/home/*/.bun/'  \
+  --exclude '/home/*/.local/share/Steam/steamapps/' \
   --include '/home/***'   \
   --exclude '*'  \
   root@$MACHINE:// $DSTDIR/

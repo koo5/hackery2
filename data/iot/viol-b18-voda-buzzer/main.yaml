@@ -148,7 +148,7 @@ sensor:
 
 one_wire:
   - platform: gpio
-    pin: 39
+    pin: 3
 
 
 
