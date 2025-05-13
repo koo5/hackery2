@@ -32,19 +32,19 @@ def main():
 	for d in ordered_dirs:
 		git_dir = os.path.join(d, '.git')
 		if os.path.exists(git_dir):
+			print()  # blank line
 			print(f'Entering {d}')
+			print('=' * 72)
 			os.chdir(d)
 			# Print current directory
 			print(os.getcwd())
 			# Execute the command
-			result = subprocess.run('fish -c ' + shlex.quote(cmd_str), shell=True)
+			result = subprocess.run('fish -c ' + shlex.quote(cmd_str), shell=True, stderr=subprocess.STDOUT)
 			if result.returncode == 0:
 				print('ok')
 			else:
 				print('failed')
-			print()  # blank line
-			print('=' * 72)
-			print()  # blank line
+#			print()  # blank line
 			# Return to parent directory
 			os.chdir('..')
 #		else:
