@@ -7,3 +7,21 @@ __pycache__
 .aider*
 **/node_modules
 **/.#*
+
+# Python packaging
+*.egg-info/
+*.egg
+dist/
+build/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/

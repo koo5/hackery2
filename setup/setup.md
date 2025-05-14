@@ -25,7 +25,7 @@ fish
 ## basics0.1
 
 ```
-sudo apt install net-tools apt-config-auto-update unattended-upgrades apt-listchanges mailutils powermgmt-base
+sudo apt install net-tools apt-config-auto-update unattended-upgrades apt-listchanges mailutils powermgmt-base toilet
 ```
 
 ```
