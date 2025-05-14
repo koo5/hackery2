@@ -113,7 +113,7 @@ def gclur(**kwargs):
 		if name == None:
 			logger.info( "wat")
 		else:
-			clone("https://github.com/"+name+".git", **kwargs)
+			clone("https://github.com/"+name+".git", args)
 	
 	else:
 		res = name_search(lookie)
@@ -130,9 +130,9 @@ def gclur(**kwargs):
 					logger.info ("...")
 			try:
 				logger.info ("Cloning " + res[0][1] + "...")
-				clone("https://github.com/"+res[0][1]+".git", **kwargs)
+				clone("https://github.com/"+res[0][1]+".git", args)
 			except Exception as e:
-				logger.info ("An error occured:", e)
+				logger.info ("An error occured: %s", e)
 
 		#save it for later
 		o = open(last_search, "w")
@@ -140,7 +140,7 @@ def gclur(**kwargs):
 		o.close()
 
 
-def clone(url, optional_clone_args):
+def clone(url, optional_clone_args=[]):
 
 	url_parsed = urllib.parse.urlparse(url)
 	logger.info(str(url_parsed))
