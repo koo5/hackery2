@@ -1,0 +1,15 @@
+#!/usr/bin/env fish
+
+ # Get the list of run IDs, skipping the header and keeping only the IDs
+ set run_ids (gh run list --limit 100 --json databaseId --jq '.[].databaseId')
+
+ # Convert the list to an array
+ set run_ids_array (string split ' ' $run_ids)
+
+ # Get the number of runs
+ set num_runs (count $run_ids_array)
+
+ # Loop through the run IDs, skipping the most recent one
+ for i in (seq 2 $num_runs)
+     gh run delete $run_ids_array[$i]
+ end
