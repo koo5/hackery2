@@ -5,8 +5,8 @@ import glob
 import re
 
 def get_python_scripts():
-    """Get all Python scripts from src/hackery2/bin directory"""
-    return glob.glob('src/hackery2/bin/*.py')
+    """Get all Python scripts from src/hackery2/lib directory"""
+    return glob.glob('src/hackery2/lib/*.py')
 
 def create_console_scripts():
     """Create console_scripts entries for bin scripts based on their structure"""
@@ -24,7 +24,7 @@ def create_console_scripts():
         
         # Use original script name as command name
         console_scripts.append(
-            f"{script_name}=hackery2.bin.script_wrapper:{function_name}"
+            f"{script_name}=hackery2.lib.script_wrapper:{function_name}"
         )
     
     return console_scripts
