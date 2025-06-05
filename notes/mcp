@@ -1,0 +1,2 @@
+  claude mcp add playwright -s user -- npx @playwright/mcp@latest
+

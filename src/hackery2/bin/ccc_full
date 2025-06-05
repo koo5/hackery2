@@ -1,0 +1,76 @@
+#!/bin/env fish
+
+set prompt $argv
+if test -z "$prompt"
+	set prompt --model o3-mini 'Write a commit message for the following git changes. You are provided with:
+1. The git diff showing what changed
+2. The full content of all affected files for context
+
+Analyze the changes in context and write a clear, descriptive commit message. 
+- Start with a concise summary line (max 50 chars if possible)
+- Optionally add a blank line followed by more detailed explanation
+- Focus on WHY the changes were made, not just WHAT changed
+- Be concise for minor changes (typos, formatting, etc)
+- Group related changes together
+- Mention each significant area of work on a separate line
+
+Answer with ONLY the commit message, no additional commentary.'
+end
+
+if git --no-pager diff --exit-code HEAD
+	# No changes to commit
+	exit
+else
+	echo
+	printf 'Analyzing changes with full file context...\n\n'
+
+	# Create a temporary file to store all the information
+	set context_file (mktemp /tmp/commit_context.XXXXXX)
+	
+	# Get list of changed files
+	set changed_files (git diff --name-only HEAD)
+	
+	# Add summary
+	echo "SUMMARY OF CHANGES:" >> $context_file
+	echo "Modified files: "(count $changed_files) >> $context_file
+	for file in $changed_files
+		echo "  - $file" >> $context_file
+	end
+	echo "" >> $context_file
+	
+	# Add the diff
+	echo "==== DETAILED DIFF ====" >> $context_file
+	git diff HEAD >> $context_file
+	echo "" >> $context_file
+	
+	# Add full content of each changed file with better formatting
+	echo "==== FULL FILE CONTENTS FOR CONTEXT ====" >> $context_file
+	for file in $changed_files
+		if test -f $file
+			echo "" >> $context_file
+			echo "┌─────────────────────────────────────────" >> $context_file
+			echo "│ File: $file" >> $context_file
+			echo "│ Size: "(wc -l < $file)" lines" >> $context_file
+			echo "└─────────────────────────────────────────" >> $context_file
+			echo "" >> $context_file
+			cat -n $file >> $context_file
+			echo "" >> $context_file
+		end
+	end
+	
+	# Stream llm output word-by-word, capturing simultaneously
+	set F (mktemp /tmp/commit_msg.XXXXXX)
+	cat $context_file | llm prompt $prompt | dd bs=1 status=none | tee $F
+	or exit 1
+	set commit_message (cat $F | string collect)
+	
+	# Clean up temp files
+	rm -f $context_file $F
+
+	# get the diff again and prepend each line with a #
+	set diff_with_comments (git diff HEAD | sed 's/^/# /' | string collect)
+
+	# run git commit with the commit message and diff
+	gcam (printf "%s\n\n%s" "$commit_message" "$diff_with_comments" | string collect)  -e
+	and gp
+end
