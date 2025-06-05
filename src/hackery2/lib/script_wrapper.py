@@ -21,7 +21,7 @@ def _make_runner(script_name):
     Returns:
         A function that will run the script
     """
-    module_name = f"hackery2.bin.{script_name}"
+    module_name = f"hackery2.lib.{script_name}"
     
     def wrapper():
         # Import the module
