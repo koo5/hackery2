@@ -6,6 +6,7 @@ from pathlib import Path
 import git
 import click
 import logging
+import os
 logger = logging.getLogger()
 
 
@@ -37,7 +38,7 @@ def get_commits(commits, repo, branch):
 				'author': commit.author.name,
 				'email': commit.author.email,
 				'message': commit.message.strip().replace('\n\n', ' | ').replace('\n\r', ' | ').replace('\r\n', ' | ').replace('\n', ' | ').replace('\r', ' | ').replace('\t', ' '),
-				'directory': Path(repo.working_dir).relative_to(Path('.').absolute()),
+				'directory': _get_relative_path(repo),
 				'branch': branch.name
 			}
 
@@ -45,16 +46,50 @@ def get_commits(commits, repo, branch):
 def get_all_commits():
 	commits = {}
 	root = git.Repo('.')
-	repos = [root]
-	for x in root.iter_submodules():
-		if x.module_exists():
-			repos.append(git.Repo(x.path))
+	repos = []
+	_collect_repos_recursively(root, repos)
 	for repo in repos:
 		git_log(commits, repo)
 	# drop duplicates
 	commits = list(commits.values())
 	commits.sort(key=lambda x: x['timestamp'])  # sort by commit time
 	return commits
+
+
+def _get_relative_path(repo):
+	"""Get the relative path of a repository from the root working directory."""
+	try:
+		root_path = Path('.').absolute()
+		repo_path = Path(repo.working_tree_dir).absolute()
+		return repo_path.relative_to(root_path)
+	except ValueError:
+		# If the repo is not under the current directory, return absolute path
+		return repo_path
+
+
+def _collect_repos_recursively(repo, repos_list):
+	"""Recursively collect all repositories including nested submodules."""
+	repos_list.append(repo)
+	logger.info(f"Collecting commits from: {repo.working_tree_dir}")
+	
+	try:
+		# Use iter_submodules with recurse=False to handle each level separately
+		for submodule in repo.iter_submodules():
+			if submodule.module_exists():
+				try:
+					# submodule.abspath is the absolute path to the submodule
+					submodule_path = Path(submodule.abspath)
+					logger.info(f"Checking submodule '{submodule.name}' at: {submodule_path}")
+					
+					if submodule_path.exists() and (submodule_path / '.git').exists():
+						sub_repo = submodule.module()
+						_collect_repos_recursively(sub_repo, repos_list)
+					else:
+						logger.warning(f"Submodule path does not exist or is not initialized: {submodule_path}")
+				except Exception as e:
+					logger.warning(f"Failed to access submodule {submodule.name}: {e}")
+	except Exception as e:
+		logger.warning(f"Failed to iterate submodules in {repo.working_tree_dir}: {e}")
 
 
 @click.command()
@@ -99,5 +134,6 @@ def branch_sort_key(branch):
 
 
 if __name__ == "__main__":
-	logging.basicConfig(level="INFO")
+	log_level = os.environ.get('LOG_LEVEL', 'WARNING').upper()
+	logging.basicConfig(level=log_level)
 	main()
