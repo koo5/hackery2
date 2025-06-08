@@ -35,13 +35,19 @@ if git --no-pager diff --exit-code  --cached
 else
 	echo
 	
-	# Get list of changed files first to display count
-	set changed_files (git diff --name-only  --cached)
+	# Get list of changed files first to display count (convert to absolute paths)
+	set git_root (git rev-parse --show-toplevel)
+	set changed_files_rel (git diff --name-only  --cached)
+	set changed_files
+	for file in $changed_files_rel
+		set changed_files $changed_files "$git_root/$file"
+	end
 	set file_count (count $changed_files)
 	
 	# Set the actual prompt with file count if using template
 	if test -n "$prompt_template"
-		set prompt --model o3-mini (printf "$prompt_template" $file_count)
+		set formatted_prompt (printf "$prompt_template" $file_count)
+		set prompt --model o3-mini "$formatted_prompt"
 	end
 	
 	if test "$include_context" = "true"
@@ -78,10 +84,14 @@ else
 	echo "" >> $context_file
 	
 	# Add full content of each changed file with better formatting (if enabled)
+	echo "DEBUG: include_context='$include_context', file_count=$file_count" >> $context_file
 	if test "$include_context" = "true"
 		echo "< ==== FULL FILE CONTENTS FOR CONTEXT ==== >" >> $context_file
+		#echo "DEBUG: Starting to process $file_count files" >> $context_file
 		for file in $changed_files
+			#echo "DEBUG: Processing file: '$file'" >> $context_file
 			if test -f $file
+				#echo "DEBUG: File exists, adding content" >> $context_file
 				echo "" >> $context_file
 				echo "┌─────────────────────────────────────────" >> $context_file
 				echo "│ File: $file" >> $context_file
@@ -90,9 +100,14 @@ else
 				echo "" >> $context_file
 				cat -n $file >> $context_file
 				echo "" >> $context_file
+			else
+				#echo "DEBUG: File '$file' does not exist!" >> $context_file
 			end
 		end
+		#echo "DEBUG: Finished processing all files" >> $context_file
 		echo "< /==== FULL FILE CONTENTS FOR CONTEXT ==== >" >> $context_file
+	else
+		echo "DEBUG: Skipping full context because include_context='$include_context'" >> $context_file
 	end
 	
 	# Stream llm output word-by-word, capturing simultaneously
