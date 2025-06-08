@@ -1,0 +1,91 @@
+#!/bin/env fish
+
+# Intention tracking tool for better commit messages
+# Usage: 
+#   intention add "Working on user authentication"
+#   intention show
+#   intention clear
+#   intention edit
+
+# Find git root directory and set intention file path
+set git_root (git rev-parse --show-toplevel 2>/dev/null)
+if test -z "$git_root"
+    echo "Error: Not in a git repository"
+    exit 1
+end
+set intention_file "$git_root/.dev_intention"
+
+function show_help
+    echo "Usage: intention <command> [args]"
+    echo "Commands:"
+    echo "  add <text>    - Add intention to current work"
+    echo "  show         - Show current intentions"
+    echo "  clear        - Clear all intentions"
+    echo "  edit         - Edit intentions in editor"
+    echo "  get          - Get intentions for commit scripts (internal)"
+end
+
+if test (count $argv) -eq 0
+    show_help
+    exit 1
+end
+
+set command $argv[1]
+
+switch $command
+    case add
+        if test (count $argv) -lt 2
+            echo "Error: Please provide intention text"
+            exit 1
+        end
+        set intention_text $argv[2..-1]
+        
+        # Ensure .dev_intention is in .gitignore at git root
+        set gitignore_file "$git_root/.gitignore"
+        if test -f $gitignore_file
+            if not grep -q "^\\.dev_intention\$" $gitignore_file
+                echo ".dev_intention" >> $gitignore_file
+                echo "Added .dev_intention to .gitignore"
+            end
+        else
+            echo ".dev_intention" > $gitignore_file
+            echo "Created .gitignore and added .dev_intention"
+        end
+        
+        echo "• "(string join " " $intention_text) >> $intention_file
+        echo "Added intention: "(string join " " $intention_text)
+        
+    case show
+        if test -f $intention_file
+            echo "Current intentions:"
+            cat $intention_file
+        else
+            echo "No intentions set"
+        end
+        
+    case clear
+        if test -f $intention_file
+            rm $intention_file
+            echo "Cleared all intentions"
+        else
+            echo "No intentions to clear"
+        end
+        
+    case edit
+        if test -f $intention_file
+            $EDITOR $intention_file
+        else
+            echo "No intentions file exists. Use 'intention add' first."
+        end
+        
+    case get
+        # Internal command for commit scripts
+        if test -f $intention_file
+            cat $intention_file
+        end
+        
+    case '*'
+        echo "Unknown command: $command"
+        show_help
+        exit 1
+end

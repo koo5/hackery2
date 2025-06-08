@@ -1,10 +1,22 @@
 #!/bin/env fish
 
-set prompt $argv
+# Parse arguments for --no-context flag
+set include_context true
+set prompt_args
+for arg in $argv
+	if test "$arg" = "--no-context"
+		set include_context false
+	else
+		set prompt_args $prompt_args $arg
+	end
+end
+
+set prompt $prompt_args
 if test -z "$prompt"
-	set prompt --model o3-mini 'Write a commit message for the following git changes. You are provided with:
+	# Count will be available after we get changed_files
+	set prompt_template 'Write a commit message for the following git changes affecting %d files. You are provided with:
 1. The git diff showing what changed
-2. The full content of all affected files for context
+2. The full content of all affected files for context (if enabled)
 
 Analyze the changes in context and write a clear, descriptive commit message. 
 - Start with a concise summary line (max 50 chars if possible)
@@ -17,45 +29,70 @@ Analyze the changes in context and write a clear, descriptive commit message.
 Answer with ONLY the commit message, no additional commentary.'
 end
 
-if git --no-pager diff --exit-code HEAD
+if git --no-pager diff --exit-code  --cached
 	# No changes to commit
 	exit
 else
 	echo
-	printf 'Analyzing changes with full file context...\n\n'
+	
+	# Get list of changed files first to display count
+	set changed_files (git diff --name-only  --cached)
+	set file_count (count $changed_files)
+	
+	# Set the actual prompt with file count if using template
+	if test -n "$prompt_template"
+		set prompt --model o3-mini (printf "$prompt_template" $file_count)
+	end
+	
+	if test "$include_context" = "true"
+		printf 'Analyzing %d changed files with full file context...\n\n' $file_count
+	else
+		printf 'Analyzing %d changed files (no full context)...\n\n' $file_count
+	end
 
 	# Create a temporary file to store all the information
 	set context_file (mktemp /tmp/commit_context.XXXXXX)
 	
-	# Get list of changed files
-	set changed_files (git diff --name-only HEAD)
+	# Add intentions if available
+	set intentions (intention get)
+	if test -n "$intentions"
+		echo "< ==== CURRENT DEVELOPMENT INTENTIONS ==== >" >> $context_file
+		echo "$intentions" >> $context_file
+		echo "< /==== CURRENT DEVELOPMENT INTENTIONS ==== >" >> $context_file
+		echo "" >> $context_file
+	end
 	
 	# Add summary
-	echo "SUMMARY OF CHANGES:" >> $context_file
+	echo "< ==== SUMMARY OF CHANGES ==== >" >> $context_file
 	echo "Modified files: "(count $changed_files) >> $context_file
 	for file in $changed_files
 		echo "  - $file" >> $context_file
 	end
+	echo "< /==== SUMMARY OF CHANGES ==== >" >> $context_file
 	echo "" >> $context_file
 	
 	# Add the diff
-	echo "==== DETAILED DIFF ====" >> $context_file
-	git diff HEAD >> $context_file
+	echo "< ==== DETAILED DIFF ==== >" >> $context_file
+	git diff --cached >> $context_file
+	echo "< /==== DETAILED DIFF ==== >" >> $context_file
 	echo "" >> $context_file
 	
-	# Add full content of each changed file with better formatting
-	echo "==== FULL FILE CONTENTS FOR CONTEXT ====" >> $context_file
-	for file in $changed_files
-		if test -f $file
-			echo "" >> $context_file
-			echo "┌─────────────────────────────────────────" >> $context_file
-			echo "│ File: $file" >> $context_file
-			echo "│ Size: "(wc -l < $file)" lines" >> $context_file
-			echo "└─────────────────────────────────────────" >> $context_file
-			echo "" >> $context_file
-			cat -n $file >> $context_file
-			echo "" >> $context_file
+	# Add full content of each changed file with better formatting (if enabled)
+	if test "$include_context" = "true"
+		echo "< ==== FULL FILE CONTENTS FOR CONTEXT ==== >" >> $context_file
+		for file in $changed_files
+			if test -f $file
+				echo "" >> $context_file
+				echo "┌─────────────────────────────────────────" >> $context_file
+				echo "│ File: $file" >> $context_file
+				echo "│ Size: "(wc -l < $file)" lines" >> $context_file
+				echo "└─────────────────────────────────────────" >> $context_file
+				echo "" >> $context_file
+				cat -n $file >> $context_file
+				echo "" >> $context_file
+			end
 		end
+		echo "< /==== FULL FILE CONTENTS FOR CONTEXT ==== >" >> $context_file
 	end
 	
 	# Stream llm output word-by-word, capturing simultaneously
@@ -64,13 +101,18 @@ else
 	or exit 1
 	set commit_message (cat $F | string collect)
 	
-	# Clean up temp files
-	rm -f $context_file $F
-
-	# get the diff again and prepend each line with a #
-	set diff_with_comments (git diff HEAD | sed 's/^/# /' | string collect)
+	# get the body of the prompt and prepend each line with a #
+	set commented_prompt (cat $context_file | sed 's/^/# /' | string collect)
 
 	# run git commit with the commit message and diff
-	gcam (printf "%s\n\n%s" "$commit_message" "$diff_with_comments" | string collect)  -e
-	and gp
+	gcm (printf "%s\n\n%s" "$commit_message" "$commented_prompt" | string collect)  -e
+	and begin
+		# Clear intentions after successful commit
+		intention clear >/dev/null 2>&1
+		gp
+	end
+
+	# Clean up temp files
+	#rm -f $context_file $F
+
 end

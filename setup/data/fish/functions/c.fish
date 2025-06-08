@@ -1,3 +1,3 @@
 function c
-	ccc $argv
+	ccc_full $argv
 end
