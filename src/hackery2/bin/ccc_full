@@ -91,15 +91,28 @@ else
 		for file in $changed_files
 			#echo "DEBUG: Processing file: '$file'" >> $context_file
 			if test -f $file
-				#echo "DEBUG: File exists, adding content" >> $context_file
-				echo "" >> $context_file
-				echo "┌─────────────────────────────────────────" >> $context_file
-				echo "│ File: $file" >> $context_file
-				echo "│ Size: "(wc -l < $file)" lines" >> $context_file
-				echo "└─────────────────────────────────────────" >> $context_file
-				echo "" >> $context_file
-				cat -n $file >> $context_file
-				echo "" >> $context_file
+				# Check if file is text using file command
+				set file_type (file --mime-type --brief $file)
+				if string match --quiet 'text/*' $file_type; or string match --quiet 'application/json' $file_type; or string match --quiet 'application/xml' $file_type; or string match --quiet 'application/javascript' $file_type
+					#echo "DEBUG: File exists and is text, adding content" >> $context_file
+					echo "" >> $context_file
+					echo "┌─────────────────────────────────────────" >> $context_file
+					echo "│ File: $file" >> $context_file
+					echo "│ Size: "(wc -l < $file)" lines" >> $context_file
+					echo "│ Type: $file_type" >> $context_file
+					echo "└─────────────────────────────────────────" >> $context_file
+					echo "" >> $context_file
+					cat -n $file >> $context_file
+					echo "" >> $context_file
+				else
+					#echo "DEBUG: Skipping binary file: '$file' (type: $file_type)" >> $context_file
+					echo "" >> $context_file
+					echo "┌─────────────────────────────────────────" >> $context_file
+					echo "│ File: $file" >> $context_file
+					echo "│ Type: $file_type (BINARY - SKIPPED)" >> $context_file
+					echo "└─────────────────────────────────────────" >> $context_file
+					echo "" >> $context_file
+				end
 			else
 				#echo "DEBUG: File '$file' does not exist!" >> $context_file
 			end
