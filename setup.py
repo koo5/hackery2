@@ -41,6 +41,7 @@ setup(
         # Command line and process utilities
         "click",                  # Command line interface creation
         "fire",                   # Automatic CLI generation
+        "psycopg2",
         "ptyprocess",             # Pseudo-terminal utilities
         "prompt_toolkit==1.0.14", # Interactive command-line toolkit (specific version)
         

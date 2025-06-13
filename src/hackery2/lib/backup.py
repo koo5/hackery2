@@ -46,16 +46,44 @@ log.setLevel(logging.INFO)
 _use_db = True
 
 
-@click.command()
-@click.option('--source', default='host', help='Source to backup')
-@click.option('--target-machine', default='None', help='Target machine for backup')
-@click.option('--target-fs', default=None, help='Target filesystem')
-@click.option('--local', is_flag=True, help='Perform local backup')
-@click.option('--quick', is_flag=True, help='Quick backup mode')
-@click.option('--prune/--no-prune', default=True, help='Prune old backups')
-def run(source, target_machine, target_fs, local, quick, prune):
+@click.group()
+def cli():
+	"""Backup utility with three modes: snapshot-only, local backup, and remote backup."""
+	pass
 
-	print(f'source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}')
+@cli.command()
+@click.option('--source', default='host', help='Source to backup')
+@click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
+@click.option('--prune/--no-prune', default=True, help='Prune old snapshots')
+def snapshot(source, quick, prune):
+	"""Mode 1: Create local snapshots only (no backup target needed)."""
+	print(f'Creating snapshots only - source={source}, quick={quick}, prune={prune}')
+	_run_backup(source=source, target_machine=None, target_fs=None, local=True, quick=quick, prune=prune, snapshot_only=True)
+
+@cli.command()
+@click.option('--source', default='host', help='Source to backup')
+@click.option('--target-fs', required=True, help='Target filesystem for local backup')
+@click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
+@click.option('--prune/--no-prune', default=True, help='Prune old backups')
+def local_backup(source, target_fs, quick, prune):
+	"""Mode 2: Create backups to a local backup location."""
+	print(f'Local backup - source={source}, target_fs={target_fs}, quick={quick}, prune={prune}')
+	_run_backup(source=source, target_machine=None, target_fs=target_fs, local=True, quick=quick, prune=prune, snapshot_only=False)
+
+@cli.command()
+@click.option('--source', default='host', help='Source to backup')
+@click.option('--target-machine', required=True, help='Remote machine for backup (e.g., r64, jj)')
+@click.option('--target-fs', help='Target filesystem on remote machine')
+@click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
+@click.option('--prune/--no-prune', default=True, help='Prune old backups')
+def remote_backup(source, target_machine, target_fs, quick, prune):
+	"""Mode 3: Create backups to a remote machine."""
+	print(f'Remote backup - source={source}, target_machine={target_machine}, target_fs={target_fs}, quick={quick}, prune={prune}')
+	_run_backup(source=source, target_machine=target_machine, target_fs=target_fs, local=False, quick=quick, prune=prune, snapshot_only=False)
+
+def _run_backup(source='host', target_machine=None, target_fs=None, local=False, quick=False, prune=True, snapshot_only=False):
+
+	print(f'_run_backup: source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}, snapshot_only = {snapshot_only}')
 
 	default_target_machine = 'r64'
 	default_target_fs='/bac18/'
@@ -105,7 +133,7 @@ def run(source, target_machine, target_fs, local, quick, prune):
 	print()
 	print('---done find_backup_subvols---')
 	print()
-	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune)
+	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only)
 
 
 def sync_stuff(hostname):
@@ -232,7 +260,7 @@ def get_filesystems():
 	return fss
 
 
-def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune):
+def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only=False):
 	for fs in fss:
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
@@ -250,16 +278,22 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune):
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 			subvol_path = Path(f"{toplevel}/{source_path}{name}")
 			#ccs(f"""date""")
-			if local:
+			if snapshot_only:
+				# Mode 1: Only create local snapshots
 				ccs(f"""bfg --YES=true local_commit --SUBVOL={subvol_path} """)
+			elif local:
+				# Mode 2: Local backup
+				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
+				ccs(f"""bfg --YES=true commit_and_push --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
 			else:
+				# Mode 3: Remote backup
 				remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
 				ccs(f"""bfg --YES=true {sshstr2} commit_and_push --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
 			#ccs(f"""date""")
 			print('', file = sys.stderr)
 		if _use_db:
 			ccs(f"""bfg --YES=true --FS={toplevel} update_db """)
-			if not local:
+			if not local and not snapshot_only:
 				ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
 
 		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
@@ -276,7 +310,7 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune):
 				target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 				subvol_path = Path(f"{toplevel}/{source_path}{name}")
 				ccs(f"""bfg prune_local --DB={_use_db} --YES=true  --SUBVOL={subvol_path} """)
-				if not local:
+				if not local and not snapshot_only:
 					remote_subvol_path = Path(target_fs)/'backups'/target_dir/target_subvol_name
 					ccs(f"""bfg {sshstr2} prune_remote  --YES=true  --LOCAL_SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path}""")
 
@@ -446,7 +480,7 @@ def check_if_mounted(sshstr, target_fs):
 
 
 if __name__ == "__main__":
-	run()
+	cli()
 
 
 
