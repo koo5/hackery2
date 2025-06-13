@@ -36,7 +36,7 @@ import shlex # Added for splitting command output
 from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
-from infra import *
+from .infra import *
 import logging
 log = logging.getLogger()
 log.setLevel(logging.INFO)

@@ -1,4 +1,4 @@
-from infra import *
+from src.hackery2.lib.infra import *
 
 r64_ip()
 

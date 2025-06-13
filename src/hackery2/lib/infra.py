@@ -1,4 +1,4 @@
-from shell import *
+from .shell import *
 
 
 
