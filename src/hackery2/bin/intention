@@ -34,6 +34,7 @@ set command $argv[1]
 
 switch $command
     case add
+    case update
         if test (count $argv) -lt 2
             echo "Error: Please provide intention text"
             exit 1
