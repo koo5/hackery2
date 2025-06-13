@@ -3,7 +3,7 @@
 
 """
 install:
- pip install fire ptyprocess
+ pip install click ptyprocess
 
 
 notes:
@@ -38,6 +38,7 @@ from datetime import datetime
 from collections import defaultdict
 from .infra import *
 import logging
+import click
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
@@ -45,7 +46,16 @@ log.setLevel(logging.INFO)
 _use_db = True
 
 
-def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=False, prune=True):
+@click.command()
+@click.option('--source', default='host', help='Source to backup')
+@click.option('--target-machine', default='None', help='Target machine for backup')
+@click.option('--target-fs', default=None, help='Target filesystem')
+@click.option('--local', is_flag=True, help='Perform local backup')
+@click.option('--quick', is_flag=True, help='Quick backup mode')
+@click.option('--prune/--no-prune', default=True, help='Prune old backups')
+def run(source, target_machine, target_fs, local, quick, prune):
+
+	print(f'source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}')
 
 	default_target_machine = 'r64'
 	default_target_fs='/bac18/'
@@ -59,13 +69,13 @@ def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=F
 	if target_fs is None:
 		target_fs = default_target_fs
 
-	if target_machine == '':
+	if target_machine == 'None':
 		print('target_machine = None')
 		target_machine = None
 
 	if not local:
 		print(f'target_machine = {target_machine}')
-		sshstr, sshstr2 = set_up_target(target_machine, QUICK)
+		sshstr, sshstr2 = set_up_target(target_machine, quick)
 	else:
 		sshstr = ''
 		sshstr2 = ''
@@ -80,7 +90,7 @@ def run(source='host', target_machine=None, target_fs=None, local=False, QUICK=F
 	# grab whatever info would not be transferred from ext4 partitions
 	#srun('sudo snap save')
 
-	if not QUICK:
+	if not quick:
 		srun('snap list | sudo tee /root/snap_list')
 		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
 		#anything else?
@@ -117,10 +127,10 @@ def import_noncows(source, hostname, target_fs, fss):
 	rsync_ext4_filesystems_into_backup_folder(fss)
 
 
-def set_up_target(target_machine, QUICK):
+def set_up_target(target_machine, quick):
 
 	if target_machine is None:
-		if not QUICK:
+		if not quick:
 			ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
 		return  '', ''
 
@@ -436,7 +446,7 @@ def check_if_mounted(sshstr, target_fs):
 
 
 if __name__ == "__main__":
-	fire.Fire(run)
+	run()
 
 
 

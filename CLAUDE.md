@@ -6,6 +6,8 @@
 - Install dependencies: `pip install -r requirements.txt`
 - Create virtual environment: `python -m venv .venv && source .venv/bin/activate`
 - Run Python script: `python /home/koom/hackery2/src/hackery2/bin/script.py`
+- Track development intentions: `intention add "Working on feature X"`, `intention show`, `intention clear`
+- **IMPORTANT**: Always set intentions before starting new features or bug fixes using `intention add`
 
 ## Code Style
 - Indentation: Tabs for Python, 4 spaces for bash scripts
