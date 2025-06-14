@@ -65,10 +65,18 @@ def snapshot(source, quick, prune):
 @click.option('--target-fs', required=True, help='Target filesystem for local backup')
 @click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
 @click.option('--prune/--no-prune', default=True, help='Prune old backups')
-def local_backup(source, target_fs, quick, prune):
+def local(source, target_fs, quick, prune):
 	"""Mode 2: Create backups to a local backup location."""
 	print(f'Local backup - source={source}, target_fs={target_fs}, quick={quick}, prune={prune}')
 	_run_backup(source=source, target_machine=None, target_fs=target_fs, local=True, quick=quick, prune=prune, snapshot_only=False)
+
+@cli.command()
+@click.option('--source', default='host', help='Source to backup')
+@click.option('--target-fs', required=True, help='Target filesystem for local backup')
+@click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
+@click.option('--prune/--no-prune', default=True, help='Prune old backups')
+def vpss(source, target_fs, quick, prune):
+	_run_backup(source=source, target_machine=None, target_fs=target_fs, local=True, quick=quick, prune=prune, snapshot_only=False, vpss=True)
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
@@ -76,12 +84,12 @@ def local_backup(source, target_fs, quick, prune):
 @click.option('--target-fs', help='Target filesystem on remote machine')
 @click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
 @click.option('--prune/--no-prune', default=True, help='Prune old backups')
-def remote_backup(source, target_machine, target_fs, quick, prune):
+def remote(source, target_machine, target_fs, quick, prune):
 	"""Mode 3: Create backups to a remote machine."""
 	print(f'Remote backup - source={source}, target_machine={target_machine}, target_fs={target_fs}, quick={quick}, prune={prune}')
 	_run_backup(source=source, target_machine=target_machine, target_fs=target_fs, local=False, quick=quick, prune=prune, snapshot_only=False)
 
-def _run_backup(source='host', target_machine=None, target_fs=None, local=False, quick=False, prune=True, snapshot_only=False):
+def _run_backup(source='host', target_machine=None, target_fs=None, local=False, quick=False, prune=True, snapshot_only=False, vpss=False):
 
 	print(f'_run_backup: source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}, snapshot_only = {snapshot_only}')
 
@@ -118,12 +126,14 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	# grab whatever info would not be transferred from ext4 partitions
 	#srun('sudo snap save')
 
-	if not quick:
-		srun('snap list | sudo tee /root/snap_list')
-		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
-		#anything else?
-		#pause firefox? pause some vms?
-		import_noncows(source, hostname, target_fs, fss)
+	srun('snap list | sudo tee /root/snap_list')
+	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
+	#anything else?
+	#pause firefox? pause some vms?
+
+	if vpss:
+		backup_vpss(target_fs)
+	import_noncows(source, hostname, target_fs, fss)
 
 	print()
 	print('---done import_noncows---')
@@ -148,10 +158,6 @@ def import_noncows(source, hostname, target_fs, fss):
 	"""
 	todo: we should make a snapshot of each subvol right after the transfer is finished. This will parallel how btrfs snapshots are "imported".
 	"""
-
-	if hostname == 'r64':
-		backup_vpss(target_fs)
-
 	rsync_ext4_filesystems_into_backup_folder(fss)
 
 
@@ -178,7 +184,7 @@ def set_up_target(target_machine, quick):
 
 	elif target_machine == 'jj':
 		long_ssh = ' -o ServerAliveInterval=600 -o ServerAliveCountMax=999999  -o TCPKeepAlive=no  '
-		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {long_ssh} {insecure_speedups} koom@jj'
+		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {long_ssh} {insecure_speedups} koom@10.0.0.24'
 
 
 	elif target_machine == 'r64':
