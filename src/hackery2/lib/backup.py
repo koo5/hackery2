@@ -84,12 +84,15 @@ def vpss(source, target_fs, quick, prune):
 @click.option('--target-fs', help='Target filesystem on remote machine')
 @click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
 @click.option('--prune/--no-prune', default=True, help='Prune old backups')
-def remote(source, target_machine, target_fs, quick, prune):
+@click.option('--backups/--no-backups', default=False, help='Also transfer all most recent snapshots in backups to remote machine')
+def remote(source, target_machine, target_fs, quick, prune, backups):
 	"""Mode 3: Create backups to a remote machine."""
 	print(f'Remote backup - source={source}, target_machine={target_machine}, target_fs={target_fs}, quick={quick}, prune={prune}')
 	_run_backup(source=source, target_machine=target_machine, target_fs=target_fs, local=False, quick=quick, prune=prune, snapshot_only=False)
 
-def _run_backup(source='host', target_machine=None, target_fs=None, local=False, quick=False, prune=True, snapshot_only=False, vpss=False):
+
+
+def _run_backup(source='host', target_machine=None, target_fs=None, local=False, quick=False, prune=True, snapshot_only=False, vpss=False, backups=False):
 
 	print(f'_run_backup: source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}, snapshot_only = {snapshot_only}')
 
@@ -138,7 +141,7 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	print()
 	print('---done import_noncows---')
 	print()
-	if not local:
+	if backups:
 		fss[-1]['subvols'].extend(find_backup_subvols(fss[-1]))
 	print()
 	print('---done find_backup_subvols---')
@@ -351,7 +354,7 @@ import grp
 
 
 def backup_vpss(target_fs):
-	for cloud_host in json.load(open(os.path.expanduser('~/secrets.json')))['cloud_servers']:
+	for cloud_host in json.load(open(os.path.expanduser('/d/sync/jj/secrets.json')))['cloud_servers']:
 		backup_vps(target_fs, cloud_host)
 
 
