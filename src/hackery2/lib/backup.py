@@ -136,7 +136,8 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 
 	if vpss:
 		backup_vpss(target_fs)
-	import_noncows(source, hostname, target_fs, fss)
+	else:
+		import_noncows(source, hostname, target_fs, fss)
 
 	print()
 	print('---done import_noncows---')
