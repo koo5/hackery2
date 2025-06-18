@@ -1,4 +1,21 @@
 #!/usr/bin/env python3
+"""
+PreEdit - Interactive Input Filter GUI
+
+A GUI application that monitors an input file for incoming data and allows
+manual editing before forwarding to a target program. Features:
+
+- File monitoring: Watches input file for new lines of data
+- Manual mode: Allows editing data before sending to target program
+- Auto mode: Automatically forwards all incoming data without editing
+- Repetitive sequence limiting: Prevents spam by limiting repeated patterns
+- GUI interface: Tkinter-based interface with input/output areas
+
+Usage: preedit <input_file> <program_and_args...>
+Examples:
+  preedit /tmp/input.txt python -u script.py --verbose
+  preedit /tmp/voice sh -c '~/vvvv/venv/bin/piper --model ~/vvvv/cs_CZ-jirka-medium.onnx --output-raw | aplay -r 22050 -f S16_LE -t raw -'
+"""
 import sys
 import os
 import subprocess
