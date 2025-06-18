@@ -31,9 +31,6 @@ class PreEditGUI:
 		self.monitor_thread = threading.Thread(target=self.monitor_file, daemon=True)
 		self.monitor_thread.start()
 		
-		# Start output monitoring thread
-		self.output_thread = threading.Thread(target=self.monitor_output, daemon=True)
-		self.output_thread.start()
 		
 	def setup_gui(self):
 		"""Setup the GUI"""
@@ -180,17 +177,6 @@ class PreEditGUI:
 		except Exception as e:
 			self.root.after(0, self.append_output, f"Error monitoring file: {e}\n")
 			
-	def monitor_output(self):
-		"""Monitor program output"""
-		try:
-			while self.running and self.process.poll() is None:
-				line = self.process.stdout.readline()
-				if line:
-					self.root.after(0, self.append_output, line)
-				else:
-					time.sleep(0.01)
-		except Exception as e:
-			self.root.after(0, self.append_output, f"Error monitoring output: {e}\n")
 			
 	def append_to_input(self, text):
 		"""Append text to input text widget (thread-safe)"""
