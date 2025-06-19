@@ -39,6 +39,7 @@ from collections import defaultdict
 from .infra import *
 import logging
 import click
+import json5
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
@@ -355,8 +356,9 @@ import grp
 
 
 def backup_vpss(target_fs):
-	for cloud_host in json.load(open(os.path.expanduser('/d/sync/jj/secrets.json')))['cloud_servers']:
-		backup_vps(target_fs, cloud_host)
+	with open(os.path.expanduser('/d/sync/jj/secrets.json'), 'r') as f:
+		for cloud_host in json5.load(f)['vpss']:
+			backup_vps(target_fs, cloud_host)
 
 
 
@@ -372,8 +374,8 @@ def backup_vps(target_fs, cloud_host):
 
 	username = getpass.getuser()
 	group_name = grp.getgrgid(os.getgid()).gr_name
-
 	ccs(f'sudo chown {username}:{group_name} {where}')
+
 	ccs(f'backup_vps.sh {cloud_host} {where}; true')
 	ccs(f'bfg local_commit --SUBVOL={where}')
 

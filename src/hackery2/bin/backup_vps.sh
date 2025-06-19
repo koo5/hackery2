@@ -44,6 +44,7 @@ rsync -av --progress -h -e hpnssh -r $argv[3] \
   --exclude '/home/*/.config/syncthing'  \
   --exclude '/home/*/.bun/'  \
   --exclude '/home/*/.local/share/Steam/steamapps/' \
+  --exclude '/home/koom/.local/share/nvm/' \
   --include '/home/***'   \
   --exclude '*'  \
   root@$MACHINE:// $DSTDIR/
