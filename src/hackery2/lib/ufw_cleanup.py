@@ -3,7 +3,7 @@
 UFW Cleanup - Compare UFW rules with actual open ports and generate delete commands
 """
 
-import argparse
+zzzimport argparse
 import subprocess
 import sys
 import json
