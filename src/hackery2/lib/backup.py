@@ -41,7 +41,10 @@ import logging
 import click
 import json5
 log = logging.getLogger()
+# Set up logging
 log.setLevel(logging.INFO)
+if 'BACKUP_DEBUG' in os.environ:
+	log.setLevel(logging.DEBUG)
 
 
 _use_db = True
@@ -305,7 +308,7 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, sna
 		if _use_db:
 			ccs(f"""bfg --YES=true --FS={toplevel} update_db """)
 			if not local and not snapshot_only:
-				ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
+				ccs(f"""{sshstr} bfg --YES=true --SUBVOL={target_fs} update_db """)
 
 		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
 
@@ -358,7 +361,12 @@ import grp
 def backup_vpss(target_fs):
 	with open(os.path.expanduser('/d/sync/jj/secrets.json'), 'r') as f:
 		for cloud_host in json5.load(f)['vpss']:
-			backup_vps(target_fs, cloud_host)
+			if isinstance(cloud_host, dict):
+				# New schema with filesystem specifications
+				backup_vps_with_fs(target_fs, cloud_host)
+			else:
+				# Legacy string format
+				backup_vps(target_fs, cloud_host)
 
 
 
@@ -378,6 +386,40 @@ def backup_vps(target_fs, cloud_host):
 
 	ccs(f'backup_vps.sh {cloud_host} {where}; true')
 	ccs(f'bfg local_commit --SUBVOL={where}')
+
+
+def backup_vps_with_fs(target_fs, host_config):
+	"""Backup VPS with filesystem specifications using bfg remote_commit_and_pull."""
+	host = host_config['host']
+	fss = host_config['fss']
+	
+	log.info(f"Backing up {host} with {len(fss)} filesystems")
+	
+	# Set up SSH connection for remote bfg operations
+	ssh = get_hpnssh_executable()
+	sshstr = f'{ssh} root@{host}'
+	sshstr2 = '--sshstr="' + sshstr + '"'
+	
+	for fs in fss:
+		toplevel = fs['toplevel']
+		subvols = fs['subvols']
+		
+		for subvol in subvols:
+			# Construct paths
+			remote_subvol = Path(toplevel) / subvol if subvol != '/' else Path(toplevel)
+			subvol_name = subvol if subvol != '/' else toplevel.replace('/', '_') + '_root'
+			local_backup_path = Path(target_fs) / 'backups' / host / subvol_name
+			
+			log.info(f"Remote commit and pull: {remote_subvol} -> {local_backup_path}")
+			
+			try:
+				# Use bfg's remote_commit_and_pull command
+				ccs(f"bfg --YES=true {sshstr2} remote_commit_and_pull {remote_subvol} {local_backup_path}")
+				
+			except Exception as e:
+				log.error(f"Failed to backup {remote_subvol} from {host}: {e}")
+				# Continue with other subvolumes even if one fails
+				continue
 
 
 def parse_snapshot_name(dname):

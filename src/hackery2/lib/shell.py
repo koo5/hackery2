@@ -7,9 +7,12 @@ from ptyprocess import PtyProcess
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
+# set logging to debug if the environment variable SHELL_DEBUG is set
 hhh = logging.StreamHandler()
 log.addHandler(hhh)
 #hhh.setFormatter(logging.Formatter("%(asctime)s;%(levelname)s;%(message)s","%Y-%m-%d %H:%M:%S"))
+if 'SHELL_DEBUG' in os.environ:
+	log.setLevel(logging.DEBUG)
 
 
 sq = shlex.quote
@@ -34,6 +37,7 @@ def srun(cmd):
 
 
 def cc(cmd):
+	log.debug((shlex.join(cmd)))
 	return subprocess.check_call(cmd, text=True, universal_newlines=True)
 
 
