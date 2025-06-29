@@ -55,13 +55,14 @@ def get_open_ports() -> Set[Tuple[str, str]]:
 				proto = 'tcp'
 				local_addr = parts[3]
 				
-				# Extract port from address (e.g., "0.0.0.0:22" -> "22")
-				if ':' in local_addr:
-					port = local_addr.rsplit(':', 1)[1]
-					open_ports.add((port, proto))
-				elif '.' in local_addr and local_addr.count('.') == 4:
+				# Extract port from address
+				if ':::' in local_addr:
 					# IPv6 format like :::22
-					port = local_addr.split('.')[-1]
+					port = local_addr.split(':::')[1]
+					open_ports.add((port, proto))
+				elif ':' in local_addr:
+					# IPv4 format like "0.0.0.0:22" or specific IP
+					port = local_addr.rsplit(':', 1)[1]
 					open_ports.add((port, proto))
 		
 		return open_ports
@@ -149,7 +150,7 @@ def main():
 		# This ensures rule numbers don't change as we delete
 		unused_rules.sort(key=lambda r: r['number'], reverse=True)
 		
-		print("# UFW cleanup commands (execute from bottom to top):")
+		print("# UFW cleanup commands:")
 		for rule in unused_rules:
 			# Build rule description
 			port_info = f"{rule['port']}"
