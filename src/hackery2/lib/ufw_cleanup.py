@@ -108,11 +108,6 @@ def main():
 		description='Compare UFW rules with actual open ports and generate cleanup commands'
 	)
 	parser.add_argument(
-		'--dry-run', '-n',
-		action='store_true',
-		help='Show what would be deleted without generating commands'
-	)
-	parser.add_argument(
 		'--verbose', '-v',
 		action='store_true',
 		help='Show detailed information'
@@ -160,21 +155,12 @@ def main():
 		print("No unused UFW rules found.")
 		return
 	
-	if args.dry_run:
-		print("Unused UFW rules:")
-		for rule in unused_rules:
-			port_info = f"{rule['port']}"
-			if rule['protocol']:
-				port_info += f"/{rule['protocol']}"
-			dest_info = f"to {rule['destination']}" if rule['destination'] != "Anywhere" else ""
-			print(f"  Rule {rule['number']}: {port_info} {dest_info} from {rule['source']}")
-	else:
-		# Generate delete commands, starting from highest rule number
-		# This ensures rule numbers don't change as we delete
-		unused_rules.sort(key=lambda r: r['number'], reverse=True)
-		
-		print("# UFW cleanup commands:")
-		for rule in unused_rules:
+	# Generate delete commands, starting from highest rule number
+	# This ensures rule numbers don't change as we delete
+	unused_rules.sort(key=lambda r: r['number'], reverse=True)
+	
+	print("# UFW cleanup commands:")
+	for rule in unused_rules:
 			# Build rule description
 			port_info = f"{rule['port']}" if rule['port'] else "any"
 			if rule['protocol']:
