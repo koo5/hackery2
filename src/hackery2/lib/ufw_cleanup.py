@@ -15,7 +15,7 @@ def get_ufw_rules() -> List[Dict]:
 	"""Get UFW rules using ufw_status.py."""
 	try:
 		result = subprocess.run(
-			['ufw_status.py', '--json'],
+			['ufw_status', '--json'],
 			capture_output=True,
 			text=True,
 			check=True
