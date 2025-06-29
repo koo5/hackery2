@@ -117,21 +117,44 @@ def main():
 		action='store_true',
 		help='Show detailed information'
 	)
+	parser.add_argument(
+		'--comment', '-c',
+		type=str,
+		help='Delete all rules with this comment (skips port checking)'
+	)
 	
 	args = parser.parse_args()
 	
-	# Get UFW rules and open ports
+	# Get UFW rules
 	ufw_rules = get_ufw_rules()
-	open_ports = get_open_ports()
 	
-	if args.verbose:
-		print("Open ports detected:")
-		for port, proto in sorted(open_ports):
-			print(f"  {port}/{proto}")
-		print()
-	
-	# Find unused rules
-	unused_rules = find_unused_rules(ufw_rules, open_ports)
+	if args.comment:
+		# Filter rules by comment
+		matching_rules = []
+		for rule in ufw_rules:
+			# Check if the source field contains a comment
+			if '#' in rule['source']:
+				# Extract the comment part
+				comment_part = rule['source'].split('#', 1)[1].strip()
+				if comment_part == args.comment:
+					matching_rules.append(rule)
+		unused_rules = matching_rules
+		
+		if args.verbose:
+			print(f"Found {len(unused_rules)} rules with comment '{args.comment}'")
+			print()
+	else:
+		# Normal operation - find unused ports
+		open_ports = get_open_ports()
+		
+		if args.verbose:
+			print("Open ports detected:")
+			for port, proto in sorted(open_ports):
+				print(f"  {port}/{proto}")
+			print()
+		
+		# Find unused rules
+		unused_rules = find_unused_rules(ufw_rules, open_ports)
 	
 	if not unused_rules:
 		print("No unused UFW rules found.")
@@ -153,15 +176,17 @@ def main():
 		print("# UFW cleanup commands:")
 		for rule in unused_rules:
 			# Build rule description
-			port_info = f"{rule['port']}"
+			port_info = f"{rule['port']}" if rule['port'] else "any"
 			if rule['protocol']:
 				port_info += f"/{rule['protocol']}"
 			
 			desc_parts = []
 			desc_parts.append(f"{rule['action']} {rule['direction']}")
 			desc_parts.append(port_info)
-			if rule['destination'] != "Anywhere":
+			if rule['destination'] != "Anywhere" and rule['destination'] != "Anywhere (v6)":
 				desc_parts.append(f"to {rule['destination']}")
+			
+			# For the source, include the full text (with comment if present)
 			desc_parts.append(f"from {rule['source']}")
 			
 			description = " ".join(desc_parts)
