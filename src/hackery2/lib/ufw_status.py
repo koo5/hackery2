@@ -47,17 +47,32 @@ def parse_ufw_rule(rule_line: str) -> Optional[Dict[str, str]]:
 		destination = to_field
 		port = None
 	else:
-		# Try to parse as "destination port" or "destination port/protocol"
-		# First check if there's a space (indicating destination + port)
-		parts = to_field.rsplit(' ', 1)
-		if len(parts) == 2:
-			# Has destination and port/service
-			destination = parts[0]
-			port_part = parts[1]
+		# Handle IPv6 port format like "80 (v6)" or "10102 (v6)"
+		if to_field.endswith(' (v6)'):
+			# Remove the (v6) suffix and parse the rest
+			to_field_clean = to_field[:-5].strip()
+			# Now parse as normal
+			parts = to_field_clean.rsplit(' ', 1)
+			if len(parts) == 2:
+				# Has destination and port/service
+				destination = parts[0] + " (v6)"
+				port_part = parts[1]
+			else:
+				# No destination, just port/service
+				destination = "Anywhere (v6)"
+				port_part = to_field_clean
 		else:
-			# No destination, just port/service
-			destination = "Anywhere"
-			port_part = to_field
+			# Try to parse as "destination port" or "destination port/protocol"
+			# First check if there's a space (indicating destination + port)
+			parts = to_field.rsplit(' ', 1)
+			if len(parts) == 2:
+				# Has destination and port/service
+				destination = parts[0]
+				port_part = parts[1]
+			else:
+				# No destination, just port/service
+				destination = "Anywhere"
+				port_part = to_field
 		
 		# Parse port_part which can be:
 		# - Port number: "22"
