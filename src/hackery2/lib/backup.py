@@ -140,8 +140,8 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 
 	if vpss:
 		backup_vpss(target_fs)
-	else:
-		import_noncows(source, hostname, target_fs, fss)
+
+	import_noncows(source, hostname, target_fs, fss)
 
 	print()
 	print('---done import_noncows---')
@@ -240,18 +240,19 @@ def get_filesystems():
 			'toplevel': '/bac4',
 			'subvols': m(['cold'])
 		},
-		{
-			'toplevel': '/home/koom/Sync',
-			'subvols': m(['/'])
-		},
-		{
-			'toplevel': '/',
-			'subvols': m(['/']),
-		},
-		{
-			'toplevel': '/bac18',
-			'subvols': m(['/']),
-		}]
+		# {
+		# 	'toplevel': '/home/koom/Sync',
+		# 	'subvols': m(['/'])
+		# },
+		# {
+		# 	'toplevel': '/',
+		# 	'subvols': m(['/']),
+		# },
+		# {
+		# 	'toplevel': '/bac18',
+		# 	'subvols': m(['/']),
+		# }
+		]
 	elif hostname == 't14':
 		fss = [{
 			'toplevel': '/',
