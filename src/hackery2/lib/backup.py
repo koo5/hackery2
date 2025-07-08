@@ -127,8 +127,9 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 		check_if_mounted(sshstr, target_fs)
 
 	fss = get_filesystems()
-
-	sync_stuff(hostname)
+	
+	if hostname != 'r64':
+		sync_stuff(hostname)
 
 	# grab whatever info would not be transferred from ext4 partitions
 	#srun('sudo snap save')
