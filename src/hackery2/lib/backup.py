@@ -260,7 +260,7 @@ def get_filesystems():
 		},
 		{
 			'toplevel': '/data',
-			'subvols': m(['/']),
+			'subvols': m(['/', 'data/sync']),
 		}]
 	elif hostname == 'c1':
 		_use_db = False
@@ -525,10 +525,10 @@ def m(subvols):
 
 
 def check_if_mounted(sshstr, target_fs):
-	for line in co(shlex.split(f'{sshstr} cat /etc/mtab')).strip().split('\n'):
+	for line in co(shlex.split(f'{sshstr} -t "cat /etc/mtab"')).strip().split('\n'):
 		print(line)
 		items = line.split()
-		if items[1] +'/' == target_fs:
+		if items[1] == target_fs or items[1] + '/' == target_fs:
 			return
 	raise Exception(f'{target_fs} not mounted')
 
