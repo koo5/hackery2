@@ -60,6 +60,15 @@ wifi:
       dns1: !secret gateway2
       dns2: 8.8.8.8
 
+  - ssid: !secret ssid3
+    password: !secret password3
+    manual_ip:
+      static_ip: !secret ip3
+      gateway: !secret gateway3
+      subnet: 255.255.255.0
+      dns1: !secret gateway3
+      dns2: 8.8.8.8
+
   use_address: "$name.local"
 
 

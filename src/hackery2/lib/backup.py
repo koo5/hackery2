@@ -308,7 +308,7 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, sna
 			#ccs(f"""date""")
 			print('', file = sys.stderr)
 		if _use_db:
-			ccs(f"""bfg --YES=true --FS={toplevel} update_db """)
+			ccs(f"""bfg --YES=true update_db --FS={toplevel} """)
 			if not local and not snapshot_only:
 				ccs(f"""{sshstr} bfg --YES=true --SUBVOL={target_fs} update_db """)
 
