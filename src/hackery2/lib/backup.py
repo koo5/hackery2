@@ -274,7 +274,7 @@ def get_filesystems():
 
 def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only=False):
 	for fs in fss:
-		if not check_if_mounted_local(fs.toplevel):
+		if not check_if_mounted_local(fs['toplevel']):
 			print('SKIP non-mounted ' + fs.toplevel)
 			continue
 		toplevel = fs['toplevel']
