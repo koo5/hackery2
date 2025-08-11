@@ -62,17 +62,36 @@ def read_localstorage_file(data_sqlite_path, origin_name):
 			if value is None:
 				storage_data[key] = None
 			elif isinstance(value, bytes):
-				# Try to decode bytes to string
+				# Try different decodings
+				decoded = None
+				
+				# Try UTF-8 first
 				try:
-					value_str = value.decode('utf-8')
-					# Try to parse as JSON
-					try:
-						storage_data[key] = json.loads(value_str)
-					except json.JSONDecodeError:
-						storage_data[key] = value_str
+					decoded = value.decode('utf-8')
 				except UnicodeDecodeError:
-					# If can't decode, store as hex representation
-					storage_data[key] = f"<binary: {value.hex()[:100]}...>"
+					pass
+				
+				# Try UTF-16 if utf16_length is set or UTF-8 failed
+				if decoded is None:
+					try:
+						decoded = value.decode('utf-16-le')
+					except UnicodeDecodeError:
+						pass
+				
+				# Try latin-1 as fallback (always succeeds)
+				if decoded is None:
+					try:
+						decoded = value.decode('latin-1')
+					except UnicodeDecodeError:
+						# Last resort - show as hex
+						storage_data[key] = f"<binary: {value.hex()}>"
+						continue
+				
+				# Now try to parse the decoded string as JSON
+				try:
+					storage_data[key] = json.loads(decoded)
+				except json.JSONDecodeError:
+					storage_data[key] = decoded
 			else:
 				# Try to parse as JSON
 				try:
