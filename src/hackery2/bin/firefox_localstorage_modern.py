@@ -160,24 +160,14 @@ def display_storage_data(all_storage_data, filter_origin=None, filter_key=None, 
 			displayed_any = True
 			total_items += 1
 			
-			if verbose:
-				print(f"\nKey: {key}")
-				
-				# Format the value for display
-				if isinstance(value, (dict, list)):
-					print(f"Value (JSON):\n{json.dumps(value, indent=2)}")
-				else:
-					value_str = str(value) if value is not None else "null"
-					if len(value_str) > 200 and not verbose:
-						print(f"Value (truncated): {value_str[:200]}...")
-					else:
-						print(f"Value: {value_str}")
+			print(f"\nKey: {key}")
+			
+			# Format the value for display
+			if isinstance(value, (dict, list)):
+				print(f"Value (JSON):\n{json.dumps(value, indent=2)}")
 			else:
-				# Compact display
-				value_preview = str(value) if value is not None else "null"
-				if len(value_preview) > 50:
-					value_preview = value_preview[:50] + "..."
-				print(f"  {key}: {value_preview}")
+				value_str = str(value) if value is not None else "null"
+				print(f"Value: {value_str}")
 		
 		if not displayed_any and filter_key:
 			print(f"  (No keys matching '{filter_key}')")
