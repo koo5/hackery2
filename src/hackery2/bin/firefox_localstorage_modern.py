@@ -62,36 +62,36 @@ def read_localstorage_file(data_sqlite_path, origin_name):
 			if value is None:
 				storage_data[key] = None
 			elif isinstance(value, bytes):
-				# Try different decodings
-				decoded = None
-				
-				# Try UTF-8 first
-				try:
-					decoded = value.decode('utf-8')
-				except UnicodeDecodeError:
-					pass
-				
-				# Try UTF-16 if utf16_length is set or UTF-8 failed
-				if decoded is None:
+				# Check if it's compressed (compression_type 1 means snappy compression)
+				if compression_type == 1:
+					# Firefox uses snappy compression for large values
+					# For now, just show it's compressed
+					hex_preview = value.hex()
+					# Check if it looks like UTF-16 (starts with specific bytes)
+					if hex_preview.startswith('f8'):
+						storage_data[key] = f"<compressed data, {len(value)} bytes>"
+					else:
+						# Try to decode as-is
+						try:
+							value_str = value.decode('utf-8')
+							try:
+								storage_data[key] = json.loads(value_str)
+							except json.JSONDecodeError:
+								storage_data[key] = value_str
+						except UnicodeDecodeError:
+							storage_data[key] = f"<binary: {value.hex()[:100]}...>"
+				else:
+					# Not compressed, try to decode
 					try:
-						decoded = value.decode('utf-16-le')
+						value_str = value.decode('utf-8')
+						# Try to parse as JSON
+						try:
+							storage_data[key] = json.loads(value_str)
+						except json.JSONDecodeError:
+							storage_data[key] = value_str
 					except UnicodeDecodeError:
-						pass
-				
-				# Try latin-1 as fallback (always succeeds)
-				if decoded is None:
-					try:
-						decoded = value.decode('latin-1')
-					except UnicodeDecodeError:
-						# Last resort - show as hex
-						storage_data[key] = f"<binary: {value.hex()}>"
-						continue
-				
-				# Now try to parse the decoded string as JSON
-				try:
-					storage_data[key] = json.loads(decoded)
-				except json.JSONDecodeError:
-					storage_data[key] = decoded
+						# If can't decode, store as hex representation
+						storage_data[key] = f"<binary: {value.hex()[:100]}...>"
 			else:
 				# Try to parse as JSON
 				try:
