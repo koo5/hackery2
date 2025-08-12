@@ -173,8 +173,8 @@ def import_noncows(source, hostname, target_fs, fss):
 def set_up_target(target_machine, quick):
 
 	if target_machine is None:
-		if not quick:
-			ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
+		#if not quick:
+		#	ccs('sudo swipl -s /home/koom/hackery2/src/hackery2/bin/disks.pl  -g "start"')
 		return  '', ''
 
 	insecure_speedups = ''
@@ -241,18 +241,14 @@ def get_filesystems():
 			'toplevel': '/bac4',
 			'subvols': m(['cold'])
 		},
-		# {
-		# 	'toplevel': '/home/koom/Sync',
-		# 	'subvols': m(['/'])
-		# },
-		# {
-		# 	'toplevel': '/',
-		# 	'subvols': m(['/']),
-		# },
-		# {
-		# 	'toplevel': '/bac18',
-		# 	'subvols': m(['/']),
-		# }
+		{
+			'toplevel': '/home/koom/Sync',
+			'subvols': m(['/'])
+		},
+		{
+			'toplevel': '/',
+			'subvols': m(['/']),
+		},
 		]
 	elif hostname == 't14':
 		fss = [{
@@ -264,7 +260,7 @@ def get_filesystems():
 			'subvols': m(['/', 'data/sync']),
 		}]
 	elif hostname == 'c1':
-		_use_db = False
+		#_use_db = False
 		fss = [{
 			'toplevel': '/',
 			'subvols': m(['/'])
@@ -278,6 +274,9 @@ def get_filesystems():
 
 def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only=False):
 	for fs in fss:
+		if not check_if_mounted_local(fs['toplevel']):
+			print('SKIP non-mounted ' + fs.toplevel)
+			continue
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
 			if subvol.get('just_push'):
@@ -523,6 +522,12 @@ def m(subvols):
 			'name':subvol,
 			'source_path':''} for subvol in subvols]
 
+
+def check_if_mounted_local(fs):
+	for line in co(shlex.split('cat /etc/mtab')).strip().split('\n'):
+		items = line.split()
+		if items[1] == fs or items[1] + '/' == fs:
+			return True
 
 
 def check_if_mounted(sshstr, target_fs):
