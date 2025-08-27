@@ -132,8 +132,12 @@ else
 	# get the body of the prompt and prepend each line with a #
 	set commented_prompt (cat $context_file | sed 's/^/# /' | string collect)
 
-	# run git commit with the commit message and diff
-	gcm (printf "%s\n\n%s" "$commit_message" "$commented_prompt" | string collect)  -e
+	# Create temporary file for commit message to avoid argument length limits
+	set commit_file (mktemp /tmp/commit_message.XXXXXX)
+	printf "%s\n\n%s" "$commit_message" "$commented_prompt" > $commit_file
+
+	# run git commit with message from file to avoid argument length limits
+	git commit -F $commit_file -e
 	and begin
 		# Clear intentions after successful commit
 		intention clear >/dev/null 2>&1
@@ -141,6 +145,6 @@ else
 	end
 
 	# Clean up temp files
-	#rm -f $context_file $F
+	rm -f $context_file $F $commit_file
 
 end

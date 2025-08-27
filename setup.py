@@ -60,7 +60,8 @@ setup(
         # Version control
         "gitpython",              # Git repository interaction
 
-        "json5",
+        "typer",
+#       "json5",
 #        "tkinter",
         
         # Optional dependencies (uncomment as needed for specific scripts)
