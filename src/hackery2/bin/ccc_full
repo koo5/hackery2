@@ -1,11 +1,15 @@
 #!/bin/env fish
 
-# Parse arguments for --no-context flag
+# Parse arguments
 set include_context true
+set do_push true
 set prompt_args
+
 for arg in $argv
 	if test "$arg" = "--no-context"
 		set include_context false
+	elif test "$arg" = "--no-push"
+		set do_push false
 	else
 		set prompt_args $prompt_args $arg
 	end
@@ -141,7 +145,9 @@ else
 	and begin
 		# Clear intentions after successful commit
 		intention clear >/dev/null 2>&1
-		gp
+		if test "$do_push" = "true"
+			gp
+		end
 	end
 
 	# Clean up temp files
