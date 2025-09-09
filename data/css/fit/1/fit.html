@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hello World Fit</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #f4f6f9;
+  }
+
+  .fit-box {
+    width: 100vw;
+    height: 100vh;
+    border: 2px solid #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .fit-text {
+    white-space: nowrap;   /* one line only */
+    line-height: 1;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="fit-box" id="box">
+  <div class="fit-text" id="text">  HE:LL:OooooooooooooooooooooooooooW</div>
+</div>
+
+<script>
+function fitText(el, {min=4, max=500, precision=0.5} = {}) {
+  const parent = el.parentElement;
+  if (!parent) return;
+  const availW = parent.clientWidth;
+  const availH = parent.clientHeight;
+  if (!availW || !availH) return;
+
+  el.style.fontSize = min + 'px';
+
+  const fits = (size) => {
+    el.style.fontSize = size + 'px';
+    return el.scrollWidth <= availW && el.scrollHeight <= availH;
+  };
+
+  let lo = min, hi = max;
+  if (!fits(min)) { hi = min; }
+  else if (fits(max)) { lo = max; }
+  else {
+    while (hi - lo > precision) {
+      const mid = (lo + hi) / 2;
+      if (fits(mid)) lo = mid; else hi = mid;
+    }
+  }
+  el.style.fontSize = Math.floor(lo) + 'px';
+}
+
+const text = document.getElementById('text');
+const box  = document.getElementById('box');
+
+const refit = () => fitText(text);
+
+new ResizeObserver(refit).observe(box);
+window.addEventListener('resize', refit);
+refit();
+</script>
+</body>
+</html>

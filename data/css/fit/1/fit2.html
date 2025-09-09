@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Auto-Fitting Table (Pure JS)</title>
+<style>
+  :root { color-scheme: light dark; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    background: Canvas;
+    color: CanvasText;
+    font-family: system-ui, sans-serif;
+  }
+
+  /* Container the table must fit inside */
+  .fit-box {
+    width: min(92vw, 1100px);
+    height: min(82vh, 640px);
+    padding: 12px;                         /* reduces available space (respected by fitter) */
+    border: 1px solid color-mix(in oklch, CanvasText 20%, Canvas);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    display: grid;
+    place-items: center;
+    overflow: hidden;                       /* no scrollbars during search */
+    background: Canvas;
+  }
+
+  /* We scale the font-size on this wrapper */
+  .fit-content {
+    display: inline-block;                  /* accurate scrollWidth/Height */
+    line-height: 1.05;                      /* tighter vertical spacing */
+    white-space: nowrap;                    /* cells stay single-line */
+  }
+
+  table {
+    border-collapse: collapse;
+    table-layout: fixed;                    /* predictable column widths */
+    white-space: nowrap;
+  }
+  caption {
+    caption-side: top;
+    margin-bottom: 0.4em;
+    font-weight: 600;
+    letter-spacing: .02em;
+  }
+  td {
+    border: 1px solid color-mix(in oklch, CanvasText 18%, Canvas);
+    padding: .25em .5em;                    /* scales with font-size */
+    min-width: 2.6em;                       /* keeps very small grids readable */
+    text-align: center;
+    user-select: none;
+  }
+
+  .hud {
+    position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+    font: 12px/1.3 system-ui, sans-serif; opacity: .7;
+    background: color-mix(in oklch, Canvas 60%, CanvasText 10%);
+    padding: 6px 10px; border-radius: 999px; border: 1px solid color-mix(in oklch, CanvasText 15%, Canvas);
+    backdrop-filter: blur(4px);
+  }
+</style>
+</head>
+<body>
+
+<div class="fit-box" id="box">
+  <div class="fit-content" id="fit">
+    <table id="table">
+      <caption id="cap">—</caption>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="hud" id="hud">Fitting…</div>
+
+<script>
+/* ---------- Font-size fitter (binary search) ---------- */
+function fitToParent(el, opts = {}) {
+  const {
+    min = 6,          // px
+    max = 600,        // px
+    precision = 0.5,  // stop when hi-lo <= precision
+    safety = 0        // subtract from available W/H if you ever see rounding clips
+  } = opts;
+
+  const parent = el.parentElement;
+  if (!parent) return;
+
+  const availW = Math.max(0, parent.clientWidth  - safety);
+  const availH = Math.max(0, parent.clientHeight - safety);
+  if (!availW || !availH) return;
+
+  // Stabilize layout
+  el.style.fontSize = min + "px";
+
+  const fits = (size) => {
+    el.style.fontSize = size + "px";
+    const eps = 0.5; // allow for subpixel rounding
+    return el.scrollWidth  <= availW + eps &&
+           el.scrollHeight <= availH + eps;
+  };
+
+  let lo = min, hi = max;
+
+  if (!fits(min)) {
+    hi = min; // even min overflows
+  } else if (fits(max)) {
+    lo = max; // even max fits
+  } else {
+    while (hi - lo > precision) {
+      const mid = (lo + hi) / 2;
+      if (fits(mid)) lo = mid; else hi = mid;
+    }
+  }
+
+  el.style.fontSize = Math.floor(lo) + "px";
+}
+
+/* ---------- Table builder ---------- */
+function renderTable(tbody, rows, cols) {
+  // Build rows efficiently
+  const frag = document.createDocumentFragment();
+  for (let r = 0; r < rows; r++) {
+    const tr = document.createElement("tr");
+    for (let c = 0; c < cols; c++) {
+      const td = document.createElement("td");
+      td.textContent = `${r + 1}×${c + 1}`;
+      tr.appendChild(td);
+    }
+    frag.appendChild(tr);
+  }
+  tbody.replaceChildren(frag);
+}
+
+/* ---------- Animation loop (vary rows/cols) ---------- */
+(function main() {
+  const box  = document.getElementById("box");
+  const fit  = document.getElementById("fit");
+  const tbody= document.getElementById("tbody");
+  const cap  = document.getElementById("cap");
+  const hud  = document.getElementById("hud");
+
+  let rows = 1, cols = 1;
+  let dr = +1, dc = +1;
+  const RMIN = 1, RMAX = 14;
+  const CMIN = 1, CMAX = 16;
+
+  function step() {
+    rows += dr;
+    cols += dc;
+    if (rows >= RMAX || rows <= RMIN) dr *= -1;
+    if (cols >= CMAX || cols <= CMIN) dc *= -1;
+
+    cap.textContent = `${rows} × ${cols}`;
+    renderTable(tbody, rows, cols);
+
+    // Fit after DOM updates
+    requestAnimationFrame(() => fitToParent(fit, { min: 6, max: 600, precision: 0.5, safety: 0 }));
+  }
+
+  // Kick off and repeat
+  step();
+  const timer = setInterval(step, 450);
+
+  // Refit on container/window changes
+  const ro = new ResizeObserver(() => requestAnimationFrame(() =>
+    fitToParent(fit, { min: 6, max: 600, precision: 0.5, safety: 0 })
+  ));
+  ro.observe(box);
+  window.addEventListener("resize", () =>
+    requestAnimationFrame(() => fitToParent(fit, { min: 6, max: 600 }))
+  );
+
+  // Initial HUD update + clean up
+  const updHud = () => {
+    hud.textContent = `Rows: ${rows}  |  Cols: ${cols}  |  font-size: ${getComputedStyle(fit).fontSize}`;
+  };
+  const hudTick = setInterval(updHud, 250);
+
+  // Initial fit
+  requestAnimationFrame(() => {
+    fitToParent(fit, { min: 6, max: 600 });
+    updHud();
+  });
+
+  window.addEventListener("beforeunload", () => {
+    clearInterval(timer);
+    clearInterval(hudTick);
+    ro.disconnect();
+  });
+})();
+</script>
+</body>
+</html>

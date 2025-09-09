@@ -6,9 +6,10 @@ set do_push true
 set prompt_args
 
 for arg in $argv
+	echo aaa $arg
 	if test "$arg" = "--no-context"
 		set include_context false
-	elif test "$arg" = "--no-push"
+	else if test "$arg" = "--no-push"
 		set do_push false
 	else
 		set prompt_args $prompt_args $arg
