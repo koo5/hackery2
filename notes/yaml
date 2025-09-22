@@ -1,0 +1,2 @@
+Every time there's yaml, you can use dhall and compile to json instead. You get typing and strictness that way - regardless of whether the service allows it internally. - https://news.ycombinator.com/item?id=44658820
+

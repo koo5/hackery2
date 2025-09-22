@@ -227,10 +227,6 @@ def get_filesystems():
 	elif hostname == 'jj':
 		fss = [
 			{
-				'toplevel': '/var',
-				'subvols': m(['/']),
-			},
-			{
 				'toplevel': '/d2',
 				'subvols': m(['u/sync', 'u', 'dev3', 'home', '/']),
 			},

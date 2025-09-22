@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+    echo "Usage: k <command> [args...]"
+    echo "Opens a new Konsole window running the specified command"
+    exit 1
+fi
+
+# Create timestamp for unique profile name
+TIMESTAMP=$(date +%Y%m%d_%H%M%S_%N)
+PROFILE_NAME="${TIMESTAMP}"
+PROFILE_PATH="$HOME/.local/share/konsole/${PROFILE_NAME}.profile"
+
+# Copy base profile
+cp "$HOME/.local/share/konsole/base.profile" "$PROFILE_PATH"
+
+# Update the command in the profile
+# Escape the command properly for the profile file
+COMMAND="$*"
+sed -i "s|^Command=.*|Command=$COMMAND|" "$PROFILE_PATH"
+
+# Start konsole with the new profile
+konsole --profile "$PROFILE_NAME"
+

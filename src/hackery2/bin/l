@@ -1,0 +1,4 @@
+#!/bin/env fish
+
+stdbuf -i0 -o0 -e0 $argv
+
