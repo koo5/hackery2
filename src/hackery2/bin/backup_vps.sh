@@ -12,14 +12,14 @@ sleep 1; e
 echo start
 
 rsync -av --progress -h -e hpnssh -r $argv[3] \
-  --exclude 'dont_backup'  \
-  --exclude 'venv' \
-  --exclude '.venv' \
-  --exclude '.cache'  \
-  --exclude '__pycache__'  \
-  --exclude '.npm'  \
-  --exclude 'site-packages'  \
-  --exclude 'node_modules'   \
+  --exclude '*/dont_backup/**'  \
+  --exclude '*/venv/' \
+  --exclude '*/.venv/' \
+  --exclude '*/.cache/'  \
+  --exclude '*/__pycache__/'  \
+  --exclude '*/.npm/'  \
+  --exclude '*/site-packages/'  \
+  --exclude '*/node_modules/'   \
   --exclude '/var/cache/'  \
   --include '/var/lib/'   \
   --include '/var/lib/docker/'  \
