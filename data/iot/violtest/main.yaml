@@ -5,6 +5,8 @@ ota:
     password: !secret otapass
 
 
+
+
 wifi:
   power_save_mode: none
 
@@ -59,14 +61,12 @@ web_server:
 
 esp32:
   board: lolin_s2_mini
+  framework:
+    type: esp-idf
 
 
 esphome:
   name: {{ dirbid }}
-  on_boot:
-    then:
-      - logger.log: 'bOooOoOoOooOoOooOoOoOooOoOooOoOoOooOoOoOoOt'
-
 
 
 mqtt:
@@ -102,6 +102,11 @@ text_sensor:
       name: ESP Latest Scan Results
     dns_address:
       name: ESP DNS Address
+  - platform: debug
+    device:
+      name: "Device Info"
+    reset_reason:
+      name: "Reset Reason"
 
   - platform: template
     name: "d"
@@ -110,6 +115,9 @@ text_sensor:
     update_interval: 100s
 
 
+
+debug:
+  update_interval: 5s
 
 
 sensor:
