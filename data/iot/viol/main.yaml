@@ -40,9 +40,6 @@ wifi:
       dns1: !secret gateway3
       dns2: 8.8.8.8
 
-  - ssid: !secret ssid4
-    password: !secret password4
-
   use_address: "{{ dirbid }}.local"
 
 network:
@@ -50,15 +47,18 @@ network:
 
 
 logger:
-  level: DEBUG
+  level: INFO
 
 
 web_server:
   port: 80
 
 
+
 esp32:
   board: lolin_s2_mini
+  framework:
+    type: esp-idf
 
 
 esphome:

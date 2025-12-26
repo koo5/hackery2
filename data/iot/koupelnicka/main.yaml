@@ -40,9 +40,6 @@ wifi:
       dns1: !secret gateway3
       dns2: 8.8.8.8
 
-  - ssid: !secret ssid4
-    password: !secret password4
-
   use_address: "{{ dirbid }}.local"
 
 network:
@@ -57,8 +54,11 @@ web_server:
   port: 80
 
 
+
 esp32:
   board: lolin_s2_mini
+  framework:
+    type: esp-idf
 
 
 esphome:
@@ -105,19 +105,6 @@ text_sensor:
 
 
 
-sun:
-  latitude: 50.0755°
-  longitude: 14.4378°
-
-  on_sunrise:
-    - then:
-        - logger.log: Good morning!
-  on_sunset:
-    - then:
-        - logger.log: Good evening!
-
-
-
 time:
   - platform: sntp
     id: ntp
@@ -131,13 +118,6 @@ sensor:
     update_interval: 1s
   - platform: uptime
     name: Uptime Sensor
-  - platform: sun
-    name: Sun Elevation
-    type: elevation
-  - platform: sun
-    name: Sun Azimuth
-    type: azimuth
-
 
 
 

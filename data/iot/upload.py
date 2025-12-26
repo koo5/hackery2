@@ -66,8 +66,8 @@ def run(dir: pathlib.Path, bid=0, cmd='run', device='', podman='docker'):
 
 
 	config = {}
-	config['dir'] = name
-	config['bid'] = bid
+	config['dir'] = name # directory of the esphome config
+	config['bid'] = bid # board id
 	config['dirbid'] = f'{name}{bid}'
 
 	config_file = pathlib.Path(name / 'config.py')

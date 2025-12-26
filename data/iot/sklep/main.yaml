@@ -2,7 +2,7 @@
 substitutions:
   ip: 10.0.0.47
   clock: ntp
-  mqtt_topic_prefix: $name
+#  mqtt_topic_prefix: $name
 
 
 esphome:
@@ -27,14 +27,24 @@ ota:
 
 wifi:
 #  enable_on_boot: false  # new config option
+
   networks:
-  - ssid: !secret ssid
-    password: !secret password
+  - ssid: !secret ssid1
+    password: !secret password1
     manual_ip:
-      static_ip: $ip
-      gateway: 10.0.0.138
+      static_ip: !secret ip1
+      gateway: !secret gateway1
       subnet: 255.255.255.0
-      dns1: 10.0.0.138
+      dns1: !secret gateway1
+      dns2: 8.8.8.8
+
+  - ssid: !secret ssid2
+    password: !secret password2
+    manual_ip:
+      static_ip: !secret ip2
+      gateway: !secret gateway2
+      subnet: 255.255.255.0
+      dns1: !secret gateway2
       dns2: 8.8.8.8
 
 
@@ -45,7 +55,7 @@ network:
 
 web_server:
   port: 80
-  ota: true
+
 
 
 mqtt:
@@ -56,7 +66,7 @@ mqtt:
   keepalive: 10s
   reboot_timeout: 50min
   #topic_prefix: $mqtt_topic_prefix
-  topic_prefix: "koo5/sklep"
+  #topic_prefix: "koo5/sklep"
 
 sensor:
 
