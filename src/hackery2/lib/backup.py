@@ -252,7 +252,7 @@ def get_filesystems():
 		},
 		{
 			'toplevel': '/data',
-			'subvols': m(['/', {path: 'data/sync', 'snapshot_only': True}]),
+			'subvols': m(['/', {'path': 'data/sync', 'snapshot_only': True}]),
 		}]
 	return fss
 
@@ -266,7 +266,11 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, sna
 			continue
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
-			if subvol.get('snapshot_only') and not snapshot_only:
+
+			if isinstance(subvol, dict):
+				subvol_is_snapshot_only = subvol.get('snapshot_only', False)
+				subvol = subvol['path']
+			if not snapshot_only and subvol_is_snapshot_only:
 				continue
 			if subvol.get('just_push'):
 				if not local:
