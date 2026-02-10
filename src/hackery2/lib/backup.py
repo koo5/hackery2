@@ -100,8 +100,8 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 
 	print(f'_run_backup: source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}, snapshot_only = {snapshot_only}')
 
-	default_target_machine = 'r64'
-	default_target_fs='/bac18/'
+	default_target_machine = 'jj'
+	default_target_fs='/bac20/'
 
 	if hostname == 'r64':
 		default_target_machine = None
@@ -131,16 +131,15 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	if hostname != 'r64':
 		sync_stuff(hostname)
 
-	# grab whatever info would not be transferred from ext4 partitions
-	#srun('sudo snap save')
-
-	srun('snap list | sudo tee /root/snap_list')
-	srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
-	#anything else?
-	#pause firefox? pause some vms?
-
 	if vpss:
 		backup_vpss(target_fs)
+	else:
+		# grab whatever info would not be transferred from ext4 partitions
+		srun('sudo snap save')
+		srun('snap list | sudo tee /root/snap_list')
+		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
+		# anything else?
+		# pause firefox? pause some vms?
 
 	import_noncows(source, hostname, target_fs, fss)
 
@@ -159,7 +158,6 @@ def sync_stuff(hostname):
 	where = f'/d/sync/jj/host/{hostname}/'
 	what = f'/home/koom/.local/share/fish/fish_history'
 	cc(ss(f'mkdir -p {where}'))
-
 	srun(f'rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
 
 
@@ -227,17 +225,18 @@ def get_filesystems():
 	elif hostname == 'jj':
 		fss = [
 			{
+				'toplevel': '/bac20',
+				'subvols': m(['cold'])
+			},
+			{
 				'toplevel': '/d2',
 				'subvols': m(['u/sync', 'u', 'dev3', 'home', '/']),
 			},
 		]
-
 	elif hostname == 'r64':
-		fss = [{
-			'toplevel': '/bac4',
-			'subvols': m(['cold'])
-		},
+		fss = [
 		{
+			'snapshot_only': True,
 			'toplevel': '/home/koom/Sync',
 			'subvols': m(['/'])
 		},
@@ -253,28 +252,22 @@ def get_filesystems():
 		},
 		{
 			'toplevel': '/data',
-			'subvols': m(['/', 'data/sync']),
-		}]
-	elif hostname == 'c1':
-		#_use_db = False
-		fss = [{
-			'toplevel': '/',
-			'subvols': m(['/'])
-		},
-		{
-			'toplevel': '/home/koom',
-			'subvols': m(['/']),
+			'subvols': m(['/', {path: 'data/sync', 'snapshot_only': True}]),
 		}]
 	return fss
 
 
 def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only=False):
 	for fs in fss:
+		if fs.get('snapshot_only') and not snapshot_only:
+			continue
 		if not check_if_mounted_local(fs['toplevel']):
-			print('SKIP non-mounted ' + fs.toplevel)
+			print('SKIP non-mounted ' + fs['toplevel'])
 			continue
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
+			if subvol.get('snapshot_only') and not snapshot_only:
+				continue
 			if subvol.get('just_push'):
 				if not local:
 					print('PUSH ' + toplevel + '/' + subvol['path'])

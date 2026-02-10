@@ -1,0 +1,2 @@
+#!/usr/bin/env fish
+date --utc +%Y-%m-%d_%H-%M-%S_UTC
