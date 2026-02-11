@@ -264,13 +264,12 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, sna
 		if not check_if_mounted_local(fs['toplevel']):
 			print('SKIP non-mounted ' + fs['toplevel'])
 			continue
+		if local and Path(fs['toplevel']) == Path(target_fs):
+			print('SKIP local ' + fs['toplevel'])
+			continue
 		toplevel = fs['toplevel']
 		for subvol in fs['subvols']:
-
-			if isinstance(subvol, dict):
-				subvol_is_snapshot_only = subvol.get('snapshot_only', False)
-				subvol = subvol['path']
-			if not snapshot_only and subvol_is_snapshot_only:
+			if not snapshot_only and subvol.get('snapshot_only'):
 				continue
 			if subvol.get('just_push'):
 				if not local:
@@ -512,8 +511,10 @@ def find_backup_subvols(fs):
 def m(subvols):
 	"""return subvol specifications for a machine's filesystem"""
 	return [{'target_dir': hostname,
-			'name':subvol,
-			'source_path':''} for subvol in subvols]
+			'name': subvol if isinstance(subvol, str) else subvol['path'],
+			'source_path':'',
+			 'snapshot_only': isinstance(subvol, dict) and subvol.get('snapshot_only', False)
+			 } for subvol in subvols]
 
 
 def check_if_mounted_local(fs):
