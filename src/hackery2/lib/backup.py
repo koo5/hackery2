@@ -135,7 +135,7 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 		backup_vpss(target_fs)
 	else:
 		# grab whatever info would not be transferred from ext4 partitions
-		srun('sudo snap save')
+		#srun('sudo snap save')
 		srun('snap list | sudo tee /root/snap_list')
 		srun('ubuntu_selected_packages list | sudo tee /root/apt_list')
 		# anything else?
