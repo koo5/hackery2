@@ -1,4 +1,4 @@
 #!/bin/env fish
 
-stdbuf -i0 -o0 -e0 $argv
+PYTHONUNBUFFERED=1 stdbuf -i0 -o0 -e0 $argv
 
