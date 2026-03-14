@@ -61,7 +61,7 @@ setup(
         "gitpython",              # Git repository interaction
 
         "typer",
-#       "json5",
+       "json5",
 #        "tkinter",
         
         # Optional dependencies (uncomment as needed for specific scripts)

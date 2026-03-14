@@ -535,6 +535,9 @@ def check_if_mounted(sshstr, target_fs):
 
 
 if __name__ == "__main__":
+	if _use_db:
+		if subprocess.call(['bash', '-c', """PGPASSWORD='bfg' psql -h hours.internal -U bfg -d bfg -1 -c "select from snapshots" --echo-all"""], stdout=subprocess.PIPE) != 0:
+			sys.exit(1)
 	cli()
 
 
