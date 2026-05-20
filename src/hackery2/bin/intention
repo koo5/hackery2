@@ -14,7 +14,7 @@ if test -z "$git_root"
     exit 1
 end
 set intention_file "$git_root/.dev_intention"
-
+echo "using $intention_file ..."
 function show_help
     echo "Usage: intention <command> [args]"
     echo "Commands:"
@@ -32,9 +32,8 @@ end
 
 set command $argv[1]
 
-switch $command
+switch "$command"
     case add
-    case update
         if test (count $argv) -lt 2
             echo "Error: Please provide intention text"
             exit 1

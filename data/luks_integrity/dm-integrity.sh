@@ -9,15 +9,16 @@ echo
 echo "dm-integrity ..."
 
 # clean the header
-dd status=none if=/dev/zero bs=4096 count=10 of=$DEV  conv=notrunc
+dd status=none if=/dev/zero bs=4096 count=10 of=$BENCHMARK_DEVICE  conv=notrunc
 
 
-echo "YES" | integritysetup format $CYP $DEV
-sh -x -c "integritysetup open $DEV $CRYPTDEV"
+echo "YES" | integritysetup format $CYP $BENCHMARK_DEVICE
+sh -x -c "integritysetup open $BENCHMARK_DEVICE $CRYPTDEV"
+DEV_BLOCKS=$(($(blockdev --getsize64 /dev/mapper/$CRYPTDEV) / BS))
 
 echo
 echo "writing..."
-sh -x -c "$DD if=/dev/zero bs=$BS count=$BCDATA of=/dev/mapper/$CRYPTDEV"
+$BENCH_DD "dm-integrity $CYP write" $DD if=/dev/zero bs=$BS count=$DEV_BLOCKS of=/dev/mapper/$CRYPTDEV
 echo
 sync
 $UPTIME
@@ -29,8 +30,9 @@ $DROP_CACHES
 
 echo
 echo "reading it back:"
-integritysetup   open   $DEV $CRYPTDEV
-sh -x -c "$DD_NOSYNC  if=/dev/mapper/$CRYPTDEV bs=$BS count=$BCDATA of=/dev/null"
+integritysetup   open   $BENCHMARK_DEVICE $CRYPTDEV
+DEV_BLOCKS=$(($(blockdev --getsize64 /dev/mapper/$CRYPTDEV) / BS))
+$BENCH_DD "dm-integrity $CYP read" $DD_NOSYNC if=/dev/mapper/$CRYPTDEV bs=$BS count=$DEV_BLOCKS of=/dev/null
 echo
 sync
 $UPTIME

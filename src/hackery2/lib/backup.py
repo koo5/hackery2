@@ -179,12 +179,12 @@ def set_up_target(target_machine, quick):
 	ssh = get_hpnssh_executable()
 
 	if target_machine == 'r64.internal':
-		insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
+		#insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
 		long_ssh = ' -o ServerAliveInterval=600 -o ServerAliveCountMax=999999  -o TCPKeepAlive=no  '
 		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {long_ssh} {insecure_speedups} koom@r64.internal'
 
 	if target_machine == 'jj.internal':
-		insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
+		#insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
 		long_ssh = ' -o ServerAliveInterval=600 -o ServerAliveCountMax=999999  -o TCPKeepAlive=no  '
 		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {long_ssh} {insecure_speedups} koom@jj.internal'
 
@@ -196,8 +196,8 @@ def set_up_target(target_machine, quick):
 
 	elif target_machine == 'r64':
 		r64_ip = get_r64_ip()
-		if r64_ip.startswith('10.'):
-			insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
+		#if r64_ip.startswith('10.'):
+		#	insecure_speedups = '-o NoneSwitch=yes  -o NoneEnabled=yes'
 		sshstr = f'{ssh}  -p 2222  -o TCPRcvBufPoll=yes {insecure_speedups} koom@{r64_ip}'
 
 	else:
@@ -226,7 +226,8 @@ def get_filesystems():
 		fss = [
 			{
 				'toplevel': '/bac20',
-				'subvols': m(['cold'])
+				'subvols': m(['cold']),
+				'transfer_only': True
 			},
 			{
 				'toplevel': '/d2',
@@ -260,6 +261,8 @@ def get_filesystems():
 def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only=False):
 	for fs in fss:
 		if fs.get('snapshot_only') and not snapshot_only:
+			continue
+		if fs.get('transfer_only', False) and snapshot_only:
 			continue
 		if not check_if_mounted_local(fs['toplevel']):
 			print('SKIP non-mounted ' + fs['toplevel'])

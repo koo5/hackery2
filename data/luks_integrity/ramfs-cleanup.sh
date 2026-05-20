@@ -2,7 +2,7 @@
 
 echo "cleanup:"
 ./close.sh
-rm $DEV || true
+rm $BENCHMARK_DEVICE || true
 umount $MNT || true
 
 

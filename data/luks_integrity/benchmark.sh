@@ -12,7 +12,7 @@ echo
 echo
 echo
 echo "raw write:"
-sh -x -c "$DD if=/dev/zero bs=$BS count=$BC of=$DEV"
+$BENCH_DD "raw write" $DD if=/dev/zero bs=$BS count=$BC of=$BENCHMARK_DEVICE
 sync
 $UPTIME
 echo
@@ -20,12 +20,12 @@ echo
 $DROP_CACHES
 echo
 echo "raw read:"
-sh -x -c "$DD_NOSYNC if=$DEV bs=$BS count=$BC of=/dev/null"
+$BENCH_DD "raw read" $DD_NOSYNC if=$BENCHMARK_DEVICE bs=$BS count=$BC of=/dev/null
 sync
 $UPTIME
 
 
-echo
+echo;echo;echo;echo;
 free -h | grep -v Swap || true
 
 echo "DM-INTEGRITY"
@@ -41,7 +41,7 @@ export CYP="--integrity sha256"
 
 
 
-echo
+echo;echo;echo;echo;
 free -h | grep -v Swap || true
 
 echo "LUKS2"
@@ -58,20 +58,22 @@ export CYP="--integrity hmac-sha256"
 export CYP=" --cipher=chacha20-random  --integrity=poly1305"
 ./try_cyp.sh
 
+#echo;echo;echo;echo;
+#echo "LUKS INSIDE DM-INTEGRITY"
+#
+#export CYP=""
+#
+#export INTEGRITY_CYP="--integrity crc32c"
+#./luks_inside_dm-integrity.sh
+#
+#export INTEGRITY_CYP="--integrity sha1"
+#./luks_inside_dm-integrity.sh
+#
+#export INTEGRITY_CYP="--integrity sha256"
+#./luks_inside_dm-integrity.sh
 
-echo "LUKS INSIDE DM-INTEGRITY"
 
-
-export CYP=""
-
-export INTEGRITY_CYP="--integrity crc32c"
-./luks_inside_dm-integrity.sh
-
-export INTEGRITY_CYP="--integrity sha1"
-./luks_inside_dm-integrity.sh
-
-export INTEGRITY_CYP="--integrity sha256"
-./luks_inside_dm-integrity.sh
-
-
+echo;echo;echo
+echo "=== BENCHMARK RESULTS ==="
+echo "Test|Speed" | cat - "$RESULTS_FILE" | column -t -s'|'
 
