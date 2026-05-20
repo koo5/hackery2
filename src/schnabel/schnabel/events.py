@@ -11,10 +11,14 @@ from __future__ import annotations
 import contextlib
 import os
 import uuid
+from datetime import datetime, timezone
 from typing import Any, Callable, Iterable, Optional, Union
 
 from rdflib import Dataset, Literal, URIRef
+from rdflib.namespace import RDF, XSD
 from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore
+
+from . import vocab
 
 try:
     import json5 as _jsonlib
@@ -87,7 +91,6 @@ class EventLog:
             return
 
         self._is_null = False
-        self._default_graph = URIRef(config.get("default_graph", DEFAULT_GRAPH))
         backend = config.get("backend", "memory")
         self._backend = backend
 
@@ -121,10 +124,14 @@ class EventLog:
     # --- emit -------------------------------------------------------------
 
     def emit(self, s, p, o, g=None) -> None:
-        """Emit one quad. Terms must be rdflib URIRef/BNode/Literal."""
+        """Emit one quad. Terms must be rdflib URIRef/BNode/Literal.
+        ``g=None`` writes into the dataset's default graph — discoverable by
+        plain SPARQL triple patterns (no GRAPH wrapper needed). This is the
+        brn/pyin "default graph for pointers" idiom.
+        """
         if self._is_null:
             return
-        quad: Quad = (s, p, o, g if g is not None else self._default_graph)
+        quad: Quad = (s, p, o, g)
         if self._buffer is not None:
             self._buffer.append(quad)
         else:
@@ -133,10 +140,7 @@ class EventLog:
     def emit_many(self, quads: Iterable[Quad]) -> None:
         if self._is_null:
             return
-        materialized = [
-            (s, p, o, g if g is not None else self._default_graph)
-            for (s, p, o, g) in quads
-        ]
+        materialized = list(quads)
         if self._buffer is not None:
             self._buffer.extend(materialized)
         else:
@@ -167,14 +171,20 @@ class EventLog:
         if self._backend == "nquads-file":
             assert self._nquads_file is not None
             for s, p, o, g in quads:
-                self._nquads_file.write(
-                    f"{s.n3()} {p.n3()} {o.n3()} {g.n3()} .\n"
-                )
+                if g is None:
+                    self._nquads_file.write(f"{s.n3()} {p.n3()} {o.n3()} .\n")
+                else:
+                    self._nquads_file.write(
+                        f"{s.n3()} {p.n3()} {o.n3()} {g.n3()} .\n"
+                    )
             self._nquads_file.flush()
         else:
             assert self._dataset is not None
             for s, p, o, g in quads:
-                self._dataset.add((s, p, o, g))
+                if g is None:
+                    self._dataset.add((s, p, o))
+                else:
+                    self._dataset.add((s, p, o, g))
 
     # --- identifiers ------------------------------------------------------
 
@@ -197,10 +207,11 @@ class EventLog:
     # --- pointer idiom ----------------------------------------------------
 
     def pointer_swap(self, s, p, o, g=None) -> None:
-        """Atomically replace ``s p ?o`` with ``s p o`` in ``g``.
+        """Atomically replace ``s p ?o`` with ``s p o``.
 
         The brn / pyin "latest pointer" idiom. Stable subject; ``rdf:value``-style
-        predicate; the object is the current pointer-target.
+        predicate; the object is the current pointer-target. ``g=None`` lands in
+        the dataset's default graph so consumers can query without a GRAPH wrapper.
         """
         if self._is_null:
             return
@@ -208,10 +219,13 @@ class EventLog:
             raise NotImplementedError(
                 "pointer_swap requires a queryable backend (memory or sparql-http)"
             )
-        target = g if g is not None else self._default_graph
-        graph_handle = self._dataset.graph(target)
-        graph_handle.remove((s, p, None))
-        graph_handle.add((s, p, o))
+        if g is None:
+            self._dataset.remove((s, p, None))
+            self._dataset.add((s, p, o))
+        else:
+            graph_handle = self._dataset.graph(g)
+            graph_handle.remove((s, p, None))
+            graph_handle.add((s, p, o))
 
     # --- query ------------------------------------------------------------
 
@@ -232,6 +246,61 @@ class EventLog:
         if graph is None:
             return self._dataset.quads()
         return self._dataset.quads((None, None, None, graph))
+
+    # --- high-level: invocation lifecycle ---------------------------------
+
+    @contextlib.contextmanager
+    def invocation(self, type_iri: URIRef, *, suffix: Optional[str] = None):
+        """Wrap a unit of work as an invocation graph.
+
+        On entry: mint a fresh graph IRI, emit ``(inv rdf:type <type_iri>)`` and
+        ``startedAt`` into that graph, swap the ``latest_invocation`` pointer.
+        On normal exit: emit ``status=complete`` and ``endedAt``.
+        On exception: emit ``status=failed``, ``error``, ``endedAt`` and re-raise.
+
+        Yields an ``_InvocationHandle`` that gives the body convenient
+        graph-scoped ``emit()`` and ``emit_about()``. In null-mode the handle's
+        IRI is ``None`` and all its methods are no-ops.
+        """
+        if self._is_null:
+            yield _InvocationHandle(self, None)
+            return
+
+        if suffix is None:
+            # Derive a short suffix from the type IRI's last segment so the
+            # graph IRI is a bit more debuggable: urn:schnabel:graph:<uuid>_localcommit
+            tail = str(type_iri)
+            for sep in (":", "/", "#"):
+                if sep in tail:
+                    tail = tail.rsplit(sep, 1)[-1]
+            suffix = tail.lower()
+
+        inv = self.graph(suffix=suffix)
+        started = datetime.now(timezone.utc).isoformat()
+
+        with self.batch():
+            self.emit(inv, RDF.type, type_iri, g=inv)
+            self.emit(inv, vocab.started_at,
+                Literal(started, datatype=XSD.dateTime), g=inv)
+            self.pointer_swap(vocab.latest_invocation, vocab.points_to, inv)
+
+        handle = _InvocationHandle(self, inv)
+        try:
+            yield handle
+        except BaseException as exc:
+            with self.batch():
+                self.emit(inv, vocab.status, vocab.STATUS_FAILED, g=inv)
+                self.emit(inv, vocab.error, Literal(str(exc)), g=inv)
+                self.emit(inv, vocab.ended_at,
+                    Literal(datetime.now(timezone.utc).isoformat(),
+                            datatype=XSD.dateTime), g=inv)
+            raise
+
+        with self.batch():
+            self.emit(inv, vocab.status, vocab.STATUS_COMPLETE, g=inv)
+            self.emit(inv, vocab.ended_at,
+                Literal(datetime.now(timezone.utc).isoformat(),
+                        datatype=XSD.dateTime), g=inv)
 
     # --- subscribe (phase 3) ----------------------------------------------
 
@@ -268,3 +337,35 @@ class EventLog:
     def is_null(self) -> bool:
         """True when no config was provided/found and all operations are no-ops."""
         return self._is_null
+
+
+class _InvocationHandle:
+    """Graph-scoped facade yielded by ``EventLog.invocation()``.
+
+    Carries the invocation IRI and provides ``emit()`` / ``emit_about()`` that
+    automatically scope to the invocation's graph. In null-mode ``iri`` is
+    ``None`` and all methods short-circuit.
+    """
+
+    __slots__ = ("log", "iri")
+
+    def __init__(self, log: "EventLog", iri: Optional[URIRef]):
+        self.log = log
+        self.iri = iri
+
+    def emit(self, p, o) -> None:
+        """Emit ``(iri, p, o)`` in the invocation's graph."""
+        if self.iri is None:
+            return
+        self.log.emit(self.iri, p, o, g=self.iri)
+
+    def emit_about(self, s, p, o) -> None:
+        """Emit ``(s, p, o)`` in the invocation's graph — for child resources
+        (e.g. a snapshot the invocation produced) where ``s`` isn't the
+        invocation itself."""
+        if self.iri is None:
+            return
+        self.log.emit(s, p, o, g=self.iri)
+
+    def bn(self, suffix: str = "") -> URIRef:
+        return self.log.bn(suffix=suffix)

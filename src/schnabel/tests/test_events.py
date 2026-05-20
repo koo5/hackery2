@@ -5,9 +5,20 @@ import os
 
 import pytest
 from rdflib import Literal, URIRef
+from rdflib.namespace import RDF
 
 from schnabel.events import EventLog, parse_descriptor
-from schnabel.vocab import BFG, latest_invocation, points_to
+from schnabel.vocab import (
+    BFG,
+    latest_invocation,
+    points_to,
+    started_at,
+    ended_at,
+    status as status_pred,
+    error as error_pred,
+    STATUS_COMPLETE,
+    STATUS_FAILED,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -106,22 +117,27 @@ def test_pointer_swap_replaces_prior_value():
     log.pointer_swap(latest_invocation, points_to, a)
     log.pointer_swap(latest_invocation, points_to, b)
 
+    # Pointer lives in the default graph; query without a GRAPH wrapper.
     matches = list(log.query(
-        "SELECT ?o WHERE { GRAPH ?g { <urn:schnabel:vocab:core:latest_invocation> "
-        "<urn:schnabel:vocab:core:points_to> ?o } }"
+        "SELECT ?o WHERE { <urn:schnabel:vocab:core:latest_invocation> "
+        "<urn:schnabel:vocab:core:points_to> ?o }"
     ))
     assert len(matches) == 1
     assert matches[0][0] == b
     log.close()
 
 
-def test_default_graph_used_when_g_omitted():
-    log = EventLog({"backend": "memory", "default_graph": "urn:test:default"})
+def test_emit_without_g_lands_in_default_graph_queryable_plainly():
+    """When emit() is called without g, the quad goes into rdflib's default
+    graph — queryable by SPARQL without a GRAPH wrapper. This is the brn/pyin
+    'pointer in the default graph' idiom."""
+    log = EventLog({"backend": "memory"})
     log.emit(URIRef("x:a"), BFG.onHost, Literal("h"))
-    quads = list(log.quads())
-    assert len(quads) == 1
-    # rdflib yields the graph term as a URIRef directly.
-    assert str(quads[0][3]) == "urn:test:default"
+    rows = list(log.query(
+        "SELECT ?o WHERE { <x:a> <urn:schnabel:vocab:bfg:onHost> ?o }"
+    ))
+    assert len(rows) == 1
+    assert str(rows[0][0]) == "h"
     log.close()
 
 
@@ -181,4 +197,93 @@ def test_config_from_env(monkeypatch):
     log = EventLog()
     assert log.is_null is False
     assert log.config == {"backend": "memory"}
+    log.close()
+
+
+# ---------------------------------------------------------------------------
+# invocation() context manager
+# ---------------------------------------------------------------------------
+
+
+def test_invocation_happy_path_emits_lifecycle_quads():
+    log = EventLog({"backend": "memory"})
+    with log.invocation(BFG.LocalCommit) as inv:
+        inv.emit(BFG.onHost, Literal("h"))
+    assert inv.iri is not None
+
+    quads = list(log.quads(inv.iri))
+    preds = {str(q[1]) for q in quads}
+    assert str(RDF.type) in preds
+    assert str(started_at) in preds
+    assert str(ended_at) in preds
+    assert str(status_pred) in preds
+    assert str(BFG.onHost) in preds
+
+    status_rows = list(log.query(
+        f"SELECT ?s WHERE {{ GRAPH <{inv.iri}> {{ <{inv.iri}> <{status_pred}> ?s }} }}"
+    ))
+    assert {str(r[0]) for r in status_rows} == {str(STATUS_COMPLETE)}
+
+    # latest_invocation pointer was swapped to this invocation.
+    ptr_rows = list(log.query(
+        f"SELECT ?i WHERE {{ <{latest_invocation}> <{points_to}> ?i }}"
+    ))
+    assert [str(r[0]) for r in ptr_rows] == [str(inv.iri)]
+    log.close()
+
+
+def test_invocation_failure_path_emits_failed_status_and_error():
+    log = EventLog({"backend": "memory"})
+
+    with pytest.raises(RuntimeError, match="boom"):
+        with log.invocation(BFG.LocalCommit) as inv:
+            inv.emit(BFG.onHost, Literal("h"))
+            raise RuntimeError("boom")
+
+    status_rows = list(log.query(
+        f"SELECT ?s WHERE {{ GRAPH <{inv.iri}> {{ <{inv.iri}> <{status_pred}> ?s }} }}"
+    ))
+    assert {str(r[0]) for r in status_rows} == {str(STATUS_FAILED)}
+
+    err_rows = list(log.query(
+        f"SELECT ?e WHERE {{ GRAPH <{inv.iri}> {{ <{inv.iri}> <{error_pred}> ?e }} }}"
+    ))
+    assert any("boom" in str(r[0]) for r in err_rows)
+    log.close()
+
+
+def test_invocation_null_mode_yields_no_op_handle(monkeypatch):
+    monkeypatch.delenv("QUADSTORE", raising=False)
+    log = EventLog()
+    assert log.is_null is True
+
+    with log.invocation(BFG.LocalCommit) as inv:
+        assert inv.iri is None
+        # All handle methods must be safe in null-mode.
+        inv.emit(BFG.onHost, Literal("h"))
+        inv.emit_about(URIRef("x:y"), BFG.abspath, Literal("z"))
+        assert inv.bn("snapshot").startswith("urn:schnabel:bn:")
+    log.close()
+
+
+def test_invocation_handle_emit_about_scopes_to_invocation_graph():
+    log = EventLog({"backend": "memory"})
+    with log.invocation(BFG.LocalCommit) as inv:
+        snap = inv.bn("snapshot")
+        inv.emit(BFG.snapshot, snap)
+        inv.emit_about(snap, BFG.abspath, Literal("/path/to/snap"))
+
+    # The snapshot bnode's abspath should live in the invocation's graph.
+    rows = list(log.query(
+        f"SELECT ?p WHERE {{ GRAPH <{inv.iri}> {{ <{snap}> <{BFG.abspath}> ?p }} }}"
+    ))
+    assert [str(r[0]) for r in rows] == ["/path/to/snap"]
+    log.close()
+
+
+def test_invocation_iri_has_lowercase_suffix_derived_from_type():
+    log = EventLog({"backend": "memory"})
+    with log.invocation(BFG.LocalCommit) as inv:
+        pass
+    assert str(inv.iri).endswith("_localcommit")
     log.close()

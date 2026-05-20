@@ -78,8 +78,9 @@ QUADSTORE='@~/.config/schnabel/quadstore.json5'
 | `path` | conditional | For `nquads-file`: where to append. For `memory`: optional persistence path. |
 | `endpoint` | for `sparql-http` | Base URL of the SPARQL 1.1 endpoint. |
 | `auth` | optional | Auth descriptor. `kind`: `basic`, `bearer`, `mtls`, … |
-| `default_graph` | optional | IRI used when an emit doesn't specify `g`. |
 | `pubsub` | optional | Sub-descriptor for the notification channel. |
+
+When `emit()` is called without an explicit `g`, the quad lands in the dataset's **default graph** — queryable by plain SPARQL triple patterns without a `GRAPH` wrapper. This is the brn/pyin "pointer in the default graph" idiom: pointers and other dataset-wide singletons go to the default graph; per-invocation bulk data goes into named graphs minted via `log.graph(...)`.
 
 ### `pubsub` sub-keys
 

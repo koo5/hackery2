@@ -15,6 +15,19 @@ SCHNABEL = Namespace("urn:schnabel:vocab:core:")
 latest_invocation = SCHNABEL.latest_invocation
 points_to = SCHNABEL.points_to
 
+# Lifecycle predicates emitted by ``EventLog.invocation()`` for any emitter.
+# Same names across bfg, backup, intention, etc. — so cross-emitter SPARQL joins
+# don't need namespace translation.
+started_at = SCHNABEL.startedAt
+ended_at = SCHNABEL.endedAt
+status = SCHNABEL.status
+error = SCHNABEL.error
+
+# Status values (as IRIs, not Literals, so FILTER (?s = core:complete) works).
+STATUS_RUNNING = SCHNABEL.running
+STATUS_COMPLETE = SCHNABEL.complete
+STATUS_FAILED = SCHNABEL.failed
+
 # Per-area vocabularies. Each is a separate namespace so a future SPARQL query
 # can prefix-filter by emitter.
 BFG = Namespace("urn:schnabel:vocab:bfg:")
@@ -35,4 +48,11 @@ __all__ = [
     "INTENTION",
     "latest_invocation",
     "points_to",
+    "started_at",
+    "ended_at",
+    "status",
+    "error",
+    "STATUS_RUNNING",
+    "STATUS_COMPLETE",
+    "STATUS_FAILED",
 ]

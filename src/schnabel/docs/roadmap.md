@@ -6,31 +6,33 @@ Phased plan. Phase 0 is "before any of this exists"; each later phase requires t
 
 bfg emits via prose-on-stdout-mixed-with-one-JSON-line. backup.sh `tee`s the output and `grep`s for `{"result"`. Per-invocation logs don't exist (one concatenated stream). Parent snapshot is logged at DEBUG, never surfaced. Zero byte accounting.
 
-## Phase 1 — `schnabel.EventLog` + minimum bfg wiring
+## Phase 1 — `schnabel.EventLog` + minimum bfg wiring ✅
 
 **Deliverables:**
 
-- `schnabel/events.py` with the API per [`design.md`](design.md).
-- `memory` and `sparql-http` backends.
-- bfg's `local_commit` (smallest method, no network) wired to emit invocation/snapshot quads.
-- A small test: run `local_commit` against a scratch subvol, query the store back, assert what bfg returned matches what the store recorded.
-- `QUADSTORE` env var honored; `NullEventLog` when absent.
+- [x] `schnabel/events.py` with the API per [`design.md`](design.md).
+- [x] `memory`, `nquads-file`, and `sparql-http` backends.
+- [x] bfg's `local_commit` wired to emit invocation/snapshot quads.
+- [x] `QUADSTORE` env var honored; null-mode when absent.
+- [x] Editable-installed into bfg via poetry path dep; into hackery2 via `pipx runpip` in `install.sh` (D-009).
 
-**No-goals:** MQTT pubsub, byte counting, multi-machine, ACL, backup.py changes.
+**Done.** Per-invocation traces land in any configured QUADSTORE; SPARQL retrieves them.
 
-**Done when:** bfg can be configured to record a structured per-invocation trace; a SPARQL query retrieves the trace.
-
-## Phase 2 — All bfg commands instrumented; backup.py reads back
+## Phase 2 — All bfg commands instrumented; backup.py reads back (in progress)
 
 **Deliverables:**
 
-- Every public bfg command emits invocation quads (entry, exit, key events).
-- Parent snapshot picked at `btrfsgit.py:1093` is emitted as `bfg:parentSnapshot`.
-- Byte counting plumbed into `local_send`/`remote_send` (Popen chain replacing `shell=True`, byte count emitted as `bfg:bytesTransferred` periodically — or via `pv -bnf`).
-- backup.py mints an outer invocation IRI per `_run_backup`; child bfg invocations record `bfg:invokedBy <outer>`.
-- backup.py prints a per-subvol summary line after each `ccs("bfg ...")` by querying the store.
+- [x] `EventLog.invocation()` context manager extracted to handle the lifecycle pattern (D-010).
+- [x] `local_commit` refactored onto the helper.
+- [x] `push` emits invocation quads, including `bfg:parentSnapshot` (reified with abspath + uuids) when `find_common_parent` picks one (one of the original three asks).
+- [x] `pull` emits the same structure symmetrically.
+- [x] Byte counting plumbed into `local_send` (via `pv -nbf` injection + tmpfile-tailing daemon thread) and `remote_send` (in-process Popen chain with chunked read/write counter). Reports to both sinks: the existing `_prerr`/`tee`'d log AND the active schnabel invocation, as `bfg:bytesTransferred` quads at every 64 MiB threshold plus a final (D-011).
+- [ ] `remote_commit`, `checkout_local`, `checkout_remote`, `update_db`, `prune_local`, `prune_remote` emit.
+- [ ] Compound commands (`commit_and_push`, `remote_commit_and_pull`, `commit_and_push_and_checkout`, `commit_and_generate_patch`) emit an outer invocation that references the inner ones via `bfg:invokedSubcommand` (vocab name TBD).
+- [ ] backup.py mints an outer invocation IRI per `_run_backup`; child bfg invocations record `bfg:invokedBy <outer>` (passed via env var into the bfg subprocess).
+- [ ] backup.py prints a per-subvol summary line after each `ccs("bfg ...")` by querying the store.
 
-**Done when:** the three asks from the original conversation are met. Detailed per-invocation log via graph-per-invocation; parent snapshot surfaced via emitted `bfg:parentSnapshot`; byte accounting via emitted `bfg:bytesTransferred`.
+**Done when:** the three asks from the original conversation are met. Detailed per-invocation log via graph-per-invocation **(done)**; parent snapshot surfaced via emitted `bfg:parentSnapshot` **(done)**; byte accounting via emitted `bfg:bytesTransferred` **(done)**. The remaining Phase 2 work is broadening coverage to the rest of bfg's commands and stitching backup.py into the same store.
 
 ## Phase 3 — Pubsub: MQTT + `bfg-watch`
 

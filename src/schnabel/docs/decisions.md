@@ -93,6 +93,35 @@ Append-only record. When a decision is reversed, a new entry supersedes the old;
 - **Choice:** `schnabel`.
 - **Why:** German *Schnabel* = beak. Connects to *rostrum* (Latin beak, the Roman speaker's platform decorated with bronze ship-beaks). *Halt den Schnabel!* makes the speech-organ metaphor explicit. Distinct enough to grep, low namespace collision in software.
 
+## D-010 — `invocation()` context manager as the canonical activity primitive
+
+- **Date:** 2026-05-20
+- **Status:** Adopted
+- **Question:** Each emitter (bfg's `local_commit`, `push`, `pull`, etc.) needs the same 15-line lifecycle boilerplate: mint graph IRI, emit type + startedAt, swap latest-invocation pointer, do work, emit status+endedAt on exit, emit failed+error+endedAt on exception. Inline at each call site, or extract a helper?
+- **Alternatives:**
+  1. Inline at every call site — strictly follows D-002's "don't abstract early," each command is self-contained.
+  2. Extract a `with log.invocation(BFG.X) as inv:` context manager that handles the lifecycle uniformly and yields a graph-scoped handle.
+- **Choice:** Option 2.
+- **Why:** Two repetitions (`local_commit` and `push`) were enough to make the boilerplate's tax — 15+ lines of `_log.batch()` / `_log.emit(...g=inv)` / failure-handling per command — obviously wasteful, with ~10 more commands queued. The helper doesn't anticipate hypothetical future requirements; it consolidates a pattern already proven in the codebase. It also encodes the canonical lifecycle vocabulary (`core:startedAt`, `core:endedAt`, `core:status`, `core:error`, `core:running`/`complete`/`failed`) so every emitter automatically agrees on those terms — cross-emitter SPARQL joins ("what was running at 14:32") work without per-tool translation.
+- **Shape:** `_InvocationHandle` is the yielded object. Has `iri` (the graph IRI), `emit(p, o)` (emits in the invocation's graph with `s=iri`), `emit_about(s, p, o)` (graph-scoped but arbitrary subject — for child resources like snapshots the invocation produced), and `bn(suffix)` (mint a child-resource IRI). In null-mode `iri=None` and all methods short-circuit, so call sites stay unconditional.
+
+## D-011 — Byte-count reporting goes to both sinks (schnabel **and** the file-tee'd log)
+
+- **Date:** 2026-05-20
+- **Status:** Adopted
+- **Question:** When bfg's send pipeline reports byte progress, where does it land?
+- **Alternatives:**
+  1. Schnabel only — only consumers with a configured QUADSTORE see the numbers.
+  2. The file-tee'd log only (the original prose stream) — preserves backward compatibility but the data isn't queryable.
+  3. Both sinks. Same source, two materializations.
+- **Choice:** Option 3.
+- **Why:** The pyin lesson: a single emit call writing to two sinks (the `.n3` file *and* the SPARQL accumulator) is the proven shape, neither sink is privileged, and operators get to keep using `grep` on the tee'd log while machine consumers query SPARQL. For bfg specifically: anyone debugging a stalled backup will reach for the existing log first; removing the byte counts from there to force them to set up a QUADSTORE would be a regression in feature parity. The helper ``_emit_bytes_progress(invocation, n, kind)`` writes to both at one call site, so they can never drift.
+- **Shape:**
+  - `local_send` (shell pipeline with ssh receive or file redirect): inject `pv -nbf 2>$tmpfile` between `btrfs send` and the target. A daemon thread tails the tmpfile, throttles to ~one report per 64 MiB advance, and calls `_emit_bytes_progress`. Falls back to the original shell command (with a one-line warning) when `pv` isn't on `$PATH`.
+  - `remote_send` (already a Popen chain): replace `p2.communicate()` with a hand-rolled read-from-p1-stdout / write-to-p2-stdin loop in 4-MiB chunks; emit progress at the same 64-MiB threshold.
+  - Both paths emit a final value after the subprocess exits so we never drop the total.
+  - Byte counts accumulate (one quad per threshold cross), not pointer-swap. The progress curve is itself an audit artifact. Consumers wanting "current" can ``MAX(?n)`` or ``ORDER BY DESC LIMIT 1``.
+
 ## D-009 — Packaging and install model
 
 - **Date:** 2026-05-20
