@@ -4,7 +4,7 @@
 set -euo pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO="$( cd "$DIR/../../.." && pwd )"
+REPO="$( git -C "$DIR" rev-parse --show-toplevel )"
 RULE=/etc/udev/rules.d/95-remap-numrow.rules
 
 # adapt the checked-in rule (written for koom@t14); order matters: longest match first
