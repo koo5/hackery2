@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Invert the number row (symbols unshifted, digits on Shift) and set key repeat rate.
+#
+# Usage: remap_numrow_apply [delay] [rate]
+#
+# Instead of loading a frozen keymap dump (which goes stale and made all GTK apps
+# die with BadValue on keyboard hotplug — see xorg-server 21.1.12-1ubuntu1.5 XKB
+# hardening), rebuild the map from the server's CURRENT settings and merge in the
+# small numrow override from xkb/symbols/numrow.
+set -euo pipefail
+
+DELAY="${1:-150}"
+RATE="${2:-60}"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+setxkbmap -print \
+	| sed '/xkb_symbols/ s/"\s*}/+numrow(inverted)"\t}/' \
+	| xkbcomp -w 0 -I"$DIR/xkb" - "$DISPLAY"
+
+xset r rate "$DELAY" "$RATE"

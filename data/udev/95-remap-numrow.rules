@@ -1,0 +1,5 @@
+# Re-apply the numrow remap + key repeat rate whenever a keyboard (re)connects,
+# e.g. the ThinkPad Compact Bluetooth Keyboard waking from idle sleep.
+# The sleep gives the X server time to attach the new input device first.
+# Install: data/setup/misc/install_remap_numrow_udev.sh (adapts user/paths to the local machine)
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ENV{ID_INPUT_KEYBOARD}=="1", RUN+="/usr/bin/systemd-run --no-block --collect --uid=koom --setenv=DISPLAY=:0 --setenv=XAUTHORITY=/home/koom/.Xauthority /bin/sh -c 'sleep 2; exec /home/koom/hackery2/src/hackery2/bin/remap_numrow_fastest'"

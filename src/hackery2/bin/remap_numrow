@@ -1,11 +1,2 @@
 #!/usr/bin/env bash
-
-# xev -event keyboard
-# 
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-echo $DIR
-cd "$DIR"
-
-xkbcomp xkb.dump $DISPLAY #:0
-xset r rate 170 40
+exec "$(dirname "${BASH_SOURCE[0]}")/remap_numrow_apply" 170 40

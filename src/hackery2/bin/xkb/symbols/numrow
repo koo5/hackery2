@@ -1,0 +1,15 @@
+// Inverted number row: symbols unshifted, digits on Shift.
+// Applied on top of the current layout by remap_numrow_faster.
+partial alphanumeric_keys
+xkb_symbols "inverted" {
+	key <AE01> { [ exclam,      1, exclamdown,           onesuperior          ] };
+	key <AE02> { [ at,          2, masculine,            twosuperior          ] };
+	key <AE03> { [ numbersign,  3, ordfeminine,          threesuperior        ] };
+	key <AE04> { [ dollar,      4, cent,                 sterling             ] };
+	key <AE05> { [ percent,     5, EuroSign,             yen                  ] };
+	key <AE06> { [ asciicircum, 6, hstroke,              Hstroke              ] };
+	key <AE07> { [ ampersand,   7, eth,                  ETH                  ] };
+	key <AE08> { [ asterisk,    8, thorn,                THORN                ] };
+	key <AE09> { [ parenleft,   9, leftsinglequotemark,  leftdoublequotemark  ] };
+	key <AE10> { [ parenright,  0, rightsinglequotemark, rightdoublequotemark ] };
+};
