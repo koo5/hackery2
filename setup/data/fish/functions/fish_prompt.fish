@@ -3,6 +3,12 @@ function fish_prompt --description 'Informative prompt'
     set -l last_pipestatus $pipestatus
     set -lx __fish_last_status $status # Export for __fish_print_pipestatus.
 
+	# Show active virtualenv (prompt munging by activate.fish is disabled
+	# via VIRTUAL_ENV_DISABLE_PROMPT, see auto_venv.fish)
+	if test -n "$VIRTUAL_ENV"
+		echo -n (set_color brmagenta)"($(basename $VIRTUAL_ENV)) "(set_color normal)
+	end
+
 	git rev-parse --short HEAD 2&> /dev/null
 	if test $status -eq 0
 	    set -l git_commit (git rev-parse --short HEAD)
