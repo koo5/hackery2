@@ -443,9 +443,11 @@ sudo apt install snapd
 ```
 git config --global push.default current
 git config --global push.autoSetupRemote true
+```
 
-pipx install llm
+
+## llm
+```
+uv tool install llm --exclude-newer (date -d '6 weeks ago' +%Y-%m-%d)
 llm keys set openai
-
-
 ```
