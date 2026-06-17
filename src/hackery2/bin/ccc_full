@@ -118,7 +118,7 @@ def main():
 
 	# Build prompt
 	if not prompt_args:
-		prompt = ['--model', 'o3-mini',
+		prompt = ['--model', 'gpt-5-mini',
 			'Write a commit message for the following git changes affecting %d files. '
 			'You are provided with:\n'
 			'1. The git diff showing what changed\n'

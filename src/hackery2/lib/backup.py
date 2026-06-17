@@ -231,7 +231,7 @@ def get_filesystems():
 			},
 			{
 				'toplevel': '/d2',
-				'subvols': m(['u/sync', 'u', 'dev3', 'home', '/']),
+				'subvols': m(['u/sync', 'u', 'dev3', 'home', '/', 'images/dev4']),
 			},
 		]
 	elif hostname == 'r64':
