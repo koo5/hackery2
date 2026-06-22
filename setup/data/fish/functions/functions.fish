@@ -13,3 +13,4 @@ function nox
     end
 end
 
+alias dep-audit '/home/koom/hackery2/tools/dep-audit/.venv/bin/pip-audit'

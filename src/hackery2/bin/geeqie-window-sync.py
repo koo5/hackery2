@@ -47,7 +47,7 @@ def main():
             if current_file and current_file != last_file:
                 gg(f"--id={slave}", f"--file={current_file}")
                 last_file = current_file
-            time.sleep(0.1)
+            time.sleep(0.15)
     except KeyboardInterrupt:
         gg(f"--id={slave}", "--close-window")
         print("\nStopped.")
