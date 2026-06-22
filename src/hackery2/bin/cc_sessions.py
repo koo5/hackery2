@@ -8,6 +8,9 @@ that mark new conversations vs. forks of earlier ones.
 
 Grep-friendly: every content line is prefixed with `[timestamp] session-short role:`
 so `grep -B 2 -A 10 pattern` stays useful. Headers start with `=== `.
+
+Use --list for a flat listing or --tree for a fork tree showing how sessions
+branch from one another (forks and resumes nest under their origin).
 """
 
 import argparse
@@ -147,6 +150,135 @@ def first_ts(records) -> str:
 	return ""
 
 
+def session_title(recs, start_idx: int = 0, maxlen: int = 70) -> str:
+	"""Best-effort one-line label: the first real user prompt in the session.
+
+	Skips meta records and XML-ish wrappers (system reminders, command stdout,
+	tool_result-only user turns) so the label reflects what the human typed."""
+	for r in recs[start_idx:]:
+		if r.get("type") != "user" or r.get("isMeta"):
+			continue
+		content = r.get("message", {}).get("content")
+		if isinstance(content, str):
+			texts = [content]
+		elif isinstance(content, list):
+			texts = [b.get("text", "") for b in content if b.get("type") == "text"]
+		else:
+			texts = []
+		for text in texts:
+			t = " ".join((text or "").split())
+			if not t or t.startswith("<"):
+				continue
+			return t[:maxlen] + ("…" if len(t) > maxlen else "")
+	return ""
+
+
+def classify_sessions(sessions):
+	"""Single dedup pass returning fork relationships and per-session ownership.
+
+	`sessions` must already be sorted oldest-first. For each session returns a
+	dict with: sid, jf, recs, all_uuids, first_new_idx (None if fully
+	contained), ts (of the first new message), kind (NEW/FORK/ORPHAN/CONTAINED),
+	parent (session id this one forks from, if any), parent_uuid, owned (set of
+	uuids this session is responsible for printing), and total record count."""
+	seen_uuid: dict[str, str] = {}  # uuid -> session id that first owned it
+	infos = []
+	for sid, jf, recs, all_uuids in sessions:
+		first_new_idx = None
+		for i, r in enumerate(recs):
+			u = r.get("uuid")
+			if u and u not in seen_uuid:
+				first_new_idx = i
+				break
+		info = {
+			"sid": sid, "jf": jf, "recs": recs, "all_uuids": all_uuids,
+			"first_new_idx": first_new_idx, "ts": first_ts(recs),
+			"kind": None, "parent": None, "parent_uuid": None,
+			"owned": set(), "total": len(recs),
+		}
+		if first_new_idx is None:
+			# Every uuid already printed elsewhere: a resume/duplicate. Nest it
+			# under whichever session owns its first record, when known.
+			info["kind"] = "CONTAINED"
+			info["parent"] = seen_uuid.get(recs[0].get("uuid"))
+			infos.append(info)
+			continue
+
+		first_new = recs[first_new_idx]
+		parent_u = first_new.get("parentUuid")
+		info["ts"] = first_new.get("timestamp") or info["ts"]
+		if parent_u and parent_u in seen_uuid:
+			info["kind"] = "FORK"
+			info["parent"] = seen_uuid[parent_u]
+			info["parent_uuid"] = parent_u
+		elif parent_u is None or parent_u in all_uuids:
+			info["kind"] = "NEW"
+		else:
+			info["kind"] = "ORPHAN"
+			info["parent_uuid"] = parent_u
+
+		owned = set()
+		for r in recs[first_new_idx:]:
+			u = r.get("uuid")
+			if u and u in seen_uuid:
+				continue
+			if u:
+				seen_uuid[u] = sid
+				owned.add(u)
+		info["owned"] = owned
+		infos.append(info)
+	return infos
+
+
+def print_tree(infos):
+	"""Render sessions as a forest, nesting forks under the session they
+	branched from (and contained/duplicate sessions under their origin)."""
+	by_sid = {info["sid"]: info for info in infos}
+	children: dict[str, list] = {info["sid"]: [] for info in infos}
+	roots = []
+	for info in infos:
+		parent = info["parent"]
+		if parent and parent in by_sid:
+			children[parent].append(info["sid"])
+		else:
+			roots.append(info["sid"])
+
+	def ts_key(sid: str) -> str:
+		return by_sid[sid]["ts"] or ""
+
+	roots.sort(key=ts_key)
+	for kids in children.values():
+		kids.sort(key=ts_key)
+
+	def node_line(sid: str) -> str:
+		info = by_sid[sid]
+		ts = (info["ts"] or "")[:19].replace("T", " ")
+		kind = info["kind"]
+		n = len(info["owned"])
+		bits = f"{short(sid)}  [{ts}]  {kind}  {n} msg"
+		if kind == "FORK" and info["parent_uuid"]:
+			bits += f" @{short(info['parent_uuid'])}"
+		title = session_title(info["recs"], info["first_new_idx"] or 0)
+		if title:
+			bits += f'  "{title}"'
+		return bits
+
+	def render(sid: str, prefix: str, is_last: bool, is_root: bool):
+		if is_root:
+			print(node_line(sid))
+			child_prefix = ""
+		else:
+			connector = "└── " if is_last else "├── "
+			print(prefix + connector + node_line(sid))
+			child_prefix = prefix + ("    " if is_last else "│   ")
+		kids = children[sid]
+		for i, c in enumerate(kids):
+			render(c, child_prefix, i == len(kids) - 1, False)
+
+	for i, sid in enumerate(roots):
+		render(sid, "", i == len(roots) - 1, True)
+
+
 def main():
 	ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
 	ap.add_argument("path", nargs="?", default=os.getcwd(),
@@ -157,6 +289,8 @@ def main():
 		help="Show assistant thinking blocks")
 	ap.add_argument("--list", action="store_true",
 		help="Just list sessions found and exit")
+	ap.add_argument("--tree", action="store_true",
+		help="Show sessions as a fork tree and exit")
 	args = ap.parse_args()
 
 	try:
@@ -178,32 +312,30 @@ def main():
 			print(f"{first_ts(recs)}  {sid}  ({len(recs)} msgs)  {jf}")
 		return 0
 
-	# Track every UUID we've printed so shared/forked messages print once.
-	seen_uuid: dict[str, str] = {}  # uuid -> session_id that owned the print
+	# One pass establishes fork relationships and which uuids each session is
+	# responsible for printing (so shared/forked messages print exactly once).
+	infos = classify_sessions(sessions)
 
-	for sid, jf, recs, all_uuids in sessions:
-		# Find the first record whose uuid is NEW (never seen before).
-		first_new_idx = None
-		for i, r in enumerate(recs):
-			u = r.get("uuid")
-			if u and u not in seen_uuid:
-				first_new_idx = i
-				break
+	if args.tree:
+		print_tree(infos)
+		return 0
+
+	for info in infos:
+		sid, jf, recs = info["sid"], info["jf"], info["recs"]
+		first_new_idx = info["first_new_idx"]
 
 		if first_new_idx is None:
 			# Entire session is already covered by earlier sessions.
 			print(f"=== session {short(sid)}  (no new messages; fully contained in earlier sessions) ===")
 			continue
 
-		first_new = recs[first_new_idx]
-		parent_u = first_new.get("parentUuid")
-		ts = first_new.get("timestamp", "")
-		if parent_u and parent_u in seen_uuid:
+		ts = info["ts"]
+		kind = info["kind"]
+		if kind == "FORK":
 			# Shared a previously-printed conversational message → real fork.
-			origin = seen_uuid[parent_u]
-			header = (f"=== session {short(sid)}  FORK of {short(origin)} "
-				f"at parent {short(parent_u)}  [{ts}]  file={jf.name} ===")
-		elif parent_u is None or parent_u in all_uuids:
+			header = (f"=== session {short(sid)}  FORK of {short(info['parent'])} "
+				f"at parent {short(info['parent_uuid'])}  [{ts}]  file={jf.name} ===")
+		elif kind == "NEW":
 			# Root, or parent is a non-conversational record in this same
 			# file (e.g. SessionStart progress hook). Fresh conversation.
 			header = f"=== session {short(sid)}  NEW CONVERSATION  [{ts}]  file={jf.name} ==="
@@ -211,15 +343,13 @@ def main():
 			# Parent referenced but not found anywhere: could be a resumed
 			# session whose origin file was deleted.
 			header = (f"=== session {short(sid)}  ORPHAN START "
-				f"(parent {short(parent_u)} not seen)  [{ts}]  file={jf.name} ===")
+				f"(parent {short(info['parent_uuid'])} not seen)  [{ts}]  file={jf.name} ===")
 		print(header)
 
 		for r in recs[first_new_idx:]:
 			u = r.get("uuid")
-			if u and u in seen_uuid:
+			if u and u not in info["owned"]:
 				continue
-			if u:
-				seen_uuid[u] = sid
 			t = r.get("type")
 			ts = r.get("timestamp", "")
 			prefix = f"[{ts}] {short(sid)}"
