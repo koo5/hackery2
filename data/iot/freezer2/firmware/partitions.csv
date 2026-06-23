@@ -1,0 +1,10 @@
+# freezer2 partition table — 4 MB flash, dual-OTA + raw log ring buffer.
+# See docs/DESIGN.md §3.3. Phase 0 doesn't use `logdata` yet, but we build against the real
+# layout from the start so the firmware-size-vs-1.5MB-slot question (DESIGN §8) is measurable.
+# Name,     Type, SubType, Offset,   Size
+nvs,        data, nvs,     0x9000,   0x6000
+otadata,    data, ota,     0xf000,   0x2000
+phy_init,   data, phy,     0x11000,  0x1000
+ota_0,      app,  ota_0,   0x20000,  0x180000
+ota_1,      app,  ota_1,   0x1a0000, 0x180000
+logdata,    data, 0x40,    0x320000, 0xE0000

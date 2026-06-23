@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>freezer2 — Phase 0 spike</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.31/dist/uPlot.min.css">
+<style>
+	body { font: 14px/1.4 system-ui, sans-serif; margin: 1rem; max-width: 960px; }
+	button { font-size: 1rem; padding: .5rem .9rem; margin-right: .5rem; }
+	#info { margin: .8rem 0; display: grid; grid-template-columns: max-content 1fr; gap: .2rem .8rem; }
+	#info div:nth-child(odd) { color: #666; }
+	#log { white-space: pre-wrap; background: #111; color: #0f0; padding: .6rem; height: 9rem;
+	       overflow: auto; font-family: monospace; font-size: 12px; border-radius: 4px; }
+	#chart { margin: 1rem 0; }
+	.live { font-size: 1.6rem; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>freezer2 — Phase 0 spike</h1>
+<p>Web Bluetooth → C3 firmware. Android Chrome only. Must be served over <code>https</code> or
+   <code>http://localhost</code> (see README).</p>
+
+<button data-testid="btn-connect" id="connect">Connect</button>
+<button data-testid="btn-reload" id="reload" disabled>Reload history</button>
+<button data-testid="btn-live" id="live" disabled>Live: off</button>
+
+<div id="info"></div>
+<div class="live" data-testid="live-temp"></div>
+<div id="chart"></div>
+<h3>Log</h3>
+<div id="log" data-testid="log"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/uplot@1.6.31/dist/uPlot.iife.min.js"></script>
+<script>
+const SVC  = "f2c70001-9a1f-4b1e-8a2d-1c0ffeec0001";
+const CMD  = "f2c70002-9a1f-4b1e-8a2d-1c0ffeec0001";
+const LIVE = "f2c70003-9a1f-4b1e-8a2d-1c0ffeec0001";
+
+// opcodes / modes (mirror docs/PROTOCOL.md)
+const C = { HELLO:0x00, GET_TIME:0x23, SET_TIME:0x24, LIVE:0x33, READ_LOG:0x35 };
+const LOG = { SINCE:0x01, LASTN:0x02, ALL:0x03, DONE:0x00, CHUNK:0x01, ERR:0xFF };
+
+let device, cmdChar, liveChar;
+let recs = [];        // {t, mean, min, max, flags}
+let liveOn = false;
+let chart;
+
+const $ = (id) => document.getElementById(id);
+function log(...a) {
+	const el = $("log");
+	el.textContent += a.join(" ") + "\n";
+	el.scrollTop = el.scrollHeight;
+}
+
+async function writeCmd(bytes) {
+	const buf = new Uint8Array(bytes);
+	if (cmdChar.writeValueWithoutResponse) await cmdChar.writeValueWithoutResponse(buf);
+	else await cmdChar.writeValue(buf);
+}
+
+function onCmd(ev) {
+	const dv = ev.target.value;
+	const op = dv.getUint8(0), st = dv.getUint8(1);
+	if (op === C.HELLO) { parseHello(dv); }
+	else if (op === C.READ_LOG) {
+		if (st === LOG.CHUNK) {
+			const n = dv.getUint8(4);
+			let o = 5;
+			for (let i = 0; i < n; i++) {
+				recs.push({
+					t:    dv.getUint32(o, true),
+					mean: dv.getInt16(o + 4, true) / 100,
+					min:  dv.getInt16(o + 6, true) / 100,
+					max:  dv.getInt16(o + 8, true) / 100,
+					flags: dv.getUint8(o + 10),
+				});
+				o += 12;
+			}
+		} else if (st === LOG.DONE) {
+			const total = dv.getUint32(2, true);
+			log(`history done: ${recs.length} records (device said ${total})`);
+			render();
+			$("reload").disabled = false;
+		} else {
+			log("READ_LOG error", st);
+		}
+	}
+}
+
+function onLive(ev) {
+	const dv = ev.target.value;
+	const c = dv.getInt16(4, true) / 100;
+	$("live-temp").textContent = `live: ${c.toFixed(2)} °C`;
+}
+
+function parseHello(dv) {
+	const id = [...new Uint8Array(dv.buffer.slice(11, 17))]
+		.map(b => b.toString(16).padStart(2, "0")).join(":");
+	const info = {
+		proto: dv.getUint8(2),
+		fw: dv.getUint16(3, true),
+		recSize: dv.getUint8(17),
+		total: dv.getUint32(18, true),
+		oldest: dv.getUint32(22, true),
+		newest: dv.getUint32(26, true),
+		clock: dv.getUint32(30, true),
+		clockUncert: dv.getUint8(34),
+		cur: dv.getInt16(35, true) / 100,
+	};
+	const grid = $("info");
+	grid.innerHTML = "";
+	const row = (k, v) => { grid.insertAdjacentHTML("beforeend", `<div>${k}</div><div>${v}</div>`); };
+	row("device id", id);
+	row("proto / fw", `${info.proto} / ${info.fw}`);
+	row("record size", `${info.recSize} B`);
+	row("stored records", info.total);
+	row("range", `${new Date(info.oldest*1000).toISOString().slice(0,16)} → ${new Date(info.newest*1000).toISOString().slice(0,16)}`);
+	row("device clock", info.clockUncert ? "UNCERTAIN" : new Date(info.clock*1000).toISOString());
+	row("current", `${info.cur.toFixed(2)} °C`);
+	log("HELLO ok — pulling full history…");
+
+	// Phase 0: just pull everything. Phase 1 will send READ_LOG SINCE <max epoch in PouchDB>.
+	recs = [];
+	const t0 = performance.now();
+	window._t0 = t0;
+	writeCmd([C.READ_LOG, LOG.ALL]);
+}
+
+function render() {
+	const dt = (performance.now() - window._t0) / 1000;
+	log(`transfer + decode took ${dt.toFixed(2)} s for ${recs.length} records`);
+	recs.sort((a, b) => a.t - b.t);
+	const xs = recs.map(r => r.t);
+	const maxs = recs.map(r => r.max);
+	const mins = recs.map(r => r.min);
+	const means = recs.map(r => r.mean);
+	const data = [xs, maxs, mins, means];
+
+	const opts = {
+		width: Math.min(920, innerWidth - 32), height: 360,
+		title: "freezer temperature (min/max band + mean)",
+		scales: { x: { time: true } },
+		series: [
+			{},
+			{ label: "max °C", stroke: "#d33", width: 1 },
+			{ label: "min °C", stroke: "#36c", width: 1 },
+			{ label: "mean °C", stroke: "#111", width: 2 },
+		],
+		bands: [{ series: [1, 2], fill: "rgba(60,120,220,0.15)" }],
+	};
+	if (chart) chart.destroy();
+	chart = new uPlot(opts, data, $("chart"));
+}
+
+async function connect() {
+	try {
+		device = await navigator.bluetooth.requestDevice({
+			filters: [{ services: [SVC] }], optionalServices: [SVC],
+		});
+		device.addEventListener("gattserverdisconnected", () => {
+			log("disconnected"); $("reload").disabled = true; $("live").disabled = true;
+		});
+		log("connecting…");
+		const server = await device.gatt.connect();
+		const svc = await server.getPrimaryService(SVC);
+		cmdChar = await svc.getCharacteristic(CMD);
+		await cmdChar.startNotifications();
+		cmdChar.addEventListener("characteristicvaluechanged", onCmd);
+		try {
+			liveChar = await svc.getCharacteristic(LIVE);
+			await liveChar.startNotifications();
+			liveChar.addEventListener("characteristicvaluechanged", onLive);
+			$("live").disabled = false;
+		} catch (e) { log("no LIVE char:", e.message); }
+		log("connected; sending HELLO");
+		await writeCmd([C.HELLO]);
+	} catch (e) {
+		log("connect failed:", e.message);
+	}
+}
+
+$("connect").onclick = connect;
+$("reload").onclick = () => { recs = []; window._t0 = performance.now(); writeCmd([C.READ_LOG, LOG.ALL]); };
+$("live").onclick = async () => {
+	liveOn = !liveOn;
+	await writeCmd([C.LIVE, liveOn ? 1 : 0]);
+	$("live").textContent = `Live: ${liveOn ? "on" : "off"}`;
+};
+
+if (!navigator.bluetooth) log("⚠ Web Bluetooth not available — use Chrome/Edge on Android or desktop.");
+</script>
+</body>
+</html>
