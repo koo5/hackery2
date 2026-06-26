@@ -9,15 +9,23 @@ that mark new conversations vs. forks of earlier ones.
 Grep-friendly: every content line is prefixed with `[timestamp] session-short role:`
 so `grep -B 2 -A 10 pattern` stays useful. Headers start with `=== `.
 
-Use --list for a flat listing or --tree for a fork tree showing how sessions
-branch from one another (forks and resumes nest under their origin).
+Use --list for a flat listing or --tree for a `git log --graph --oneline --all`
+view of the message DAG: one row per message (deduped across all session files),
+with rails showing where sessions fork from a shared parent message.
+
+Use --git-export DIR to materialise that same DAG as a throwaway git repo (one
+commit per prompt, or per message with --all-messages) so you can explore the
+fork history in any git GUI: `gitk --all`, git gui, tig, lazygit, etc. Session
+ids ride along in each commit subject and as `sess/<id>` branches at the tips.
 """
 
 import argparse
 import json
 import os
 import re
+import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 
@@ -230,53 +238,352 @@ def classify_sessions(sessions):
 	return infos
 
 
-def print_tree(infos):
-	"""Render sessions as a forest, nesting forks under the session they
-	branched from (and contained/duplicate sessions under their origin)."""
-	by_sid = {info["sid"]: info for info in infos}
-	children: dict[str, list] = {info["sid"]: [] for info in infos}
-	roots = []
-	for info in infos:
-		parent = info["parent"]
-		if parent and parent in by_sid:
-			children[parent].append(info["sid"])
+def first_line(text: str) -> str:
+	"""First non-blank line of a string, whitespace collapsed."""
+	for ln in (text or "").splitlines():
+		s = " ".join(ln.split())
+		if s:
+			return s
+	return ""
+
+
+def msg_oneline(rec, maxlen: int = 90) -> str:
+	"""`--oneline`-style label for one message: role tag + content gist.
+
+	Picks a representative block (text wins; otherwise the first tool_use /
+	tool_result / thinking) so the line reflects what the message actually did."""
+	msg = rec.get("message", {})
+	role = msg.get("role", rec.get("type", "?"))
+	tag = {"user": "U", "assistant": "A"}.get(role, (role[:1] or "?").upper())
+	content = msg.get("content")
+	gist = ""
+	if isinstance(content, str):
+		gist = first_line(content)
+	elif isinstance(content, list):
+		text_block = next(
+			(b for b in content if b.get("type") == "text" and (b.get("text") or "").strip()),
+			None,
+		)
+		if text_block:
+			gist = first_line(text_block.get("text", ""))
+		elif content:
+			b = content[0]
+			bt = b.get("type")
+			if bt == "tool_use":
+				inp = json.dumps(b.get("input", {}), ensure_ascii=False)
+				gist = f"⚙ {b.get('name', '?')} {first_line(inp)}"
+			elif bt == "tool_result":
+				inner = b.get("content")
+				if isinstance(inner, list):
+					txt = " ".join(ib.get("text", "") for ib in inner if ib.get("type") == "text")
+				else:
+					txt = str(inner or "")
+				err = "ERROR " if b.get("is_error") else ""
+				gist = f"↩ {err}{first_line(txt)}"
+			elif bt == "thinking":
+				gist = "💭 " + first_line(b.get("thinking", ""))
+			else:
+				gist = f"<{bt}>"
+	gist = " ".join(gist.split())
+	if len(gist) > maxlen:
+		gist = gist[: maxlen - 1] + "…"
+	return f"{tag} {gist}" if gist else tag
+
+
+def is_prompt(rec) -> bool:
+	"""True for a genuine human prompt: a non-meta user turn whose content has
+	real text (not a tool_result, system reminder, or command wrapper)."""
+	if rec.get("type") != "user" or rec.get("isMeta"):
+		return False
+	content = rec.get("message", {}).get("content")
+	if isinstance(content, str):
+		t = content.strip()
+		return bool(t) and not t.startswith("<")
+	if isinstance(content, list):
+		for b in content:
+			if b.get("type") == "text":
+				t = (b.get("text") or "").strip()
+				if t and not t.startswith("<"):
+					return True
+	return False
+
+
+def build_message_graph(sdir: Path, is_node=None):
+	"""Dedup every message across all session files into one conversation DAG.
+
+	`is_node(record)` selects which records become graph nodes (default: every
+	user/assistant message). Returns (nodes, parent_of) where nodes maps uuid ->
+	the record (first occurrence; forks duplicate shared history, so any copy
+	will do) and parent_of maps each node uuid to its nearest ancestor *node*
+	uuid (walking through any records that sit in the parentUuid chain but aren't
+	themselves nodes), or None for a root. This is the `--all` view: a fork is
+	just a message with two children, where two sessions branched from one
+	parent."""
+	if is_node is None:
+		def is_node(d):
+			return d.get("type") in ("user", "assistant")
+	nodes = {}        # uuid -> record selected by is_node
+	link = {}         # uuid -> parentUuid, for EVERY record (keeps chain intact)
+	for jf in sorted(sdir.glob("*.jsonl")):
+		with jf.open() as fh:
+			for line in fh:
+				line = line.strip()
+				if not line:
+					continue
+				try:
+					d = json.loads(line)
+				except json.JSONDecodeError:
+					continue
+				u = d.get("uuid")
+				if not u:
+					continue
+				link.setdefault(u, d.get("parentUuid"))
+				if is_node(d):
+					nodes.setdefault(u, d)
+
+	def nearest_node_ancestor(u):
+		p = link.get(u)
+		seen = set()
+		while p is not None and p not in nodes:
+			if p in seen:  # defensive: never loop on a malformed chain
+				return None
+			seen.add(p)
+			p = link.get(p)
+		return p if p in nodes else None
+
+	parent_of = {u: nearest_node_ancestor(u) for u in nodes}
+	return nodes, parent_of
+
+
+def graph_order(ids, parent_of, ts_of):
+	"""Newest-first order that still emits every child before its parent.
+
+	`git log --graph` only renders newest-first (`--graph --reverse` is broken
+	in git for exactly this reason): the rail layout needs a parent's lane to
+	stay open until every child lane has reached it. A node becomes emittable
+	once all its children are emitted; among those we always take the most
+	recent, which approximates git's date-order."""
+	child_count = {i: 0 for i in ids}
+	for i in ids:
+		p = parent_of(i)
+		if p is not None and p in child_count:
+			child_count[p] += 1
+	available = [i for i in ids if child_count[i] == 0]
+	order = []
+	while available:
+		nid = max(available, key=ts_of)
+		available.remove(nid)
+		order.append(nid)
+		p = parent_of(nid)
+		if p is not None and p in child_count:
+			child_count[p] -= 1
+			if child_count[p] == 0:
+				available.append(p)
+	return order
+
+
+def render_rails(order, parent_of, label_of) -> list[str]:
+	"""Lay out nodes (already in newest-first, child-before-parent order) as a
+	`git log --graph`-style rail diagram. Each node is one `*` row; a node's lane
+	stays open (`|`) until its parent appears below, where lanes converge (`|/`).
+	Nodes sharing no history run in parallel lanes, like independent branches."""
+	lanes = []  # lanes[col] = node-id this lane is waiting to reach, or None
+	lines = []
+	for nid in order:
+		hits = [c for c, l in enumerate(lanes) if l == nid]
+		if hits:
+			mycol, extra = hits[0], hits[1:]
 		else:
-			roots.append(info["sid"])
+			# A branch tip (no descendant displayed yet): take a free lane.
+			mycol = next((c for c, l in enumerate(lanes) if l is None), len(lanes))
+			if mycol == len(lanes):
+				lanes.append(nid)
+			else:
+				lanes[mycol] = nid
+			extra = []
 
-	def ts_key(sid: str) -> str:
-		return by_sid[sid]["ts"] or ""
+		active = [c for c, l in enumerate(lanes) if l is not None]
 
-	roots.sort(key=ts_key)
-	for kids in children.values():
-		kids.sort(key=ts_key)
+		# Convergence row: extra child lanes slope down-left into mycol.
+		if extra:
+			row = [" "] * (2 * max(active) + 1)
+			for c in active:
+				row[2 * c] = "|"
+			for c in extra:
+				row[2 * c] = " "
+				row[2 * c - 1] = "/"
+			lines.append("".join(row).rstrip())
+			for c in extra:
+				lanes[c] = None
+			active = [c for c, l in enumerate(lanes) if l is not None]
 
-	def node_line(sid: str) -> str:
-		info = by_sid[sid]
-		ts = (info["ts"] or "")[:19].replace("T", " ")
-		kind = info["kind"]
-		n = len(info["owned"])
-		bits = f"{short(sid)}  [{ts}]  {kind}  {n} msg"
-		if kind == "FORK" and info["parent_uuid"]:
-			bits += f" @{short(info['parent_uuid'])}"
-		title = session_title(info["recs"], info["first_new_idx"] or 0)
-		if title:
-			bits += f'  "{title}"'
-		return bits
+		# Node row: `*` at this lane, `|` for every other still-open lane.
+		row = [" "] * (2 * max(active) + 1)
+		for c in active:
+			row[2 * c] = "|"
+		row[2 * mycol] = "*"
+		lines.append(f"{''.join(row).rstrip()} {label_of(nid)}")
 
-	def render(sid: str, prefix: str, is_last: bool, is_root: bool):
-		if is_root:
-			print(node_line(sid))
-			child_prefix = ""
-		else:
-			connector = "└── " if is_last else "├── "
-			print(prefix + connector + node_line(sid))
-			child_prefix = prefix + ("    " if is_last else "│   ")
-		kids = children[sid]
-		for i, c in enumerate(kids):
-			render(c, child_prefix, i == len(kids) - 1, False)
+		lanes[mycol] = parent_of(nid)  # lane now waits for the parent (None at a root)
+		while lanes and lanes[-1] is None:
+			lanes.pop()
+	return lines
 
-	for i, sid in enumerate(roots):
-		render(sid, "", i == len(roots) - 1, True)
+
+def print_graph(sdir: Path):
+	"""Render the whole project's message DAG as a git-graph-style oneline log."""
+	nodes, parent_of = build_message_graph(sdir)
+	if not nodes:
+		return
+
+	def ts_of(u):
+		return nodes[u].get("timestamp") or ""
+
+	def label_of(u):
+		t = ts_of(u)[5:16].replace("T", " ")  # MM-DD HH:MM
+		return f"{short(u)} [{t}] {msg_oneline(nodes[u])}"
+
+	order = graph_order(list(nodes), lambda u: parent_of.get(u), ts_of)
+	print("\n".join(render_rails(order, lambda u: parent_of.get(u), label_of)))
+
+
+def to_epoch(ts: str) -> int:
+	"""Unix seconds from an ISO-8601 timestamp like 2026-06-23T18:40:43.123Z."""
+	if not ts:
+		return 0
+	s = ts.strip().replace("Z", "+00:00")
+	for candidate in (s, re.sub(r"\.\d+", "", s)):
+		try:
+			return int(datetime.fromisoformat(candidate).timestamp())
+		except ValueError:
+			continue
+	return 0
+
+
+def message_text(rec) -> str:
+	"""Full readable text of a message (tool calls/results expanded)."""
+	content = rec.get("message", {}).get("content")
+	return "\n".join(render_content(content, full=True, show_thinking=True))
+
+
+def export_git(sdir: Path, outdir: str, all_messages: bool = False, force: bool = False) -> int:
+	"""Materialise the message DAG as a throwaway git repo so it can be browsed
+	with any git history GUI (gitk, git gui, tig, lazygit, VS Code Git Graph…).
+
+	Each node becomes a commit (parentUuid -> git parent, message timestamp ->
+	commit date), the session id is sneaked into both the commit subject and a
+	`sess/<id>` branch at that session's tip, and the message body is written to
+	`msg/<uuid>.md` so the GUI's diff/patch pane shows the message itself. By
+	default one commit per user prompt; --all-messages commits the full DAG."""
+	nodes, parent_of = build_message_graph(sdir, None if all_messages else is_prompt)
+	if not nodes:
+		print("error: no matching messages to export", file=sys.stderr)
+		return 1
+
+	out = Path(outdir).expanduser().resolve()
+	if out.exists() and any(out.iterdir()) and not force:
+		print(f"error: {out} is not empty (pass --force to reuse it)", file=sys.stderr)
+		return 2
+	out.mkdir(parents=True, exist_ok=True)
+	if not (out / ".git").exists():
+		subprocess.run(["git", "init", "-q", "-b", "main", str(out)], check=True)
+	else:
+		# Re-export into an existing repo: drop our own refs from the prior run
+		# so stale session branches don't linger (leaves any other refs alone).
+		prior = subprocess.run(
+			["git", "-C", str(out), "for-each-ref", "--format=%(refname)", "refs/heads/sess/"],
+			capture_output=True, text=True, check=False,
+		).stdout.split()
+		if prior:
+			subprocess.run(["git", "-C", str(out), "update-ref", "--stdin"],
+				input="".join(f"delete {r}\n" for r in prior), text=True, check=False)
+
+	def ts_of(u):
+		return nodes[u].get("timestamp") or ""
+
+	newest_first = graph_order(list(nodes), lambda u: parent_of.get(u), ts_of)
+	order = list(reversed(newest_first))  # parents before children, for fast-import
+
+	buf = bytearray()
+
+	def w(s):
+		buf.extend(s.encode())
+
+	def wdata(b: bytes):
+		buf.extend(f"data {len(b)}\n".encode())
+		buf.extend(b)
+		buf.extend(b"\n")
+
+	mark = {}
+	counter = 0
+	for u in order:
+		rec = nodes[u]
+		role = rec.get("message", {}).get("role") or rec.get("type") or "?"
+		sid = rec.get("sessionId") or ""
+		ts = rec.get("timestamp") or ""
+		body = message_text(rec)
+		ident = f"{role} <{role}@claude.local>"
+		md = f"# {role} · {ts}\n\nsession: {sid}\nuuid: {u}\n\n{body}\n".encode()
+		subject = f"[{short(sid)}] {msg_oneline(rec, maxlen=68)}"
+		msg = "\n".join([
+			subject, "", body, "", "---",
+			f"Session: {sid}", f"UUID: {u}", f"Time: {ts}", f"Role: {role}",
+		]).encode()
+
+		counter += 1
+		bmark = counter
+		w("blob\n")
+		w(f"mark :{bmark}\n")
+		wdata(md)
+
+		counter += 1
+		cmark = counter
+		mark[u] = cmark
+		p = parent_of.get(u)
+		parented = p is not None and p in mark
+		if not parented:
+			w("reset refs/heads/import\n")  # leave branch unborn -> a root commit
+		w("commit refs/heads/import\n")
+		w(f"mark :{cmark}\n")
+		w(f"author {ident} {to_epoch(ts)} +0000\n")
+		w(f"committer {ident} {to_epoch(ts)} +0000\n")
+		wdata(msg)
+		if parented:
+			w(f"from :{mark[p]}\n")
+		w(f"M 100644 :{bmark} msg/{u}.md\n\n")
+
+	# Ref every leaf (a message with no children) so the whole DAG — including
+	# abandoned retry branches — is reachable and shows up in `gitk --all`.
+	# Label each leaf by its session id; only suffix with the leaf uuid when a
+	# session branched and so has more than one tip.
+	child_count = {u: 0 for u in nodes}
+	for u in nodes:
+		p = parent_of.get(u)
+		if p in child_count:
+			child_count[p] += 1
+	leaves_by_session = {}
+	for u in order:
+		if child_count[u] == 0:
+			leaves_by_session.setdefault(nodes[u].get("sessionId") or "unknown", []).append(u)
+	branches = 0
+	for sid, leaves in leaves_by_session.items():
+		for u in leaves:
+			name = f"sess/{sid}" if len(leaves) == 1 else f"sess/{sid}__{u[:8]}"
+			w(f"reset refs/heads/{name}\nfrom :{mark[u]}\n\n")
+			branches += 1
+	w(f"reset refs/heads/main\nfrom :{mark[newest_first[0]]}\n\n")
+
+	subprocess.run(
+		["git", "-C", str(out), "fast-import", "--quiet", "--date-format=raw"],
+		input=bytes(buf), check=True,
+	)
+	subprocess.run(["git", "-C", str(out), "update-ref", "-d", "refs/heads/import"], check=False)
+	subprocess.run(["git", "-C", str(out), "checkout", "-q", "-f", "main"], check=False)
+
+	print(f"Exported {len(order)} commits across {branches} branches to {out}")
+	print(f"Browse it:  (cd {out}; gitk --all)")
+	print(f"      or:   git -C {out} log --graph --oneline --all")
+	return 0
 
 
 def main():
@@ -290,7 +597,13 @@ def main():
 	ap.add_argument("--list", action="store_true",
 		help="Just list sessions found and exit")
 	ap.add_argument("--tree", action="store_true",
-		help="Show sessions as a fork tree and exit")
+		help="Show the message DAG as a git-log-graph-style oneline log and exit")
+	ap.add_argument("--git-export", metavar="DIR",
+		help="Export the message DAG as a throwaway git repo at DIR (browse with gitk --all)")
+	ap.add_argument("--all-messages", action="store_true",
+		help="With --git-export: one commit per message (default: one per user prompt)")
+	ap.add_argument("--force", action="store_true",
+		help="With --git-export: allow a non-empty target directory")
 	args = ap.parse_args()
 
 	try:
@@ -298,6 +611,9 @@ def main():
 	except FileNotFoundError as e:
 		print(f"error: {e}", file=sys.stderr)
 		return 2
+
+	if args.git_export:
+		return export_git(sdir, args.git_export, args.all_messages, args.force)
 
 	sessions = load_sessions(sdir)
 	if not sessions:
@@ -312,13 +628,15 @@ def main():
 			print(f"{first_ts(recs)}  {sid}  ({len(recs)} msgs)  {jf}")
 		return 0
 
+	if args.tree:
+		# `git log --graph --oneline --all` over the message DAG: one row per
+		# message, deduped across all session files, rails showing forks.
+		print_graph(sdir)
+		return 0
+
 	# One pass establishes fork relationships and which uuids each session is
 	# responsible for printing (so shared/forked messages print exactly once).
 	infos = classify_sessions(sessions)
-
-	if args.tree:
-		print_tree(infos)
-		return 0
 
 	for info in infos:
 		sid, jf, recs = info["sid"], info["jf"], info["recs"]
