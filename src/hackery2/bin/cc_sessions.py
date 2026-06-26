@@ -10,8 +10,10 @@ Grep-friendly: every content line is prefixed with `[timestamp] session-short ro
 so `grep -B 2 -A 10 pattern` stays useful. Headers start with `=== `.
 
 Use --list for a flat listing or --tree for a `git log --graph --oneline --all`
-view of the message DAG: one row per message (deduped across all session files),
-with rails showing where sessions fork from a shared parent message.
+view of the message DAG (deduped across all session files), with rails showing
+where sessions fork from a shared parent message. By default --tree shows only
+the prompts you typed — the navigate view, for telling threads apart and spotting
+where you forked, without the tool-call noise; add --full for one row per message.
 
 Use --git-export DIR to materialise that same DAG as a throwaway git repo (one
 commit per prompt, or per message with --all-messages) so you can explore the
@@ -158,26 +160,45 @@ def first_ts(records) -> str:
 	return ""
 
 
-def session_title(recs, start_idx: int = 0, maxlen: int = 70) -> str:
-	"""Best-effort one-line label: the first real user prompt in the session.
+def _user_texts(rec) -> list[str]:
+	"""Plain-text strings a user record carries (skips tool_result/other blocks)."""
+	content = rec.get("message", {}).get("content")
+	if isinstance(content, str):
+		return [content]
+	if isinstance(content, list):
+		return [b.get("text", "") for b in content if b.get("type") == "text"]
+	return []
 
-	Skips meta records and XML-ish wrappers (system reminders, command stdout,
-	tool_result-only user turns) so the label reflects what the human typed."""
-	for r in recs[start_idx:]:
-		if r.get("type") != "user" or r.get("isMeta"):
-			continue
-		content = r.get("message", {}).get("content")
-		if isinstance(content, str):
-			texts = [content]
-		elif isinstance(content, list):
-			texts = [b.get("text", "") for b in content if b.get("type") == "text"]
-		else:
-			texts = []
-		for text in texts:
-			t = " ".join((text or "").split())
-			if not t or t.startswith("<"):
-				continue
+
+def is_prompt(rec) -> bool:
+	"""True for a turn the human actually typed.
+
+	Excludes assistant/tool records, meta records, and XML-ish wrappers (system
+	reminders, command stdout, tool_result-only user turns) — i.e. the noise that
+	makes the full message graph hard to navigate."""
+	if rec.get("type") != "user" or rec.get("isMeta"):
+		return False
+	for text in _user_texts(rec):
+		t = " ".join((text or "").split())
+		if t and not t.startswith("<"):
+			return True
+	return False
+
+
+def prompt_text(rec, maxlen: int = 100) -> str:
+	"""The first real typed line of a user prompt, whitespace-collapsed."""
+	for text in _user_texts(rec):
+		t = " ".join((text or "").split())
+		if t and not t.startswith("<"):
 			return t[:maxlen] + ("…" if len(t) > maxlen else "")
+	return ""
+
+
+def session_title(recs, start_idx: int = 0, maxlen: int = 70) -> str:
+	"""Best-effort one-line label: the first real user prompt in the session."""
+	for r in recs[start_idx:]:
+		if is_prompt(r):
+			return prompt_text(r, maxlen)
 	return ""
 
 
@@ -288,24 +309,6 @@ def msg_oneline(rec, maxlen: int = 90) -> str:
 	if len(gist) > maxlen:
 		gist = gist[: maxlen - 1] + "…"
 	return f"{tag} {gist}" if gist else tag
-
-
-def is_prompt(rec) -> bool:
-	"""True for a genuine human prompt: a non-meta user turn whose content has
-	real text (not a tool_result, system reminder, or command wrapper)."""
-	if rec.get("type") != "user" or rec.get("isMeta"):
-		return False
-	content = rec.get("message", {}).get("content")
-	if isinstance(content, str):
-		t = content.strip()
-		return bool(t) and not t.startswith("<")
-	if isinstance(content, list):
-		for b in content:
-			if b.get("type") == "text":
-				t = (b.get("text") or "").strip()
-				if t and not t.startswith("<"):
-					return True
-	return False
 
 
 def build_message_graph(sdir: Path, is_node=None):
@@ -430,9 +433,19 @@ def render_rails(order, parent_of, label_of) -> list[str]:
 	return lines
 
 
-def print_graph(sdir: Path):
-	"""Render the whole project's message DAG as a git-graph-style oneline log."""
-	nodes, parent_of = build_message_graph(sdir)
+def print_graph(sdir: Path, full: bool = False):
+	"""Render the project's message DAG as a `git log --graph`-style oneline log.
+
+	Two zoom levels on the same graph, picked by `full`:
+
+	- default (navigate zoom): one row per prompt you actually typed — the intent
+	  skeleton across every thread. Assistant/tool/thinking noise is dropped, but
+	  the fork structure is preserved exactly, because you only ever fork *at* a
+	  prompt: two threads share an identical typed prefix and then diverge on the
+	  line where you said something different, so you recognise the split by your
+	  own words. Parent links hop over the dropped messages.
+	- full (inspect zoom): one row per message, the complete topology."""
+	nodes, parent_of = build_message_graph(sdir, None if full else is_prompt)
 	if not nodes:
 		return
 
@@ -441,7 +454,8 @@ def print_graph(sdir: Path):
 
 	def label_of(u):
 		t = ts_of(u)[5:16].replace("T", " ")  # MM-DD HH:MM
-		return f"{short(u)} [{t}] {msg_oneline(nodes[u])}"
+		gist = msg_oneline(nodes[u]) if full else prompt_text(nodes[u])
+		return f"{short(u)} [{t}] {gist}"
 
 	order = graph_order(list(nodes), lambda u: parent_of.get(u), ts_of)
 	print("\n".join(render_rails(order, lambda u: parent_of.get(u), label_of)))
@@ -591,13 +605,15 @@ def main():
 	ap.add_argument("path", nargs="?", default=os.getcwd(),
 		help="Project directory (default: CWD)")
 	ap.add_argument("--full", action="store_true",
-		help="Don't truncate tool inputs / results")
+		help="Show full detail: untruncated tool inputs/results in the dump; "
+			"every message (not just prompts) in --tree")
 	ap.add_argument("--thinking", action="store_true",
 		help="Show assistant thinking blocks")
 	ap.add_argument("--list", action="store_true",
 		help="Just list sessions found and exit")
 	ap.add_argument("--tree", action="store_true",
-		help="Show the message DAG as a git-log-graph-style oneline log and exit")
+		help="Show the message DAG as a git-log-graph oneline log (just your "
+			"prompts; add --full for every message) and exit")
 	ap.add_argument("--git-export", metavar="DIR",
 		help="Export the message DAG as a throwaway git repo at DIR (browse with gitk --all)")
 	ap.add_argument("--all-messages", action="store_true",
@@ -629,9 +645,10 @@ def main():
 		return 0
 
 	if args.tree:
-		# `git log --graph --oneline --all` over the message DAG: one row per
-		# message, deduped across all session files, rails showing forks.
-		print_graph(sdir)
+		# `git log --graph --oneline --all` over the message DAG, deduped across
+		# all session files, rails showing forks. Default: one row per typed
+		# prompt (navigate zoom); --full: one row per message (inspect zoom).
+		print_graph(sdir, args.full)
 		return 0
 
 	# One pass establishes fork relationships and which uuids each session is
