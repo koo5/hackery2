@@ -24,6 +24,8 @@ in each commit subject and as `sess/<id>` branches at the tips.
 Use --html [FILE] for a self-contained interactive HTML/SVG of the same graph:
 gitk-style lanes coloured per session, each thread tip badged with its title,
 hover for the full prompt, click a row to copy its `claude --resume` command.
+Use --serve [PORT] to serve that graph live on localhost, regenerated on each
+request so a browser refresh reflects newly-written messages.
 """
 
 import argparse
@@ -634,16 +636,15 @@ for (const r of document.querySelectorAll('.row')) {
 """
 
 
-def print_html(sdir: Path, full: bool = False, out_path: str = None) -> int:
-	"""Write the message DAG as a self-contained interactive HTML/SVG file:
-	gitk-style lanes on the left, one row per node coloured by session, each
-	thread tip badged with its title, hover for the full prompt, click a row to
-	copy its `claude --resume <id>` command."""
+def build_html(sdir: Path, full: bool = False):
+	"""Build a self-contained interactive HTML/SVG of the message DAG: gitk-style
+	lanes on the left, one row per node coloured by session, each thread tip with
+	a ◆ title node, hover for the full prompt, click a row to copy its `claude
+	--resume <id>` command. Returns the HTML string, or None if there are none."""
 	g = analyze_graph(sdir, full)
 	nodes = g["nodes"]
 	if not nodes:
-		print("error: no messages to render", file=sys.stderr)
-		return 1
+		return None
 	pof, ts_of, order = g["pof"], g["ts_of"], g["order"]
 	child_count, leaf_sid = g["child_count"], g["leaf_sid"]
 	title_for, gist_of = g["title_for"], g["gist_of"]
@@ -731,12 +732,68 @@ def print_html(sdir: Path, full: bool = False, out_path: str = None) -> int:
 	header = (f'<header><b>cc_sessions</b> · {esc(sdir.name)} · {len(order)} nodes '
 		f'({mode}) · <span>click a row to copy its <b>claude --resume</b> command, '
 		f'hover for the full prompt</span></header>')
-	html = HTML_HEAD + header + svg + HTML_TAIL
+	return HTML_HEAD + header + svg + HTML_TAIL
 
+
+def print_html(sdir: Path, full: bool = False, out_path: str = None) -> int:
+	"""Build the interactive HTML/SVG graph and write it to a file."""
+	html = build_html(sdir, full)
+	if html is None:
+		print("error: no messages to render", file=sys.stderr)
+		return 1
 	out = Path(out_path).expanduser()
 	out.write_text(html, encoding="utf-8")
-	print(f"Wrote {out}  ({len(order)} nodes, {width}×{height}px)")
+	print(f"Wrote {out}")
 	print(f"Open it:  xdg-open {out}")
+	return 0
+
+
+def serve_html(sdir: Path, full: bool = False, port: int = 8000) -> int:
+	"""Serve the interactive graph over HTTP, regenerated on every request so a
+	browser refresh reflects newly-written messages. Binds to localhost only;
+	Ctrl-C to stop. If the requested port is taken, falls back to a free one."""
+	import http.server
+	import webbrowser
+
+	class Handler(http.server.BaseHTTPRequestHandler):
+		def do_GET(self):
+			if self.path.split("?")[0] not in ("/", "/index.html"):
+				self.send_error(404)
+				return
+			html = build_html(sdir, full)
+			if html is None:
+				self.send_error(404, "no messages to render")
+				return
+			body = html.encode("utf-8")
+			self.send_response(200)
+			self.send_header("Content-Type", "text/html; charset=utf-8")
+			self.send_header("Content-Length", str(len(body)))
+			self.send_header("Cache-Control", "no-store")
+			self.end_headers()
+			self.wfile.write(body)
+
+		def log_message(self, *args):  # keep the terminal quiet
+			pass
+
+	try:
+		httpd = http.server.HTTPServer(("127.0.0.1", port), Handler)
+	except OSError:
+		httpd = http.server.HTTPServer(("127.0.0.1", 0), Handler)  # port busy -> any free port
+	url = f"http://127.0.0.1:{httpd.server_address[1]}/"
+	mode = "every message" if full else "your prompts"
+	print(f"Serving cc_sessions graph ({mode}) for {sdir.name} at {url}")
+	print("  refresh the page to pick up new messages · Ctrl-C to stop")
+	if os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"):
+		try:
+			webbrowser.open(url)
+		except Exception:
+			pass
+	try:
+		httpd.serve_forever()
+	except KeyboardInterrupt:
+		print("\nstopped")
+	finally:
+		httpd.server_close()
 	return 0
 
 
@@ -901,6 +958,9 @@ def main():
 	ap.add_argument("--html", nargs="?", const="", default=None, metavar="FILE",
 		help="Write an interactive HTML/SVG graph (gitk-style, click to copy "
 			"--resume); omit FILE to use ~/.cache/cc_sessions/<project>.html")
+	ap.add_argument("--serve", nargs="?", const=8000, default=None, type=int, metavar="PORT",
+		help="Serve the interactive graph on http://localhost:PORT (default 8000), "
+			"regenerated each request so a refresh shows new messages")
 	ap.add_argument("--force", action="store_true",
 		help="With --git-export: allow reusing a non-empty target directory")
 	args = ap.parse_args()
@@ -925,6 +985,9 @@ def main():
 		else:
 			out = args.html
 		return print_html(sdir, args.full, str(out))
+
+	if args.serve is not None:
+		return serve_html(sdir, args.full, args.serve)
 
 	sessions = load_sessions(sdir)
 	if not sessions:
