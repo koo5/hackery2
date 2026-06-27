@@ -14,3 +14,7 @@ function nox
 end
 
 alias dep-audit '/home/koom/hackery2/tools/dep-audit/.venv/bin/pip-audit'
+
+function ccst --description 'cc_sessions message-graph, horizontally scrollable'
+    python3 /home/koom/hackery2/src/hackery2/bin/cc_sessions.py --tree $argv | less -S
+end

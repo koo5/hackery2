@@ -15,10 +15,15 @@ where sessions fork from a shared parent message. By default --tree shows only
 the prompts you typed — the navigate view, for telling threads apart and spotting
 where you forked, without the tool-call noise; add --full for one row per message.
 
-Use --git-export DIR to materialise that same DAG as a throwaway git repo (one
-commit per prompt, or per message with --all-messages) so you can explore the
-fork history in any git GUI: `gitk --all`, git gui, tig, lazygit, etc. Session
-ids ride along in each commit subject and as `sess/<id>` branches at the tips.
+Use --git-export [DIR] to materialise that same DAG as a throwaway git repo (one
+commit per prompt, or per message with --full) so you can explore the fork
+history in any git GUI: `gitk --all`, git gui, tig, lazygit, etc. Omit DIR to use
+an auto-refreshed cache at ~/.cache/cc_sessions/<project>. Session ids ride along
+in each commit subject and as `sess/<id>` branches at the tips.
+
+Use --html [FILE] for a self-contained interactive HTML/SVG of the same graph:
+gitk-style lanes coloured per session, each thread tip badged with its title,
+hover for the full prompt, click a row to copy its `claude --resume` command.
 """
 
 import argparse
@@ -69,6 +74,12 @@ def resolve_sessions_dir(target: str) -> Path:
 
 def short(uuid: str, n: int = 8) -> str:
 	return uuid[:n] if uuid else "-" * n
+
+
+def esc(s) -> str:
+	"""Escape text for embedding in HTML/SVG (element text and attributes)."""
+	return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+		.replace('"', "&quot;"))
 
 
 def render_content(content, full: bool, show_thinking: bool) -> list[str]:
@@ -158,6 +169,31 @@ def first_ts(records) -> str:
 		if ts:
 			return ts
 	return ""
+
+
+def load_titles(sdir: Path):
+	"""Map session id -> (custom_title, ai_title) from the title records Claude
+	Code writes: `/rename` appends a `custom-title` record and the auto-namer an
+	`ai-title` record, both `{..., sessionId}`. Last write per session wins."""
+	custom, ai = {}, {}
+	for jf in sorted(sdir.glob("*.jsonl")):
+		with jf.open() as fh:
+			for line in fh:
+				line = line.strip()
+				if not line:
+					continue
+				try:
+					d = json.loads(line)
+				except json.JSONDecodeError:
+					continue
+				sid = d.get("sessionId")
+				if not sid:
+					continue
+				if d.get("type") == "custom-title" and d.get("customTitle"):
+					custom[sid] = d["customTitle"]
+				elif d.get("type") == "ai-title" and d.get("aiTitle"):
+					ai[sid] = d["aiTitle"]
+	return custom, ai
 
 
 def _user_texts(rec) -> list[str]:
@@ -385,11 +421,15 @@ def graph_order(ids, parent_of, ts_of):
 	return order
 
 
-def render_rails(order, parent_of, label_of) -> list[str]:
+def render_rails(order, parent_of, label_of, deco_of=None) -> list[str]:
 	"""Lay out nodes (already in newest-first, child-before-parent order) as a
 	`git log --graph`-style rail diagram. Each node is one `*` row; a node's lane
 	stays open (`|`) until its parent appears below, where lanes converge (`|/`).
-	Nodes sharing no history run in parallel lanes, like independent branches."""
+	Nodes sharing no history run in parallel lanes, like independent branches.
+
+	`deco_of(nid)`, if given and truthy, prints an extra `◆` row just above the
+	node in the same lane — a synthetic label node (used to hang a thread's title
+	above its tip, so the title reads on its own line instead of crowding it)."""
 	lanes = []  # lanes[col] = node-id this lane is waiting to reach, or None
 	lines = []
 	for nid in order:
@@ -420,6 +460,15 @@ def render_rails(order, parent_of, label_of) -> list[str]:
 				lanes[c] = None
 			active = [c for c, l in enumerate(lanes) if l is not None]
 
+		# Synthetic label row (e.g. a thread title) hung above the node row.
+		deco = deco_of(nid) if deco_of else None
+		if deco:
+			row = [" "] * (2 * max(active) + 1)
+			for c in active:
+				row[2 * c] = "|"
+			row[2 * mycol] = "◆"
+			lines.append(f"{''.join(row).rstrip()} {deco}")
+
 		# Node row: `*` at this lane, `|` for every other still-open lane.
 		row = [" "] * (2 * max(active) + 1)
 		for c in active:
@@ -431,6 +480,57 @@ def render_rails(order, parent_of, label_of) -> list[str]:
 		while lanes and lanes[-1] is None:
 			lanes.pop()
 	return lines
+
+
+def analyze_graph(sdir: Path, full: bool = False) -> dict:
+	"""Shared analysis behind every graph view. Builds the message DAG (only
+	human prompts unless `full`), orders it newest-first / child-before-parent,
+	and returns per-node helpers: `leaf_sid` (the resumable session id of the tip
+	whose lane a node sits on), `title_for`, `gist_of`, plus `child_count`/`order`.
+
+	`leaf_sid` is derived, not read off the record: forks rewrite sessionId on
+	copied messages, so a shared node's own id is unreliable; instead each node is
+	attributed to its newest descendant tip — the lane the graph draws it on — and
+	a tip lives in one file only, so its sessionId is sound."""
+	nodes, parent_of = build_message_graph(sdir, None if full else is_prompt)
+
+	custom, ai = load_titles(sdir)
+	opening = {sid: session_title(recs) for sid, _jf, recs, _ in load_sessions(sdir)}
+
+	def title_for(sid):
+		return custom.get(sid) or ai.get(sid) or opening.get(sid, "")
+
+	def pof(u):
+		return parent_of.get(u)
+
+	def ts_of(u):
+		return nodes[u].get("timestamp") or ""
+
+	order = graph_order(list(nodes), pof, ts_of)
+
+	child_count = {u: 0 for u in nodes}
+	for u in nodes:
+		if pof(u) in child_count:
+			child_count[pof(u)] += 1
+	owner, pending = {}, {}
+	for u in order:
+		own = pending.pop(u, u)  # claimed by its newest child, else u is a tip itself
+		owner[u] = own
+		p = pof(u)
+		if p is not None and p not in pending:
+			pending[p] = own
+
+	def leaf_sid(u):
+		return nodes[owner[u]].get("sessionId") or owner[u]
+
+	def gist_of(u):
+		return msg_oneline(nodes[u]) if full else prompt_text(nodes[u])
+
+	return {
+		"nodes": nodes, "pof": pof, "ts_of": ts_of, "order": order,
+		"child_count": child_count, "leaf_sid": leaf_sid,
+		"title_for": title_for, "gist_of": gist_of, "full": full,
+	}
 
 
 def print_graph(sdir: Path, full: bool = False):
@@ -445,20 +545,199 @@ def print_graph(sdir: Path, full: bool = False):
 	  line where you said something different, so you recognise the split by your
 	  own words. Parent links hop over the dropped messages.
 	- full (inspect zoom): one row per message, the complete topology."""
-	nodes, parent_of = build_message_graph(sdir, None if full else is_prompt)
+	g = analyze_graph(sdir, full)
+	nodes = g["nodes"]
 	if not nodes:
 		return
+	pof, ts_of, order = g["pof"], g["ts_of"], g["order"]
+	child_count, leaf_sid = g["child_count"], g["leaf_sid"]
+	title_for, gist_of = g["title_for"], g["gist_of"]
 
-	def ts_of(u):
-		return nodes[u].get("timestamp") or ""
+	def redundant(title, gist):
+		# True when the title is just the tip's own prompt (single-prompt thread),
+		# differing only by truncation — no point showing it twice.
+		a, b = title.rstrip("… "), gist.rstrip("… ")
+		return a.startswith(b) or b.startswith(a)
 
 	def label_of(u):
 		t = ts_of(u)[5:16].replace("T", " ")  # MM-DD HH:MM
-		gist = msg_oneline(nodes[u]) if full else prompt_text(nodes[u])
-		return f"{short(u)} [{t}] {gist}"
+		return f"{short(leaf_sid(u))} [{t}] {gist_of(u)}"
 
-	order = graph_order(list(nodes), lambda u: parent_of.get(u), ts_of)
-	print("\n".join(render_rails(order, lambda u: parent_of.get(u), label_of)))
+	def deco_of(u):
+		# Hang the thread's title on its own ◆ node above each tip.
+		if child_count[u] != 0:
+			return None
+		title = title_for(leaf_sid(u))
+		if not title or redundant(title, gist_of(u)):
+			return None
+		return f"«{title}»"
+
+	print("\n".join(render_rails(order, pof, label_of, deco_of)))
+
+
+def layout_rails(order, parent_of):
+	"""Assign each node a (row, col) on the same lanes render_rails uses, but as
+	coordinates rather than ASCII. Returns (pos: nid -> (row, col), maxcol)."""
+	lanes = []
+	pos = {}
+	maxcol = 0
+	for row, nid in enumerate(order):
+		hits = [c for c, l in enumerate(lanes) if l == nid]
+		if hits:
+			mycol, extra = hits[0], hits[1:]
+		else:
+			mycol = next((c for c, l in enumerate(lanes) if l is None), len(lanes))
+			if mycol == len(lanes):
+				lanes.append(nid)
+			else:
+				lanes[mycol] = nid
+			extra = []
+		for c in extra:
+			lanes[c] = None
+		pos[nid] = (row, mycol)
+		maxcol = max(maxcol, mycol)
+		lanes[mycol] = parent_of(nid)
+		while lanes and lanes[-1] is None:
+			lanes.pop()
+	return pos, maxcol
+
+
+HTML_HEAD = """<!doctype html><html><head><meta charset="utf-8">
+<title>cc_sessions graph</title><style>
+body{margin:0;background:#0d1117;color:#c9d1d9;
+ font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+header{position:sticky;top:0;z-index:5;background:#161b22;padding:8px 14px;
+ border-bottom:1px solid #30363d;}
+header b{color:#e6edf3;} header span{color:#8b949e;}
+.row{cursor:pointer;}
+.row .hl{fill:#ffffff;opacity:0;}
+.row:hover .hl{opacity:.05;}
+.sid{fill:#6e7681;} .time{fill:#586069;} .msg{fill:#c9d1d9;}
+.title{font-weight:700;}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+ background:#238636;color:#fff;padding:6px 12px;border-radius:6px;
+ opacity:0;transition:opacity .2s;pointer-events:none;}
+</style></head><body>
+"""
+
+HTML_TAIL = """<div id="toast"></div><script>
+for (const r of document.querySelectorAll('.row')) {
+  r.addEventListener('click', () => {
+    const cmd = r.getAttribute('data-resume');
+    navigator.clipboard && navigator.clipboard.writeText(cmd);
+    const t = document.getElementById('toast');
+    t.textContent = 'copied: ' + cmd; t.style.opacity = 1;
+    setTimeout(() => { t.style.opacity = 0; }, 1600);
+  });
+}
+</script></body></html>
+"""
+
+
+def print_html(sdir: Path, full: bool = False, out_path: str = None) -> int:
+	"""Write the message DAG as a self-contained interactive HTML/SVG file:
+	gitk-style lanes on the left, one row per node coloured by session, each
+	thread tip badged with its title, hover for the full prompt, click a row to
+	copy its `claude --resume <id>` command."""
+	g = analyze_graph(sdir, full)
+	nodes = g["nodes"]
+	if not nodes:
+		print("error: no messages to render", file=sys.stderr)
+		return 1
+	pof, ts_of, order = g["pof"], g["ts_of"], g["order"]
+	child_count, leaf_sid = g["child_count"], g["leaf_sid"]
+	title_for, gist_of = g["title_for"], g["gist_of"]
+
+	pos, maxcol = layout_rails(order, pof)
+
+	ROW_H, COL_W, LPAD, TOP, CHARPX = 22, 16, 14, 10, 7.2
+
+	def color(sid):
+		return f"hsl({sum(sid.encode()) % 360}, 60%, 64%)"
+
+	def cx(col):
+		return LPAD + col * COL_W
+
+	def cy(row):
+		return TOP + row * ROW_H + ROW_H // 2
+
+	# Weave a synthetic title node in just above each titled tip, so the topic
+	# reads as its own ◆ node and the real leaf below shows only its last message.
+	cols = {nid: c for nid, (_r, c) in pos.items()}
+
+	def tip_title(nid):
+		if child_count[nid] != 0:
+			return ""
+		t = title_for(leaf_sid(nid))
+		return t if (t and t.rstrip("… ") not in gist_of(nid)) else ""
+
+	display = []  # (kind, nid); a "title" entry sits immediately above its "node"
+	for nid in order:
+		if tip_title(nid):
+			display.append(("title", nid))
+		display.append(("node", nid))
+	realrow = {nid: i for i, (kind, nid) in enumerate(display) if kind == "node"}
+
+	# Edges (behind nodes): a smooth bezier from each node down to its parent.
+	edges = []
+	for nid in order:
+		p = pof(nid)
+		if p in realrow:
+			x1, y1 = cx(cols[nid]), cy(realrow[nid])
+			x2, y2 = cx(cols[p]), cy(realrow[p])
+			ym = (y1 + y2) / 2
+			edges.append(
+				f'<path d="M{x1},{y1} C{x1},{ym} {x2},{ym} {x2},{y2}" '
+				f'stroke="{color(leaf_sid(nid))}" fill="none" stroke-width="1.5" opacity=".6"/>')
+
+	text_x = cx(maxcol) + 18
+	rows, widest = [], 0
+	for i, (kind, nid) in enumerate(display):
+		c, sid = cols[nid], leaf_sid(nid)
+		col, x, y = color(sid), cx(cols[nid]), cy(i)
+		hl = f'<rect class="hl" x="0" y="{TOP + i * ROW_H}" width="100%" height="{ROW_H}"/>'
+		resume = f'claude --resume {esc(sid)}'
+		if kind == "title":
+			title = title_for(sid)
+			d = 5  # a diamond marker, with a short stem down to its tip
+			diamond = (f'<path d="M{x},{y - d} L{x + d},{y} L{x},{y + d} L{x - d},{y} Z" '
+				f'fill="{col}"/>')
+			stem = (f'<line x1="{x}" y1="{y}" x2="{x}" y2="{cy(i + 1)}" '
+				f'stroke="{col}" stroke-width="1.5" opacity=".6"/>')
+			body = (f'{hl}{stem}{diamond}<text x="{text_x}" y="{y + 4}">'
+				f'<tspan class="title" fill="{col}">«{esc(title)}»</tspan></text>')
+			tooltip = title
+			widest = max(widest, len(title) + 4)
+		else:
+			tstr = ts_of(nid)[5:16].replace("T", " ")
+			gist = gist_of(nid)
+			circle = f'<circle cx="{x}" cy="{y}" r="5" fill="{col}" stroke="#0d1117" stroke-width="1.5"/>'
+			body = (f'{hl}{circle}<text x="{text_x}" y="{y + 4}">'
+				f'<tspan class="sid">{esc(short(sid))}</tspan> '
+				f'<tspan class="time">[{esc(tstr)}]</tspan>  '
+				f'<tspan class="msg">{esc(gist)}</tspan></text>')
+			tooltip = gist
+			widest = max(widest, len(short(sid)) + len(tstr) + len(gist) + 10)
+		rows.append(f'<g class="row" data-resume="{resume}"><title>{esc(tooltip)}</title>{body}</g>')
+
+	width = int(text_x + widest * CHARPX + 30)
+	height = TOP * 2 + len(display) * ROW_H
+	svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+		f'font-family="inherit" font-size="13">'
+		f'<g class="edges">{"".join(edges)}</g>'
+		f'<g class="nodes">{"".join(rows)}</g></svg>')
+
+	mode = "every message" if full else "your prompts"
+	header = (f'<header><b>cc_sessions</b> · {esc(sdir.name)} · {len(order)} nodes '
+		f'({mode}) · <span>click a row to copy its <b>claude --resume</b> command, '
+		f'hover for the full prompt</span></header>')
+	html = HTML_HEAD + header + svg + HTML_TAIL
+
+	out = Path(out_path).expanduser()
+	out.write_text(html, encoding="utf-8")
+	print(f"Wrote {out}  ({len(order)} nodes, {width}×{height}px)")
+	print(f"Open it:  xdg-open {out}")
+	return 0
 
 
 def to_epoch(ts: str) -> int:
@@ -480,7 +759,7 @@ def message_text(rec) -> str:
 	return "\n".join(render_content(content, full=True, show_thinking=True))
 
 
-def export_git(sdir: Path, outdir: str, all_messages: bool = False, force: bool = False) -> int:
+def export_git(sdir: Path, outdir: str, full: bool = False, force: bool = False) -> int:
 	"""Materialise the message DAG as a throwaway git repo so it can be browsed
 	with any git history GUI (gitk, git gui, tig, lazygit, VS Code Git Graph…).
 
@@ -488,8 +767,8 @@ def export_git(sdir: Path, outdir: str, all_messages: bool = False, force: bool 
 	commit date), the session id is sneaked into both the commit subject and a
 	`sess/<id>` branch at that session's tip, and the message body is written to
 	`msg/<uuid>.md` so the GUI's diff/patch pane shows the message itself. By
-	default one commit per user prompt; --all-messages commits the full DAG."""
-	nodes, parent_of = build_message_graph(sdir, None if all_messages else is_prompt)
+	default one commit per user prompt; full=True commits every message."""
+	nodes, parent_of = build_message_graph(sdir, None if full else is_prompt)
 	if not nodes:
 		print("error: no matching messages to export", file=sys.stderr)
 		return 1
@@ -588,7 +867,9 @@ def export_git(sdir: Path, outdir: str, all_messages: bool = False, force: bool 
 	w(f"reset refs/heads/main\nfrom :{mark[newest_first[0]]}\n\n")
 
 	subprocess.run(
-		["git", "-C", str(out), "fast-import", "--quiet", "--date-format=raw"],
+		# --force allows non-fast-forward ref moves when refreshing an existing
+		# export (e.g. switching between prompt-only and --full rebuilds main).
+		["git", "-C", str(out), "fast-import", "--quiet", "--force", "--date-format=raw"],
 		input=bytes(buf), check=True,
 	)
 	subprocess.run(["git", "-C", str(out), "update-ref", "-d", "refs/heads/import"], check=False)
@@ -606,7 +887,7 @@ def main():
 		help="Project directory (default: CWD)")
 	ap.add_argument("--full", action="store_true",
 		help="Show full detail: untruncated tool inputs/results in the dump; "
-			"every message (not just prompts) in --tree")
+			"every message (not just prompts) in --tree and --git-export")
 	ap.add_argument("--thinking", action="store_true",
 		help="Show assistant thinking blocks")
 	ap.add_argument("--list", action="store_true",
@@ -614,12 +895,14 @@ def main():
 	ap.add_argument("--tree", action="store_true",
 		help="Show the message DAG as a git-log-graph oneline log (just your "
 			"prompts; add --full for every message) and exit")
-	ap.add_argument("--git-export", metavar="DIR",
-		help="Export the message DAG as a throwaway git repo at DIR (browse with gitk --all)")
-	ap.add_argument("--all-messages", action="store_true",
-		help="With --git-export: one commit per message (default: one per user prompt)")
+	ap.add_argument("--git-export", nargs="?", const="", default=None, metavar="DIR",
+		help="Export the message DAG as a throwaway git repo for browsing with gitk "
+			"--all; omit DIR to use ~/.cache/cc_sessions/<project> (auto-refreshed)")
+	ap.add_argument("--html", nargs="?", const="", default=None, metavar="FILE",
+		help="Write an interactive HTML/SVG graph (gitk-style, click to copy "
+			"--resume); omit FILE to use ~/.cache/cc_sessions/<project>.html")
 	ap.add_argument("--force", action="store_true",
-		help="With --git-export: allow a non-empty target directory")
+		help="With --git-export: allow reusing a non-empty target directory")
 	args = ap.parse_args()
 
 	try:
@@ -628,8 +911,20 @@ def main():
 		print(f"error: {e}", file=sys.stderr)
 		return 2
 
-	if args.git_export:
-		return export_git(sdir, args.git_export, args.all_messages, args.force)
+	if args.git_export is not None:
+		auto = args.git_export == ""
+		target = Path.home() / ".cache" / "cc_sessions" / sdir.name if auto else args.git_export
+		# The auto cache path is ours to manage, so refresh it in place.
+		return export_git(sdir, str(target), args.full, args.force or auto)
+
+	if args.html is not None:
+		if args.html == "":
+			cache = Path.home() / ".cache" / "cc_sessions"
+			cache.mkdir(parents=True, exist_ok=True)
+			out = cache / f"{sdir.name}.html"
+		else:
+			out = args.html
+		return print_html(sdir, args.full, str(out))
 
 	sessions = load_sessions(sdir)
 	if not sessions:
