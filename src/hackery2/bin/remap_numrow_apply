@@ -1,18 +1,28 @@
 #!/usr/bin/env bash
-# Invert the number row (symbols unshifted, digits on Shift) and set key repeat rate.
+# Reset to my default layout with an inverted number row (symbols unshifted,
+# digits on Shift) and set the key repeat rate. Also the "switch back" from `cz`.
 #
 # Usage: remap_numrow_apply [delay] [rate]
 #
 # Instead of loading a frozen keymap dump (which goes stale and made all GTK apps
 # die with BadValue on keyboard hotplug — see xorg-server 21.1.12-1ubuntu1.5 XKB
-# hardening), rebuild the map from the server's CURRENT settings and merge in the
-# small numrow override from xkb/symbols/numrow.
+# hardening), set the base layout via RMLVO, then merge in the small numrow
+# override from xkb/symbols/numrow. Setting the base explicitly (rather than
+# reading the current map) is what lets this restore colemak after `cz`.
 set -euo pipefail
 
 DELAY="${1:-150}"
 RATE="${2:-60}"
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Base layout — override via env if needed.
+LAYOUT="${NUMROW_LAYOUT:-us,us}"
+VARIANT="${NUMROW_VARIANT:-colemak,intl}"
+OPTIONS="${NUMROW_OPTIONS:-grp:alts_toggle}"
+
+# Apply the base layout for real first, so the layout indicator / _XKB_RULES_NAMES
+# reflect colemak (not e.g. a leftover `cz`), then overlay the numrow via xkbcomp.
+setxkbmap -layout "$LAYOUT" -variant "$VARIANT" -option "$OPTIONS"
 setxkbmap -print \
 	| sed '/xkb_symbols/ s/"\s*}/+numrow(inverted)"\t}/' \
 	| xkbcomp -w 0 -I"$DIR/xkb" - "$DISPLAY"
