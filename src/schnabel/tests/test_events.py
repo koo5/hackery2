@@ -16,6 +16,7 @@ from schnabel.vocab import (
     ended_at,
     status as status_pred,
     error as error_pred,
+    invoked_by,
     STATUS_COMPLETE,
     STATUS_FAILED,
 )
@@ -286,4 +287,118 @@ def test_invocation_iri_has_lowercase_suffix_derived_from_type():
     with log.invocation(BFG.LocalCommit) as inv:
         pass
     assert str(inv.iri).endswith("_localcommit")
+    log.close()
+
+
+def test_invocation_picks_up_parent_from_env_var(monkeypatch):
+    monkeypatch.setenv("SCHNABEL_PARENT_INVOCATION", "urn:schnabel:graph:outer123_runbackup")
+    log = EventLog({"backend": "memory"})
+    with log.invocation(BFG.LocalCommit) as inv:
+        pass
+
+    rows = list(log.query(
+        f"SELECT ?p WHERE {{ GRAPH <{inv.iri}> {{ <{inv.iri}> <{invoked_by}> ?p }} }}"
+    ))
+    assert [str(r[0]) for r in rows] == ["urn:schnabel:graph:outer123_runbackup"]
+    log.close()
+
+
+def test_invocation_no_invoked_by_emit_when_env_var_missing(monkeypatch):
+    monkeypatch.delenv("SCHNABEL_PARENT_INVOCATION", raising=False)
+    log = EventLog({"backend": "memory"})
+    with log.invocation(BFG.LocalCommit) as inv:
+        pass
+
+    rows = list(log.query(
+        f"SELECT ?p WHERE {{ GRAPH <{inv.iri}> {{ <{inv.iri}> <{invoked_by}> ?p }} }}"
+    ))
+    assert rows == []
+    log.close()
+
+
+def test_invocation_explicit_parent_overrides_env_var(monkeypatch):
+    monkeypatch.setenv("SCHNABEL_PARENT_INVOCATION", "urn:test:env-parent")
+    log = EventLog({"backend": "memory"})
+    explicit = URIRef("urn:test:explicit-parent")
+    with log.invocation(BFG.LocalCommit, parent=explicit) as inv:
+        pass
+
+    rows = list(log.query(
+        f"SELECT ?p WHERE {{ GRAPH <{inv.iri}> {{ <{inv.iri}> <{invoked_by}> ?p }} }}"
+    ))
+    assert [str(r[0]) for r in rows] == ["urn:test:explicit-parent"]
+    log.close()
+
+
+def test_invocation_sets_env_var_for_children_while_inside_body(monkeypatch):
+    monkeypatch.delenv("SCHNABEL_PARENT_INVOCATION", raising=False)
+    log = EventLog({"backend": "memory"})
+
+    seen = {}
+    with log.invocation(BFG.LocalCommit) as inv:
+        seen["during"] = os.environ.get("SCHNABEL_PARENT_INVOCATION")
+
+    assert seen["during"] == str(inv.iri)
+    assert os.environ.get("SCHNABEL_PARENT_INVOCATION") is None
+    log.close()
+
+
+def test_invocation_restores_prior_env_var(monkeypatch):
+    monkeypatch.setenv("SCHNABEL_PARENT_INVOCATION", "urn:test:outer")
+    log = EventLog({"backend": "memory"})
+
+    with log.invocation(BFG.LocalCommit) as inv:
+        # Inside, env var is the new invocation's IRI.
+        assert os.environ["SCHNABEL_PARENT_INVOCATION"] == str(inv.iri)
+
+    # On exit, the prior value (which became this invocation's parent) is restored.
+    assert os.environ["SCHNABEL_PARENT_INVOCATION"] == "urn:test:outer"
+    log.close()
+
+
+def test_invocation_restores_env_var_on_exception(monkeypatch):
+    monkeypatch.setenv("SCHNABEL_PARENT_INVOCATION", "urn:test:outer")
+    log = EventLog({"backend": "memory"})
+
+    with pytest.raises(RuntimeError):
+        with log.invocation(BFG.LocalCommit):
+            raise RuntimeError("boom")
+
+    assert os.environ["SCHNABEL_PARENT_INVOCATION"] == "urn:test:outer"
+    log.close()
+
+
+def test_nested_invocations_form_a_call_tree(monkeypatch):
+    """The whole point of the auto-propagation: nested ``with log.invocation()``
+    calls build a parent→child→grandchild chain in the store automatically."""
+    monkeypatch.delenv("SCHNABEL_PARENT_INVOCATION", raising=False)
+    log = EventLog({"backend": "memory"})
+
+    with log.invocation(BFG.LocalCommit) as outer:
+        with log.invocation(BFG.Push) as inner:
+            with log.invocation(BFG.RemoteCommit) as deepest:
+                pass
+
+    # Each inner invocation should record its immediate enclosing invocation.
+    def parent_of(child_iri):
+        rows = list(log.query(
+            f"SELECT ?p WHERE {{ GRAPH <{child_iri}> {{ <{child_iri}> <{invoked_by}> ?p }} }}"
+        ))
+        return str(rows[0][0]) if rows else None
+
+    assert parent_of(outer.iri) is None  # top level had no env
+    assert parent_of(inner.iri) == str(outer.iri)
+    assert parent_of(deepest.iri) == str(inner.iri)
+    log.close()
+
+
+def test_invocation_empty_env_var_is_treated_as_absent(monkeypatch):
+    monkeypatch.setenv("SCHNABEL_PARENT_INVOCATION", "   ")
+    log = EventLog({"backend": "memory"})
+    with log.invocation(BFG.LocalCommit) as inv:
+        pass
+    rows = list(log.query(
+        f"SELECT ?p WHERE {{ GRAPH <{inv.iri}> {{ <{inv.iri}> <{invoked_by}> ?p }} }}"
+    ))
+    assert rows == []
     log.close()

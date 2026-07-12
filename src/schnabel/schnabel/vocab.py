@@ -22,6 +22,10 @@ started_at = SCHNABEL.startedAt
 ended_at = SCHNABEL.endedAt
 status = SCHNABEL.status
 error = SCHNABEL.error
+invoked_by = SCHNABEL.invokedBy
+"""``core:invokedBy <parent_inv>`` — links a child invocation to the outer
+invocation that launched it. Picked up automatically from the
+``SCHNABEL_PARENT_INVOCATION`` env var by ``EventLog.invocation()``."""
 
 # Status values (as IRIs, not Literals, so FILTER (?s = core:complete) works).
 STATUS_RUNNING = SCHNABEL.running
@@ -52,6 +56,7 @@ __all__ = [
     "ended_at",
     "status",
     "error",
+    "invoked_by",
     "STATUS_RUNNING",
     "STATUS_COMPLETE",
     "STATUS_FAILED",

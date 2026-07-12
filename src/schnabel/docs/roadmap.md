@@ -27,12 +27,12 @@ bfg emits via prose-on-stdout-mixed-with-one-JSON-line. backup.sh `tee`s the out
 - [x] `push` emits invocation quads, including `bfg:parentSnapshot` (reified with abspath + uuids) when `find_common_parent` picks one (one of the original three asks).
 - [x] `pull` emits the same structure symmetrically.
 - [x] Byte counting plumbed into `local_send` (via `pv -nbf` injection + tmpfile-tailing daemon thread) and `remote_send` (in-process Popen chain with chunked read/write counter). Reports to both sinks: the existing `_prerr`/`tee`'d log AND the active schnabel invocation, as `bfg:bytesTransferred` quads at every 64 MiB threshold plus a final (D-011).
-- [ ] `remote_commit`, `checkout_local`, `checkout_remote`, `update_db`, `prune_local`, `prune_remote` emit.
-- [ ] Compound commands (`commit_and_push`, `remote_commit_and_pull`, `commit_and_push_and_checkout`, `commit_and_generate_patch`) emit an outer invocation that references the inner ones via `bfg:invokedSubcommand` (vocab name TBD).
-- [ ] backup.py mints an outer invocation IRI per `_run_backup`; child bfg invocations record `bfg:invokedBy <outer>` (passed via env var into the bfg subprocess).
-- [ ] backup.py prints a per-subvol summary line after each `ccs("bfg ...")` by querying the store.
+- [x] `remote_commit`, `checkout_local`, `checkout_remote`, `update_db`, `prune_local`, `prune_remote` emit. `prune_local`/`prune_remote` also emit one `bfg:prunedSnapshot` quad per deleted snapshot.
+- [x] Compound commands (`commit_and_push`, `remote_commit_and_pull`, `commit_and_push_and_checkout`, `commit_and_generate_patch`) wrap their bodies in their own `log.invocation()`. Inner `local_commit`/`push`/`pull`/`checkout_*` invocations automatically link via `core:invokedBy` because `EventLog.invocation()` sets/restores `SCHNABEL_PARENT_INVOCATION` around its body (D-012a).
+- [x] backup.py mints an outer invocation IRI per `_run_backup`; child bfg invocations record `core:invokedBy <outer>` via the `SCHNABEL_PARENT_INVOCATION` env var (D-012).
+- [x] backup.py prints an end-of-run summary by querying the store for all child invocations (subvol, parent snapshot used, max bytes transferred, push/pull destination, status). Single SPARQL query; per-child Python-side formatting.
 
-**Done when:** the three asks from the original conversation are met. Detailed per-invocation log via graph-per-invocation **(done)**; parent snapshot surfaced via emitted `bfg:parentSnapshot` **(done)**; byte accounting via emitted `bfg:bytesTransferred` **(done)**. The remaining Phase 2 work is broadening coverage to the rest of bfg's commands and stitching backup.py into the same store.
+**Done when:** the three asks from the original conversation are met. Detailed per-invocation log via graph-per-invocation **(done)**; parent snapshot surfaced via emitted `bfg:parentSnapshot` **(done)**; byte accounting via emitted `bfg:bytesTransferred` **(done)**. All public bfg commands instrumented; all compound commands form proper call trees; backup.py's outer invocation links to children automatically. **Phase 2 complete.**
 
 ## Phase 3 — Pubsub: MQTT + `bfg-watch`
 

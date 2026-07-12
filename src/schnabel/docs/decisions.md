@@ -105,6 +105,32 @@ Append-only record. When a decision is reversed, a new entry supersedes the old;
 - **Why:** Two repetitions (`local_commit` and `push`) were enough to make the boilerplate's tax — 15+ lines of `_log.batch()` / `_log.emit(...g=inv)` / failure-handling per command — obviously wasteful, with ~10 more commands queued. The helper doesn't anticipate hypothetical future requirements; it consolidates a pattern already proven in the codebase. It also encodes the canonical lifecycle vocabulary (`core:startedAt`, `core:endedAt`, `core:status`, `core:error`, `core:running`/`complete`/`failed`) so every emitter automatically agrees on those terms — cross-emitter SPARQL joins ("what was running at 14:32") work without per-tool translation.
 - **Shape:** `_InvocationHandle` is the yielded object. Has `iri` (the graph IRI), `emit(p, o)` (emits in the invocation's graph with `s=iri`), `emit_about(s, p, o)` (graph-scoped but arbitrary subject — for child resources like snapshots the invocation produced), and `bn(suffix)` (mint a child-resource IRI). In null-mode `iri=None` and all methods short-circuit, so call sites stay unconditional.
 
+## D-012 — Parent-invocation linkage via the `SCHNABEL_PARENT_INVOCATION` env var
+
+- **Date:** 2026-05-20 (revised 2026-05-21 — see D-012a)
+- **Status:** Adopted
+- **Question:** When process A spawns process B as a subprocess, how does B's invocation know it was launched by A's invocation, so the audit graph reflects the call tree?
+- **Alternatives:**
+  1. Pass the parent IRI as a CLI argument to every child (`bfg --SCHNABEL_PARENT=urn:...`). Requires per-tool CLI plumbing.
+  2. Write a "current invocation" pointer to the store; children read it on entry. Race-prone if multiple parents run concurrently.
+  3. Pass the parent IRI in an environment variable (`SCHNABEL_PARENT_INVOCATION`). Subprocesses inherit env by default; no per-call argument plumbing needed.
+- **Choice:** Option 3.
+- **Why:** Env-var inheritance is exactly the right channel for "ambient context that flows into children automatically." Battle-tested (W3C `TRACEPARENT` is the standardized version of the same pattern for distributed tracing). No CLI plumbing per tool. No race: each subprocess gets a snapshot of the env at spawn time. `EventLog.invocation()` reads `SCHNABEL_PARENT_INVOCATION` on entry and emits `(inv core:invokedBy <parent>)` into the new invocation's graph automatically; an explicit `parent=` arg overrides the env var for callers that need it. Note: this env-var IS data IPC for plumbing (the invocation IRI), not the runtime data channel — the actual runtime data still flows through the quadstore. Feedback memory [[feedback-no-ndjson-or-ad-hoc-ipc]] doesn't forbid env vars for *plumbing*; it forbids them as the *substantive* channel.
+- **What would trigger consolidating into one `SCHNABEL_CONTEXT` blob:** the addition of a third or fourth piece of ambient context (tags, dry-run mode, type override, …). At two env vars (`QUADSTORE`, `SCHNABEL_PARENT_INVOCATION`) with orthogonal meanings, splitting is clearer than merging. Pre-consolidation would design for hypotheticals.
+
+## D-012a — `invocation()` auto-propagates its IRI as the parent for nested invocations
+
+- **Date:** 2026-05-21
+- **Status:** Adopted
+- **Question:** Who is responsible for setting `SCHNABEL_PARENT_INVOCATION` before spawning a subprocess (or before calling another schnabel-instrumented function)? D-012's original answer was "the producer, manually."
+- **Alternatives:**
+  1. Caller sets/restores manually in a `try/finally` every time. Two-line ritual at every callsite; easy to forget.
+  2. `EventLog.invocation()` itself sets the env var to the new invocation's IRI on entry, restores the prior value on exit. Caller-invisible.
+- **Choice:** Option 2.
+- **Why:** With two real callsites needing this (`backup.py:_run_backup` and bfg's four compound commands), the manual ritual hit the two-occurrences-justifies-extraction threshold cleanly. More importantly, **the env-var management is the same concept as parent-IRI pickup** — both are part of "this invocation is the ambient parent context while its body runs." Owning both in one place keeps them consistent. As a bonus, nested `with log.invocation()` blocks automatically form a call tree: outer's IRI sits in the env when middle starts (middle records outer as parent), middle's IRI sits in the env when inner starts (inner records middle), etc. — proven by the `test_nested_invocations_form_a_call_tree` test. Caveat: single-threaded only; concurrent invocations on one process would stomp on each other's env. Document and revisit if/when concurrent emit becomes a real use case.
+
+
+
 ## D-011 — Byte-count reporting goes to both sinks (schnabel **and** the file-tee'd log)
 
 - **Date:** 2026-05-20

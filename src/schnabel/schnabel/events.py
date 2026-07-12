@@ -250,17 +250,25 @@ class EventLog:
     # --- high-level: invocation lifecycle ---------------------------------
 
     @contextlib.contextmanager
-    def invocation(self, type_iri: URIRef, *, suffix: Optional[str] = None):
+    def invocation(self, type_iri: URIRef, *,
+                   suffix: Optional[str] = None,
+                   parent: Optional[URIRef] = None):
         """Wrap a unit of work as an invocation graph.
 
-        On entry: mint a fresh graph IRI, emit ``(inv rdf:type <type_iri>)`` and
-        ``startedAt`` into that graph, swap the ``latest_invocation`` pointer.
+        On entry: mint a fresh graph IRI, emit ``(inv rdf:type <type_iri>)``,
+        ``startedAt``, and — if a parent invocation was passed or found in the
+        ``SCHNABEL_PARENT_INVOCATION`` env var — ``(inv core:invokedBy <parent>)``.
+        Swap the ``latest_invocation`` pointer to this invocation.
+
         On normal exit: emit ``status=complete`` and ``endedAt``.
-        On exception: emit ``status=failed``, ``error``, ``endedAt`` and re-raise.
+        On exception: emit ``status=failed``, ``error``, ``endedAt``, re-raise.
 
         Yields an ``_InvocationHandle`` that gives the body convenient
         graph-scoped ``emit()`` and ``emit_about()``. In null-mode the handle's
         IRI is ``None`` and all its methods are no-ops.
+
+        :param parent: explicit parent invocation IRI. Takes precedence over
+            the ``SCHNABEL_PARENT_INVOCATION`` env var when both are present.
         """
         if self._is_null:
             yield _InvocationHandle(self, None)
@@ -278,29 +286,53 @@ class EventLog:
         inv = self.graph(suffix=suffix)
         started = datetime.now(timezone.utc).isoformat()
 
+        # Parent-invocation linkage: explicit arg > env var > none.
+        if parent is None:
+            env_parent = os.environ.get("SCHNABEL_PARENT_INVOCATION", "").strip()
+            if env_parent:
+                parent = URIRef(env_parent)
+        elif not isinstance(parent, URIRef):
+            parent = URIRef(str(parent))
+
         with self.batch():
             self.emit(inv, RDF.type, type_iri, g=inv)
             self.emit(inv, vocab.started_at,
                 Literal(started, datatype=XSD.dateTime), g=inv)
+            if parent is not None:
+                self.emit(inv, vocab.invoked_by, parent, g=inv)
             self.pointer_swap(vocab.latest_invocation, vocab.points_to, inv)
+
+        # Propagate this invocation as the ambient parent for any subprocess
+        # spawned inside the body. Schnabel's W3C-TRACEPARENT-style cross-process
+        # linkage (D-012). Restored in the finally below regardless of how the
+        # body exits, including on exception. Single-threaded only — concurrent
+        # invocations on the same process would stomp on each other.
+        prev_env = os.environ.get("SCHNABEL_PARENT_INVOCATION")
+        os.environ["SCHNABEL_PARENT_INVOCATION"] = str(inv)
 
         handle = _InvocationHandle(self, inv)
         try:
-            yield handle
-        except BaseException as exc:
+            try:
+                yield handle
+            except BaseException as exc:
+                with self.batch():
+                    self.emit(inv, vocab.status, vocab.STATUS_FAILED, g=inv)
+                    self.emit(inv, vocab.error, Literal(str(exc)), g=inv)
+                    self.emit(inv, vocab.ended_at,
+                        Literal(datetime.now(timezone.utc).isoformat(),
+                                datatype=XSD.dateTime), g=inv)
+                raise
+
             with self.batch():
-                self.emit(inv, vocab.status, vocab.STATUS_FAILED, g=inv)
-                self.emit(inv, vocab.error, Literal(str(exc)), g=inv)
+                self.emit(inv, vocab.status, vocab.STATUS_COMPLETE, g=inv)
                 self.emit(inv, vocab.ended_at,
                     Literal(datetime.now(timezone.utc).isoformat(),
                             datatype=XSD.dateTime), g=inv)
-            raise
-
-        with self.batch():
-            self.emit(inv, vocab.status, vocab.STATUS_COMPLETE, g=inv)
-            self.emit(inv, vocab.ended_at,
-                Literal(datetime.now(timezone.utc).isoformat(),
-                        datatype=XSD.dateTime), g=inv)
+        finally:
+            if prev_env is None:
+                os.environ.pop("SCHNABEL_PARENT_INVOCATION", None)
+            else:
+                os.environ["SCHNABEL_PARENT_INVOCATION"] = prev_env
 
     # --- subscribe (phase 3) ----------------------------------------------
 
