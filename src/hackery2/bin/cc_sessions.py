@@ -662,6 +662,17 @@ def build_html(sdir: Path, full: bool = False):
 	def cy(row):
 		return TOP + row * ROW_H + ROW_H // 2
 
+	def full_text(nid, limit=4000):
+		# The whole message for the hover tooltip (not the truncated row gist):
+		# the complete typed prompt, or in --full mode the expanded message.
+		rec = nodes[nid]
+		if full:
+			t = message_text(rec)
+		else:
+			t = "\n".join(x for x in _user_texts(rec) if x.strip()) or message_text(rec)
+		t = t.strip()
+		return t[:limit] + ("…" if len(t) > limit else "")
+
 	# Weave a synthetic title node in just above each titled tip, so the topic
 	# reads as its own ◆ node and the real leaf below shows only its last message.
 	cols = {nid: c for nid, (_r, c) in pos.items()}
@@ -717,7 +728,7 @@ def build_html(sdir: Path, full: bool = False):
 				f'<tspan class="sid">{esc(short(sid))}</tspan> '
 				f'<tspan class="time">[{esc(tstr)}]</tspan>  '
 				f'<tspan class="msg">{esc(gist)}</tspan></text>')
-			tooltip = gist
+			tooltip = full_text(nid)
 			widest = max(widest, len(short(sid)) + len(tstr) + len(gist) + 10)
 		rows.append(f'<g class="row" data-resume="{resume}"><title>{esc(tooltip)}</title>{body}</g>')
 

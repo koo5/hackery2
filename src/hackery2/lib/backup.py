@@ -84,6 +84,24 @@ def vpss(source, target_fs, quick, prune):
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
+@click.option('--percent', default=30.0, type=float, help='Percentage of oldest snapshots to clean (default 30)')
+@click.option('--dry-run', is_flag=True, help='Only report what would be cleaned, delete nothing')
+def clean(source, percent, dry_run):
+	"""Aggressively clean old local snapshots, keeping only those needed as shared parents for future incremental sends."""
+	print(f'Clean old snapshots - source={source}, percent={percent}, dry_run={dry_run}')
+	_run_clean(source=source, percent=percent, dry_run=dry_run)
+
+@cli.command()
+@click.option('--source', default='host', help='Source to backup')
+@click.option('--percent', default=30.0, type=float, help='Clean percentage to simulate (default 30)')
+@click.option('--all', 'show_all', is_flag=True, help='List every snapshot instead of collapsing the trivially-kept recent ones')
+def report(source, percent, show_all):
+	"""Read-only: show a per-subvol table of local snapshots and what prune+clean would do to each (and which ones are held as shared parents)."""
+	print(f'Snapshot report - source={source}, percent={percent}, all={show_all}')
+	_run_report(source=source, percent=percent, show_all=show_all)
+
+@cli.command()
+@click.option('--source', default='host', help='Source to backup')
 @click.option('--target-machine', required=True, help='Remote machine for backup (e.g., r64, jj)')
 @click.option('--target-fs', help='Target filesystem on remote machine')
 @click.option('--quick', is_flag=True, help='Quick mode - skip some operations')
@@ -152,6 +170,82 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	print('---done find_backup_subvols---')
 	print()
 	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only)
+
+
+def _run_clean(source='host', percent=30.0, dry_run=False):
+	"""
+	Aggressively clean old local snapshots on this machine's source filesystems.
+
+	Mirrors the subvol iteration of the local prune step, but calls bfg clean_local, which
+	deletes the oldest `percent`% of snapshots while refusing to delete snapshots that are
+	still needed as shared parents for future incremental sends.
+	"""
+	print(f'_run_clean: source = {source}, percent = {percent}, dry_run = {dry_run}')
+
+	fss = get_filesystems()
+
+	for fs in fss:
+		toplevel = fs['toplevel']
+
+		# backup-target filesystems hold snapshots received from other machines; those are
+		# managed (pruned) by their source machines, so we don't clean them here.
+		if fs.get('transfer_only'):
+			print('SKIP transfer-only ' + toplevel)
+			continue
+		if not check_if_mounted_local(toplevel):
+			print('SKIP non-mounted ' + toplevel)
+			continue
+
+		# refresh the db so clean_local knows which snapshots are shared with remotes
+		if _use_db:
+			ccs(f"""bfg --YES=true update_db --FS={toplevel} """)
+
+		for subvol in fs['subvols']:
+			if subvol.get('just_push'):
+				continue
+			name = subvol['name']
+			source_path = subvol['source_path']
+			subvol_path = Path(f"{toplevel}/{source_path}{name}")
+			dry = ' --DRY_RUN=True' if dry_run else ''
+			# first thin the history with the normal time-based retention policy, then
+			# aggressively drop the oldest percent% of whatever remains.
+			print('PRUNE ' + str(subvol_path))
+			ccs(f"""bfg prune_local --DB={_use_db} --YES=true{dry} --SUBVOL={subvol_path} """)
+			print('CLEAN ' + str(subvol_path))
+			ccs(f"""bfg clean_local --DB={_use_db} --YES=true --PERCENT={percent}{dry} --SUBVOL={subvol_path} """)
+
+
+def _run_report(source='host', percent=30.0, show_all=False):
+	"""
+	Read-only report: for each source subvol on this machine, refresh the db and print the
+	prune+clean plan (what would be kept/removed and why) via bfg report_local. Deletes nothing.
+	"""
+	print(f'_run_report: source = {source}, percent = {percent}, all = {show_all}')
+
+	fss = get_filesystems()
+
+	for fs in fss:
+		toplevel = fs['toplevel']
+
+		if fs.get('transfer_only'):
+			print('SKIP transfer-only ' + toplevel)
+			continue
+		if not check_if_mounted_local(toplevel):
+			print('SKIP non-mounted ' + toplevel)
+			continue
+
+		# refresh the db so shared-parent detection reflects the current state of all machines
+		if _use_db:
+			ccs(f"""bfg --YES=true update_db --FS={toplevel} """)
+
+		for subvol in fs['subvols']:
+			if subvol.get('just_push'):
+				continue
+			name = subvol['name']
+			source_path = subvol['source_path']
+			subvol_path = Path(f"{toplevel}/{source_path}{name}")
+			all_flag = ' --ALL=True' if show_all else ''
+			ccs(f"""bfg report_local --DB={_use_db} --PERCENT={percent}{all_flag} --SUBVOL={subvol_path} """)
 
 
 def sync_stuff(hostname):

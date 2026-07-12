@@ -26,3 +26,4 @@ ENV/
 env.bak/
 venv.bak/
 .dev_intention
+.playwright-mcp/

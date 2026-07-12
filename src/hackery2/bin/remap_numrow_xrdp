@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# xrdp-safe numrow remap: anchor to an explicit us+colemak base instead of the
+# live keymap. Over xrdp, `setxkbmap -print` of the *current* map yields a
+# descriptor whose xkbcomp reload kills the special keys (arrows/Home/End/Fn),
+# because xrdp's keycodes don't survive the round-trip. Building from an explicit
+# layout keeps those keys working while still inverting the number row.
+#
+# colemak is reasserted here on purpose, so this stays correct whether or not
+# XFCE also owns the layout. Do NOT add -layout/-variant to remap_numrow_apply
+# (the local script) -- that one must keep reading the live us+colemak map.
+#
+# Usage: remap_numrow_xrdp [delay] [rate]
+set -euo pipefail
+
+DELAY="${1:-150}"
+RATE="${2:-60}"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+setxkbmap -layout us -variant colemak -print \
+	| sed '/xkb_symbols/ s/"\s*}/+numrow(inverted)"\t}/' \
+	| xkbcomp -w 0 -I"$DIR/xkb" - "$DISPLAY"
+
+xset r rate "$DELAY" "$RATE"
