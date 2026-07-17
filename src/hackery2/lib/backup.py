@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-
+zzz
 """
 install:
  pip install click ptyprocess
@@ -40,6 +40,13 @@ from .infra import *
 import logging
 import click
 import json5
+from rdflib import Literal
+from schnabel import EventLog
+from schnabel.vocab import BACKUP, BFG
+import schnabel.vocab as schnabel_vocab
+
+_log = EventLog()
+
 log = logging.getLogger()
 # Set up logging
 log.setLevel(logging.INFO)
@@ -100,6 +107,30 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 
 	print(f'_run_backup: source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}, snapshot_only = {snapshot_only}')
 
+	with _log.invocation(BACKUP.RunBackup) as outer:
+		outer.emit(BACKUP.onHost, Literal(hostname))
+		outer.emit(BACKUP.source, Literal(str(source)))
+		if target_machine is not None:
+			outer.emit(BACKUP.targetMachine, Literal(str(target_machine)))
+		if target_fs is not None:
+			outer.emit(BACKUP.targetFs, Literal(str(target_fs)))
+		outer.emit(BACKUP.localMode, Literal(bool(local)))
+		outer.emit(BACKUP.snapshotOnly, Literal(bool(snapshot_only)))
+		outer.emit(BACKUP.vpss, Literal(bool(vpss)))
+
+		# SCHNABEL_PARENT_INVOCATION is set automatically by
+		# EventLog.invocation() so child bfg subprocesses link back to us.
+		_do_run_backup(source, target_machine, target_fs, local, quick, prune, snapshot_only, vpss, backups)
+
+		# End-of-run summary, derived from the store. Swallow failures so a
+		# summary glitch can't mask the actual backup outcome.
+		try:
+			_print_backup_summary(_log, outer.iri)
+		except Exception as e:
+			log.warning(f'backup summary print failed: {e}')
+
+
+def _do_run_backup(source, target_machine, target_fs, local, quick, prune, snapshot_only, vpss, backups):
 	default_target_machine = 'jj'
 	default_target_fs='/bac20/'
 
@@ -152,6 +183,79 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	print('---done find_backup_subvols---')
 	print()
 	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only)
+
+
+def _print_backup_summary(log, outer_iri):
+	"""End-of-run summary, derived from the schnabel store. One line per child
+	invocation, in start order. Quiet when no log is configured or no children
+	were recorded."""
+	if log.is_null or outer_iri is None:
+		return
+
+	child_rows = list(log.query(f"""
+		PREFIX core: <urn:schnabel:vocab:core:>
+		SELECT ?inv ?type ?started WHERE {{
+			GRAPH ?inv {{
+				?inv a ?type ;
+				     core:invokedBy <{outer_iri}> ;
+				     core:startedAt ?started .
+			}}
+		}} ORDER BY ?started
+	"""))
+
+	if not child_rows:
+		return
+
+	print()
+	print('--- backup summary (from schnabel store) ---')
+	for row in child_rows:
+		inv, type_iri, started = row
+		# Collect facts about this invocation from its own graph, indexed by
+		# (subject, predicate).
+		by_pred = defaultdict(list)
+		for s, p, o, g in log.quads(inv):
+			by_pred[(str(s), str(p))].append(o)
+
+		inv_key = str(inv)
+		def me(pred):
+			return [str(x) for x in by_pred.get((inv_key, str(pred)), [])]
+
+		def about(subj_iri, pred):
+			return [str(x) for x in by_pred.get((str(subj_iri), str(pred)), [])]
+
+		type_short = str(type_iri).rsplit(':', 1)[-1]
+		parts = [f'  {started}', type_short]
+
+		subvol = me(BFG.subvol)
+		if subvol:
+			parts.append(subvol[0])
+
+		# parentSnapshot is a blank-node IRI; follow it to its abspath.
+		parent_iris = by_pred.get((inv_key, str(BFG.parentSnapshot)), [])
+		if parent_iris:
+			parent_abs = about(parent_iris[0], BFG.abspath)
+			if parent_abs:
+				parts.append(f'parent={parent_abs[0]}')
+
+		bytes_ = me(BFG.bytesTransferred)
+		if bytes_:
+			max_b = max(int(b) for b in bytes_)
+			parts.append(f'bytes={max_b:,}')
+
+		pushed = me(BFG.pushedTo)
+		if pushed:
+			parts.append(f'→ {pushed[0]}')
+		pulled = me(BFG.pulledTo)
+		if pulled:
+			parts.append(f'← {pulled[0]}')
+
+		status_vals = me(schnabel_vocab.status)
+		if status_vals:
+			parts.append(f'[{status_vals[0].rsplit(":", 1)[-1]}]')
+
+		print('  '.join(parts))
+	print('--- end backup summary ---')
+	print()
 
 
 def sync_stuff(hostname):
