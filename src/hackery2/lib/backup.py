@@ -37,6 +37,7 @@ from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 from .infra import *
+from . import locks
 import logging
 import click
 import json5
@@ -50,10 +51,35 @@ if 'BACKUP_DEBUG' in os.environ:
 _use_db = True
 
 
+BACKUP_LOCK = '/run/lock/backup.py.lock'
+
+
+_exit_if_locked = False
+
+
 @click.group()
-def cli():
+@click.option('--exit-if-locked', is_flag=True,
+			  help='If a concurrent backup.py run holds the lock, exit immediately (code 75) '
+				   'instead of waiting. Use for cron so runs cannot pile up behind a stuck one.')
+def cli(exit_if_locked):
 	"""Backup utility with three modes: snapshot-only, local backup, and remote backup."""
-	pass
+	global _exit_if_locked
+	_exit_if_locked = exit_if_locked
+
+
+def _take_pipeline_lock():
+	# one backup.py pipeline at a time on this machine: cron and manual runs would
+	# otherwise interleave and compute prune/clean protection from db state that the
+	# other run is concurrently invalidating (bfg's db advisory lock only serializes
+	# individual operations, not whole pipelines). Held until the process exits.
+	# Called at the start of the actual work (not in the group callback, where it
+	# would also make `backup <cmd> --help` block on the lock).
+	try:
+		locks.acquire(BACKUP_LOCK, wait=not _exit_if_locked)
+	except locks.LockHeld as e:
+		print(f'{e} - another backup.py run is in progress, exiting (--exit-if-locked)',
+			  file=sys.stderr)
+		sys.exit(75)  # EX_TEMPFAIL: "transient, try again later" for cron
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
@@ -85,11 +111,14 @@ def vpss(source, target_fs, quick, prune):
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
 @click.option('--percent', default=30.0, type=float, help='Percentage of oldest snapshots to clean (default 30)')
+@click.option('--min-free', default=None,
+			  help='Instead of percent-of-series, delete oldest unprotected snapshots fs-wide only '
+				   'until this much space is free (e.g. 500G, 2T). Idempotent - safe to re-run/cron.')
 @click.option('--dry-run', is_flag=True, help='Only report what would be cleaned, delete nothing')
-def clean(source, percent, dry_run):
+def clean(source, percent, min_free, dry_run):
 	"""Aggressively clean old local snapshots, keeping only those needed as shared parents for future incremental sends."""
-	print(f'Clean old snapshots - source={source}, percent={percent}, dry_run={dry_run}')
-	_run_clean(source=source, percent=percent, dry_run=dry_run)
+	print(f'Clean old snapshots - source={source}, percent={percent}, min_free={min_free}, dry_run={dry_run}')
+	_run_clean(source=source, percent=percent, min_free=min_free, dry_run=dry_run)
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
@@ -117,6 +146,8 @@ def remote(source, target_machine, target_fs, quick, prune, backups):
 def _run_backup(source='host', target_machine=None, target_fs=None, local=False, quick=False, prune=True, snapshot_only=False, vpss=False, backups=False):
 
 	print(f'_run_backup: source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}, snapshot_only = {snapshot_only}')
+
+	_take_pipeline_lock()
 
 	default_target_machine = 'jj'
 	default_target_fs='/bac20/'
@@ -172,33 +203,53 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only)
 
 
-def _run_clean(source='host', percent=30.0, dry_run=False):
+def _run_clean(source='host', percent=30.0, min_free=None, dry_run=False):
 	"""
 	Aggressively clean old local snapshots on this machine's source filesystems.
 
 	Mirrors the subvol iteration of the local prune step, but calls bfg clean_local, which
 	deletes the oldest `percent`% of snapshots while refusing to delete snapshots that are
 	still needed as shared parents for future incremental sends.
+
+	With min_free set, cleaning is goal-based instead: after the usual prune, each
+	filesystem gets bfg clean_fs --MIN_FREE, which deletes oldest unprotected snapshots
+	fs-wide only until that much space is free (idempotent, so re-running compounds nothing).
 	"""
-	print(f'_run_clean: source = {source}, percent = {percent}, dry_run = {dry_run}')
+	print(f'_run_clean: source = {source}, percent = {percent}, min_free = {min_free}, dry_run = {dry_run}')
+
+	_take_pipeline_lock()
 
 	fss = get_filesystems()
-
+	mounted = [fs for fs in fss if check_if_mounted_local(fs['toplevel'])]
 	for fs in fss:
+		if fs not in mounted:
+			print('SKIP non-mounted ' + fs['toplevel'])
+
+	# first refresh the db for ALL local filesystems, so that both directions of
+	# shared-snapshot detection (source-side prune protecting pairs on the targets, and
+	# target-side pile cleaning protecting pairs with the sources) see current state -
+	# not the state from whenever the last backup or manual update_db happened to run.
+	if _use_db:
+		for fs in mounted:
+			ccs(f"""bfg --YES=true update_db --FS={fs['toplevel']} """)
+
+	for fs in mounted:
 		toplevel = fs['toplevel']
 
-		# backup-target filesystems hold snapshots received from other machines; those are
-		# managed (pruned) by their source machines, so we don't clean them here.
-		if fs.get('transfer_only'):
-			print('SKIP transfer-only ' + toplevel)
-			continue
-		if not check_if_mounted_local(toplevel):
-			print('SKIP non-mounted ' + toplevel)
-			continue
+		dry = ' --DRY_RUN=True' if dry_run else ''
 
-		# refresh the db so clean_local knows which snapshots are shared with remotes
-		if _use_db:
-			ccs(f"""bfg --YES=true update_db --FS={toplevel} """)
+		if fs.get('transfer_only'):
+			# backup-target filesystem: holds piles of received snapshots with no origin
+			# subvolume here, so prune/clean them per series (fs-wide), protecting the
+			# shared pairs found via the db.
+			print('PRUNE FS ' + toplevel)
+			ccs(f"""bfg prune_fs --DB={_use_db} --YES=true{dry} --FS={toplevel} """)
+			print('CLEAN FS ' + toplevel)
+			if min_free:
+				ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --MIN_FREE={min_free}{dry} --FS={toplevel} """)
+			else:
+				ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --PERCENT={percent}{dry} --FS={toplevel} """)
+			continue
 
 		for subvol in fs['subvols']:
 			if subvol.get('just_push'):
@@ -206,13 +257,19 @@ def _run_clean(source='host', percent=30.0, dry_run=False):
 			name = subvol['name']
 			source_path = subvol['source_path']
 			subvol_path = Path(f"{toplevel}/{source_path}{name}")
-			dry = ' --DRY_RUN=True' if dry_run else ''
 			# first thin the history with the normal time-based retention policy, then
-			# aggressively drop the oldest percent% of whatever remains.
+			# (below) aggressively drop old snapshots.
 			print('PRUNE ' + str(subvol_path))
 			ccs(f"""bfg prune_local --DB={_use_db} --YES=true{dry} --SUBVOL={subvol_path} """)
-			print('CLEAN ' + str(subvol_path))
-			ccs(f"""bfg clean_local --DB={_use_db} --YES=true --PERCENT={percent}{dry} --SUBVOL={subvol_path} """)
+			if not min_free:
+				print('CLEAN ' + str(subvol_path))
+				ccs(f"""bfg clean_local --DB={_use_db} --YES=true --PERCENT={percent}{dry} --SUBVOL={subvol_path} """)
+
+		if min_free:
+			# goal-based cleaning covers the whole fs at once (series discovery also
+			# finds the flat local snapshot layout)
+			print('CLEAN FS ' + toplevel)
+			ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --MIN_FREE={min_free}{dry} --FS={toplevel} """)
 
 
 def _run_report(source='host', percent=30.0, show_all=False):
@@ -222,21 +279,28 @@ def _run_report(source='host', percent=30.0, show_all=False):
 	"""
 	print(f'_run_report: source = {source}, percent = {percent}, all = {show_all}')
 
+	_take_pipeline_lock()
+
 	fss = get_filesystems()
 
+	all_flag = ' --ALL=True' if show_all else ''
+
+	mounted = [fs for fs in fss if check_if_mounted_local(fs['toplevel'])]
 	for fs in fss:
+		if fs not in mounted:
+			print('SKIP non-mounted ' + fs['toplevel'])
+
+	# refresh the db for ALL local filesystems first (see _run_clean for why)
+	if _use_db:
+		for fs in mounted:
+			ccs(f"""bfg --YES=true update_db --FS={fs['toplevel']} """)
+
+	for fs in mounted:
 		toplevel = fs['toplevel']
 
 		if fs.get('transfer_only'):
-			print('SKIP transfer-only ' + toplevel)
+			ccs(f"""bfg report_fs --DB={_use_db} --PERCENT={percent}{all_flag} --FS={toplevel} """)
 			continue
-		if not check_if_mounted_local(toplevel):
-			print('SKIP non-mounted ' + toplevel)
-			continue
-
-		# refresh the db so shared-parent detection reflects the current state of all machines
-		if _use_db:
-			ccs(f"""bfg --YES=true update_db --FS={toplevel} """)
 
 		for subvol in fs['subvols']:
 			if subvol.get('just_push'):
@@ -244,7 +308,6 @@ def _run_report(source='host', percent=30.0, show_all=False):
 			name = subvol['name']
 			source_path = subvol['source_path']
 			subvol_path = Path(f"{toplevel}/{source_path}{name}")
-			all_flag = ' --ALL=True' if show_all else ''
 			ccs(f"""bfg report_local --DB={_use_db} --PERCENT={percent}{all_flag} --SUBVOL={subvol_path} """)
 
 
@@ -397,8 +460,14 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, sna
 			print('', file = sys.stderr)
 		if _use_db:
 			ccs(f"""bfg --YES=true update_db --FS={toplevel} """)
-			if not local and not snapshot_only:
-				ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
+			# also rescan the target fs, so that the prune below sees the snapshots we just
+			# pushed and protects the shared pairs - otherwise the source-side prune keeps
+			# deleting the very snapshots that future incremental sends need as parents.
+			if not snapshot_only:
+				if local:
+					ccs(f"""bfg --YES=true update_db --FS={target_fs} """)
+				else:
+					ccs(f"""{sshstr} bfg --YES=true --FS={target_fs} update_db """)
 
 		#ccs(f"""bfg prune_stashes --YES=true --FS={target_fs} """)
 
