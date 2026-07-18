@@ -51,7 +51,7 @@ if 'BACKUP_DEBUG' in os.environ:
 _use_db = True
 
 
-BACKUP_LOCK = '/run/lock/backup.py.lock'
+LOCK_DIR = '/run/lock'
 
 
 _exit_if_locked = False
@@ -59,27 +59,38 @@ _exit_if_locked = False
 
 @click.group()
 @click.option('--exit-if-locked', is_flag=True,
-			  help='If a concurrent backup.py run holds the lock, exit immediately (code 75) '
-				   'instead of waiting. Use for cron so runs cannot pile up behind a stuck one.')
+			  help='If a concurrent backup.py run holds a needed target lock, exit immediately '
+				   '(code 75) instead of waiting. Use for cron so runs cannot pile up behind a '
+				   'stuck one.')
 def cli(exit_if_locked):
 	"""Backup utility with three modes: snapshot-only, local backup, and remote backup."""
 	global _exit_if_locked
 	_exit_if_locked = exit_if_locked
 
 
-def _take_pipeline_lock():
-	# one backup.py pipeline at a time on this machine: cron and manual runs would
-	# otherwise interleave and compute prune/clean protection from db state that the
-	# other run is concurrently invalidating (bfg's db advisory lock only serializes
-	# individual operations, not whole pipelines). Held until the process exits.
-	# Called at the start of the actual work (not in the group callback, where it
-	# would also make `backup <cmd> --help` block on the lock).
-	try:
-		locks.acquire(BACKUP_LOCK, wait=not _exit_if_locked)
-	except locks.LockHeld as e:
-		print(f'{e} - another backup.py run is in progress, exiting (--exit-if-locked)',
-			  file=sys.stderr)
-		sys.exit(75)  # EX_TEMPFAIL: "transient, try again later" for cron
+def _lock_path(resource):
+	slug = re.sub(r'[^A-Za-z0-9._-]+', '_', str(resource).strip('/')) or 'root'
+	return f'{LOCK_DIR}/backup.py.{slug}.lock'
+
+
+def _take_target_locks(resources):
+	# Per-target locking: runs that mutate the same target (a backup destination fs,
+	# this machine's snapshot pipeline, a remote machine:fs) serialize; runs on
+	# disjoint targets proceed concurrently - a day-long cold send to one pile no
+	# longer starves the hourly snapshot cron. Source-side interleavings (snapshot
+	# creation, prune_local) need no machine-level lock: creation is append-only and
+	# every deletion decision runs under bfg's db advisory lock, which enforces the
+	# newer-live-pair invariant. Locks are taken in sorted order (so multi-lock
+	# holders like clean cannot deadlock each other) and held until the process
+	# exits. Called at the start of the actual work (not in the group callback,
+	# where it would also make `backup <cmd> --help` block on the locks).
+	for path in sorted({_lock_path(r) for r in resources}):
+		try:
+			locks.acquire(path, wait=not _exit_if_locked)
+		except locks.LockHeld as e:
+			print(f'{e} - a backup.py run is working on this target, exiting (--exit-if-locked)',
+				  file=sys.stderr)
+			sys.exit(75)  # EX_TEMPFAIL: "transient, try again later" for cron
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
@@ -147,15 +158,13 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 
 	print(f'_run_backup: source = {source}, target_machine = {target_machine}, target_fs = {target_fs}, local = {local}, quick = {quick}, prune = {prune}, snapshot_only = {snapshot_only}')
 
-	_take_pipeline_lock()
-
 	default_target_machine = 'jj'
 	default_target_fs='/bac20/'
 
 	if hostname == 'r64':
 		default_target_machine = None
 		default_target_fs = '/bac19/'
-	
+
 	if target_machine is None:
 		target_machine = default_target_machine
 	if target_fs is None:
@@ -164,6 +173,13 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	if target_machine == 'None':
 		print('target_machine = None')
 		target_machine = None
+
+	if snapshot_only:
+		_take_target_locks(['snapshots'])
+	elif local or target_machine is None:
+		_take_target_locks([target_fs])
+	else:
+		_take_target_locks([f'{target_machine}:{target_fs}'])
 
 	if not local:
 		print(f'target_machine = {target_machine}')
@@ -217,13 +233,15 @@ def _run_clean(source='host', percent=30.0, min_free=None, dry_run=False):
 	"""
 	print(f'_run_clean: source = {source}, percent = {percent}, min_free = {min_free}, dry_run = {dry_run}')
 
-	_take_pipeline_lock()
-
 	fss = get_filesystems()
 	mounted = [fs for fs in fss if check_if_mounted_local(fs['toplevel'])]
 	for fs in fss:
 		if fs not in mounted:
 			print('SKIP non-mounted ' + fs['toplevel'])
+
+	# clean deletes on every mounted fs, so it serializes against any run targeting
+	# one of them (e.g. a receive landing in a pile it is about to measure)
+	_take_target_locks([fs['toplevel'] for fs in mounted])
 
 	# first refresh the db for ALL local filesystems, so that both directions of
 	# shared-snapshot detection (source-side prune protecting pairs on the targets, and
@@ -279,7 +297,8 @@ def _run_report(source='host', percent=30.0, show_all=False):
 	"""
 	print(f'_run_report: source = {source}, percent = {percent}, all = {show_all}')
 
-	_take_pipeline_lock()
+	# no lock: read-only wrt subvols (update_db serializes itself via bfg's db
+	# advisory lock), and a report must be runnable while a long backup is in flight
 
 	fss = get_filesystems()
 

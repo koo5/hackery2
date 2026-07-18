@@ -1,0 +1,13 @@
+# systemd --user unit: plain notify-send when earlyoom kills something.
+# Install: install -D -m 644 ~/hackery2/data/setup/systemd/user/earlyoom-notify.service \
+#            ~/.config/systemd/user/earlyoom-notify.service
+#          && systemctl --user daemon-reload && systemctl --user enable --now earlyoom-notify
+[Unit]
+Description=Desktop notification when earlyoom kills a process
+
+[Service]
+ExecStart=/bin/sh -c 'journalctl -f -t earlyoom --since=now -o cat | grep --line-buffered "sending SIG" | while read -r line; do notify-send -u critical -a earlyoom "earlyoom" "$$line"; done'
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

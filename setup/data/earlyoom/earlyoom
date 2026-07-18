@@ -1,0 +1,20 @@
+# Default settings for earlyoom. This file is sourced by /bin/sh from
+# /etc/init.d/earlyoom or by systemd from earlyoom.service.
+#
+# Managed in hackery2: data/setup/data/earlyoom/earlyoom
+# Install: sudo install -m 644 ~/hackery2/data/setup/data/earlyoom/earlyoom /etc/default/earlyoom
+#          && sudo systemctl restart earlyoom
+#
+# -m 10   act when available RAM < 10% (SIGTERM; SIGKILL below 5%)
+# -s 90   ...AND free swap < 90%. Swap here is 121G and ~20G sits used even
+#         when healthy, so this gate is nearly always open — available RAM
+#         is the real trigger. (Default 10% would allow ~110G of
+#         thrash-swapping before earlyoom ever acted.)
+# -n      desktop notification on kill (needs the systembus-notify package)
+# -r 3600 hourly memory report in the journal
+# --avoid subtract 300 badness points from matching comm names (15-char
+#         truncated). Relative protection, not immunity — a runaway process
+#         still outgrows the offset. The regex must contain NO whitespace and
+#         no quotes: systemd splits $EARLYOOM_ARGS on spaces without quote
+#         handling, so a quoted regex (as in the stock example) breaks.
+EARLYOOM_ARGS="-r 3600 -n -m 10 -s 90 --avoid (^|/)(init|systemd.*|Xorg|kwin_x11|plasmashell|sddm|xfce4-terminal|konsole|fish|tmux.*|yggdrasil|claude|backup.*|terminator|hpnsshd|sshd|dbus-daemon|NetworkManager|kwrite)$"
