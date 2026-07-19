@@ -59,7 +59,7 @@ _exit_if_locked = False
 
 @click.group()
 @click.option('--exit-if-locked', is_flag=True,
-			  help='If a concurrent backup.py run holds a needed target lock, exit immediately '
+			  help='If another run of the same pipeline holds its lock, exit immediately '
 				   '(code 75) instead of waiting. Use for cron so runs cannot pile up behind a '
 				   'stuck one.')
 def cli(exit_if_locked):
@@ -73,24 +73,27 @@ def _lock_path(resource):
 	return f'{LOCK_DIR}/backup.py.{slug}.lock'
 
 
-def _take_target_locks(resources):
-	# Per-target locking: runs that mutate the same target (a backup destination fs,
-	# this machine's snapshot pipeline, a remote machine:fs) serialize; runs on
-	# disjoint targets proceed concurrently - a day-long cold send to one pile no
-	# longer starves the hourly snapshot cron. Source-side interleavings (snapshot
-	# creation, prune_local) need no machine-level lock: creation is append-only and
-	# every deletion decision runs under bfg's db advisory lock, which enforces the
-	# newer-live-pair invariant. Locks are taken in sorted order (so multi-lock
-	# holders like clean cannot deadlock each other) and held until the process
-	# exits. Called at the start of the actual work (not in the group callback,
-	# where it would also make `backup <cmd> --help` block on the locks).
-	for path in sorted({_lock_path(r) for r in resources}):
-		try:
-			locks.acquire(path, wait=not _exit_if_locked)
-		except locks.LockHeld as e:
-			print(f'{e} - a backup.py run is working on this target, exiting (--exit-if-locked)',
-				  file=sys.stderr)
-			sys.exit(75)  # EX_TEMPFAIL: "transient, try again later" for cron
+def _take_pipeline_lock(name):
+	# Pipeline-identity locking: each pipeline mode takes locks that only prevent
+	# a duplicate of itself working the same resource (cron pileup, a
+	# double-started manual run) - 'snapshots', 'vpss:<target>', 'clean:<fs>'.
+	# Cross-pipeline and cross-machine concurrency is
+	# deliberately not serialized here; it is governed where the data lives:
+	# every receive holds a .series flock on its target dir (a duplicate transfer
+	# of the same series exits EX_TEMPFAIL and bfg skips it), and every deletion
+	# decision runs under bfg's db advisory lock, which enforces the
+	# newer-live-pair invariant. local/remote transfer runs therefore take no
+	# machine lock at all. Returns the lock fd: most callers hold until process
+	# exit, clean releases each fs's lock (os.close) when moving to the next.
+	# Called at the start of the actual work (not in the group callback, where it
+	# would also make `backup <cmd> --help` block on the lock).
+	path = _lock_path(name)
+	try:
+		return locks.acquire(path, wait=not _exit_if_locked)
+	except locks.LockHeld as e:
+		print(f'{e} - another {name} run is in progress, exiting (--exit-if-locked)',
+			  file=sys.stderr)
+		sys.exit(75)  # EX_TEMPFAIL: "transient, try again later" for cron
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
@@ -175,11 +178,13 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 		target_machine = None
 
 	if snapshot_only:
-		_take_target_locks(['snapshots'])
-	elif local or target_machine is None:
-		_take_target_locks([target_fs])
-	else:
-		_take_target_locks([f'{target_machine}:{target_fs}'])
+		_take_pipeline_lock('snapshots')
+	elif vpss:
+		# the vps rsync phase is not series-guarded, so two vpss runs into the SAME
+		# target must serialize (interleaved rsync --delete into the same dirs);
+		# vpss runs into different target disks are useful concurrency and proceed
+		_take_pipeline_lock(f'vpss:{target_fs}')
+	# local/remote transfer runs take no machine lock, see _take_pipeline_lock
 
 	if not local:
 		print(f'target_machine = {target_machine}')
@@ -239,10 +244,6 @@ def _run_clean(source='host', percent=30.0, min_free=None, dry_run=False):
 		if fs not in mounted:
 			print('SKIP non-mounted ' + fs['toplevel'])
 
-	# clean deletes on every mounted fs, so it serializes against any run targeting
-	# one of them (e.g. a receive landing in a pile it is about to measure)
-	_take_target_locks([fs['toplevel'] for fs in mounted])
-
 	# first refresh the db for ALL local filesystems, so that both directions of
 	# shared-snapshot detection (source-side prune protecting pairs on the targets, and
 	# target-side pile cleaning protecting pairs with the sources) see current state -
@@ -256,38 +257,48 @@ def _run_clean(source='host', percent=30.0, min_free=None, dry_run=False):
 
 		dry = ' --DRY_RUN=True' if dry_run else ''
 
-		if fs.get('transfer_only'):
-			# backup-target filesystem: holds piles of received snapshots with no origin
-			# subvolume here, so prune/clean them per series (fs-wide), protecting the
-			# shared pairs found via the db.
-			print('PRUNE FS ' + toplevel)
-			ccs(f"""bfg prune_fs --DB={_use_db} --YES=true{dry} --FS={toplevel} """)
-			print('CLEAN FS ' + toplevel)
-			if min_free:
-				ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --MIN_FREE={min_free}{dry} --FS={toplevel} """)
-			else:
-				ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --PERCENT={percent}{dry} --FS={toplevel} """)
-			continue
-
-		for subvol in fs['subvols']:
-			if subvol.get('just_push'):
+		# cleans of the same fs serialize; cleans of different fss (e.g. two piles on
+		# separate disks) run concurrently. Deliberately NOT serialized against
+		# transfers: min-free clean maintains a free-space floor and is meant to run
+		# while backups land - evicting the oldest unprotected tail to make room for
+		# incoming data is its job. Released per fs so an overlapping clean run can
+		# pipeline through the remaining disks behind this one.
+		lock_fd = _take_pipeline_lock(f'clean:{toplevel}')
+		try:
+			if fs.get('transfer_only'):
+				# backup-target filesystem: holds piles of received snapshots with no origin
+				# subvolume here, so prune/clean them per series (fs-wide), protecting the
+				# shared pairs found via the db.
+				print('PRUNE FS ' + toplevel)
+				ccs(f"""bfg prune_fs --DB={_use_db} --YES=true{dry} --FS={toplevel} """)
+				print('CLEAN FS ' + toplevel)
+				if min_free:
+					ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --MIN_FREE={min_free}{dry} --FS={toplevel} """)
+				else:
+					ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --PERCENT={percent}{dry} --FS={toplevel} """)
 				continue
-			name = subvol['name']
-			source_path = subvol['source_path']
-			subvol_path = Path(f"{toplevel}/{source_path}{name}")
-			# first thin the history with the normal time-based retention policy, then
-			# (below) aggressively drop old snapshots.
-			print('PRUNE ' + str(subvol_path))
-			ccs(f"""bfg prune_local --DB={_use_db} --YES=true{dry} --SUBVOL={subvol_path} """)
-			if not min_free:
-				print('CLEAN ' + str(subvol_path))
-				ccs(f"""bfg clean_local --DB={_use_db} --YES=true --PERCENT={percent}{dry} --SUBVOL={subvol_path} """)
 
-		if min_free:
-			# goal-based cleaning covers the whole fs at once (series discovery also
-			# finds the flat local snapshot layout)
-			print('CLEAN FS ' + toplevel)
-			ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --MIN_FREE={min_free}{dry} --FS={toplevel} """)
+			for subvol in fs['subvols']:
+				if subvol.get('just_push'):
+					continue
+				name = subvol['name']
+				source_path = subvol['source_path']
+				subvol_path = Path(f"{toplevel}/{source_path}{name}")
+				# first thin the history with the normal time-based retention policy, then
+				# (below) aggressively drop old snapshots.
+				print('PRUNE ' + str(subvol_path))
+				ccs(f"""bfg prune_local --DB={_use_db} --YES=true{dry} --SUBVOL={subvol_path} """)
+				if not min_free:
+					print('CLEAN ' + str(subvol_path))
+					ccs(f"""bfg clean_local --DB={_use_db} --YES=true --PERCENT={percent}{dry} --SUBVOL={subvol_path} """)
+
+			if min_free:
+				# goal-based cleaning covers the whole fs at once (series discovery also
+				# finds the flat local snapshot layout)
+				print('CLEAN FS ' + toplevel)
+				ccs(f"""bfg clean_fs --DB={_use_db} --YES=true --MIN_FREE={min_free}{dry} --FS={toplevel} """)
+		finally:
+			os.close(lock_fd)
 
 
 def _run_report(source='host', percent=30.0, show_all=False):
