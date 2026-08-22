@@ -39,7 +39,16 @@ function fish_prompt --description 'Informative prompt'
         
         set -l pipestatus_string (__fish_print_pipestatus "[" "]" "|" "$status_color" "$statusb_color" $last_pipestatus)
 
-        printf '[%s] %s%s@%s %s%s%s%s %s%s%s\n \n' (date "+%H:%M:%S") (set_color brblue) \
+        # Pending alerts from every synced host (run `alerts` to read them).
+        # An unmatched glob assigns empty silently, so the usual case of having
+        # no alerts costs no subprocess -- `count` is a builtin.
+        set -l alert_files /d/sync/jj/host/*/alerts/*.alert
+        set -l alert_seg ""
+        if test (count $alert_files) -gt 0
+            set alert_seg (set_color -o yellow)" ⚠"(count $alert_files)(set_color normal)
+        end
+
+        printf '[%s]%s %s%s@%s %s%s%s%s %s%s%s\n \n' (date "+%H:%M:%S") $alert_seg (set_color brblue) \
             $USER (prompt_hostname) (set_color $fish_color_cwd) $PWD (set_color yellow) $vcs_info $pipestatus_string (set_color normal)
     end
 end
