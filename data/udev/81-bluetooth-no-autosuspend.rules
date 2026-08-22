@@ -1,0 +1,17 @@
+# Intel AX200 Bluetooth (8087:0029) - never let the radio USB-runtime-suspend.
+#
+# Why: on this t14 (AMD Renoir/Cezanne) the radio hangs off xhci_hcd 0000:06:00.4
+# as usb 4-4. When it is runtime-suspended it can come back wedged: it refuses
+# re-addressing ("device not accepting address N, error -62"), a port power cycle
+# does not revive it, and the kernel's failed cleanup takes the whole xHCI
+# controller down ("HC died"). That kills Bluetooth *and* the fingerprint reader
+# on 4-3, and only a full poweroff brings the radio back - a PCI remove/rescan of
+# 06:00.4 revives the controller but the radio re-wedges and kills it again.
+#
+# Observed twice: 2026-08-07 09:38 (recovered as hci1) and 2026-08-08 00:23 (did not).
+#
+# Numbered above systemd's 60-autosuspend.rules so this wins.
+# The real enforcement is modprobe.d/btusb-no-autosuspend.conf - btusb re-enables
+# autosuspend during probe, which runs after this rule. This is belt-and-braces.
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="8087", ATTR{idProduct}=="0029", \
+    TEST=="power/control", ATTR{power/control}="on"
