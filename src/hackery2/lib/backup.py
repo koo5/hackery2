@@ -123,16 +123,20 @@ def vpss(source, target_fs, quick, prune):
 	_run_backup(source=source, target_machine=None, target_fs=target_fs, local=True, quick=quick, prune=prune, snapshot_only=False, vpss=True)
 
 @cli.command()
-@click.option('--source', default='host', help='Source to backup')
+@click.option('--fs', default=None,
+			  help='Only clean this filesystem (toplevel mount path, e.g. /bac20). '
+				   'The db is still refreshed for all mounted filesystems so shared-parent '
+				   'protection sees the full picture. Default: clean all mounted filesystems.')
 @click.option('--percent', default=30.0, type=float, help='Percentage of oldest snapshots to clean (default 30)')
 @click.option('--min-free', default=None,
 			  help='Instead of percent-of-series, delete oldest unprotected snapshots fs-wide only '
-				   'until this much space is free (e.g. 500G, 2T). Idempotent - safe to re-run/cron.')
+				   'until this much space is free (e.g. 500G, 2T). Filesystems already above the '
+				   'target are skipped entirely, prune included. Idempotent - safe to re-run/cron.')
 @click.option('--dry-run', is_flag=True, help='Only report what would be cleaned, delete nothing')
-def clean(source, percent, min_free, dry_run):
+def clean(fs, percent, min_free, dry_run):
 	"""Aggressively clean old local snapshots, keeping only those needed as shared parents for future incremental sends."""
-	print(f'Clean old snapshots - source={source}, percent={percent}, min_free={min_free}, dry_run={dry_run}')
-	_run_clean(source=source, percent=percent, min_free=min_free, dry_run=dry_run)
+	print(f'Clean old snapshots - fs={fs}, percent={percent}, min_free={min_free}, dry_run={dry_run}')
+	_run_clean(only_fs=fs, percent=percent, min_free=min_free, dry_run=dry_run)
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
@@ -224,7 +228,22 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only)
 
 
-def _run_clean(source='host', percent=30.0, min_free=None, dry_run=False):
+def _parse_size(size):
+	"""'500G', '1.5T', '100MiB', '2TB' or plain bytes -> int bytes. Binary units, same
+	rules as btrfsgit's parse_size, so the string means the same thing to both sides."""
+	m = re.match(r'^([\d.]+)\s*([KMGTP]?)(I?B)?$', str(size).strip(), re.IGNORECASE)
+	if m is None:
+		raise ValueError(f'cannot parse size: {size!r}')
+	unit = m.group(2).upper() if m.group(2) else ''
+	return int(float(m.group(1)) * 1024 ** (' KMGTP'.index(unit) if unit else 0))
+
+
+def _free_bytes(path):
+	st = os.statvfs(path)
+	return st.f_bavail * st.f_frsize
+
+
+def _run_clean(only_fs=None, percent=30.0, min_free=None, dry_run=False):
 	"""
 	Aggressively clean old local snapshots on this machine's source filesystems.
 
@@ -232,17 +251,56 @@ def _run_clean(source='host', percent=30.0, min_free=None, dry_run=False):
 	deletes the oldest `percent`% of snapshots while refusing to delete snapshots that are
 	still needed as shared parents for future incremental sends.
 
-	With min_free set, cleaning is goal-based instead: after the usual prune, each
-	filesystem gets bfg clean_fs --MIN_FREE, which deletes oldest unprotected snapshots
-	fs-wide only until that much space is free (idempotent, so re-running compounds nothing).
+	With min_free set, cleaning is goal-based instead: filesystems already reporting at
+	least that much free space are skipped entirely (no db refresh, no prune). The rest
+	get the usual prune, then bfg clean_fs --MIN_FREE, which deletes oldest unprotected
+	snapshots fs-wide only until that much space is free (idempotent, so re-running
+	compounds nothing).
+
+	With only_fs set (a toplevel mount path from get_filesystems), only that filesystem is
+	pruned/cleaned. The db refresh still covers all mounted filesystems.
 	"""
-	print(f'_run_clean: source = {source}, percent = {percent}, min_free = {min_free}, dry_run = {dry_run}')
+	print(f'_run_clean: only_fs = {only_fs}, percent = {percent}, min_free = {min_free}, dry_run = {dry_run}')
 
 	fss = get_filesystems()
 	mounted = [fs for fs in fss if check_if_mounted_local(fs['toplevel'])]
 	for fs in fss:
 		if fs not in mounted:
 			print('SKIP non-mounted ' + fs['toplevel'])
+
+	if only_fs is not None:
+		wanted = Path(only_fs)
+		to_clean = [fs for fs in mounted if Path(fs['toplevel']) == wanted]
+		if not to_clean:
+			known = ', '.join(fs['toplevel'] for fs in fss)
+			raise click.BadParameter(
+				f'{only_fs} is not a mounted filesystem known for {hostname} (known: {known})',
+				param_hint='--fs')
+	else:
+		to_clean = mounted
+
+	if min_free:
+		# goal-based mode exists to maintain a free-space floor, so a filesystem already
+		# above it needs nothing - not even the retention prune (backup runs apply that
+		# to source subvols anyway; transfer-only piles simply wait until they are under
+		# pressure). bfg clean_fs re-checks after letting pending deletions settle, but
+		# that can only find more free space than we see here, so skipping is safe.
+		try:
+			target = _parse_size(min_free)
+		except ValueError as e:
+			raise click.BadParameter(str(e), param_hint='--min-free')
+		still_below = []
+		for fs in to_clean:
+			free = _free_bytes(fs['toplevel'])
+			if free >= target:
+				print(f"SKIP {fs['toplevel']}: {free / 2**30:.1f} GiB free, "
+					  f"target {target / 2**30:.1f} GiB")
+			else:
+				still_below.append(fs)
+		to_clean = still_below
+		if not to_clean:
+			print('Nothing to clean: every selected filesystem is above the free-space target.')
+			return
 
 	# first refresh the db for ALL local filesystems, so that both directions of
 	# shared-snapshot detection (source-side prune protecting pairs on the targets, and
@@ -252,7 +310,7 @@ def _run_clean(source='host', percent=30.0, min_free=None, dry_run=False):
 		for fs in mounted:
 			ccs(f"""bfg --YES=true update_db --FS={fs['toplevel']} """)
 
-	for fs in mounted:
+	for fs in to_clean:
 		toplevel = fs['toplevel']
 
 		dry = ' --DRY_RUN=True' if dry_run else ''
@@ -345,7 +403,7 @@ def sync_stuff(hostname):
 	where = f'/d/sync/jj/host/{hostname}/'
 	what = f'/home/koom/.local/share/fish/fish_history'
 	cc(ss(f'mkdir -p {where}'))
-	srun(f'rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
+	srun(f'rsync --one-file-system -v -a -S --progress -r --delete {what} {where}')
 
 
 def import_noncows(source, hostname, target_fs, fss):
@@ -413,12 +471,12 @@ def get_filesystems():
 		fss = [
 			{
 				'toplevel': '/bac20',
-				'subvols': m(['cold']),
+				'subvols': m([ 'plain', 'cold']),
 				'transfer_only': True
 			},
 			{
 				'toplevel': '/d2',
-				'subvols': m(['u/sync', 'u', 'dev3', 'home', '/', 'images/dev4']),
+				'subvols': m(['u/sync', 'u', 'home', '/', 'images/dev4']),
 			},
 		]
 	elif hostname == 'r64':
@@ -536,7 +594,7 @@ def rsync(fss, what, name='root_ext4'):
 	if not Path(where).exists():
 		ccs(f'sudo btrfs sub create {where}')
 	# todo figure out how to tell rsync not to try to sync what it can't sync, and then we can start checking its results
-	srun(f'sudo rsync --one-file-system -v -a -S -v --progress -r --delete {what} {where}')
+	srun(f'sudo rsync --one-file-system -v -a -S --progress -r --delete {what} {where}')
 
 
 
