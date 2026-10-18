@@ -1,0 +1,22 @@
+[Unit]
+Description="vm_cpu_arbiter: the VMs' real host CPU inside the desktop's budget (experiments first)"
+After=network-online.target libvirtd.service
+StartLimitIntervalSec=60
+StartLimitBurst=40
+
+[Service]
+Environment="PYTHONUNBUFFERED=1"
+# budget: 100 % of the host's physical cores when nobody is at the desktop, 25 % when someone is (operator 10-18);
+# dev4_3 (experiments) first, dev44 (production) what is left. Domain names as libvirt knows them.
+ExecStart=/home/koom/hackery2/src/hackery2/bin/vm_cpu_arbiter.py --experiments dev4_3=http://192.168.122.31:18079 --production dev44=http://192.168.122.3:18079 --active-budget 25
+Restart=always
+RestartSec=5
+User=koom
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
