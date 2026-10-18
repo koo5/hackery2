@@ -23,9 +23,14 @@ in each commit subject and as `sess/<id>` branches at the tips.
 
 Use --html [FILE] for a self-contained interactive HTML/SVG of the same graph:
 gitk-style lanes coloured per session, each thread tip badged with its title,
-hover for the full prompt, click a row to copy its `claude --resume` command.
+hover for the full prompt, click a message to read it formatted in full, click
+its session hash to copy the `claude --resume` command.
 Use --serve [PORT] to serve that graph live on localhost, regenerated on each
-request so a browser refresh reflects newly-written messages.
+request so a browser refresh reflects newly-written messages. The page lets you
+switch between prompts, prompts + answers, and everything, select a session,
+and toggle thinking in the Everything view. --full, --view and --thinking set
+the initial display. Use --id ID (or a unique prefix) to select a session in
+any output mode, including its shared history from the selected file.
 """
 
 import argparse
@@ -36,6 +41,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 
 PROJECTS_DIR = Path.home() / ".claude" / "projects"
@@ -74,6 +80,41 @@ def resolve_sessions_dir(target: str) -> Path:
 	)
 
 
+def session_files(sdir: Path, session_id=None):
+	"""Select a session file by exact ID or unambiguous prefix."""
+	files = sorted(sdir.glob("*.jsonl"))
+	if not session_id:
+		return files
+	exact = [jf for jf in files if jf.stem == session_id]
+	matches = exact or [jf for jf in files if jf.stem.startswith(session_id)]
+	if len(matches) != 1:
+		reason = "no matching session" if not matches else "ambiguous session prefix"
+		raise ValueError(f"{reason}: {session_id}")
+	return matches
+
+
+def visible_record(rec, view="all", thinking=False):
+	"""Filter content as well as nodes, so mixed text/tool messages stay readable."""
+	if rec.get("type") not in ("user", "assistant"):
+		return None
+	if view == "prompts" and not is_prompt(rec):
+		return None
+	if view == "conversation" and not (
+		is_prompt(rec) or (rec.get("type") == "assistant" and not rec.get("isMeta"))
+	):
+		return None
+	content = rec.get("message", {}).get("content")
+	if isinstance(content, list):
+		content = [block for block in content
+			if (thinking or block.get("type") != "thinking")
+			and (view == "all" or block.get("type") == "text")]
+		if not content:
+			return None
+	elif view != "all" and not content:
+		return None
+	return {**rec, "message": {**rec.get("message", {}), "content": content}}
+
+
 def short(uuid: str, n: int = 8) -> str:
 	return uuid[:n] if uuid else "-" * n
 
@@ -82,6 +123,21 @@ def esc(s) -> str:
 	"""Escape text for embedding in HTML/SVG (element text and attributes)."""
 	return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 		.replace('"', "&quot;"))
+
+
+def tool_result_text(inner) -> str:
+	"""Flatten a tool_result's content (str or list of blocks) to plain text."""
+	if not isinstance(inner, list):
+		return str(inner or "")
+	parts = []
+	for ib in inner:
+		if ib.get("type") == "text":
+			parts.append(ib.get("text", ""))
+		elif ib.get("type") == "image":
+			parts.append("[image]")
+		else:
+			parts.append(json.dumps(ib, ensure_ascii=False))
+	return "\n".join(parts)
 
 
 def render_content(content, full: bool, show_thinking: bool) -> list[str]:
@@ -112,17 +168,7 @@ def render_content(content, full: bool, show_thinking: bool) -> list[str]:
 			lines.append(f"<tool_use {name} id={short(block.get('id',''))}> {inp_s}")
 		elif btype == "tool_result":
 			tid = short(block.get("tool_use_id", ""))
-			inner = block.get("content")
-			if isinstance(inner, list):
-				parts = []
-				for ib in inner:
-					if ib.get("type") == "text":
-						parts.append(ib.get("text", ""))
-					else:
-						parts.append(json.dumps(ib, ensure_ascii=False))
-				inner_s = "\n".join(parts)
-			else:
-				inner_s = str(inner or "")
+			inner_s = tool_result_text(block.get("content"))
 			if not full and len(inner_s) > 800:
 				inner_s = inner_s[:800] + f"… ({len(inner_s)} chars)"
 			is_err = block.get("is_error")
@@ -134,7 +180,7 @@ def render_content(content, full: bool, show_thinking: bool) -> list[str]:
 	return lines
 
 
-def load_sessions(sdir: Path):
+def load_sessions(sdir: Path, session_id=None):
 	"""Return list of (session_id, jsonl_path, [conv_records], {all_uuids_in_file}).
 
 	conv_records are filtered to user / assistant / summary. all_uuids_in_file
@@ -142,7 +188,7 @@ def load_sessions(sdir: Path):
 	record (e.g. SessionStart progress hook) in the same file vs. truly
 	from another session."""
 	sessions = []
-	for jf in sorted(sdir.glob("*.jsonl")):
+	for jf in session_files(sdir, session_id):
 		sid = jf.stem
 		records = []
 		all_uuids = set()
@@ -173,12 +219,12 @@ def first_ts(records) -> str:
 	return ""
 
 
-def load_titles(sdir: Path):
+def load_titles(sdir: Path, session_id=None):
 	"""Map session id -> (custom_title, ai_title) from the title records Claude
 	Code writes: `/rename` appends a `custom-title` record and the auto-namer an
 	`ai-title` record, both `{..., sessionId}`. Last write per session wins."""
 	custom, ai = {}, {}
-	for jf in sorted(sdir.glob("*.jsonl")):
+	for jf in session_files(sdir, session_id):
 		with jf.open() as fh:
 			for line in fh:
 				line = line.strip()
@@ -349,7 +395,7 @@ def msg_oneline(rec, maxlen: int = 90) -> str:
 	return f"{tag} {gist}" if gist else tag
 
 
-def build_message_graph(sdir: Path, is_node=None):
+def build_message_graph(sdir: Path, is_node=None, session_id=None):
 	"""Dedup every message across all session files into one conversation DAG.
 
 	`is_node(record)` selects which records become graph nodes (default: every
@@ -365,7 +411,7 @@ def build_message_graph(sdir: Path, is_node=None):
 			return d.get("type") in ("user", "assistant")
 	nodes = {}        # uuid -> record selected by is_node
 	link = {}         # uuid -> parentUuid, for EVERY record (keeps chain intact)
-	for jf in sorted(sdir.glob("*.jsonl")):
+	for jf in session_files(sdir, session_id):
 		with jf.open() as fh:
 			for line in fh:
 				line = line.strip()
@@ -484,7 +530,8 @@ def render_rails(order, parent_of, label_of, deco_of=None) -> list[str]:
 	return lines
 
 
-def analyze_graph(sdir: Path, full: bool = False) -> dict:
+def analyze_graph(sdir: Path, full: bool = False, session_id=None,
+		view=None, thinking=False) -> dict:
 	"""Shared analysis behind every graph view. Builds the message DAG (only
 	human prompts unless `full`), orders it newest-first / child-before-parent,
 	and returns per-node helpers: `leaf_sid` (the resumable session id of the tip
@@ -494,10 +541,15 @@ def analyze_graph(sdir: Path, full: bool = False) -> dict:
 	copied messages, so a shared node's own id is unreliable; instead each node is
 	attributed to its newest descendant tip — the lane the graph draws it on — and
 	a tip lives in one file only, so its sessionId is sound."""
-	nodes, parent_of = build_message_graph(sdir, None if full else is_prompt)
+	predicate = None if full else is_prompt
+	if view is not None:
+		predicate = lambda rec: visible_record(rec, view, thinking) is not None
+	nodes, parent_of = build_message_graph(sdir, predicate, session_id)
+	if view is not None:
+		nodes = {uuid: visible_record(rec, view, thinking) for uuid, rec in nodes.items()}
 
-	custom, ai = load_titles(sdir)
-	opening = {sid: session_title(recs) for sid, _jf, recs, _ in load_sessions(sdir)}
+	custom, ai = load_titles(sdir, session_id)
+	opening = {sid: session_title(recs) for sid, _jf, recs, _ in load_sessions(sdir, session_id)}
 
 	def title_for(sid):
 		return custom.get(sid) or ai.get(sid) or opening.get(sid, "")
@@ -526,7 +578,7 @@ def analyze_graph(sdir: Path, full: bool = False) -> dict:
 		return nodes[owner[u]].get("sessionId") or owner[u]
 
 	def gist_of(u):
-		return msg_oneline(nodes[u]) if full else prompt_text(nodes[u])
+		return msg_oneline(nodes[u]) if full or view == "conversation" else prompt_text(nodes[u])
 
 	return {
 		"nodes": nodes, "pof": pof, "ts_of": ts_of, "order": order,
@@ -535,7 +587,7 @@ def analyze_graph(sdir: Path, full: bool = False) -> dict:
 	}
 
 
-def print_graph(sdir: Path, full: bool = False):
+def print_graph(sdir: Path, full: bool = False, session_id=None):
 	"""Render the project's message DAG as a `git log --graph`-style oneline log.
 
 	Two zoom levels on the same graph, picked by `full`:
@@ -547,7 +599,7 @@ def print_graph(sdir: Path, full: bool = False):
 	  line where you said something different, so you recognise the split by your
 	  own words. Parent links hop over the dropped messages.
 	- full (inspect zoom): one row per message, the complete topology."""
-	g = analyze_graph(sdir, full)
+	g = analyze_graph(sdir, full, session_id)
 	nodes = g["nodes"]
 	if not nodes:
 		return
@@ -610,40 +662,226 @@ body{margin:0;background:#0d1117;color:#c9d1d9;
  font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
 header{position:sticky;top:0;z-index:5;background:#161b22;padding:8px 14px;
  border-bottom:1px solid #30363d;}
+#filters{padding:8px 14px;background:#161b22;display:flex;gap:12px;flex-wrap:wrap;}
+#filters select,#filters button{font:inherit;background:#0d1117;color:#c9d1d9;
+ border:1px solid #30363d;border-radius:4px;padding:3px;max-width:100%;}
 header b{color:#e6edf3;} header span{color:#8b949e;}
 .row{cursor:pointer;}
 .row .hl{fill:#ffffff;opacity:0;}
 .row:hover .hl{opacity:.05;}
 .sid{fill:#6e7681;} .time{fill:#586069;} .msg{fill:#c9d1d9;}
+.row .sid:hover{fill:#58a6ff;text-decoration:underline;}
 .title{font-weight:700;}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:30;
  background:#238636;color:#fff;padding:6px 12px;border-radius:6px;
  opacity:0;transition:opacity .2s;pointer-events:none;}
+#reader{position:fixed;inset:0;z-index:20;background:rgba(1,4,9,.72);display:none;
+ overflow-y:auto;padding:32px 16px;}
+#reader.open{display:block;}
+#pane{max-width:920px;margin:0 auto;background:#161b22;border:1px solid #30363d;
+ border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);}
+#pane .top{position:sticky;top:-32px;display:flex;gap:10px;align-items:baseline;
+ padding:12px 18px;background:#161b22;border-bottom:1px solid #30363d;
+ border-radius:10px 10px 0 0;}
+#pane .top .role{font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+#pane .top .meta{color:#8b949e;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#pane .top button{background:none;border:1px solid #30363d;color:#c9d1d9;border-radius:6px;
+ cursor:pointer;font:inherit;padding:2px 9px;}
+#pane .top button:hover{border-color:#8b949e;}
+#body{padding:6px 22px 22px;font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
+ color:#e6edf3;overflow-wrap:anywhere;}
+#body .blk{margin:16px 0;}
+#body .lbl{font:600 12px ui-monospace,monospace;color:#8b949e;margin:0 0 4px;}
+#body pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px 12px;
+ overflow-x:auto;white-space:pre-wrap;tab-size:4;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
+ margin:6px 0;}
+#body code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:#2d333b;
+ padding:1px 5px;border-radius:4px;}
+#body pre code{background:none;padding:0;}
+#body h1,#body h2,#body h3,#body h4{margin:18px 0 6px;line-height:1.3;}
+#body h1{font-size:1.4em;} #body h2{font-size:1.25em;} #body h3{font-size:1.1em;}
+#body p{margin:8px 0;} #body ul,#body ol{margin:6px 0;padding-left:26px;}
+#body blockquote{margin:8px 0;padding:0 12px;border-left:3px solid #30363d;color:#8b949e;}
+#body table{border-collapse:collapse;margin:8px 0;font-size:14px;}
+#body th,#body td{border:1px solid #30363d;padding:4px 9px;text-align:left;}
+#body th{background:#1c2128;}
+#body a{color:#58a6ff;}
+#body hr{border:0;border-top:1px solid #30363d;}
+#body .tool{border-left:3px solid #d29922;padding-left:12px;}
+#body .res{border-left:3px solid #3fb950;padding-left:12px;}
+#body .res.err{border-left-color:#f85149;}
+#body .think,#body .sys{border-left:3px solid #6e7681;padding-left:12px;color:#8b949e;}
+#body details>summary{cursor:pointer;color:#8b949e;font:12px ui-monospace,monospace;}
+#body .kv{display:flex;gap:8px;align-items:baseline;}
+#body .kv .k{color:#8b949e;font:12px ui-monospace,monospace;min-width:7em;}
 </style></head><body>
 """
 
-HTML_TAIL = """<div id="toast"></div><script>
+HTML_TAIL = """<div id="toast"></div>
+<div id="reader"><div id="pane"><div class="top"><span class="role"></span>
+<span class="meta"></span><button id="copy" title="copy claude --resume">resume</button>
+<button id="close" title="close (Esc)">✕</button></div><div id="body"></div></div></div>
+<script>
+const embedded = (() => { const e = document.getElementById('msgs');
+  return e ? JSON.parse(e.textContent) : null; })();
+const filters = document.getElementById('filters');
+if (filters) filters.addEventListener('change', () => filters.requestSubmit());
+const toast = document.getElementById('toast');
+function copy(cmd) {
+  navigator.clipboard && navigator.clipboard.writeText(cmd);
+  toast.textContent = 'copied: ' + cmd; toast.style.opacity = 1;
+  setTimeout(() => { toast.style.opacity = 0; }, 1600);
+}
+
+// Minimal markdown: escape everything first, then add a safe subset of markup,
+// so HTML quoted in a transcript can never execute or break the page.
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function inline(s) {
+  const codes = [];
+  s = esc(s).replace(/`([^`]+)`/g, (m, c) => '\\x00' + (codes.push(c) - 1) + '\\x00');
+  s = s.replace(/\\*\\*(.+?)\\*\\*/g, '<b>$1</b>')
+    .replace(/(^|[^*\\w])\\*(?!\\s)([^*]+?)\\*(?!\\w)/g, '$1<i>$2</i>')
+    .replace(/\\[([^\\]]+)\\]\\((https?:[^)\\s]+)\\)/g,
+      '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return s.replace(/\\x00(\\d+)\\x00/g, (m, i) => '<code>' + codes[i] + '</code>');
+}
+const FENCE = /^\\s*(```+|~~~+)/, HEAD = /^(#{1,6})\\s+(.*)/, ITEM = /^(\\s*)([-*+]|\\d+[.)])\\s+(.*)/;
+const HR = /^\\s*([-*_])(\\s*\\1){2,}\\s*$/, TROW = /^\\s*\\|.*\\|\\s*$/, TSEP = /^\\s*\\|?\\s*:?-+:?\\s*(\\|\\s*:?-+:?\\s*)*\\|?\\s*$/;
+function md(src) {
+  const L = src.replace(/\\r/g, '').split('\\n'), out = [];
+  let i = 0, m;
+  const starts = l => FENCE.test(l) || HEAD.test(l) || HR.test(l) || ITEM.test(l)
+    || /^\\s*>/.test(l) || TROW.test(l);
+  const kind = im => /\\d/.test(im[2]) ? 'ol' : 'ul';
+  while (i < L.length) {
+    const l = L[i];
+    if (!l.trim()) { i++; continue; }
+    if ((m = l.match(FENCE))) {
+      const buf = []; i++;
+      while (i < L.length && !L[i].trim().startsWith(m[1])) buf.push(L[i++]);
+      i++; out.push('<pre><code>' + esc(buf.join('\\n')) + '</code></pre>');
+    } else if ((m = l.match(HEAD))) {
+      const n = m[1].length; out.push(`<h${n}>${inline(m[2])}</h${n}>`); i++;
+    } else if (HR.test(l)) {
+      out.push('<hr>'); i++;
+    } else if (TROW.test(l) && i + 1 < L.length && TSEP.test(L[i + 1])) {
+      const cells = r => r.trim().replace(/^\\||\\|$/g, '').split(/(?<!\\\\)\\|/)
+        .map(c => inline(c.trim().replace(/\\\\\\|/g, '|')));
+      let h = '<table><tr>' + cells(l).map(c => `<th>${c}</th>`).join('') + '</tr>';
+      i += 2;
+      while (i < L.length && TROW.test(L[i]))
+        h += '<tr>' + cells(L[i++]).map(c => `<td>${c}</td>`).join('') + '</tr>';
+      out.push(h + '</table>');
+    } else if (/^\\s*>/.test(l)) {
+      const buf = [];
+      while (i < L.length && /^\\s*>/.test(L[i])) buf.push(L[i++].replace(/^\\s*>\\s?/, ''));
+      out.push('<blockquote>' + md(buf.join('\\n')) + '</blockquote>');
+    } else if ((m = l.match(ITEM))) {
+      const tag = kind(m), items = [];
+      while (i < L.length && L[i].trim() && !FENCE.test(L[i]) && !HEAD.test(L[i])) {
+        const im = L[i].match(ITEM);
+        if (im && !im[1] && kind(im) !== tag) break;  // bullets -> numbers: new list
+        if (im) items.push([im[1].length, im[3]]);
+        else items[items.length - 1][1] += '\\n' + L[i].trim();
+        i++;
+      }
+      out.push(`<${tag}>` + items.map(([ind, t]) =>
+        `<li style="margin-left:${ind * 0.5}em">${t.split('\\n').map(inline).join('<br>')}</li>`)
+        .join('') + `</${tag}>`);
+    } else {
+      const buf = [l]; i++;
+      while (i < L.length && L[i].trim() && !starts(L[i])) buf.push(L[i++]);
+      out.push('<p>' + buf.map(inline).join('<br>') + '</p>');
+    }
+  }
+  return out.join('');
+}
+
+function pre(t) { return '<pre>' + esc(t) + '</pre>'; }
+function fold(label, inner, open) {
+  return `<details${open ? ' open' : ''}><summary>${esc(label)}</summary>${inner}</details>`;
+}
+function renderBlock(b) {
+  if (b.type === 'text') {
+    const t = b.text.trim();
+    // System reminders, command wrappers etc.: tucked away, shown verbatim.
+    if (t.startsWith('<')) return `<div class="blk sys">${fold(t.split('\\n')[0].slice(0, 80),
+      pre(t), false)}</div>`;
+    return `<div class="blk">${md(b.text)}</div>`;
+  }
+  if (b.type === 'thinking')
+    return `<div class="blk think">${fold('thinking', md(b.text), false)}</div>`;
+  if (b.type === 'tool_use') {
+    const fields = Object.entries(b.input || {}).map(([k, v]) => {
+      if (typeof v !== 'object' && !String(v).includes('\\n') && String(v).length < 100)
+        return `<div class="kv"><span class="k">${esc(k)}</span><code>${esc(v)}</code></div>`;
+      return `<div class="lbl">${esc(k)}</div>` +
+        pre(typeof v === 'string' ? v : JSON.stringify(v, null, 2));
+    }).join('');
+    return `<div class="blk tool"><div class="lbl">⚙ ${esc(b.name)}</div>${fields}</div>`;
+  }
+  if (b.type === 'tool_result') {
+    const n = b.text.split('\\n').length;
+    const label = `↩ ${b.is_error ? 'error' : 'result'} · ${n} line${n === 1 ? '' : 's'}`;
+    return `<div class="blk res${b.is_error ? ' err' : ''}">${fold(label, pre(b.text), n <= 40)}</div>`;
+  }
+  return `<div class="blk">${pre(b.text)}</div>`;
+}
+
+const reader = document.getElementById('reader'), body = document.getElementById('body');
+let current = null;
+async function openMsg(row) {
+  const uuid = row.getAttribute('data-uuid');
+  current = row.getAttribute('data-resume');
+  reader.querySelector('.meta').textContent = '';
+  reader.querySelector('.role').textContent = '…';
+  body.innerHTML = '';
+  reader.classList.add('open'); reader.scrollTop = 0;
+  let m;
+  try {
+    m = embedded ? embedded[uuid] : await (await fetch('msg/' + uuid + location.search)).json();
+  } catch (e) { m = null; }
+  if (!m) { body.innerHTML = '<p>could not load message ' + esc(uuid) + '</p>'; return; }
+  reader.querySelector('.role').textContent = m.role;
+  reader.querySelector('.meta').textContent = [m.timestamp.replace('T', ' ').slice(0, 19),
+    current.split(' ').pop(), m.model].filter(Boolean).join(' · ');
+  body.innerHTML = m.blocks.map(renderBlock).join('') || '<p><i>(empty)</i></p>';
+}
+function closeReader() { reader.classList.remove('open'); }
+document.getElementById('close').onclick = closeReader;
+document.getElementById('copy').onclick = () => current && copy(current);
+reader.addEventListener('click', e => { if (e.target === reader) closeReader(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReader(); });
+
 for (const r of document.querySelectorAll('.row')) {
-  r.addEventListener('click', () => {
-    const cmd = r.getAttribute('data-resume');
-    navigator.clipboard && navigator.clipboard.writeText(cmd);
-    const t = document.getElementById('toast');
-    t.textContent = 'copied: ' + cmd; t.style.opacity = 1;
-    setTimeout(() => { t.style.opacity = 0; }, 1600);
+  r.addEventListener('click', e => {
+    // The session hash copies the resume command; the rest of a message row
+    // opens it in the reader. Title rows have no message, so they just copy.
+    if (!r.hasAttribute('data-uuid') || e.target.closest('.sid'))
+      copy(r.getAttribute('data-resume'));
+    else openMsg(r);
   });
 }
 </script></body></html>
 """
 
 
-def build_html(sdir: Path, full: bool = False):
-	"""Build a self-contained interactive HTML/SVG of the message DAG: gitk-style
-	lanes on the left, one row per node coloured by session, each thread tip with
-	a ◆ title node, hover for the full prompt, click a row to copy its `claude
-	--resume <id>` command. Returns the HTML string, or None if there are none."""
-	g = analyze_graph(sdir, full)
+def build_html(sdir: Path, full: bool = False, embed: bool = True,
+		session_id=None, view=None, thinking=False):
+	"""Build an interactive HTML/SVG of the message DAG: gitk-style lanes on the
+	left, one row per node coloured by session, each thread tip with a ◆ title
+	node, hover for the full prompt. Clicking a row's session hash copies its
+	`claude --resume <id>` command; clicking the rest opens the message in a
+	formatted reader pane. With `embed` every message's content is inlined so the
+	file is self-contained; without it the page fetches `msg/<uuid>` on demand
+	(what --serve does, keeping big projects' pages light). Returns the HTML
+	string, or None if there are none."""
+	view = view or ("all" if full else "prompts")
+	full = view == "all"
+	g = analyze_graph(sdir, full, session_id, view, thinking)
 	nodes = g["nodes"]
-	if not nodes:
+	if not nodes and embed:
 		return None
 	pof, ts_of, order = g["pof"], g["ts_of"], g["order"]
 	child_count, leaf_sid = g["child_count"], g["leaf_sid"]
@@ -666,7 +904,7 @@ def build_html(sdir: Path, full: bool = False):
 		# The whole message for the hover tooltip (not the truncated row gist):
 		# the complete typed prompt, or in --full mode the expanded message.
 		rec = nodes[nid]
-		if full:
+		if view != "prompts":
 			t = message_text(rec)
 		else:
 			t = "\n".join(x for x in _user_texts(rec) if x.strip()) or message_text(rec)
@@ -730,7 +968,9 @@ def build_html(sdir: Path, full: bool = False):
 				f'<tspan class="msg">{esc(gist)}</tspan></text>')
 			tooltip = full_text(nid)
 			widest = max(widest, len(short(sid)) + len(tstr) + len(gist) + 10)
-		rows.append(f'<g class="row" data-resume="{resume}"><title>{esc(tooltip)}</title>{body}</g>')
+		uuid_attr = f' data-uuid="{esc(nid)}"' if kind == "node" else ""
+		rows.append(f'<g class="row" data-resume="{resume}"{uuid_attr}>'
+			f'<title>{esc(tooltip)}</title>{body}</g>')
 
 	width = int(text_x + widest * CHARPX + 30)
 	height = TOP * 2 + len(display) * ROW_H
@@ -739,16 +979,43 @@ def build_html(sdir: Path, full: bool = False):
 		f'<g class="edges">{"".join(edges)}</g>'
 		f'<g class="nodes">{"".join(rows)}</g></svg>')
 
-	mode = "every message" if full else "your prompts"
+	mode = {"all": "every message", "conversation": "prompts + answers",
+		"prompts": "your prompts"}[view]
 	header = (f'<header><b>cc_sessions</b> · {esc(sdir.name)} · {len(order)} nodes '
-		f'({mode}) · <span>click a row to copy its <b>claude --resume</b> command, '
-		f'hover for the full prompt</span></header>')
-	return HTML_HEAD + header + svg + HTML_TAIL
+		f'({mode}) · <span>click a message to read it in full, click its session '
+		f'hash to copy <b>claude --resume</b></span></header>')
+	if not embed:
+		options = "".join(
+			f'<option value="{value}"{" selected" if value == view else ""}>{label}</option>'
+			for value, label in (("prompts", "Prompts"),
+				("conversation", "Prompts + answers"), ("all", "Everything")))
+		selected = session_files(sdir, session_id)[0].stem if session_id else ""
+		session_options = '<option value="">All sessions</option>' + "".join(
+			f'<option value="{esc(jf.stem)}"'
+			f'{" selected" if jf.stem == selected else ""}>{esc(jf.stem)}</option>'
+			for jf in session_files(sdir))
+		header += (f'<form id="filters" method="get"><label>Show <select name="view">'
+			f'{options}</select></label> <label>Session <select name="id">'
+			f'{session_options}</select></label> <label><input type="checkbox" '
+			f'name="thinking" value="1"{" checked" if thinking else ""}> '
+			'Thinking (Everything)</label>'
+			'<input type="hidden" name="filters" value="1"> '
+			'<button type="submit">Refresh</button></form>')
+		if not nodes:
+			header += '<p>No messages match these filters. Try Everything or another session.</p>'
+	data = ""
+	if embed:
+		# `</` escaped so message text can't close the <script> element early.
+		payload = json.dumps({u: message_payload(nodes[u]) for u in order},
+			ensure_ascii=False).replace("</", "<\\/")
+		data = f'<script id="msgs" type="application/json">{payload}</script>'
+	return HTML_HEAD + header + svg + data + HTML_TAIL
 
 
-def print_html(sdir: Path, full: bool = False, out_path: str = None) -> int:
+def print_html(sdir: Path, full: bool = False, out_path: str = None,
+		session_id=None, view=None, thinking=False) -> int:
 	"""Build the interactive HTML/SVG graph and write it to a file."""
-	html = build_html(sdir, full)
+	html = build_html(sdir, full, session_id=session_id, view=view, thinking=thinking)
 	if html is None:
 		print("error: no messages to render", file=sys.stderr)
 		return 1
@@ -759,25 +1026,57 @@ def print_html(sdir: Path, full: bool = False, out_path: str = None) -> int:
 	return 0
 
 
-def serve_html(sdir: Path, full: bool = False, port: int = 8000) -> int:
+def serve_html(sdir: Path, full: bool = False, port: int = 8000,
+		session_id=None, view=None, thinking=False) -> int:
 	"""Serve the interactive graph over HTTP, regenerated on every request so a
 	browser refresh reflects newly-written messages. Binds to localhost only;
 	Ctrl-C to stop. If the requested port is taken, falls back to a free one."""
 	import http.server
 	import webbrowser
 
+	default_view = view or ("all" if full else "prompts")
+
 	class Handler(http.server.BaseHTTPRequestHandler):
 		def do_GET(self):
-			if self.path.split("?")[0] not in ("/", "/index.html"):
+			request = urlsplit(self.path)
+			path = request.path
+			query = parse_qs(request.query, keep_blank_values=True)
+			active_view = query.get("view", [default_view])[0]
+			active_id = query.get("id", [session_id])[0] or None
+			active_thinking = query.get("thinking", [
+				"0" if "filters" in query else "1" if thinking else "0"])[0] == "1"
+			try:
+				if active_view not in ("prompts", "conversation", "all"):
+					raise ValueError("invalid view")
+				session_files(sdir, active_id)
+			except ValueError as error:
+				self.send_error(400, str(error))
+				return
+			if path.startswith("/msg/"):
+				# Reader pane content, looked up fresh across every message
+				# (not just the graph's nodes) so it works in either zoom.
+				nodes, _ = build_message_graph(sdir, session_id=active_id)
+				rec = nodes.get(path[len("/msg/"):])
+				if rec is not None:
+					rec = visible_record(rec, active_view, active_thinking)
+				if rec is None:
+					self.send_error(404, "no such message")
+					return
+				body = json.dumps(message_payload(rec), ensure_ascii=False).encode("utf-8")
+				ctype = "application/json"
+			elif path in ("/", "/index.html"):
+				html = build_html(sdir, full, embed=False, session_id=active_id,
+					view=active_view, thinking=active_thinking)
+				if html is None:
+					self.send_error(404, "no messages to render")
+					return
+				body = html.encode("utf-8")
+				ctype = "text/html; charset=utf-8"
+			else:
 				self.send_error(404)
 				return
-			html = build_html(sdir, full)
-			if html is None:
-				self.send_error(404, "no messages to render")
-				return
-			body = html.encode("utf-8")
 			self.send_response(200)
-			self.send_header("Content-Type", "text/html; charset=utf-8")
+			self.send_header("Content-Type", ctype)
 			self.send_header("Content-Length", str(len(body)))
 			self.send_header("Cache-Control", "no-store")
 			self.end_headers()
@@ -791,7 +1090,7 @@ def serve_html(sdir: Path, full: bool = False, port: int = 8000) -> int:
 	except OSError:
 		httpd = http.server.HTTPServer(("127.0.0.1", 0), Handler)  # port busy -> any free port
 	url = f"http://127.0.0.1:{httpd.server_address[1]}/"
-	mode = "every message" if full else "your prompts"
+	mode = default_view
 	print(f"Serving cc_sessions graph ({mode}) for {sdir.name} at {url}")
 	print("  refresh the page to pick up new messages · Ctrl-C to stop")
 	if os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"):
@@ -827,7 +1126,45 @@ def message_text(rec) -> str:
 	return "\n".join(render_content(content, full=True, show_thinking=True))
 
 
-def export_git(sdir: Path, outdir: str, full: bool = False, force: bool = False) -> int:
+def message_payload(rec) -> dict:
+	"""JSON-able view of one message for the HTML reader pane: metadata plus its
+	content blocks, kept structured (not flattened) so the browser can format
+	prose as markdown, tool inputs field by field and tool output verbatim."""
+	msg = rec.get("message", {})
+	content = msg.get("content")
+	if isinstance(content, str):
+		content = [{"type": "text", "text": content}]
+	blocks = []
+	for b in content or []:
+		bt = b.get("type", "?")
+		if bt == "text":
+			blocks.append({"type": "text", "text": b.get("text") or ""})
+		elif bt == "thinking":
+			# Often redacted to "" on disk; say so rather than show nothing.
+			text = b.get("thinking") or ""
+			blocks.append({"type": "thinking",
+				"text": text if text.strip() else "*(not recorded in the transcript)*"})
+		elif bt == "tool_use":
+			blocks.append({"type": "tool_use", "name": b.get("name", "?"),
+				"input": b.get("input", {})})
+		elif bt == "tool_result":
+			blocks.append({"type": "tool_result", "text": tool_result_text(b.get("content")),
+				"is_error": bool(b.get("is_error"))})
+		elif bt == "image":
+			blocks.append({"type": "other", "text": "[image]"})
+		else:
+			blocks.append({"type": "other", "text": json.dumps(b, ensure_ascii=False)[:2000]})
+	return {
+		"role": msg.get("role") or rec.get("type") or "?",
+		"timestamp": rec.get("timestamp") or "",
+		"uuid": rec.get("uuid") or "",
+		"model": msg.get("model") or "",
+		"blocks": blocks,
+	}
+
+
+def export_git(sdir: Path, outdir: str, full: bool = False, force: bool = False,
+		session_id=None) -> int:
 	"""Materialise the message DAG as a throwaway git repo so it can be browsed
 	with any git history GUI (gitk, git gui, tig, lazygit, VS Code Git Graph…).
 
@@ -836,7 +1173,7 @@ def export_git(sdir: Path, outdir: str, full: bool = False, force: bool = False)
 	`sess/<id>` branch at that session's tip, and the message body is written to
 	`msg/<uuid>.md` so the GUI's diff/patch pane shows the message itself. By
 	default one commit per user prompt; full=True commits every message."""
-	nodes, parent_of = build_message_graph(sdir, None if full else is_prompt)
+	nodes, parent_of = build_message_graph(sdir, None if full else is_prompt, session_id)
 	if not nodes:
 		print("error: no matching messages to export", file=sys.stderr)
 		return 1
@@ -953,11 +1290,15 @@ def main():
 	ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
 	ap.add_argument("path", nargs="?", default=os.getcwd(),
 		help="Project directory (default: CWD)")
+	ap.add_argument("--id", metavar="SESSION_ID",
+		help="Select one session by full ID or unique prefix (includes its copied history)")
+	ap.add_argument("--view", choices=("prompts", "conversation", "all"),
+		help="Initial --serve/--html view: prompts, prompts + answers, or everything")
 	ap.add_argument("--full", action="store_true",
 		help="Show full detail: untruncated tool inputs/results in the dump; "
-			"every message (not just prompts) in --tree and --git-export")
+			"every message in --tree, --git-export, --html and --serve")
 	ap.add_argument("--thinking", action="store_true",
-		help="Show assistant thinking blocks")
+		help="Show assistant thinking blocks, including in --serve/--html")
 	ap.add_argument("--list", action="store_true",
 		help="Just list sessions found and exit")
 	ap.add_argument("--tree", action="store_true",
@@ -978,7 +1319,8 @@ def main():
 
 	try:
 		sdir = resolve_sessions_dir(args.path)
-	except FileNotFoundError as e:
+		session_files(sdir, args.id)
+	except (FileNotFoundError, ValueError) as e:
 		print(f"error: {e}", file=sys.stderr)
 		return 2
 
@@ -986,7 +1328,7 @@ def main():
 		auto = args.git_export == ""
 		target = Path.home() / ".cache" / "cc_sessions" / sdir.name if auto else args.git_export
 		# The auto cache path is ours to manage, so refresh it in place.
-		return export_git(sdir, str(target), args.full, args.force or auto)
+		return export_git(sdir, str(target), args.full, args.force or auto, args.id)
 
 	if args.html is not None:
 		if args.html == "":
@@ -995,12 +1337,12 @@ def main():
 			out = cache / f"{sdir.name}.html"
 		else:
 			out = args.html
-		return print_html(sdir, args.full, str(out))
+		return print_html(sdir, args.full, str(out), args.id, args.view, args.thinking)
 
 	if args.serve is not None:
-		return serve_html(sdir, args.full, args.serve)
+		return serve_html(sdir, args.full, args.serve, args.id, args.view, args.thinking)
 
-	sessions = load_sessions(sdir)
+	sessions = load_sessions(sdir, args.id)
 	if not sessions:
 		print(f"(no conversational records in {sdir})", file=sys.stderr)
 		return 1
@@ -1017,7 +1359,7 @@ def main():
 		# `git log --graph --oneline --all` over the message DAG, deduped across
 		# all session files, rails showing forks. Default: one row per typed
 		# prompt (navigate zoom); --full: one row per message (inspect zoom).
-		print_graph(sdir, args.full)
+		print_graph(sdir, args.full, args.id)
 		return 0
 
 	# One pass establishes fork relationships and which uuids each session is
