@@ -8,6 +8,11 @@ when nobody is at it (xprintidle >= --idle-after-s, the luigi_toggler mechanism)
 is; no margin (that belongs to the topology). The ARBITER splits it: the experiments VM may use all of it, the
 production VM what the experiments VM leaves.
 
+PRESENT WITHOUT THE DESKTOP (over ssh, where xprintidle sees an idle desktop): `vm_cpu_present.py --budget 25`
+connects to --socket (default $XDG_RUNTIME_DIR/vm_cpu_arbiter.sock, mode 600) and holds the connection; while any
+such client is connected the budget is the lowest of theirs and the desktop's. When the ssh session drops, the
+client dies with it, the kernel closes its end, and the budget returns at the next tick -- nothing to clean up.
+
 It steers by what the HOST pays, not what a guest reports: the kernel's CPU accounting of the cgroup libvirt gives
 each VM (machine.slice/machine-qemu\x2d<id>\x2d<domain>.scope, cpu.stat usage_usec: every thread of the VM, no
 process scanning), smoothed over a few seconds -- on 10-18 dev44's guest showed 0.5 cores while its qemu took 2.5. A guest's shaper level does not map to host CPU in
@@ -21,6 +26,7 @@ import glob
 import json
 import logging
 import os
+import socket
 import subprocess
 import threading
 import time
@@ -60,6 +66,59 @@ def vm_cgroup(domain: str) -> str | None:
 def cpu_s(cgroup: str) -> float:
     with open(f"{cgroup}/cpu.stat") as f:
         return next(int(line.split()[1]) for line in f if line.startswith("usage_usec ")) / 1e6
+
+
+class Clients:
+    """Connected presence clients: connection -> the budget (%) it asked for. A connection's end is its departure."""
+    lock = threading.Lock()
+    budgets: dict = {}
+
+    @classmethod
+    def lowest(cls) -> float | None:
+        with cls.lock:
+            return min(cls.budgets.values(), default=None)
+
+
+def serve(path: str) -> None:
+    """Accept presence clients on a unix socket: each sends one line {"budget": 0..100, "who": "..."} and stays."""
+    if os.path.exists(path):
+        os.unlink(path)                                    # a previous arbiter's socket; only one listens here
+    srv = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    old = os.umask(0o177)
+    srv.bind(path)
+    os.umask(old)
+    srv.listen()
+
+    def hold(conn):
+        key = id(conn)
+        try:
+            line = conn.makefile("r").readline()
+            msg = json.loads(line)
+            budget = float(msg["budget"])
+            if not 0 <= budget <= 100:
+                raise ValueError(f"budget must be 0..100, not {budget}")
+        except (ValueError, KeyError, TypeError, OSError) as e:
+            conn.sendall(json.dumps({"error": f"{type(e).__name__}: {e}"}).encode() + b"\n")
+            conn.close()
+            return
+        with Clients.lock:
+            Clients.budgets[key] = budget
+        log.info("present: %s holds the budget at %s %% (%d connected)", msg.get("who", "?"), budget,
+                 len(Clients.budgets))
+        conn.sendall(json.dumps({"ok": True, "budget": budget}).encode() + b"\n")
+        try:
+            while conn.recv(4096):                         # a client sends nothing more; EOF = it is gone
+                pass
+        except OSError:
+            pass
+        with Clients.lock:
+            Clients.budgets.pop(key, None)
+        log.info("gone: %s (%d connected)", msg.get("who", "?"), len(Clients.budgets))
+        conn.close()
+
+    while True:
+        conn, _ = srv.accept()
+        threading.Thread(target=hold, args=(conn,), daemon=True).start()
 
 
 class VM:
@@ -112,6 +171,9 @@ def main() -> int:
     ap.add_argument("--active-budget", type=float, default=25, help="%% of the host while someone is at the desktop")
     ap.add_argument("--idle-after-s", type=float, default=120)
     ap.add_argument("--display", default=":0")
+    ap.add_argument("--socket", default=os.path.join(os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}",
+                                                     "vm_cpu_arbiter.sock"),
+                    help="where presence clients (vm_cpu_present.py) connect")
     ap.add_argument("--tick-s", type=float, default=1.0)
     ap.add_argument("--smooth", type=float, default=0.4, help="EWMA weight of a tick's CPU reading")
     ap.add_argument("--ttl-s", type=int, default=30)
@@ -125,15 +187,20 @@ def main() -> int:
         raise SystemExit("name at least one --experiments or --production VM")
     log.info("host budget base: %s cores; experiments %s, production %s", cores,
              [v.name for v in exp], [v.name for v in prod])
+    threading.Thread(target=serve, args=(a.socket,), daemon=True, name="presence").start()
     present, last_log = None, 0.0
     while True:
         now = time.monotonic()
         ms = idle_ms(a.display)
-        now_present = ms is not None and ms < a.idle_after_s * 1000
-        budget = cores * (a.active_budget if now_present else 100) / 100
-        if now_present != present:
-            log.info("desktop %s (idle %s ms): budget %.1f cores", "ACTIVE" if now_present else "idle", ms, budget)
-            present = now_present
+        at_desk = ms is not None and ms < a.idle_after_s * 1000
+        held = Clients.lowest()
+        pct = min(a.active_budget if at_desk else 100, 100 if held is None else held)
+        budget = cores * pct / 100
+        state = (at_desk, held)
+        if state != present:
+            log.info("desktop %s (idle %s ms), clients' lowest %s: budget %.1f cores (%g %%)",
+                     "ACTIVE" if at_desk else "idle", ms, held, budget, pct)
+            present = state
         for v in exp + prod:
             v.measure(now, a.smooth)
         left = budget

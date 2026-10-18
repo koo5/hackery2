@@ -1,8 +1,8 @@
 [Unit]
 Description="vm_cpu_arbiter: the VMs' real host CPU inside the desktop's budget (experiments first)"
-After=network-online.target libvirtd.service
-StartLimitIntervalSec=60
-StartLimitBurst=40
+# a user unit tied to the desktop session: logged out = no desktop to protect, its votes expire in 30 s, caps lift
+PartOf=graphical-session.target
+After=graphical-session.target
 
 [Service]
 Environment="PYTHONUNBUFFERED=1"
@@ -11,12 +11,6 @@ Environment="PYTHONUNBUFFERED=1"
 ExecStart=/home/koom/hackery2/src/hackery2/bin/vm_cpu_arbiter.py --experiments dev4_3=http://192.168.122.31:18079 --production dev44=http://192.168.122.3:18079 --active-budget 25
 Restart=always
 RestartSec=5
-User=koom
-
-# Hardening
-SystemCallArchitectures=native
-MemoryDenyWriteExecute=true
-NoNewPrivileges=true
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical-session.target
