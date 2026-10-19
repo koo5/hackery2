@@ -19,7 +19,16 @@ process scanning), smoothed over a few seconds -- on 10-18 dev44's guest showed 
 any fixed ratio, so each VM's level is a feedback loop: over its allowance -> level scaled down by allowance/cost,
 well under -> raised 10 %. Levels go to each VM's cpu_shaper (hillview enrich/recon/cpu_shaper.py) as source
 `host-arbiter`, ttl --ttl-s, so a dead arbiter's caps lift by themselves; the shaper applies the LOWEST live vote.
+Every vote also carries desktop_idle_s (seconds since the last desktop input, or null when xprintidle fails).
+The VM keeps this telemetry in memory for min(ttl_s, 60) seconds and serves GET /desktop-idle.
 Logs the budget on every change and each VM's line every --log-every-s.
+
+THE CARD (polaris, the RX 580 that also drives the desktop; STORAGE 2026-10-18, hillview infra/units/host/USAGE-SHAPING.md):
+--gpu-mode-file PATH (polaris's /temp/recon-worker/gpu-shaping, as the HOST sees it) gets `offload` while someone is
+at the desktop and `run` when it is idle -- written by rename, and only when the desktop's state changes, so a manual
+`polaris-gpu set ...` inside the box holds until the next change. Presence clients do not count: an ssh session does
+not draw on the card. Polaris's Prometheus reads desktop idleness from the VM's shaper over HTTP; there is no
+per-tick idle file write.
 """
 import argparse
 import glob
@@ -61,6 +70,14 @@ def vm_cgroup(domain: str) -> str | None:
     if len(found) > 1:
         raise RuntimeError(f"{domain}: {len(found)} cgroups match: {found}")
     return found[0] if found else None
+
+
+def write_by_rename(path: str, text: str) -> None:
+    """The reader (polaris-gpu, every few seconds) never sees half a file."""
+    tmp = f"{path}.tmp"
+    with open(tmp, "w") as f:
+        f.write(text)
+    os.replace(tmp, path)
 
 
 def cpu_s(cgroup: str) -> float:
@@ -148,9 +165,10 @@ class VM:
         elif self.cost < 0.85 * allowance:
             self.level = min(100.0, self.level * 1.1 + 1)
 
-    def vote(self, ttl_s: int) -> None:
+    def vote(self, ttl_s: int, desktop_idle_s: float | None) -> None:
         level = int(round(self.level / 5) * 5)                    # steps of 5: the shapers re-apply on change only
-        body = json.dumps({"level": level, "source": "host-arbiter", "ttl_s": ttl_s}).encode()
+        body = json.dumps({"level": level, "source": "host-arbiter", "ttl_s": ttl_s,
+                           "desktop_idle_s": desktop_idle_s}).encode()
         req = urllib.request.Request(self.url, data=body, method="POST", headers={"Content-Type": "application/json"})
         try:
             urllib.request.urlopen(req, timeout=2).read()
@@ -178,7 +196,11 @@ def main() -> int:
     ap.add_argument("--smooth", type=float, default=0.4, help="EWMA weight of a tick's CPU reading")
     ap.add_argument("--ttl-s", type=int, default=30)
     ap.add_argument("--log-every-s", type=float, default=60)
+    ap.add_argument("--gpu-mode-file", default=None,
+                    help="polaris's mode file as the host sees it: `offload` at the desk, `run` when idle")
     a = ap.parse_args()
+    if a.gpu_mode_file and not os.path.isdir(os.path.dirname(a.gpu_mode_file) or "."):
+        raise SystemExit(f"{a.gpu_mode_file}: its directory does not exist (polaris's /temp/recon-worker, as the host sees it)")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     cores = a.host_cores or physical_cores()
     exp = [VM(s, "experiments") for s in a.experiments]
@@ -188,11 +210,15 @@ def main() -> int:
     log.info("host budget base: %s cores; experiments %s, production %s", cores,
              [v.name for v in exp], [v.name for v in prod])
     threading.Thread(target=serve, args=(a.socket,), daemon=True, name="presence").start()
-    present, last_log = None, 0.0
+    present, last_log, card = None, 0.0, None
     while True:
         now = time.monotonic()
         ms = idle_ms(a.display)
         at_desk = ms is not None and ms < a.idle_after_s * 1000
+        if a.gpu_mode_file and ms is not None and at_desk != card:
+            write_by_rename(a.gpu_mode_file, "offload\n" if at_desk else "run\n")
+            log.info("card: %s -> %s", a.gpu_mode_file, "offload" if at_desk else "run")
+            card = at_desk
         held = Clients.lowest()
         pct = min(a.active_budget if at_desk else 100, 100 if held is None else held)
         budget = cores * pct / 100
@@ -210,7 +236,7 @@ def main() -> int:
         for v in prod:                                 # production shares what is left
             v.steer(left / len(prod))
         for v in exp + prod:
-            threading.Thread(target=v.vote, args=(a.ttl_s,), daemon=True).start()
+            threading.Thread(target=v.vote, args=(a.ttl_s, None if ms is None else ms / 1000), daemon=True).start()
         if now - last_log >= a.log_every_s:
             log.info("budget %.1f: %s", budget, "; ".join(
                 f"{v.name} costs {v.cost:.2f} of {v.allowance:.2f} -> level {round(v.level)}" for v in exp + prod))
