@@ -24,11 +24,13 @@ The VM keeps this telemetry in memory for min(ttl_s, 60) seconds and serves GET 
 Logs the budget on every change and each VM's line every --log-every-s.
 
 THE CARD (polaris, the RX 580 that also drives the desktop; STORAGE 2026-10-18, hillview infra/units/host/USAGE-SHAPING.md):
---gpu-mode-file PATH (polaris's /temp/recon-worker/gpu-shaping, as the HOST sees it) gets `offload` while someone is
-at the desktop and `run` when it is idle -- written by rename, and only when the desktop's state changes, so a manual
-`polaris-gpu set ...` inside the box holds until the next change. Presence clients do not count: an ssh session does
-not draw on the card. Polaris's Prometheus reads desktop idleness from the VM's shaper over HTTP; there is no
-per-tick idle file write.
+--gpu-shaper-socket PATH (polaris-gpu's control socket, /temp/recon-worker/gpu-shaper.sock as the HOST sees it) gets a
+vote every tick as source `desktop`: `offload` while someone is at the desktop, `run` when it is idle, with --ttl-s, so
+a dead arbiter's vote lapses and the card goes back to the job (2026-10-19, the operator: "through a socket rather than
+the filesystem"; the mode file it replaced was never written -- the host user could not create files in the
+container's dir). polaris-gpu takes the most restrictive live vote, so a manual `polaris-gpu set pause` still wins.
+No vote while xprintidle fails. Presence clients do not count: an ssh session does not draw on the card. Polaris's
+Prometheus reads desktop idleness from the VM's shaper over HTTP and the mode and votes from polaris-gpu itself.
 """
 import argparse
 import glob
@@ -72,12 +74,31 @@ def vm_cgroup(domain: str) -> str | None:
     return found[0] if found else None
 
 
-def write_by_rename(path: str, text: str) -> None:
-    """The reader (polaris-gpu, every few seconds) never sees half a file."""
-    tmp = f"{path}.tmp"
-    with open(tmp, "w") as f:
-        f.write(text)
-    os.replace(tmp, path)
+class Card:
+    """polaris-gpu's control socket: one vote a tick as `desktop`; quiet while it does not answer (polaris down)"""
+
+    def __init__(self, path: str):
+        self.path, self.failing, self.last = path, False, None
+
+    def vote(self, mode: str, ttl_s: int) -> None:
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as c:
+                c.settimeout(2)
+                c.connect(self.path)
+                c.sendall(json.dumps({"vote": mode, "source": "desktop", "ttl_s": ttl_s}).encode() + b"\n")
+                ans = json.loads(c.makefile("r").readline() or "null")
+            if not isinstance(ans, dict) or "error" in ans:
+                raise ValueError(f"answered {ans!r}")
+            if self.failing:
+                log.info("card: %s answers again", self.path)
+            self.failing = False
+            if mode != self.last:
+                log.info("card: desktop votes %s (in force: %s)", mode, ans.get("mode"))
+                self.last = mode
+        except (OSError, ValueError) as e:
+            if not self.failing:
+                log.warning("card: %s: %s (quiet until it answers again)", self.path, e)
+            self.failing = True
 
 
 def cpu_s(cgroup: str) -> float:
@@ -196,11 +217,12 @@ def main() -> int:
     ap.add_argument("--smooth", type=float, default=0.4, help="EWMA weight of a tick's CPU reading")
     ap.add_argument("--ttl-s", type=int, default=30)
     ap.add_argument("--log-every-s", type=float, default=60)
-    ap.add_argument("--gpu-mode-file", default=None,
-                    help="polaris's mode file as the host sees it: `offload` at the desk, `run` when idle")
+    ap.add_argument("--gpu-shaper-socket", default=None,
+                    help="polaris-gpu's control socket as the host sees it: votes `offload` at the desk, `run` when idle")
     a = ap.parse_args()
-    if a.gpu_mode_file and not os.path.isdir(os.path.dirname(a.gpu_mode_file) or "."):
-        raise SystemExit(f"{a.gpu_mode_file}: its directory does not exist (polaris's /temp/recon-worker, as the host sees it)")
+    if a.gpu_shaper_socket and not os.path.isdir(os.path.dirname(a.gpu_shaper_socket) or "."):
+        raise SystemExit(f"{a.gpu_shaper_socket}: its directory does not exist (polaris's /temp/recon-worker, as the host sees it)")
+    card = Card(a.gpu_shaper_socket) if a.gpu_shaper_socket else None
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     cores = a.host_cores or physical_cores()
     exp = [VM(s, "experiments") for s in a.experiments]
@@ -210,15 +232,13 @@ def main() -> int:
     log.info("host budget base: %s cores; experiments %s, production %s", cores,
              [v.name for v in exp], [v.name for v in prod])
     threading.Thread(target=serve, args=(a.socket,), daemon=True, name="presence").start()
-    present, last_log, card = None, 0.0, None
+    present, last_log = None, 0.0
     while True:
         now = time.monotonic()
         ms = idle_ms(a.display)
         at_desk = ms is not None and ms < a.idle_after_s * 1000
-        if a.gpu_mode_file and ms is not None and at_desk != card:
-            write_by_rename(a.gpu_mode_file, "offload\n" if at_desk else "run\n")
-            log.info("card: %s -> %s", a.gpu_mode_file, "offload" if at_desk else "run")
-            card = at_desk
+        if card is not None and ms is not None:
+            threading.Thread(target=card.vote, args=("offload" if at_desk else "run", a.ttl_s), daemon=True).start()
         held = Clients.lowest()
         pct = min(a.active_budget if at_desk else 100, 100 if held is None else held)
         budget = cores * pct / 100
