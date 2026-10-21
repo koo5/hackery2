@@ -39,6 +39,7 @@ from collections import defaultdict
 from .infra import *
 from . import locks
 import logging
+import subprocess
 import click
 import json5
 log = logging.getLogger()
@@ -160,6 +161,8 @@ def report(source, percent, show_all):
 @click.option('--backups/--no-backups', default=False, help='Also transfer all most recent snapshots in backups to remote machine')
 def remote(source, target_machine, target_fs, quick, prune, backups):
 	"""Mode 3: Create backups to a remote machine."""
+	if backups:
+		die('not implemented')
 	print(f'Remote backup - source={source}, target_machine={target_machine}, target_fs={target_fs}, quick={quick}, prune={prune}')
 	_run_backup(source=source, target_machine=target_machine, target_fs=target_fs, local=False, quick=quick, prune=prune, snapshot_only=False)
 
@@ -204,6 +207,9 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	if not local:
 		check_if_mounted(sshstr, target_fs)
 
+	backup_policy = () if snapshot_only else _read_backup_policy(
+		target_fs, None if local else sshstr)
+
 	fss = get_filesystems()
 	
 	if hostname != 'r64':
@@ -219,7 +225,10 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 		# anything else?
 		# pause firefox? pause some vms?
 
-	import_noncows(source, hostname, target_fs, fss)
+	if snapshot_only or _backup_destination_allowed(backup_policy, hostname, 'root_ext4'):
+		import_noncows(source, hostname, target_fs, fss)
+	else:
+		print(f'SKIP refused non-COW import {hostname}/root_ext4')
 
 	print()
 	print('---done import_noncows---')
@@ -229,7 +238,9 @@ def _run_backup(source='host', target_machine=None, target_fs=None, local=False,
 	print()
 	print('---done find_backup_subvols---')
 	print()
-	transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only)
+	transfer_btrfs_subvolumes(
+		sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only,
+		backup_policy=backup_policy)
 
 
 def _parse_size(size):
@@ -240,6 +251,95 @@ def _parse_size(size):
 		raise ValueError(f'cannot parse size: {size!r}')
 	unit = m.group(2).upper() if m.group(2) else ''
 	return int(float(m.group(1)) * 1024 ** (' KMGTP'.index(unit) if unit else 0))
+
+
+def _parse_backup_policy(contents, policy_path):
+	"""Parse policy text from a local or remote destination."""
+	rules = []
+	for lineno, line in enumerate(contents.splitlines(), 1):
+		text = line.strip()
+		if not text:
+			continue
+		words = text.split()
+		if len(words) == 2 and words[0] == 'refuse':
+			refuse_not = False
+			pattern = words[1]
+		elif len(words) == 3 and words[0:2] == ['refuse', 'not']:
+			refuse_not = True
+			pattern = words[2]
+		else:
+			raise click.ClickException(
+				f'invalid backup policy {policy_path}:{lineno}: '
+				f'expected "refuse [not] <machine>/<subvol>"')
+
+		if '/' not in pattern:
+			raise click.ClickException(
+				f'invalid backup policy {policy_path}:{lineno}: '
+				f'pattern must be <machine>/<subvol>, got {pattern!r}')
+		machine, subvol = pattern.split('/', 1)
+		if not machine or not subvol:
+			raise click.ClickException(
+				f'invalid backup policy {policy_path}:{lineno}: '
+				f'pattern must have non-empty machine and subvol components')
+		if any(component != '*' and '*' in component
+			   for component in (machine, subvol)):
+			raise click.ClickException(
+				f'invalid backup policy {policy_path}:{lineno}: '
+				'wildcards must be a complete component')
+		rules.append((refuse_not, machine, subvol))
+
+	return tuple(rules)
+
+
+def _read_backup_policy(target_fs, sshstr=None):
+	"""Read the optional destination-side backup selection policy.
+
+	The policy lives at ``<target_fs>/.bfg/backups``.  If the file is absent,
+	all backup destinations are accepted for compatibility with existing disks.
+
+	Each non-empty line is either ``refuse <machine>/<subvol>`` or
+	``refuse not <machine>/<subvol>``.  A component may be exactly ``*``.  The
+	first slash separates the machine from the subvolume, so a subvolume name
+	that itself contains slashes remains addressable.  With ``sshstr`` supplied,
+	the same file is read from the remote target filesystem.
+	"""
+	policy_path = Path(target_fs) / '.bfg' / 'backups'
+	if sshstr is not None:
+		remote_path = shlex.quote(str(policy_path))
+		remote_command = f'if test -f {remote_path}; then cat {remote_path}; else exit 3; fi'
+		try:
+			contents = co(shlex.split(f'{sshstr} {shlex.quote(remote_command)}'))
+		except subprocess.CalledProcessError as e:
+			if e.returncode == 3:
+				return ()
+			raise click.ClickException(
+				f'cannot read remote backup policy {policy_path}: {e}')
+		return _parse_backup_policy(contents, policy_path)
+
+	if not policy_path.exists():
+		return ()
+	if not policy_path.is_file():
+		raise click.ClickException(
+			f'backup policy path exists but is not a regular file: {policy_path}')
+
+	try:
+		contents = policy_path.read_text(encoding='utf-8')
+	except OSError as e:
+		raise click.ClickException(f'cannot read backup policy {policy_path}: {e}')
+	return _parse_backup_policy(contents, policy_path)
+
+
+def _backup_destination_matches(rule, machine, subvol):
+	refuse_not, rule_machine, rule_subvol = rule
+	matches = ((rule_machine == '*' or rule_machine == machine) and
+			   (rule_subvol == '*' or rule_subvol == subvol))
+	return not matches if refuse_not else matches
+
+
+def _backup_destination_allowed(policy, machine, subvol):
+	"""Return whether a destination backup path is permitted by *policy*."""
+	return not any(_backup_destination_matches(rule, machine, subvol)
+				   for rule in policy)
 
 
 def _free_bytes(path):
@@ -531,7 +631,13 @@ def get_filesystems():
 	return fss
 
 
-def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, snapshot_only=False):
+def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune,
+							  snapshot_only=False, backup_policy=None):
+	# Snapshot-only mode has no destination and deliberately never consults the
+	# policy. Local and remote transfers read it from their respective targets.
+	if backup_policy is None:
+		backup_policy = () if snapshot_only else _read_backup_policy(
+			target_fs, None if local else sshstr)
 	for fs in fss:
 		if fs.get('snapshot_only') and not snapshot_only:
 			continue
@@ -555,11 +661,15 @@ def transfer_btrfs_subvolumes(sshstr, sshstr2, fss, target_fs, local, prune, sna
 					ccs(f"""bfg --YES=true {sshstr2} push --SUBVOL={subvol_path} --REMOTE_SUBVOL={remote_subvol_path} """)
 				continue
 			name = subvol['name']
-			print('BACKUP ' + toplevel + '/' + name)
 			source_path = subvol['source_path']
 			target_dir = subvol['target_dir']
 			target_subvol_name = name if name != '/' else toplevel.replace('/', '_') + '_root'
 			subvol_path = Path(f"{toplevel}/{source_path}{name}")
+			if (not snapshot_only and
+				not _backup_destination_allowed(backup_policy, target_dir, target_subvol_name)):
+				print(f'SKIP refused backup destination {target_dir}/{target_subvol_name}')
+				continue
+			print('BACKUP ' + toplevel + '/' + name)
 			#ccs(f"""date""")
 			if snapshot_only:
 				# Mode 1: Only create local snapshots
@@ -634,20 +744,26 @@ import grp
 
 
 def backup_vpss(target_fs):
+	backup_policy = _read_backup_policy(target_fs)
 	with open(os.path.expanduser('/d/sync/jj/secrets.json'), 'r') as f:
 		for cloud_host in json5.load(f)['vpss']:
 			if isinstance(cloud_host, dict):
 				# New schema with filesystem specifications
-				backup_vps_with_fs(target_fs, cloud_host)
+				backup_vps_with_fs(target_fs, cloud_host, backup_policy)
 			else:
 				# Legacy string format
-				backup_vps(target_fs, cloud_host)
+				backup_vps(target_fs, cloud_host, backup_policy)
 
 
 
-def backup_vps(target_fs, cloud_host):
+def backup_vps(target_fs, cloud_host, backup_policy=None):
 
 	where = pathlib.Path(f"{target_fs}/backups/{cloud_host}/root")
+	if backup_policy is None:
+		backup_policy = _read_backup_policy(target_fs)
+	if not _backup_destination_allowed(backup_policy, cloud_host, 'root'):
+		print(f'SKIP refused backup destination {cloud_host}/root')
+		return
 
 	#os.makedirs(where.parent, exist_ok=True)
 	ccs(f'sudo mkdir -p {where.parent}')
@@ -663,10 +779,12 @@ def backup_vps(target_fs, cloud_host):
 	ccs(f'bfg local_commit --SUBVOL={where}')
 
 
-def backup_vps_with_fs(target_fs, host_config):
+def backup_vps_with_fs(target_fs, host_config, backup_policy=None):
 	"""Backup VPS with filesystem specifications using bfg remote_commit_and_pull."""
 	host = host_config['host']
 	fss = host_config['fss']
+	if backup_policy is None:
+		backup_policy = _read_backup_policy(target_fs)
 	
 	log.info(f"Backing up {host} with {len(fss)} filesystems")
 	
@@ -684,6 +802,9 @@ def backup_vps_with_fs(target_fs, host_config):
 			remote_subvol = Path(toplevel) / subvol if subvol != '/' else Path(toplevel)
 			subvol_name = subvol if subvol != '/' else toplevel.replace('/', '_') + '_root'
 			local_backup_path = Path(target_fs) / 'backups' / host / subvol_name
+			if not _backup_destination_allowed(backup_policy, host, subvol_name):
+				print(f'SKIP refused backup destination {host}/{subvol_name}')
+				continue
 			
 			log.info(f"Remote commit and pull: {remote_subvol} -> {local_backup_path}")
 			
