@@ -123,20 +123,24 @@ def vpss(source, target_fs, quick, prune):
 	_run_backup(source=source, target_machine=None, target_fs=target_fs, local=True, quick=quick, prune=prune, snapshot_only=False, vpss=True)
 
 @cli.command()
-@click.option('--fs', default=None,
+@click.option('--fs', '--disk', default=None,
 			  help='Only clean this filesystem (toplevel mount path, e.g. /bac20). '
 				   'The db is still refreshed for all mounted filesystems so shared-parent '
 				   'protection sees the full picture. Default: clean all mounted filesystems.')
+@click.option('--subvol', default=None,
+			  help='Only clean this configured source subvolume (full path, e.g. /d2/home). '
+				   'With --min-free, delete only its snapshots until the filesystem reaches the target.')
 @click.option('--percent', default=30.0, type=float, help='Percentage of oldest snapshots to clean (default 30)')
 @click.option('--min-free', default=None,
-			  help='Instead of percent-of-series, delete oldest unprotected snapshots fs-wide only '
-				   'until this much space is free (e.g. 500G, 2T). Filesystems already above the '
-				   'target are skipped entirely, prune included. Idempotent - safe to re-run/cron.')
+			  help='Instead of percent-of-series, delete oldest unprotected snapshots only '
+				   'until this much filesystem space is free (e.g. 500G, 2T). With --subvol, only its '
+				   'snapshots are eligible and retention pruning is skipped. Filesystems already above '
+				   'the target are skipped entirely. Idempotent - safe to re-run/cron.')
 @click.option('--dry-run', is_flag=True, help='Only report what would be cleaned, delete nothing')
-def clean(fs, percent, min_free, dry_run):
+def clean(fs, subvol, percent, min_free, dry_run):
 	"""Aggressively clean old local snapshots, keeping only those needed as shared parents for future incremental sends."""
 	print(f'Clean old snapshots - fs={fs}, percent={percent}, min_free={min_free}, dry_run={dry_run}')
-	_run_clean(only_fs=fs, percent=percent, min_free=min_free, dry_run=dry_run)
+	_run_clean(only_fs=fs, only_subvol=subvol, percent=percent, min_free=min_free, dry_run=dry_run)
 
 @cli.command()
 @click.option('--source', default='host', help='Source to backup')
@@ -243,7 +247,7 @@ def _free_bytes(path):
 	return st.f_bavail * st.f_frsize
 
 
-def _run_clean(only_fs=None, percent=30.0, min_free=None, dry_run=False):
+def _run_clean(only_fs=None, percent=30.0, min_free=None, dry_run=False, only_subvol=None):
 	"""
 	Aggressively clean old local snapshots on this machine's source filesystems.
 
@@ -259,6 +263,9 @@ def _run_clean(only_fs=None, percent=30.0, min_free=None, dry_run=False):
 
 	With only_fs set (a toplevel mount path from get_filesystems), only that filesystem is
 	pruned/cleaned. The db refresh still covers all mounted filesystems.
+	With only_subvol set, only that configured source subvolume is pruned/cleaned.
+	Combined with min_free, skip retention pruning and clean only its snapshots
+	until the filesystem reaches the target or eligible snapshots run out.
 	"""
 	print(f'_run_clean: only_fs = {only_fs}, percent = {percent}, min_free = {min_free}, dry_run = {dry_run}')
 
@@ -278,6 +285,23 @@ def _run_clean(only_fs=None, percent=30.0, min_free=None, dry_run=False):
 				param_hint='--fs')
 	else:
 		to_clean = mounted
+
+	if only_subvol is not None:
+		wanted_subvol = Path(only_subvol).resolve()
+		selected = []
+		for fs in to_clean:
+			if fs.get('transfer_only'):
+				continue
+			subvols = [subvol for subvol in fs['subvols']
+				if not subvol.get('just_push') and
+				Path(f"{fs['toplevel']}/{subvol['source_path']}{subvol['name']}").resolve() == wanted_subvol]
+			if subvols:
+				selected.append({**fs, 'subvols': subvols})
+		if not selected:
+			raise click.BadParameter(
+				f'{only_subvol} is not a configured source subvolume on a selected mounted filesystem',
+				param_hint='--subvol')
+		to_clean = selected
 
 	if min_free:
 		# goal-based mode exists to maintain a free-space floor, so a filesystem already
@@ -342,6 +366,10 @@ def _run_clean(only_fs=None, percent=30.0, min_free=None, dry_run=False):
 				name = subvol['name']
 				source_path = subvol['source_path']
 				subvol_path = Path(f"{toplevel}/{source_path}{name}")
+				if only_subvol is not None and min_free:
+					print('CLEAN ' + str(subvol_path))
+					ccs(f"bfg clean_local --DB={_use_db} --YES=true --MIN_FREE={shlex.quote(min_free)}{dry} --SUBVOL={shlex.quote(str(subvol_path))} ")
+					continue
 				# first thin the history with the normal time-based retention policy, then
 				# (below) aggressively drop old snapshots.
 				print('PRUNE ' + str(subvol_path))
@@ -350,7 +378,7 @@ def _run_clean(only_fs=None, percent=30.0, min_free=None, dry_run=False):
 					print('CLEAN ' + str(subvol_path))
 					ccs(f"""bfg clean_local --DB={_use_db} --YES=true --PERCENT={percent}{dry} --SUBVOL={subvol_path} """)
 
-			if min_free:
+			if min_free and only_subvol is None:
 				# goal-based cleaning covers the whole fs at once (series discovery also
 				# finds the flat local snapshot layout)
 				print('CLEAN FS ' + toplevel)

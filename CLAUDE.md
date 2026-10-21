@@ -10,6 +10,7 @@
 - **IMPORTANT**: Always set intentions before starting new features or bug fixes using `intention add`
 
 ## Code Style
+- Dont Repeat Yourself!
 - Indentation: Tabs for Python, 4 spaces for bash scripts
 - Naming: snake_case for functions/variables, CamelCase for classes
 - Imports: Group standard library first, then third-party, then local modules
@@ -17,14 +18,12 @@
 - Line length: Keep under 100 characters when possible
 
 ## File Organization
-- Python scripts: Place in `/src/hackery2/bin/`
+- Python scripts: Place in `/src/hackery2/lib/` (preferred) or `/src/hackery2/bin/`
 - Fish functions: Place in `/setup/data/fish/functions/`
 - Configuration files: Place in `/setup/data/`
 - Project modules: Create descriptive folders in `/data/`
 
 ## Python Best Practices
 - Error handling: Use specific exceptions with informative messages
-- Documentation: Add docstrings for classes and complex functions
 - Shell commands: Use `subprocess` module with proper error handling
-- Parameters: Use argument parser for scripts with multiple options
-- Project structure: Keep files focused on single responsibility
+- Parameters: Use argument parser for scripts with multiple options, prefer python click

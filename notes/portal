@@ -1,0 +1,16 @@
+
+
+ sudo update-alternatives --install /usr/bin/editor editor /usr/bin/mcedit 20
+ sudo update-alternatives --config editor
+---
+  systemctl --user edit plasma-xdg-desktop-portal-kde.service
+
+  [Service]
+  InaccessiblePaths=/path/to/external-drive
+
+  Then:
+
+  systemctl --user daemon-reload
+  systemctl --user restart plasma-xdg-desktop-portal-kde.service
+
+

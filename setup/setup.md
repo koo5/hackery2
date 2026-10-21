@@ -86,7 +86,7 @@ sudo apt install -y mc htop tmux screen iotop jnettop net-tools ufw openssh-serv
 # https://gitlab.com/volian/nala
 
 git clone https://github.com/koo5/hackery2.git
-bash ~/hackery2/src/hackery2/install.sh
+bash ~/hackery2/install.sh
 sudo ~/hackery2/setup/data/mc/setup.sh
 sudo apt install python3-virtualenv
 

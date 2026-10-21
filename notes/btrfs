@@ -1,0 +1,1 @@
+btrfs filesystem defragment -v /var/lib/libvirt/images/nocow_vms/vm_disk.raw
