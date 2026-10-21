@@ -4,7 +4,7 @@
     vm_cpu_arbiter.py --experiments dev4_3=http://192.168.122.31:18079 --production dev44=http://192.168.122.3:18079
 
 The operator, 2026-10-18: one service on the host. The DESKTOP sets the budget -- 100 % of the host's physical cores
-when nobody is at it (xprintidle >= --idle-after-s, the luigi_toggler mechanism), --active-budget % (25) when someone
+when nobody is at it (xprintidle >= --cpu-idle-after-s, the luigi_toggler mechanism), --active-budget % (25) when someone
 is; no margin (that belongs to the topology). The ARBITER splits it: the experiments VM may use all of it, the
 production VM what the experiments VM leaves.
 
@@ -25,7 +25,8 @@ Logs the budget on every change and each VM's line every --log-every-s.
 
 THE CARD (polaris, the RX 580 that also drives the desktop; STORAGE 2026-10-18, hillview infra/units/host/USAGE-SHAPING.md):
 --gpu-shaper-socket PATH (polaris-gpu's control socket, /temp/recon-worker/gpu-shaper.sock as the HOST sees it) gets a
-vote every tick as source `desktop`: `offload` while someone is at the desktop, `run` when it is idle, with --ttl-s, so
+vote every tick as source `desktop`: `offload` while someone is at the desktop (xprintidle < --polaris-idle-after-s),
+`run` when it is idle, with --ttl-s, so
 a dead arbiter's vote lapses and the card goes back to the job (2026-10-19, the operator: "through a socket rather than
 the filesystem"; the mode file it replaced was never written -- the host user could not create files in the
 container's dir). polaris-gpu takes the most restrictive live vote, so a manual `polaris-gpu set pause` still wins.
@@ -208,7 +209,10 @@ def main() -> int:
     ap.add_argument("--production", action="append", default=[], help="DOMAIN=SHAPER_URL, gets what is left")
     ap.add_argument("--host-cores", type=float, default=None, help="the budget's 100 %% (default: physical cores)")
     ap.add_argument("--active-budget", type=float, default=25, help="%% of the host while someone is at the desktop")
-    ap.add_argument("--idle-after-s", type=float, default=120)
+    ap.add_argument("--cpu-idle-after-s", type=float, default=120,
+                    help="idle seconds before CPU units regain the full host budget")
+    ap.add_argument("--polaris-idle-after-s", type=float, default=120,
+                    help="idle seconds before Polaris receives a run vote")
     ap.add_argument("--display", default=":0")
     ap.add_argument("--socket", default=os.path.join(os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}",
                                                      "vm_cpu_arbiter.sock"),
@@ -236,16 +240,18 @@ def main() -> int:
     while True:
         now = time.monotonic()
         ms = idle_ms(a.display)
-        at_desk = ms is not None and ms < a.idle_after_s * 1000
-        if card is not None and ms is not None:
-            threading.Thread(target=card.vote, args=("offload" if at_desk else "run", a.ttl_s), daemon=True).start()
+        cpu_at_desk = ms is not None and ms < a.cpu_idle_after_s * 1000
+        polaris_vote = None if ms is None else ("offload" if ms < a.polaris_idle_after_s * 1000 else "run")
+        if card is not None and polaris_vote is not None:
+            threading.Thread(target=card.vote, args=(polaris_vote, a.ttl_s), daemon=True).start()
         held = Clients.lowest()
-        pct = min(a.active_budget if at_desk else 100, 100 if held is None else held)
+        pct = min(a.active_budget if cpu_at_desk else 100, 100 if held is None else held)
         budget = cores * pct / 100
-        state = (at_desk, held)
+        state = (cpu_at_desk, polaris_vote, held)
         if state != present:
-            log.info("desktop %s (idle %s ms), clients' lowest %s: budget %.1f cores (%g %%)",
-                     "ACTIVE" if at_desk else "idle", ms, held, budget, pct)
+            log.info("desktop idle %s ms: CPU %s, Polaris %s, clients' lowest %s: budget %.1f cores (%g %%)",
+                     ms, "ACTIVE" if cpu_at_desk else "idle", polaris_vote or "no vote (idle data unavailable)",
+                     held, budget, pct)
             present = state
         for v in exp + prod:
             v.measure(now, a.smooth)
