@@ -45,6 +45,7 @@ from urllib.parse import parse_qs, urlsplit
 
 
 PROJECTS_DIR = Path.home() / ".claude" / "projects"
+SESSION_UUID_INDEX_CACHE = {}
 
 
 def slugify(path: str) -> str:
@@ -180,18 +181,23 @@ def render_content(content, full: bool, show_thinking: bool) -> list[str]:
 	return lines
 
 
-def load_sessions(sdir: Path, session_id=None):
+def load_sessions(sdir: Path, session_id=None, recovery_warnings=None,
+		recovered_ancestors=None):
 	"""Return list of (session_id, jsonl_path, [conv_records], {all_uuids_in_file}).
 
 	conv_records are filtered to user / assistant / summary. all_uuids_in_file
 	covers every line so we can tell when a parent is a non-conversational
 	record (e.g. SessionStart progress hook) in the same file vs. truly
 	from another session."""
+	selected_files = session_files(sdir, session_id)
 	sessions = []
-	for jf in session_files(sdir, session_id):
+	compact_boundaries = []
+	boundaries_by_file = {}
+	for jf in selected_files:
 		sid = jf.stem
 		records = []
 		all_uuids = set()
+		file_boundaries = []
 		with jf.open() as fh:
 			for line in fh:
 				line = line.strip()
@@ -204,10 +210,143 @@ def load_sessions(sdir: Path, session_id=None):
 				u = d.get("uuid")
 				if u:
 					all_uuids.add(u)
+				if d.get("type") == "system" and d.get("subtype") == "compact_boundary":
+					file_boundaries.append(d)
 				if d.get("type") in ("user", "assistant", "summary"):
 					records.append(d)
 		if records:
 			sessions.append((sid, jf, records, all_uuids))
+		if file_boundaries:
+			compact_boundaries.extend(file_boundaries)
+			boundaries_by_file[jf] = file_boundaries
+	if compact_boundaries:
+		# Compaction can leave only a compact_boundary record plus a summary in
+		# the resumed file. Search by UUID so unrelated, very large session logs
+		# do not all need to be parsed.
+		def index_source(source):
+			stat = source.stat()
+			cache_key = (stat.st_mtime_ns, stat.st_size)
+			cached = SESSION_UUID_INDEX_CACHE.get(source)
+			if cached and cached[0] == cache_key:
+				return cached[1]
+			by_uuid = {}
+			with source.open() as fh:
+				for line in fh:
+					try:
+						rec = json.loads(line)
+					except json.JSONDecodeError:
+						continue
+					uuid = rec.get("uuid")
+					if not uuid:
+						continue
+					if rec.get("type") not in ("user", "assistant", "summary"):
+						rec = {key: rec.get(key) for key in (
+							"uuid", "parentUuid", "type", "subtype",
+							"logicalParentUuid", "timestamp", "compactMetadata")}
+					by_uuid.setdefault(uuid, rec)
+			SESSION_UUID_INDEX_CACHE[source] = (cache_key, by_uuid)
+			return by_uuid
+
+		def find_ancestor(uuid, preferred_source, current_source, current_records):
+			# Duplicate message UUIDs can have different parentUuid links in a
+			# compacted continuation and its older source log. Follow one source
+			# file consistently instead of switching to the selected copy midway.
+			if preferred_source and preferred_source != current_source:
+				rec = index_source(preferred_source).get(uuid)
+				if rec:
+					return rec, preferred_source
+			if preferred_source == current_source and uuid in current_records:
+				return current_records[uuid], current_source
+			if preferred_source and preferred_source != current_source:
+				if uuid in current_records:
+					return current_records[uuid], current_source
+			needle = f'"uuid":"{uuid}"'
+			matches = subprocess.run(
+				["rg", "-l", "-0", "-F", "--glob", "*.jsonl", needle, str(sdir)],
+				capture_output=True, check=False,
+			)
+			candidates = [Path(raw.decode()) for raw in matches.stdout.split(b"\0") if raw]
+			candidates.sort(key=lambda path: (path == current_source, -path.stat().st_size))
+			for source in candidates:
+				rec = index_source(source).get(uuid)
+				if rec:
+					return rec, source
+			return None, None
+		for _sid, jf, records, all_uuids in sessions:
+			file_boundaries = boundaries_by_file.get(jf)
+			if not file_boundaries:
+				continue
+			present = {r.get("uuid") for r in records if r.get("uuid")}
+			record_by_uuid = {r.get("uuid"): r for r in records if r.get("uuid")}
+			ancestors = {}
+			for boundary in file_boundaries:
+				parent = boundary.get("logicalParentUuid")
+				seen = set()
+				missing_parent = None
+				preferred_source = None
+				while parent and parent not in seen:
+					seen.add(parent)
+					rec, preferred_source = find_ancestor(
+						parent, preferred_source, jf, record_by_uuid)
+					if rec is None:
+						missing_parent = parent
+						break
+					ancestors[parent] = rec
+					if rec.get("type") == "system" \
+							and rec.get("subtype") == "compact_boundary":
+						parent = rec.get("logicalParentUuid")
+					else:
+						parent = rec.get("parentUuid")
+				if missing_parent:
+					if recovery_warnings is not None:
+						metadata = boundary.get("compactMetadata") or {}
+						preserved = metadata.get("preservedSegment") or {}
+						preserved_ids = ", ".join(
+							f"{key}={preserved[key]}"
+							for key in ("headUuid", "anchorUuid", "tailUuid")
+							if preserved.get(key)
+						) or "not recorded"
+						recovery_warnings.append(
+							f"session {short(jf.stem)}: compacted history could not be fully recovered.\n"
+							f"  The compaction boundary at {boundary.get('timestamp', 'unknown time')} "
+							f"is recorded in this same session file; this does not mean the earlier "
+							f"conversation had a different session ID or that the file was overwritten.\n"
+							f"  Ancestor lookup stopped at {missing_parent}: no record with that UUID "
+							f"was found in the current project session logs. The UUID may still exist "
+							f"in a backup.\n"
+							f"  Backup search clues: logicalParentUuid={boundary.get('logicalParentUuid')}; "
+							f"boundaryUuid={boundary.get('uuid')}; preserved {preserved_ids}.\n"
+							f"  Search older copies/snapshots of ~/.claude/projects for any of those "
+							f"full UUIDs, especially the logical parent. If found, restore or copy the "
+							f"matching JSONL into this project’s session directory and rerun cc_sessions."
+						)
+			# Parent links run newest to oldest; prepend in transcript order.
+			if ancestors:
+				if recovered_ancestors is not None:
+					recovered_ancestors.extend(ancestors.values())
+				recovered = sorted(
+					(r for r in ancestors.values()
+						if r.get("type") in ("user", "assistant", "summary")
+						and r.get("uuid") not in present),
+					key=lambda r: r.get("timestamp", ""),
+				)
+				records[:0] = recovered
+				all_uuids.update(ancestors)
+			if recovery_warnings is not None and not missing_parent:
+				added = sum(
+					1 for rec in ancestors.values()
+					if rec.get("type") in ("user", "assistant", "summary")
+					and rec.get("uuid") not in present
+				)
+				recovery_warnings.append(
+					f"INFO: session {short(jf.stem)}: compaction boundary at "
+					f"{boundary.get('timestamp', 'unknown time')} points to logical parent "
+					f"{boundary.get('logicalParentUuid')}. The local parent chain is intact; "
+					f"recovered {added} earlier conversation records absent from this session file."
+					+ (" The compacted messages may only remain in backups; search older "
+						"~/.claude/projects snapshots for the logical parent and preserved UUIDs."
+						if added == 0 else "")
+				)
 	return sessions
 
 
@@ -395,7 +534,8 @@ def msg_oneline(rec, maxlen: int = 90) -> str:
 	return f"{tag} {gist}" if gist else tag
 
 
-def build_message_graph(sdir: Path, is_node=None, session_id=None):
+def build_message_graph(sdir: Path, is_node=None, session_id=None,
+		recovered_records=None):
 	"""Dedup every message across all session files into one conversation DAG.
 
 	`is_node(record)` selects which records become graph nodes (default: every
@@ -424,9 +564,26 @@ def build_message_graph(sdir: Path, is_node=None, session_id=None):
 				u = d.get("uuid")
 				if not u:
 					continue
-				link.setdefault(u, d.get("parentUuid"))
+				parent = (d.get("logicalParentUuid")
+					if d.get("type") == "system"
+					and d.get("subtype") == "compact_boundary"
+					else d.get("parentUuid"))
+				link.setdefault(u, parent)
 				if is_node(d):
 					nodes.setdefault(u, d)
+	if recovered_records:
+		for d in recovered_records:
+			u = d.get("uuid")
+			if not u:
+				continue
+			# The recovered copy comes from the source lineage. It carries the
+			# authoritative parent link when a continuation copied this UUID.
+			link[u] = (d.get("logicalParentUuid")
+				if d.get("type") == "system"
+				and d.get("subtype") == "compact_boundary"
+				else d.get("parentUuid"))
+			if is_node(d):
+				nodes.setdefault(u, d)
 
 	def nearest_node_ancestor(u):
 		p = link.get(u)
@@ -544,12 +701,15 @@ def analyze_graph(sdir: Path, full: bool = False, session_id=None,
 	predicate = None if full else is_prompt
 	if view is not None:
 		predicate = lambda rec: visible_record(rec, view, thinking) is not None
-	nodes, parent_of = build_message_graph(sdir, predicate, session_id)
+	recovered = []
+	sessions = load_sessions(sdir, session_id, recovered_ancestors=recovered)
+	nodes, parent_of = build_message_graph(
+		sdir, predicate, session_id, recovered_records=recovered)
 	if view is not None:
 		nodes = {uuid: visible_record(rec, view, thinking) for uuid, rec in nodes.items()}
 
 	custom, ai = load_titles(sdir, session_id)
-	opening = {sid: session_title(recs) for sid, _jf, recs, _ in load_sessions(sdir, session_id)}
+	opening = {sid: session_title(recs) for sid, _jf, recs, _ in sessions}
 
 	def title_for(sid):
 		return custom.get(sid) or ai.get(sid) or opening.get(sid, "")
@@ -1055,7 +1215,10 @@ def serve_html(sdir: Path, full: bool = False, port: int = 8000,
 			if path.startswith("/msg/"):
 				# Reader pane content, looked up fresh across every message
 				# (not just the graph's nodes) so it works in either zoom.
-				nodes, _ = build_message_graph(sdir, session_id=active_id)
+				recovered = []
+				load_sessions(sdir, active_id, recovered_ancestors=recovered)
+				nodes, _ = build_message_graph(
+					sdir, session_id=active_id, recovered_records=recovered)
 				rec = nodes.get(path[len("/msg/"):])
 				if rec is not None:
 					rec = visible_record(rec, active_view, active_thinking)
@@ -1342,10 +1505,16 @@ def main():
 	if args.serve is not None:
 		return serve_html(sdir, args.full, args.serve, args.id, args.view, args.thinking)
 
-	sessions = load_sessions(sdir, args.id)
+	recovery_warnings = []
+	sessions = load_sessions(sdir, args.id, recovery_warnings)
 	if not sessions:
 		print(f"(no conversational records in {sdir})", file=sys.stderr)
 		return 1
+	for warning in recovery_warnings:
+		kind = "info" if warning.startswith("INFO: ") else "warning"
+		message = warning.removeprefix("INFO: ")
+		stream = sys.stdout if kind == "info" else sys.stderr
+		print(f"{kind}: {message.replace(chr(10), chr(10) + '  ')}", file=stream)
 
 	# Sort sessions by earliest timestamp so oldest prints first.
 	sessions.sort(key=lambda s: first_ts(s[2]))
