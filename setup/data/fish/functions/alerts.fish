@@ -4,10 +4,10 @@ function alerts --description 'Show alerts raised by background jobs on any sync
     # here rather than shelling out to it, so the identical glob in fish_prompt
     # stays fork-free on every prompt.
     set -l max 5
-    set -l files /d/sync/jj/host/*/alerts/*.alert
+    set -l files /d/sync/jj/host/*/alerts/*.alert /d/shared/*/alerts/*.alert
 
     for f in $files
-        set -l m (string match -r '/host/([^/]+)/alerts/(.+)\.alert$' $f)
+        set -l m (string match -r '/([^/]+)/alerts/(.+)\.alert$' $f)
         set -l host $m[2]
         set -l name $m[3]
 
