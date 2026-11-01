@@ -42,10 +42,19 @@ function fish_prompt --description 'Informative prompt'
         # Pending alerts from every synced host (run `alerts` to read them).
         # An unmatched glob assigns empty silently, so the usual case of having
         # no alerts costs no subprocess -- `count` is a builtin.
-        set -l alert_files /d/sync/jj/host/*/alerts/*.alert
+        set -l alert_files /d/sync/jj/host/*/alerts/*.alert /d/shared/dev44/alerts/*.alert /d2/u/shared/dev4/alerts/*.alert
+        set -l n_alerts (count $alert_files)
+        # and a VM's heartbeat past its age (alert.py stale_heartbeats; line 1 is that age in
+        # seconds): read, path and math are builtins, so this stays fork-free too
+        for hb in /d/shared/dev44/alerts/*.heartbeat /d2/u/shared/dev4/alerts/*.heartbeat
+            read -l limit < $hb
+            if test (path mtime -R $hb) -gt $limit
+                set n_alerts (math $n_alerts + 1)
+            end
+        end
         set -l alert_seg ""
-        if test (count $alert_files) -gt 0
-            set alert_seg (set_color -o yellow)" ⚠"(count $alert_files)(set_color normal)
+        if test $n_alerts -gt 0
+            set alert_seg (set_color -o yellow)" ⚠"$n_alerts(set_color normal)
         end
 
         printf '[%s]%s %s%s@%s %s%s%s%s %s%s%s\n \n' (date "+%H:%M:%S") $alert_seg (set_color brblue) \
