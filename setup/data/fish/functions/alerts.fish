@@ -7,7 +7,7 @@ function alerts --description 'Show alerts raised by background jobs on any sync
     set -l files /d/sync/jj/host/*/alerts/*.alert /d/shared/*/alerts/*.alert
 
     for f in $files
-        set -l m (string match -r '/([^/]+)/alerts/(.+)\.alert$' $f)
+        set -l m (string match -r '/(?:host|shared)/([^/]+)/alerts/(.+)\.alert$' $f)
         set -l host $m[2]
         set -l name $m[3]
 
@@ -29,6 +29,24 @@ function alerts --description 'Show alerts raised by background jobs on any sync
 
         set_color brblack
         echo "  $f"
+        set_color normal
+    end
+
+    # A VM's heartbeat past its age (alert.py stale_heartbeats): line 1 the age in seconds, line 2 the text.
+    for hb in /d/shared/dev44/alerts/*.heartbeat /d2/u/shared/dev4/alerts/*.heartbeat
+        set -l body (cat $hb)
+        set -l age (path mtime -R $hb)
+        test $age -gt $body[1]; or continue
+        set -l m (string match -r '/shared/([^/]+)/alerts/(.+)\.heartbeat$' $hb)
+
+        set_color -o yellow
+        echo "⚠ $m[2]/$m[3] heartbeat stale"
+        set_color normal
+        printf '  last beat %d min ago (an alert past %d min)\n' (math -s0 $age / 60) (math -s0 $body[1] / 60)
+        printf '  %s\n' $body[2..-1]
+
+        set_color brblack
+        echo "  $hb"
         set_color normal
     end
 end

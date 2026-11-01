@@ -19,7 +19,9 @@ process scanning), smoothed over a few seconds -- on 10-18 dev44's guest showed 
 any fixed ratio, so each VM's level is a feedback loop: over its allowance -> level scaled down by allowance/cost,
 well under -> raised 10 %. Levels go to each VM's cpu_shaper (hillview enrich/recon/cpu_shaper.py) as source
 `host-arbiter`, ttl --ttl-s, so a dead arbiter's caps lift by themselves; the shaper applies the LOWEST live vote.
-Every vote also carries desktop_idle_s (seconds since the last desktop input, or null when xprintidle fails).
+Every vote also carries desktop_idle_s (seconds since the last desktop input, or null when xprintidle fails) and
+desktop_vt, the foreground virtual console (what `sudo fgconsole` prints; read from /sys/class/tty/tty0/active, which
+needs no root and no sudo line in the auth log every tick), or null when it cannot be read.
 The VM keeps this telemetry in memory for min(ttl_s, 60) seconds and serves GET /desktop-idle.
 Logs the budget on every change and each VM's line every --log-every-s.
 
@@ -60,6 +62,16 @@ def idle_ms(display: str) -> int | None:
         return int(subprocess.check_output(["xprintidle"], env={**os.environ, "DISPLAY": display}, timeout=2))
     except (subprocess.SubprocessError, OSError, ValueError):
         return None
+
+
+def foreground_vt() -> int | None:
+    """the foreground virtual console's number, as fgconsole prints it (the kernel names it: tty7 -> 7)"""
+    try:
+        with open("/sys/class/tty/tty0/active") as f:
+            name = f.read().strip()
+    except OSError:
+        return None
+    return int(name[3:]) if name.startswith("tty") and name[3:].isdigit() else None
 
 
 MACHINES = "/sys/fs/cgroup/machine.slice"
@@ -187,10 +199,10 @@ class VM:
         elif self.cost < 0.85 * allowance:
             self.level = min(100.0, self.level * 1.1 + 1)
 
-    def vote(self, ttl_s: int, desktop_idle_s: float | None) -> None:
+    def vote(self, ttl_s: int, desktop_idle_s: float | None, desktop_vt: int | None) -> None:
         level = int(round(self.level / 5) * 5)                    # steps of 5: the shapers re-apply on change only
         body = json.dumps({"level": level, "source": "host-arbiter", "ttl_s": ttl_s,
-                           "desktop_idle_s": desktop_idle_s}).encode()
+                           "desktop_idle_s": desktop_idle_s, "desktop_vt": desktop_vt}).encode()
         req = urllib.request.Request(self.url, data=body, method="POST", headers={"Content-Type": "application/json"})
         try:
             urllib.request.urlopen(req, timeout=2).read()
@@ -240,6 +252,7 @@ def main() -> int:
     while True:
         now = time.monotonic()
         ms = idle_ms(a.display)
+        vt = foreground_vt()
         cpu_at_desk = ms is not None and ms < a.cpu_idle_after_s * 1000
         polaris_vote = None if ms is None else ("offload" if ms < a.polaris_idle_after_s * 1000 else "run")
         if card is not None and polaris_vote is not None:
@@ -247,10 +260,10 @@ def main() -> int:
         held = Clients.lowest()
         pct = min(a.active_budget if cpu_at_desk else 100, 100 if held is None else held)
         budget = cores * pct / 100
-        state = (cpu_at_desk, polaris_vote, held)
+        state = (cpu_at_desk, polaris_vote, held, vt)
         if state != present:
-            log.info("desktop idle %s ms: CPU %s, Polaris %s, clients' lowest %s: budget %.1f cores (%g %%)",
-                     ms, "ACTIVE" if cpu_at_desk else "idle", polaris_vote or "no vote (idle data unavailable)",
+            log.info("desktop idle %s ms, foreground vt %s: CPU %s, Polaris %s, clients' lowest %s: budget %.1f cores (%g %%)",
+                     ms, vt, "ACTIVE" if cpu_at_desk else "idle", polaris_vote or "no vote (idle data unavailable)",
                      held, budget, pct)
             present = state
         for v in exp + prod:
@@ -262,7 +275,7 @@ def main() -> int:
         for v in prod:                                 # production shares what is left
             v.steer(left / len(prod))
         for v in exp + prod:
-            threading.Thread(target=v.vote, args=(a.ttl_s, None if ms is None else ms / 1000), daemon=True).start()
+            threading.Thread(target=v.vote, args=(a.ttl_s, None if ms is None else ms / 1000, vt), daemon=True).start()
         if now - last_log >= a.log_every_s:
             log.info("budget %.1f: %s", budget, "; ".join(
                 f"{v.name} costs {v.cost:.2f} of {v.allowance:.2f} -> level {round(v.level)}" for v in exp + prod))

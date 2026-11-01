@@ -6,6 +6,16 @@ A job that hits a condition someone needs to see about writes
 t14 is visible from jj, and because each host owns its own directory there is
 nothing for two machines to conflict over.
 
+A VM on this host writes its alerts into its virtiofs share instead (dev44's
+/shared44/alerts is /d/shared/dev44/alerts): SHARES. Those are read here, not
+synced, so they show on the VM's host only.
+
+A share may also hold <name>.heartbeat: the VM's checker rewrites it on every
+finished pass, line 1 the age in seconds past which it counts as an alert,
+line 2 what to say then. An alert the VM cannot write (its share hung, the
+VM down) is otherwise no alert: the host reads the file's mtime on its own
+disk. stale_heartbeats().
+
 Two write styles coexist deliberately:
 
   raise_alert()   overwrites, and the producer clear_alert()s it once the
@@ -29,10 +39,12 @@ and from shell, where importing is not an option:
 import os
 import socket
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(os.environ.get("ALERTS_ROOT", "/d/sync/jj/host"))
+SHARES = [Path("/d/shared/dev44"), Path("/d2/u/shared/dev4")]   # <share>/alerts/<name>.alert, host = the share's name (dev4: dev4-3's /shared43, 2026-10-29)
 HOST = socket.gethostname().split(".")[0]
 
 USAGE = """usage: alert <command> [args]
@@ -42,7 +54,8 @@ USAGE = """usage: alert <command> [args]
   raise <name> <text...>   overwrite <name> (for self-healing conditions)
   append <name> <text...>  add a timestamped line to <name>, never truncating
   clear <name>             remove this host's <name> alert
-  list                     list every alert on every synced host
+  list                     list every alert on every synced host, and every
+                           share heartbeat past its age
 """
 
 
@@ -85,9 +98,21 @@ def clear_alert(name, host=None):
 def list_alerts():
     """(host, name, path) for every alert on every synced machine."""
     found = []
-    for d in sorted(ROOT.glob("*/alerts")):
+    for d in sorted(ROOT.glob("*/alerts")) + [s / "alerts" for s in SHARES if (s / "alerts").is_dir()]:
         for path in sorted(d.glob("*.alert")):
             found.append((d.parent.name, path.stem, path))
+    return found
+
+
+def stale_heartbeats():
+    """(host, name, path, age_s, text) for every share heartbeat older than its own limit."""
+    found = []
+    for s in SHARES:
+        for path in sorted((s / "alerts").glob("*.heartbeat")):
+            limit, _, text = path.read_text().partition("\n")
+            age = time.time() - path.stat().st_mtime
+            if age > int(limit):
+                found.append((s.name, path.stem, path, age, text.strip()))
     return found
 
 
@@ -109,6 +134,8 @@ def main():
         elif cmd == "list":
             for host, name, path in list_alerts():
                 print(f"{host}\t{name}\t{path}")
+            for host, name, path, age, _ in stale_heartbeats():
+                print(f"{host}\t{name} (heartbeat {age / 60:.0f} min old)\t{path}")
         else:
             sys.stderr.write(USAGE)
             return 2
